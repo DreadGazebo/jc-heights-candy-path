@@ -482,7 +482,7 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
       </div>
     </div>
     <button id="btnSummary" class="btn btn-ghost" style="width:100%;margin-top:10px">🌙 End night &amp; see haul</button>
-    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v5.3</div>
+    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v5.4</div>
     <p class="foot">Routes are estimates. Stay on sidewalks and cross at corners.</p>
   </div>
 </section>
@@ -619,9 +619,11 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
     </div>
     <p class="muted" id="sumExtra"></p>
     <div class="btns">
+      <button id="btnSumShare" class="btn btn-pur btn-xl">📸 Share my haul</button>
       <button id="btnSumNew" class="btn btn-org btn-xl">🔁 New route</button>
       <button id="btnSumClose" class="btn btn-ghost btn-xl">Back to map</button>
     </div>
+    <button id="btnSumExport" class="btn btn-ghost" style="width:100%;margin-top:8px">⬇️ Export tonight's spots (for next year's map)</button>
     <p class="foot">Routes are estimates. Stay on sidewalks and cross at corners.</p>
   </div>
 </div>
@@ -3380,6 +3382,56 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(function () {});
   });
 }
+
+/* ---------- Haul share card + season export (v5.4) ---------- */
+function drawHaulCard(cb) {
+  var cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1080;
+  var g = cv.getContext('2d');
+  var grad = g.createLinearGradient(0, 0, 0, 1080);
+  grad.addColorStop(0, '#2a1a42'); grad.addColorStop(1, '#0d0a14');
+  g.fillStyle = grad; g.fillRect(0, 0, 1080, 1080);
+  g.textAlign = 'center';
+  g.font = '190px serif'; g.fillText('🎃', 540, 300);
+  g.fillStyle = '#f5efe6'; g.font = '700 66px system-ui, sans-serif';
+  g.fillText('Halloween 2026', 540, 435);
+  g.fillStyle = '#ffb35c'; g.font = '600 38px system-ui, sans-serif';
+  g.fillText('JC Heights Candy Path', 540, 495);
+  g.fillStyle = '#ffffff'; g.font = '900 128px system-ui, sans-serif';
+  g.fillText(String(S.counts.houses), 290, 690);
+  g.fillText(String(S.counts.candy), 790, 690);
+  g.fillStyle = '#b8aed6'; g.font = '600 34px system-ui, sans-serif';
+  g.fillText('🏠 houses visited', 290, 745);
+  g.fillText('🍬 candies', 790, 745);
+  g.fillStyle = '#e8e2f2'; g.font = '600 40px system-ui, sans-serif';
+  g.fillText('👣 ' + $('sumDist').textContent + ' walked · ⏱ ' + $('sumTime').textContent + ' out', 540, 855);
+  g.fillStyle = '#b8aed6'; g.font = '500 32px system-ui, sans-serif';
+  g.fillText('📍 ' + S.pins.length + (S.pins.length === 1 ? ' spot' : ' spots') + ' logged on the crowd map', 540, 915);
+  g.fillStyle = '#8f86ad'; g.font = '500 27px system-ui, sans-serif';
+  g.fillText('dreadgazebo.github.io/jc-heights-candy-path', 540, 1015);
+  if (cv.toBlob) cv.toBlob(cb, 'image/png'); else cb(null);
+}
+$('btnSumShare').addEventListener('click', function () {
+  drawHaulCard(function (blob) {
+    if (!blob) { toast('Could not make the card on this browser.', 'err'); return; }
+    var file = null;
+    try { file = new File([blob], 'candy-path-haul-2026.png', { type: 'image/png' }); } catch (e) {}
+    if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], title: 'My Halloween haul' }).catch(function () {});
+    } else {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = 'candy-path-haul-2026.png'; a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+    }
+  });
+});
+$('btnSumExport').addEventListener('click', function () {
+  var data = { exportedAt: new Date().toISOString(), app: 'JC Heights Candy Path', counts: { houses: S.counts.houses, candy: S.counts.candy }, pins: S.pins };
+  var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'candy-path-spots-2026.json'; a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+  toast('Exported ' + S.pins.length + ' spots. Files like this seed next year’s built-in map.', 'ok');
+});
 
 </script>
 </body>
