@@ -322,6 +322,9 @@ body.light .leaflet-popup-content-wrapper{background:#ffffff;color:#2b1e35}
 body.light .leaflet-popup-tip{background:#ffffff}
 #logCard{position:fixed;left:10px;right:10px;top:calc(var(--sat) + 64px);z-index:1150;padding:12px 14px;transition:transform .25s ease,opacity .25s ease}
 body.mode-nav #logCard{top:calc(var(--sat) + 158px)}
+#moveBar{position:fixed;left:10px;right:10px;top:calc(var(--sat) + 64px);z-index:1250;padding:12px 14px;display:flex;gap:8px;align-items:center}
+#moveBar[hidden]{display:none}
+body.mode-nav #moveBar{top:calc(var(--sat) + 158px)}
 #logCard.away{transform:translateY(-14px);opacity:0}
 .lc-head{display:flex;align-items:flex-start;gap:8px}
 .lc-flags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
@@ -446,7 +449,7 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
       <button class="btn btn-ghost js-undo" aria-label="Undo last count">↩︎</button>
     </div>
     <button id="btnSummary" class="btn btn-ghost" style="width:100%;margin-top:10px">🌙 End night &amp; see haul</button>
-    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v4.6</div>
+    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v4.7</div>
     <p class="foot">Routes are estimates. Stay on sidewalks and cross at corners.</p>
   </div>
 </section>
@@ -536,6 +539,7 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
     <button class="chip lc-flag" data-flag="nonfood" aria-pressed="false">&#128153; Non-food / allergy-safe</button>
     <button class="chip lc-flag" data-flag="decor" aria-pressed="false">&#128123; Decor only</button>
   </div>
+  <div class="lc-row"><button id="lcMove" class="btn btn-ghost btn-sm" style="width:100%">✥ Pin in the wrong spot? Move it</button></div>
   <div class="lc-row" style="align-items:center;justify-content:space-between">
     <span style="font-weight:600">Candies from this stop</span>
     <span style="display:flex;gap:8px;align-items:center">
@@ -550,6 +554,11 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
   </div>
   <img id="lcThumb" hidden alt="Photo of this stop" style="max-width:120px;border-radius:10px;margin-top:6px">
   <div class="muted" style="font-size:11px;margin-top:4px">📣 Shared live with other trick-or-treaters. Swipe the card away when you're done.</div>
+</div>
+<div id="moveBar" class="card" hidden>
+  <div style="flex:1;min-width:0"><b>✥ Move the pin</b><div class="muted" style="font-size:12px">Drag it to the right house, then tap Done.</div></div>
+  <button id="mvCancel" class="btn btn-ghost btn-sm">Cancel</button>
+  <button id="mvDone" class="btn btn-sm">Done</button>
 </div>
 
 <!-- ======== end-of-night summary ======== -->
@@ -1194,6 +1203,10 @@ function renderPins() {
     del.onclick = function () {
       S.pins.splice(idx, 1); store.set('pins', S.pins); renderPins(); map.closePopup();
     };
+    var mv = document.createElement('button');
+    mv.className = 'btn btn-ghost btn-sm'; mv.textContent = '✥ Move pin';
+    mv.onclick = function () { map.closePopup(); startMovePin(p); };
+    pop.appendChild(mv);
     pop.appendChild(del);
     m.bindPopup(pop);
     m.addTo(pinLayer);
@@ -2930,16 +2943,27 @@ $('fabLog').addEventListener('click', function () {
     bumpCount('houses', null);
     if (!logCardPin) toast(logFailToast(), 'warn');
   }
-  if (S.pos && Date.now() - S.pos.ts < 60000 && S.pos.acc <= 80) { doLog(); return; }
+  if (S.pos && Date.now() - S.pos.ts < 20000 && S.pos.acc <= 25) { doLog(); return; }
   if (!navigator.geolocation) { toast('This browser cannot share location.', 'err'); return; }
-  toast('Getting your location…', 'ok');
-  navigator.geolocation.getCurrentPosition(function (pos) {
-    onPos(pos); doLog();
-  }, function (err) {
-    if (S.pos) { doLog(); return; }
-    if (err && err.code === 1) toast('Location is blocked for this site. Tap the lock or tune icon in the address bar, allow Location, then tap Log again.', 'err');
+  toast('Getting a precise fix…', 'ok');
+  var best = null, done = false, wid = null;
+  function finish() {
+    if (done) return; done = true;
+    if (wid != null) { try { navigator.geolocation.clearWatch(wid); } catch (e) {} }
+    if (best) { onPos(best); doLog(); }
+    else if (S.pos) { doLog(); }
     else toast('No GPS fix yet. Give it a few seconds outside and tap Log again.', 'err');
-  }, { enableHighAccuracy: true, timeout: 9000, maximumAge: 5000 });
+  }
+  try {
+    wid = navigator.geolocation.watchPosition(function (pos) {
+      onPos(pos);
+      if (!best || pos.coords.accuracy < best.coords.accuracy) best = pos;
+      if (pos.coords.accuracy <= 25) finish();
+    }, function (err) {
+      if (err && err.code === 1 && !done) { done = true; toast('Location is blocked for this site. Tap the lock or tune icon in the address bar, allow Location, then tap Log again.', 'err'); }
+    }, { enableHighAccuracy: true, maximumAge: 0 });
+  } catch (e) {}
+  setTimeout(finish, 7000);
 });
 $('lcCandyPlus').addEventListener('click', function () {
   lcCandy++;
@@ -2979,6 +3003,41 @@ $('lcCandyMinus').addEventListener('click', function () {
     }).catch(function () {});
   } catch (e) {}
 })();
+
+/* ---------- Move a pin (Steve, Oct 31, 2026) ----------
+   GPS pins land where the fix says, not always where the house is. Move
+   mode swaps the pin layer for one draggable marker; Done writes the
+   corrected spot back, saves, and re-shares it to the crowd map. */
+var movePin = null, moveMarker = null;
+function startMovePin(pin) {
+  if (!pin) return;
+  if (logCardPin) hideLogCard();
+  movePin = pin;
+  if (map.hasLayer(pinLayer)) map.removeLayer(pinLayer);
+  moveMarker = L.marker([pin.lat, pin.lng], {
+    draggable: true, zIndexOffset: 900,
+    icon: L.divIcon({ className: 'pinicon', iconSize: [40, 40], iconAnchor: [20, 34], html: pinIconHtml(pin.type) })
+  }).addTo(map);
+  $('moveBar').hidden = false;
+  map.panTo([pin.lat, pin.lng]);
+}
+function endMovePin(saveIt) {
+  if (!movePin || !moveMarker) { $('moveBar').hidden = true; return; }
+  if (saveIt) {
+    var ll = moveMarker.getLatLng();
+    movePin.lat = ll.lat; movePin.lng = ll.lng;
+    store.set('pins', S.pins);
+    crowdSyncPin(movePin);
+    toast('Pin moved to the right spot.', 'ok');
+  }
+  map.removeLayer(moveMarker); moveMarker = null; movePin = null;
+  if (!map.hasLayer(pinLayer)) map.addLayer(pinLayer);
+  renderPins();
+  $('moveBar').hidden = true;
+}
+$('mvDone').addEventListener('click', function () { endMovePin(true); });
+$('mvCancel').addEventListener('click', function () { endMovePin(false); });
+$('lcMove').addEventListener('click', function () { if (logCardPin) startMovePin(logCardPin); });
 
 </script>
 </body>
