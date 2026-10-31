@@ -446,7 +446,7 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
       <button class="btn btn-ghost js-undo" aria-label="Undo last count">↩︎</button>
     </div>
     <button id="btnSummary" class="btn btn-ghost" style="width:100%;margin-top:10px">🌙 End night &amp; see haul</button>
-    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v4.4</div>
+    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v4.5</div>
     <p class="foot">Routes are estimates. Stay on sidewalks and cross at corners.</p>
   </div>
 </section>
@@ -2952,6 +2952,27 @@ $('lcCandyMinus').addEventListener('click', function () {
   }
   store.set('counts', S.counts); renderCounts(null); paintLcCandy(); armLogCardTimer();
 });
+
+/* ---------- Self-update check ----------
+   Static hosts cache the page (GitHub Pages sends max-age=600), which left
+   phones running an old build after a release. On load, fetch a no-store
+   copy of this page, read its version from the footer string, and if it is
+   newer, swap to it once. */
+(function () {
+  try {
+    function vNum(v) { var p = v.replace('v', '').split('.'); return (+p[0]) * 100 + (+p[1] || 0); }
+    var mineM = document.documentElement.innerHTML.match(/Candy Path (v\d+\.\d+)/);
+    if (!mineM) return;
+    var mine = mineM[1];
+    fetch(location.pathname + '?_chk=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
+      var m = t.match(/Candy Path (v\d+\.\d+)/);
+      if (m && vNum(m[1]) > vNum(mine) && !sessionStorage.getItem('cpUpdTried')) {
+        sessionStorage.setItem('cpUpdTried', '1');
+        location.replace(location.pathname + '?u=' + encodeURIComponent(m[1]));
+      }
+    }).catch(function () {});
+  } catch (e) {}
+})();
 
 </script>
 </body>
