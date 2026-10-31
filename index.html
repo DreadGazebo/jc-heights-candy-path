@@ -324,6 +324,17 @@ body.light .leaflet-popup-tip{background:#ffffff}
 body.mode-nav #logCard{top:calc(var(--sat) + 158px)}
 #moveBar{position:fixed;left:10px;right:10px;top:calc(var(--sat) + 64px);z-index:1250;padding:12px 14px;display:flex;gap:8px;align-items:center}
 #moveBar[hidden]{display:none}
+#partyBar{position:fixed;left:10px;right:10px;top:calc(var(--sat) + 64px);z-index:1240;padding:10px 14px;display:flex;gap:8px;align-items:center}
+#partyBar[hidden]{display:none}
+body.mode-nav #partyBar{display:none}
+body.in-party #logCard{top:calc(var(--sat) + 128px)}
+body.in-party #moveBar{top:calc(var(--sat) + 128px)}
+body.in-party.mode-nav #logCard{top:calc(var(--sat) + 222px)}
+body.in-party.mode-nav #moveBar{top:calc(var(--sat) + 222px)}
+#partyBox input{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:9px 12px;color:var(--txt);margin:0 0 8px}
+.partyicon{background:none;border:0}
+.party-dot{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#171310;font-weight:800;font-size:15px;border:2.5px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.55)}
+.party-badge{position:absolute;top:-6px;right:-8px;font-size:12px}
 body.mode-nav #moveBar{top:calc(var(--sat) + 158px)}
 #logCard.away{transform:translateY(-14px);opacity:0}
 .lc-head{display:flex;align-items:flex-start;gap:8px}
@@ -448,8 +459,9 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
       <button class="btn js-house" aria-label="Add one house visited"><b class="js-house-count">0</b><span>🏠 House visited</span></button>
       <button class="btn btn-ghost js-undo" aria-label="Undo last count">↩︎</button>
     </div>
+    <div id="partyBox" style="margin-top:14px"></div>
     <button id="btnSummary" class="btn btn-ghost" style="width:100%;margin-top:10px">🌙 End night &amp; see haul</button>
-    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v4.10</div>
+    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v5.0</div>
     <p class="foot">Routes are estimates. Stay on sidewalks and cross at corners.</p>
   </div>
 </section>
@@ -564,6 +576,10 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
   <div style="flex:1;min-width:0"><b>✥ Move the pin</b><div class="muted" style="font-size:12px">Drag it to the right house, then tap Done.</div></div>
   <button id="mvCancel" class="btn btn-ghost btn-sm">Cancel</button>
   <button id="mvDone" class="btn btn-sm">Done</button>
+</div>
+<div id="partyBar" class="card" hidden>
+  <div style="flex:1;min-width:0"><b id="partyBarText">🎉 Party</b><div id="partyBarSub" class="muted" style="font-size:12px"></div></div>
+  <button id="partyLeave" class="btn btn-ghost btn-sm">Leave</button>
 </div>
 
 <!-- ======== end-of-night summary ======== -->
@@ -2835,6 +2851,7 @@ function crowdPost(rep) {
 function crowdSyncPin(pin) {
   if (!pin) return;
   crowdPost({ lat: pin.lat, lng: pin.lng, status: pin.type, note: String(pin.note || '').slice(0, 120), photo: pin.photo || null });
+  if (typeof partyOn === 'function' && partyOn()) partyPost({ kind: 'pin', lat: pin.lat, lng: pin.lng, status: pin.type, pkind: pin.kind || 'house' });
 }
 function crowdFetch() {
   if (!crowdOn()) return;
@@ -3091,6 +3108,157 @@ document.querySelectorAll('.lc-kind').forEach(function (b) {
     store.set('pins', S.pins); renderPins(); paintLogKind(); armLogCardTimer();
   });
 });
+
+/* ================= Party mode (Phase 3c, Steve Oct 31, 2026) =================
+   Room code + display name. Members share: live position dots (posted every
+   ~20 s while moving), pins (mirrored from crowdSyncPin), and haul counts.
+   Backed by the Supabase party_posts table (public read/insert, rows simply
+   age out client-side: positions 45 min, pins 6 h). */
+var PARTY = { code: '', name: '', timer: null, lastPosPost: 0, lastPosLL: null, lastCountJson: '', members: {}, counts: {} };
+var partyLayer = L.layerGroup().addTo(map);
+try { var savedParty = store.get('party', null); if (savedParty && savedParty.code) { PARTY.code = String(savedParty.code); PARTY.name = String(savedParty.name || ''); } } catch (e) {}
+function partyOn() { return !!(PARTY.code && PARTY.name && crowdOn()); }
+function partyPost(obj) {
+  if (!partyOn()) return;
+  obj.room = PARTY.code; obj.name = PARTY.name;
+  fetch(CROWD.url + '/rest/v1/party_posts', { method: 'POST', headers: crowdHeaders(), body: JSON.stringify(obj) }).catch(function () {});
+}
+function partyGenCode() {
+  var words = ['PUMPKIN', 'GHOST', 'CANDY', 'WITCH', 'TREAT', 'MOON', 'SPOOKY', 'BOO'];
+  return words[Math.floor(Math.random() * words.length)] + Math.floor(100 + Math.random() * 900);
+}
+var PARTY_COLORS = ['#f59e0b', '#38bdf8', '#4ade80', '#f472b6', '#a78bfa', '#facc15', '#fb7185', '#2dd4bf'];
+function partyColor(name) { var h = 0; for (var i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0; return PARTY_COLORS[h % PARTY_COLORS.length]; }
+function partyAge(ts) { var m = Math.max(0, Math.round((Date.now() - ts) / 60000)); return m < 1 ? 'just now' : (m + ' min ago'); }
+function partyPoll() {
+  if (!partyOn()) return;
+  fetch(CROWD.url + '/rest/v1/party_posts?room=eq.' + encodeURIComponent(PARTY.code) + '&select=*&order=created_at.desc&limit=300', { headers: crowdHeaders() })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (rows) { if (Array.isArray(rows)) partyApply(rows); })
+    .catch(function () {});
+  var cj = JSON.stringify({ h: S.counts.houses, c: S.counts.candy });
+  if (cj !== PARTY.lastCountJson) { PARTY.lastCountJson = cj; partyPost({ kind: 'count', houses: S.counts.houses, candy: S.counts.candy }); }
+}
+function partyApply(rows) {
+  var now = Date.now(), pos = {}, counts = {}, pinMap = {};
+  rows.forEach(function (r) {
+    var age = now - new Date(r.created_at).getTime();
+    if (r.kind === 'pos' && age < 45 * 60000) { if (!pos[r.name]) pos[r.name] = r; }
+    else if (r.kind === 'count') { if (!counts[r.name]) counts[r.name] = r; }
+    else if (r.kind === 'pin' && age < 6 * 3600000 && r.name !== PARTY.name) {
+      var k = Math.round(r.lat * 2000) + ',' + Math.round(r.lng * 2000) + ',' + r.status;
+      if (!pinMap[k]) pinMap[k] = r;
+    }
+  });
+  PARTY.members = pos; PARTY.counts = counts;
+  partyLayer.clearLayers();
+  Object.keys(pos).forEach(function (name) {
+    if (name === PARTY.name) return;
+    var r = pos[name];
+    var m = L.marker([r.lat, r.lng], { icon: L.divIcon({ className: 'partyicon', iconSize: [34, 34], iconAnchor: [17, 17], html: '<div class="party-dot" style="background:' + partyColor(name) + '">' + esc(name.slice(0, 1).toUpperCase()) + '</div>' }) });
+    m.bindPopup('<div class="pop"><b>' + esc(name) + '</b><br><span class="muted" style="font-size:12px">In your party · ' + partyAge(new Date(r.created_at).getTime()) + '</span></div>');
+    m.addTo(partyLayer);
+  });
+  Object.keys(pinMap).forEach(function (k) {
+    var r = pinMap[k];
+    var m = L.marker([r.lat, r.lng], { icon: L.divIcon({ className: 'pinicon', iconSize: [40, 40], iconAnchor: [20, 34], html: '<div style="position:relative">' + pinIconHtml(r.status, r.pkind) + '<span class="party-badge">🎉</span></div>' }) });
+    m.bindPopup('<div class="pop"><b>' + esc(PIN_TYPES[r.status] ? PIN_TYPES[r.status].label : 'Treat spot') + '</b><br><span class="muted" style="font-size:12px">Logged by ' + esc(r.name) + ' · ' + partyAge(new Date(r.created_at).getTime()) + '</span></div>');
+    m.addTo(partyLayer);
+  });
+  renderPartyInfo();
+}
+function partyTotals() {
+  var h = 0, c = 0, names = {};
+  Object.keys(PARTY.counts).forEach(function (n) { h += PARTY.counts[n].houses || 0; c += PARTY.counts[n].candy || 0; names[n] = 1; });
+  Object.keys(PARTY.members).forEach(function (n) { names[n] = 1; });
+  if (PARTY.name) names[PARTY.name] = 1;
+  return { houses: h, candy: c, people: Object.keys(names).length };
+}
+function renderPartyInfo() {
+  if (!partyOn()) return;
+  var t = partyTotals();
+  $('partyBarText').textContent = '🎉 Party ' + PARTY.code + ' · ' + t.people + (t.people === 1 ? ' person' : ' people');
+  $('partyBarSub').textContent = 'Party haul: ' + t.houses + ' houses · ' + t.candy + ' candies';
+  renderPartyBox();
+}
+function renderPartyBox() {
+  var box = $('partyBox'); if (!box) return;
+  if (!partyOn()) {
+    box.innerHTML = '<div class="label">🎉 Party mode</div>' +
+      '<p class="muted" style="margin:2px 0 8px;font-size:13px">Trick-or-treat together: see each other live on the map, share the spots you log, and pool your haul.</p>' +
+      '<input id="partyName" type="text" autocomplete="off" placeholder="Your name, e.g. Steve" value="' + esc(PARTY.name || '') + '">' +
+      '<div class="row2"><button id="partyStart" class="btn btn-pur">🎉 Start a party</button><button id="partyJoinBtn" class="btn btn-ghost">Join with a code</button></div>' +
+      '<div id="partyJoinRow" hidden style="margin-top:8px"><input id="partyCode" type="text" autocomplete="off" placeholder="Party code, e.g. TREAT123" style="text-transform:uppercase"><button id="partyJoinGo" class="btn btn-org" style="width:100%">Join party</button></div>';
+    $('partyStart').addEventListener('click', function () {
+      var name = $('partyName').value.trim(); if (!name) { toast('Add your name first, so your party can see who is who.', 'warn'); return; }
+      partyJoin(partyGenCode(), name);
+    });
+    $('partyJoinBtn').addEventListener('click', function () { $('partyJoinRow').hidden = false; $('partyCode').focus(); });
+    $('partyJoinGo').addEventListener('click', function () {
+      var name = $('partyName').value.trim(); if (!name) { toast('Add your name first, so your party can see who is who.', 'warn'); return; }
+      var code = $('partyCode').value.trim().toUpperCase(); if (!code) { toast('Type the party code first.', 'warn'); return; }
+      partyJoin(code, name);
+    });
+    return;
+  }
+  var t = partyTotals();
+  var list = Object.keys(PARTY.counts).map(function (n) {
+    return '<div style="display:flex;justify-content:space-between;font-size:13px;padding:2px 0"><span>' + (n === PARTY.name ? '⭐ ' : '') + esc(n) + '</span><span class="muted">' + (PARTY.counts[n].houses || 0) + ' houses · ' + (PARTY.counts[n].candy || 0) + ' candies</span></div>';
+  }).join('');
+  box.innerHTML = '<div class="label">🎉 Party ' + esc(PARTY.code) + '</div>' +
+    '<p class="muted" style="margin:2px 0 6px;font-size:13px">Share this code so your group can join. Party haul so far: <b>' + t.houses + ' houses · ' + t.candy + ' candies</b>.</p>' +
+    (list || '<p class="muted" style="font-size:13px">Counts appear as everyone logs.</p>') +
+    '<div class="row2" style="margin-top:8px"><button id="partyCopy" class="btn btn-ghost">📋 Copy code</button><button id="partyLeave2" class="btn btn-ghost">Leave party</button></div>';
+  $('partyCopy').addEventListener('click', function () {
+    if (navigator.clipboard) navigator.clipboard.writeText(PARTY.code).then(function () { toast('Party code copied: ' + PARTY.code, 'ok'); }, function () { toast('Party code: ' + PARTY.code, 'ok'); });
+    else toast('Party code: ' + PARTY.code, 'ok');
+  });
+  $('partyLeave2').addEventListener('click', partyLeave);
+}
+function partyJoin(code, name) {
+  PARTY.code = code; PARTY.name = name; PARTY.lastCountJson = '';
+  try { store.set('party', { code: code, name: name }); } catch (e) {}
+  document.body.classList.add('in-party');
+  $('partyBar').hidden = false;
+  ensureWatch();
+  if (S.pos) { PARTY.lastPosPost = Date.now(); PARTY.lastPosLL = { lat: S.pos.lat, lng: S.pos.lng }; partyPost({ kind: 'pos', lat: S.pos.lat, lng: S.pos.lng }); }
+  partyPost({ kind: 'count', houses: S.counts.houses, candy: S.counts.candy });
+  partyPoll();
+  if (PARTY.timer) clearInterval(PARTY.timer);
+  PARTY.timer = setInterval(partyTick, 20000);
+  renderPartyInfo();
+  toast('You are in party ' + code + ' 🎉 Your group can join with this code.', 'ok');
+}
+function partyLeave() {
+  PARTY.code = ''; PARTY.lastCountJson = '';
+  try { store.set('party', { code: '', name: PARTY.name }); } catch (e) {}
+  if (PARTY.timer) { clearInterval(PARTY.timer); PARTY.timer = null; }
+  partyLayer.clearLayers();
+  document.body.classList.remove('in-party');
+  $('partyBar').hidden = true;
+  renderPartyBox();
+  toast('Left the party. Your own pins and counts are unchanged.', 'ok');
+}
+function partyTick() {
+  if (!partyOn()) return;
+  if (S.pos) {
+    var moved = !PARTY.lastPosLL || haversine(S.pos, PARTY.lastPosLL) > 15;
+    if (moved || Date.now() - PARTY.lastPosPost > 60000) {
+      PARTY.lastPosPost = Date.now(); PARTY.lastPosLL = { lat: S.pos.lat, lng: S.pos.lng };
+      partyPost({ kind: 'pos', lat: S.pos.lat, lng: S.pos.lng });
+    }
+  }
+  partyPoll();
+}
+$('partyLeave').addEventListener('click', partyLeave);
+renderPartyBox();
+if (partyOn()) {
+  document.body.classList.add('in-party');
+  $('partyBar').hidden = false;
+  if (PARTY.timer) clearInterval(PARTY.timer);
+  PARTY.timer = setInterval(partyTick, 20000);
+  partyPoll();
+}
 
 </script>
 </body>
