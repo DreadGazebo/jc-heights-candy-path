@@ -482,7 +482,7 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
       </div>
     </div>
     <button id="btnSummary" class="btn btn-ghost" style="width:100%;margin-top:10px">🌙 End night &amp; see haul</button>
-    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v5.4</div>
+    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v5.6</div>
     <p class="foot">Routes are estimates. Stay on sidewalks and cross at corners.</p>
   </div>
 </section>
@@ -3101,7 +3101,8 @@ $('lcCandyMinus').addEventListener('click', function () {
       var m = t.match(/Candy Path (v\d+\.\d+)/);
       if (m && vNum(m[1]) > vNum(mine) && !sessionStorage.getItem('cpUpdTried')) {
         sessionStorage.setItem('cpUpdTried', '1');
-        location.replace(location.pathname + '?u=' + encodeURIComponent(m[1]));
+        var pq = ''; try { pq = new URLSearchParams(location.search).get('party') || ''; } catch (e) {}
+        location.replace(location.pathname + '?u=' + encodeURIComponent(m[1]) + (pq ? '&party=' + encodeURIComponent(pq) : ''));
       }
     }).catch(function () {});
   } catch (e) {}
@@ -3187,9 +3188,9 @@ document.querySelectorAll('.lc-kind').forEach(function (b) {
    ~20 s while moving), pins (mirrored from crowdSyncPin), and haul counts.
    Backed by the Supabase party_posts table (public read/insert, rows simply
    age out client-side: positions 45 min, pins 6 h). */
-var PARTY = { code: '', name: '', timer: null, lastPosPost: 0, lastPosLL: null, lastCountJson: '', members: {}, counts: {} };
+var PARTY = { code: '', name: '', timer: null, lastPosPost: 0, lastPosLL: null, lastCountJson: '', members: {}, counts: {}, joinTs: 0, kicked: {}, kickedLocal: {}, lastRows: [] };
 var partyLayer = L.layerGroup().addTo(map);
-try { var savedParty = store.get('party', null); if (savedParty && savedParty.code) { PARTY.code = String(savedParty.code); PARTY.name = String(savedParty.name || ''); } } catch (e) {}
+try { var savedParty = store.get('party', null); if (savedParty && savedParty.code) { PARTY.code = String(savedParty.code); PARTY.name = String(savedParty.name || ''); PARTY.joinTs = savedParty.joinTs || Date.now(); } } catch (e) {}
 function partyOn() { return !!(PARTY.code && PARTY.name && crowdOn()); }
 function partyPost(obj) {
   if (!partyOn()) return;
@@ -3207,15 +3208,24 @@ function partyPoll() {
   if (!partyOn()) return;
   fetch(CROWD.url + '/rest/v1/party_posts?room=eq.' + encodeURIComponent(PARTY.code) + '&select=*&order=created_at.desc&limit=300', { headers: crowdHeaders() })
     .then(function (r) { return r.ok ? r.json() : null; })
-    .then(function (rows) { if (Array.isArray(rows)) partyApply(rows); })
+    .then(function (rows) { if (Array.isArray(rows)) { PARTY.lastRows = rows; partyApply(rows); } })
     .catch(function () {});
   var cj = JSON.stringify({ h: S.counts.houses, c: S.counts.candy });
   if (cj !== PARTY.lastCountJson) { PARTY.lastCountJson = cj; partyPost({ kind: 'count', houses: S.counts.houses, candy: S.counts.candy }); }
 }
 function partyApply(rows) {
-  var now = Date.now(), pos = {}, counts = {}, pinMap = {};
+  var now = Date.now(), pos = {}, counts = {}, pinMap = {}, kicks = {};
   rows.forEach(function (r) {
-    var age = now - new Date(r.created_at).getTime();
+    if (r.kind === 'kick') { var kt = new Date(r.created_at).getTime(); if (!kicks[r.name] || kt > kicks[r.name]) kicks[r.name] = kt; }
+  });
+  Object.keys(PARTY.kickedLocal).forEach(function (n) { if (!kicks[n] || PARTY.kickedLocal[n] > kicks[n]) kicks[n] = PARTY.kickedLocal[n]; });
+  PARTY.kicked = kicks;
+  if (PARTY.name && kicks[PARTY.name] && kicks[PARTY.name] > (PARTY.joinTs || 0)) { partyEject(); return; }
+  function live(name, ts) { return !kicks[name] || ts > kicks[name]; }
+  rows.forEach(function (r) {
+    var rts = new Date(r.created_at).getTime();
+    var age = now - rts;
+    if (!live(r.name, rts)) return;
     if (r.kind === 'pos' && age < 45 * 60000) { if (!pos[r.name]) pos[r.name] = r; }
     else if (r.kind === 'count') { if (!counts[r.name]) counts[r.name] = r; }
     else if (r.kind === 'pin' && age < 6 * 3600000 && r.name !== PARTY.name) {
@@ -3257,14 +3267,17 @@ function renderPartyInfo() {
 function renderPartyBox() {
   var box = $('partyBox'); if (!box) return;
   if (!partyOn()) {
-    box.innerHTML = '<div class="label">🎉 Party mode</div>' +
+    box.innerHTML = '<div id="partyInvite" class="warn" hidden style="margin-bottom:8px"></div>' +
+      '<div class="label">🎉 Party mode</div>' +
       '<p class="muted" style="margin:2px 0 8px;font-size:13px">Trick-or-treat together: see each other live on the map, share the spots you log, and pool your haul.</p>' +
       '<input id="partyName" type="text" autocomplete="off" placeholder="Your name, e.g. Steve" value="' + esc(PARTY.name || '') + '">' +
       '<div class="row2"><button id="partyStart" class="btn btn-pur">🎉 Start a party</button><button id="partyJoinBtn" class="btn btn-ghost">Join with a code</button></div>' +
       '<div id="partyJoinRow" hidden style="margin-top:8px"><input id="partyCode" type="text" autocomplete="off" placeholder="Party code, e.g. TREAT123" style="text-transform:uppercase"><button id="partyJoinGo" class="btn btn-org" style="width:100%">Join party</button></div>';
     $('partyStart').addEventListener('click', function () {
       var name = $('partyName').value.trim(); if (!name) { toast('Add your name first, so your party can see who is who.', 'warn'); return; }
-      partyJoin(partyGenCode(), name);
+      var newCode = partyGenCode();
+      try { store.set('partyAdmin', newCode); } catch (e) {}
+      partyJoin(newCode, name);
     });
     $('partyJoinBtn').addEventListener('click', function () { $('partyJoinRow').hidden = false; $('partyCode').focus(); });
     $('partyJoinGo').addEventListener('click', function () {
@@ -3272,25 +3285,54 @@ function renderPartyBox() {
       var code = $('partyCode').value.trim().toUpperCase(); if (!code) { toast('Type the party code first.', 'warn'); return; }
       partyJoin(code, name);
     });
+    if (typeof INVITE_CODE !== 'undefined' && INVITE_CODE) {
+      var inv = $('partyInvite');
+      inv.hidden = false;
+      inv.innerHTML = '🎉 <b>You are invited to party ' + esc(INVITE_CODE) + '.</b> Add your name above, then tap Join party.';
+      $('partyJoinRow').hidden = false;
+      $('partyCode').value = INVITE_CODE;
+    }
     return;
   }
   var t = partyTotals();
-  var list = Object.keys(PARTY.counts).map(function (n) {
-    return '<div style="display:flex;justify-content:space-between;font-size:13px;padding:2px 0"><span>' + (n === PARTY.name ? '⭐ ' : '') + esc(n) + '</span><span class="muted">' + (PARTY.counts[n].houses || 0) + ' houses · ' + (PARTY.counts[n].candy || 0) + ' candies</span></div>';
+  var roster = {};
+  Object.keys(PARTY.counts).forEach(function (n) { roster[n] = 1; });
+  Object.keys(PARTY.members).forEach(function (n) { roster[n] = 1; });
+  if (PARTY.name) roster[PARTY.name] = 1;
+  var isAdmin = (typeof partyIsAdmin === 'function') && partyIsAdmin();
+  var list = Object.keys(roster).map(function (n) {
+    var c = PARTY.counts[n];
+    var right = c ? ((c.houses || 0) + ' houses · ' + (c.candy || 0) + ' candies') : 'on the map';
+    var kick = (isAdmin && n !== PARTY.name) ? ' <button class="btn btn-ghost btn-sm partyKick" data-name="' + esc(n) + '">Kick</button>' : '';
+    return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:2px 0"><span>' + (n === PARTY.name ? '⭐ ' : '') + esc(n) + (n === PARTY.name && isAdmin ? ' (host)' : '') + '</span><span class="muted">' + right + kick + '</span></div>';
   }).join('');
   box.innerHTML = '<div class="label">🎉 Party ' + esc(PARTY.code) + '</div>' +
     '<p class="muted" style="margin:2px 0 6px;font-size:13px">Share this code so your group can join. Party haul so far: <b>' + t.houses + ' houses · ' + t.candy + ' candies</b>.</p>' +
     (list || '<p class="muted" style="font-size:13px">Counts appear as everyone logs.</p>') +
-    '<div class="row2" style="margin-top:8px"><button id="partyCopy" class="btn btn-ghost">📋 Copy code</button><button id="partyLeave2" class="btn btn-ghost">Leave party</button></div>';
+    '<button id="partyShareLink" class="btn btn-pur" style="width:100%;margin-top:8px">🔗 Share invite link</button>' +
+    '<div class="row2" style="margin-top:8px"><button id="partyCopy" class="btn btn-ghost">📋 Copy code</button><button id="partyLeave2" class="btn btn-ghost">Leave party</button></div>' +
+    ((typeof INVITE_CODE !== 'undefined' && INVITE_CODE && INVITE_CODE !== PARTY.code) ? '<button id="partySwitch" class="btn btn-ghost" style="width:100%;margin-top:8px">🎉 Switch to invited party ' + esc(INVITE_CODE) + '</button>' : '');
+  var psl = $('partyShareLink');
+  if (psl) psl.addEventListener('click', function () {
+    var link = APP_LINK + '?party=' + encodeURIComponent(PARTY.code);
+    if (navigator.share) navigator.share({ title: 'Join my trick-or-treat party', text: 'Join my party ' + PARTY.code + ' in Candy Path and trick-or-treat with us live on the map.', url: link }).catch(function () {});
+    else if (navigator.clipboard) navigator.clipboard.writeText(link).then(function () { toast('Invite link copied.', 'ok'); });
+  });
+  var psw = $('partySwitch');
+  if (psw) psw.addEventListener('click', function () { var c = INVITE_CODE; INVITE_CODE = ''; partyJoin(c, PARTY.name); });
   $('partyCopy').addEventListener('click', function () {
     if (navigator.clipboard) navigator.clipboard.writeText(PARTY.code).then(function () { toast('Party code copied: ' + PARTY.code, 'ok'); }, function () { toast('Party code: ' + PARTY.code, 'ok'); });
     else toast('Party code: ' + PARTY.code, 'ok');
   });
   $('partyLeave2').addEventListener('click', partyLeave);
+  box.querySelectorAll('.partyKick').forEach(function (b) {
+    b.addEventListener('click', function () { partyKick(b.getAttribute('data-name')); });
+  });
 }
 function partyJoin(code, name) {
   PARTY.code = code; PARTY.name = name; PARTY.lastCountJson = '';
-  try { store.set('party', { code: code, name: name }); } catch (e) {}
+  PARTY.joinTs = Date.now();
+  try { store.set('party', { code: code, name: name, joinTs: PARTY.joinTs }); } catch (e) {}
   document.body.classList.add('in-party');
   $('partyBar').hidden = false;
   ensureWatch();
@@ -3300,6 +3342,7 @@ function partyJoin(code, name) {
   if (PARTY.timer) clearInterval(PARTY.timer);
   PARTY.timer = setInterval(partyTick, 20000);
   renderPartyInfo();
+  if (typeof INVITE_CODE !== 'undefined' && INVITE_CODE) { INVITE_CODE = ''; try { history.replaceState(null, '', location.pathname); } catch (e) {} renderPartyBox(); }
   toast('You are in party ' + code + ' 🎉 Your group can join with this code.', 'ok');
 }
 function partyLeave() {
@@ -3324,6 +3367,8 @@ function partyTick() {
   partyPoll();
 }
 $('partyLeave').addEventListener('click', partyLeave);
+var INVITE_CODE = '';
+try { INVITE_CODE = (new URLSearchParams(location.search).get('party') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 16); } catch (e) {}
 renderPartyBox();
 if (partyOn()) {
   document.body.classList.add('in-party');
@@ -3432,6 +3477,40 @@ $('btnSumExport').addEventListener('click', function () {
   setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
   toast('Exported ' + S.pins.length + ' spots. Files like this seed next year’s built-in map.', 'ok');
 });
+
+/* ---------- Party host + kick (v5.6) ----------
+   The device that created the party is its host (remembered locally).
+   A kick is a party_posts row of kind 'kick' naming the member; everyone
+   stops rendering that member's activity from before the kick, and the
+   kicked device leaves on its next poll. Names are the identity here, so
+   two members sharing one name share its fate. */
+function partyIsAdmin() {
+  try { return !!PARTY.code && store.get('partyAdmin', '') === PARTY.code; } catch (e) { return false; }
+}
+function partyPostRaw(obj) {
+  if (!PARTY.code || !crowdOn()) return;
+  obj.room = PARTY.code;
+  fetch(CROWD.url + '/rest/v1/party_posts', { method: 'POST', headers: crowdHeaders(), body: JSON.stringify(obj) }).catch(function () {});
+}
+function partyKick(name) {
+  if (!name || name === PARTY.name || !partyIsAdmin()) return;
+  PARTY.kickedLocal[name] = Date.now();
+  partyPostRaw({ kind: 'kick', name: name });
+  if (PARTY.lastRows) partyApply(PARTY.lastRows);
+  renderPartyBox();
+  toast(name + ' removed from the party.', 'ok');
+}
+function partyEject() {
+  var code = PARTY.code;
+  PARTY.code = ''; PARTY.lastCountJson = '';
+  try { store.set('party', { code: '', name: PARTY.name }); } catch (e) {}
+  if (PARTY.timer) { clearInterval(PARTY.timer); PARTY.timer = null; }
+  partyLayer.clearLayers();
+  document.body.classList.remove('in-party');
+  $('partyBar').hidden = true;
+  renderPartyBox();
+  toast('The party host removed you from party ' + code + '.', 'warn');
+}
 
 </script>
 </body>
