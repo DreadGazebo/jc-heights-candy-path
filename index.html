@@ -324,6 +324,10 @@ body.light .leaflet-popup-tip{background:#ffffff}
 body.mode-nav #logCard{top:calc(var(--sat) + 158px)}
 #moveBar{position:fixed;left:10px;right:10px;top:calc(var(--sat) + 64px);z-index:1250;padding:12px 14px;display:flex;gap:8px;align-items:center}
 #moveBar[hidden]{display:none}
+#lcMini{display:none}
+#logCard.mini #lcMini{display:flex}
+#logCard.mini>div:not(.lc-head):not(#lcMini){display:none}
+#logCard.mini #lcThumb{display:none}
 #partyBar{position:fixed;left:10px;right:10px;top:calc(var(--sat) + 64px);z-index:1240;padding:10px 14px;display:flex;gap:8px;align-items:center}
 #partyBar[hidden]{display:none}
 body.mode-nav #partyBar{display:none}
@@ -461,7 +465,7 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
     </div>
     <div id="partyBox" style="margin-top:14px"></div>
     <button id="btnSummary" class="btn btn-ghost" style="width:100%;margin-top:10px">🌙 End night &amp; see haul</button>
-    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v5.0</div>
+    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v5.1</div>
     <p class="foot">Routes are estimates. Stay on sidewalks and cross at corners.</p>
   </div>
 </section>
@@ -545,6 +549,7 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
     <div style="flex:1;min-width:0"><b id="lcTitle">&#127875; Candy here, logged</b><div id="lcSub" class="muted" style="font-size:12px"></div></div>
     <button id="lcClose" class="btn btn-ghost btn-sm" aria-label="Dismiss">&#10005;</button>
   </div>
+  <div id="lcMini" class="lc-row"><button id="lcDetails" class="btn btn-pur btn-sm" style="flex:1">✏️ Add details</button><button id="lcQuickUndo" class="btn btn-ghost btn-sm">↩ Undo</button></div>
   <div class="lc-flags" role="group" aria-label="House or shop">
     <button class="chip lc-kind" data-kind="house" aria-pressed="true">🏠 House</button>
     <button class="chip lc-kind" data-kind="shop" aria-pressed="false">🛍️ Shop</button>
@@ -1069,7 +1074,7 @@ function bumpCount(kind, btn) {
   while (S.counts.histLog.length < S.counts.hist.length - 1) S.counts.histLog.push(null);
   var logRes = kind === 'houses' ? logHouseLocation() : null;
   S.counts.histLog.push(logRes ? logRes.ts : null);
-  if (logRes) { showLogCard(logRes.pin, logRes.sub); crowdSyncPin(logRes.pin); }
+  if (logRes) { showLogCard(logRes.pin, logRes.sub, logQuickNext); logQuickNext = false; crowdSyncPin(logRes.pin); }
   store.set('counts', S.counts); renderCounts(btn);
 }
 /* Tapping House visited also logs the spot as a treat location from the GPS
@@ -1114,7 +1119,9 @@ function paintLogFlags() {
   document.querySelectorAll('.lc-flag').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-flag') === logCardPin.type)); });
   $('lcTitle').textContent = { candy: '\uD83C\uDF83 Candy here, logged', out: '\uD83D\uDEAB Logged as ran out', nonfood: '\uD83D\uDC99 Non-food treats, logged', decor: '\uD83D\uDC7B Decor only, logged' }[logCardPin.type] || 'Logged';
 }
-function showLogCard(pin, sub) {
+var logQuickNext = false;
+var logStreak = { n: 0, last: 0 };
+function showLogCard(pin, sub, quick) {
   logCardPin = pin;
   $('lcSub').textContent = sub || '';
   $('lcNote').value = pin.note || '';
@@ -1124,14 +1131,23 @@ function showLogCard(pin, sub) {
   paintLogFlags(); paintLogKind();
   var card = $('logCard');
   card.classList.remove('away'); card.hidden = false;
+  if (quick) {
+    card.classList.add('mini');
+    if (Date.now() - logStreak.last < 90000) logStreak.n++; else logStreak.n = 1;
+    logStreak.last = Date.now();
+    if (logStreak.n > 1) $('lcSub').textContent = (sub || '') + ' · 🔥 streak ' + logStreak.n;
+    armLogCardTimer(4000);
+    return;
+  }
+  card.classList.remove('mini');
   armLogCardTimer();
 }
-function armLogCardTimer() {
+function armLogCardTimer(ms) {
   if (logCardTimer) clearTimeout(logCardTimer);
   logCardTimer = setTimeout(function () {
     if (document.activeElement === $('lcNote')) { armLogCardTimer(); return; }
     hideLogCard();
-  }, 12000);
+  }, ms || 12000);
 }
 function hideLogCard() {
   if (logCardPin && logCardPin._noteDirty) { logCardPin._noteDirty = false; crowdSyncPin(logCardPin); }
@@ -2970,6 +2986,7 @@ function paintLcCandy() { var el = $('lcCandyN'); if (el) el.textContent = lcCan
 $('fabLog').addEventListener('click', function () {
   ensureWatch();
   function doLog() {
+    logQuickNext = true;
     bumpCount('houses', null);
     if (!logCardPin) toast(logFailToast(), 'warn');
   }
@@ -3259,6 +3276,33 @@ if (partyOn()) {
   PARTY.timer = setInterval(partyTick, 20000);
   partyPoll();
 }
+
+/* ---------- Quick-log details + streak (v5.1) ---------- */
+$('lcDetails').addEventListener('click', function () {
+  $('logCard').classList.remove('mini');
+  logStreak.n = 0;
+  armLogCardTimer();
+});
+$('lcQuickUndo').addEventListener('click', function () {
+  hideLogCard();
+  var u = document.querySelector('.js-undo');
+  if (u) u.click();
+});
+
+/* ---------- Open where I am (v5.1) ----------
+   Unless a shared-route link brought the user here, center once on their
+   first fresh GPS fix instead of the Heights default. */
+(function () {
+  if (location.hash) return;
+  var done = false;
+  try { ensureWatch(); } catch (e) {}
+  var iv = setInterval(function () {
+    if (done) { clearInterval(iv); return; }
+    if (S.pos && Date.now() - S.pos.ts < 30000) { done = true; map.setView([S.pos.lat, S.pos.lng], 16); clearInterval(iv); }
+  }, 600);
+  setTimeout(function () { clearInterval(iv); }, 12000);
+  map.on('dragstart', function () { done = true; clearInterval(iv); });
+})();
 
 </script>
 </body>
