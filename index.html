@@ -449,7 +449,7 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
       <button class="btn btn-ghost js-undo" aria-label="Undo last count">↩︎</button>
     </div>
     <button id="btnSummary" class="btn btn-ghost" style="width:100%;margin-top:10px">🌙 End night &amp; see haul</button>
-    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v4.7</div>
+    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v4.8</div>
     <p class="foot">Routes are estimates. Stay on sidewalks and cross at corners.</p>
   </div>
 </section>
@@ -554,6 +554,7 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
   </div>
   <img id="lcThumb" hidden alt="Photo of this stop" style="max-width:120px;border-radius:10px;margin-top:6px">
   <div class="muted" style="font-size:11px;margin-top:4px">📣 Shared live with other trick-or-treaters. Swipe the card away when you're done.</div>
+  <div class="lc-row"><button id="lcRemove" class="btn btn-ghost btn-sm" style="width:100%">🗑 Remove this log</button></div>
 </div>
 <div id="moveBar" class="card" hidden>
   <div style="flex:1;min-width:0"><b>✥ Move the pin</b><div class="muted" style="font-size:12px">Drag it to the right house, then tap Done.</div></div>
@@ -3038,6 +3039,29 @@ function endMovePin(saveIt) {
 $('mvDone').addEventListener('click', function () { endMovePin(true); });
 $('mvCancel').addEventListener('click', function () { endMovePin(false); });
 $('lcMove').addEventListener('click', function () { if (logCardPin) startMovePin(logCardPin); });
+
+/* ---------- Remove this log (Steve, Oct 31, 2026) ----------
+   One tap in the log card undoes a mistaken log completely: the pin, the
+   house count, and any candies added from this card. */
+$('lcRemove').addEventListener('click', function () {
+  if (!logCardPin) return;
+  var pin = logCardPin;
+  pin._noteDirty = false;
+  var pi = S.pins.indexOf(pin); if (pi >= 0) S.pins.splice(pi, 1);
+  for (var j = S.counts.hist.length - 1; j >= 0; j--) {
+    if (S.counts.hist[j] === 'houses' && S.counts.histLog[j] === pin.ts) { S.counts.hist.splice(j, 1); S.counts.histLog.splice(j, 1); break; }
+  }
+  S.counts.houses = Math.max(0, S.counts.houses - 1);
+  if (lcCandy > 0) {
+    S.counts.candy = Math.max(0, S.counts.candy - lcCandy);
+    for (var k = 0; k < lcCandy; k++) { var ci = S.counts.hist.lastIndexOf('candy'); if (ci >= 0) { S.counts.hist.splice(ci, 1); S.counts.histLog.splice(ci, 1); } }
+    lcCandy = 0; $('lcCandyN').textContent = '0';
+  }
+  store.set('pins', S.pins); store.set('counts', S.counts);
+  renderPins(); renderCounts();
+  hideLogCard();
+  toast('Log removed: pin deleted and counters adjusted.', 'ok');
+});
 
 </script>
 </body>
