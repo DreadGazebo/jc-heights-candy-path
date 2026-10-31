@@ -446,7 +446,7 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
       <button class="btn btn-ghost js-undo" aria-label="Undo last count">↩︎</button>
     </div>
     <button id="btnSummary" class="btn btn-ghost" style="width:100%;margin-top:10px">🌙 End night &amp; see haul</button>
-    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v4.5</div>
+    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v4.6</div>
     <p class="foot">Routes are estimates. Stay on sidewalks and cross at corners.</p>
   </div>
 </section>
@@ -1047,19 +1047,26 @@ function bumpCount(kind, btn) {
    one, deduped against nearby pins, skipped when the fix is too rough. The
    pin joins future route building like any candy pin. Returns the pin's ts
    (for undo) or null. */
+var logFailReason = '';
 function logHouseLocation() {
+  logFailReason = '';
   var c = (S.lastPos && S.lastPos.coords) ? S.lastPos.coords : null;
-  if (!c) return null;
+  if (!c) { logFailReason = 'nofix'; return null; }
   var ll = { lat: c.latitude, lng: c.longitude };
   var stopsData = (typeof HEIGHTS_STOPS !== 'undefined') ? HEIGHTS_STOPS : [];
-  var best = null, bd = 40;
+  var best = null, bd = 60;
   stopsData.forEach(function (sx) { var d = haversine(ll, { lat: sx.lat, lng: sx.lon }); if (d < bd) { bd = d; best = sx; } });
   var sub = 'From your GPS fix';
   if (best) { ll = { lat: best.lat, lng: best.lon }; sub = best.name || best.addr || 'Treat stop'; }
-  else if (c.accuracy && c.accuracy > 100) return null;
-  for (var i = 0; i < S.pins.length; i++) { if (haversine(ll, S.pins[i]) < 25) return null; }
+  else if (c.accuracy && c.accuracy > 250) { logFailReason = 'rough'; return null; }
+  for (var i = 0; i < S.pins.length; i++) { if (haversine(ll, S.pins[i]) < 25) { logFailReason = 'dupe'; return null; } }
   var ts = addPin(ll.lat, ll.lng, 'candy', 'house');
   return { ts: ts, pin: S.pins[S.pins.length - 1], sub: sub };
+}
+function logFailToast() {
+  if (logFailReason === 'dupe') return 'House counted. This spot is already logged.';
+  if (logFailReason === 'rough') return 'House counted. The GPS fix is still too rough to pin this spot; try again in a few seconds.';
+  return 'House counted. No new pin could be placed here.';
 }
 
 /* Optional quick follow-up for a fresh house log: flag the treat status, add
@@ -2919,21 +2926,20 @@ var lcCandy = 0;
 function paintLcCandy() { var el = $('lcCandyN'); if (el) el.textContent = lcCandy; }
 $('fabLog').addEventListener('click', function () {
   ensureWatch();
-  if (S.pos && Date.now() - S.pos.ts < 60000) {
+  function doLog() {
     bumpCount('houses', null);
-    if (!logCardPin) toast('House counted. No new pin: the fix is too rough here, or this spot is already logged.', 'warn');
-    return;
+    if (!logCardPin) toast(logFailToast(), 'warn');
   }
+  if (S.pos && Date.now() - S.pos.ts < 60000 && S.pos.acc <= 80) { doLog(); return; }
   if (!navigator.geolocation) { toast('This browser cannot share location.', 'err'); return; }
   toast('Getting your location…', 'ok');
   navigator.geolocation.getCurrentPosition(function (pos) {
-    onPos(pos);
-    bumpCount('houses', null);
-    if (!logCardPin) toast('House counted. No new pin: the fix is too rough here, or this spot is already logged.', 'warn');
+    onPos(pos); doLog();
   }, function (err) {
+    if (S.pos) { doLog(); return; }
     if (err && err.code === 1) toast('Location is blocked for this site. Tap the lock or tune icon in the address bar, allow Location, then tap Log again.', 'err');
     else toast('No GPS fix yet. Give it a few seconds outside and tap Log again.', 'err');
-  }, { enableHighAccuracy: true, timeout: 9000, maximumAge: 10000 });
+  }, { enableHighAccuracy: true, timeout: 9000, maximumAge: 5000 });
 });
 $('lcCandyPlus').addEventListener('click', function () {
   lcCandy++;
