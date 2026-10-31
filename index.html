@@ -1,0 +1,2943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d0a14">
+<meta name="color-scheme" content="dark">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="JC Heights Candy Path">
+<meta name="description" content="JC Heights Candy Path: tell us where you start and how long you have. We build the trick-or-treat loop that hits the most candy houses, then guide you turn by turn.">
+<title>JC Heights Candy Path · Trick-or-Treat Route Planner</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%83%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<style>
+:root{
+  --bg:#0d0a14; --bg2:#15101f; --card:#1b1428; --card2:#241a35; --line:#33284a;
+  --txt:#f6f0ff; --mut:#b3a6c9; --dim:#7d7194;
+  --org:#ff7b1c; --org2:#ff9b52; --pur:#8b5cf6; --pur2:#a78bfa; --teal:#14b8a6; --red:#ef4444; --grn:#22c55e;
+  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
+  --sal:env(safe-area-inset-left,0px); --sar:env(safe-area-inset-right,0px);
+  --topH:80px; --bottomH:200px;
+  --r:18px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);overflow:hidden;overscroll-behavior:none;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji";
+  -webkit-text-size-adjust:100%;font-size:16px;line-height:1.35}
+button,input,a.btn{font:inherit;color:inherit}
+button{cursor:pointer}
+#map{position:fixed;inset:0;background:var(--bg);z-index:0;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.leaflet-container{background:var(--bg);font:inherit}
+.dark-tiles .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.94) contrast(.92) saturate(.72)}
+.leaflet-control-attribution{background:rgba(13,10,20,.75)!important;color:var(--mut)!important;font-size:10px!important;border-radius:8px 0 0 0}
+.leaflet-control-attribution a{color:var(--pur2)!important}
+.leaflet-bottom{bottom:var(--bottomH);transition:bottom .2s}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--card);color:var(--txt);box-shadow:0 8px 30px rgba(0,0,0,.6)}
+.leaflet-popup-content{margin:14px 16px;font-size:15px}
+.leaflet-container a.leaflet-popup-close-button{color:var(--mut);width:36px;height:36px;font-size:24px;line-height:36px}
+.pop b{font-size:16px}
+.pop .btn{margin-top:10px;width:100%}
+
+/* ---------- generic UI ---------- */
+.card{background:rgba(27,20,40,.96);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 10px 40px rgba(0,0,0,.55)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:10px 16px;border-radius:16px;border:1px solid var(--line);
+  background:var(--card2);font-weight:700;font-size:16px;text-decoration:none;text-align:center;user-select:none;-webkit-user-select:none;transition:transform .08s,filter .15s}
+.btn:active{transform:scale(.97);filter:brightness(1.15)}
+.btn:disabled{opacity:.45;pointer-events:none}
+.btn-org{background:linear-gradient(180deg,#ff8a33,#f26a0c);border-color:#ff9b52;color:#1a0b00}
+.btn-pur{background:linear-gradient(180deg,#9b70ff,#7c4ff0);border-color:#a78bfa;color:#fff}
+.btn-red{background:linear-gradient(180deg,#f05252,#d63131);border-color:#f87171;color:#fff}
+.btn-ghost{background:rgba(255,255,255,.04)}
+.btn-xl{width:100%;min-height:60px;font-size:19px;border-radius:18px}
+.btn-sm{min-height:48px;font-size:15px;padding:8px 12px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.row3 .btn{padding:8px 6px;font-size:14px;flex-direction:column;gap:2px;min-height:58px}
+.row3 .btn .ic{font-size:20px}
+.muted{color:var(--mut)}
+.small{font-size:13px}
+.label{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin:14px 2px 8px}
+.warn{background:rgba(255,123,28,.12);border:1px solid rgba(255,123,28,.45);color:#ffd2b0;border-radius:12px;padding:10px 12px;font-size:14px;margin-top:10px}
+
+/* ---------- header ---------- */
+#hdr{position:fixed;z-index:1100;top:calc(var(--sat) + 10px);left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);padding:10px 12px 10px 14px}
+#hdr .hrow{display:flex;align-items:center;gap:10px}
+#hdr .logo{font-size:30px;line-height:1}
+#hdr h1{margin:0;font-size:20px;letter-spacing:.01em;flex:1;background:linear-gradient(90deg,var(--org),var(--org2) 45%,var(--pur2));-webkit-background-clip:text;background-clip:text;color:transparent}
+#hdr .hbtn{width:48px;height:48px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:20px;display:grid;place-items:center}
+#tagline{margin:8px 2px 2px;color:var(--mut);font-size:14.5px;display:flex;gap:10px;align-items:flex-start}
+#tagline span{flex:1}
+#tagline button{flex:none;min-width:48px;min-height:40px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--mut);font-size:13px;font-weight:700}
+
+/* ---------- bottom sheet ---------- */
+#sheet{position:fixed;z-index:1100;left:calc(var(--sal) + 8px);right:calc(var(--sar) + 8px);bottom:calc(var(--sab) + 8px);
+  max-height:min(56vh,560px);display:flex;flex-direction:column;padding:0 14px 12px;overflow:hidden}
+#sheetHandle{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;min-height:34px;border:0;background:transparent;padding:6px 0 2px}
+#sheetHandle i{display:block;width:44px;height:5px;border-radius:3px;background:var(--line)}
+#sheetBody{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:2px;margin:0 -4px;padding:0 4px}
+#peek{display:none;width:100%;min-height:52px;border:0;background:transparent;text-align:left;font-weight:700;font-size:15px;padding:0 2px 6px}
+#sheet.collapsed #sheetBody{display:none}
+#sheet.collapsed #peek{display:block}
+.search{display:flex;gap:8px;margin-top:10px}
+.search input{flex:1;min-width:0;min-height:52px;border-radius:16px;border:1px solid var(--line);background:var(--bg2);padding:0 14px;font-size:16px;color:var(--txt);outline:none}
+.search input:focus{border-color:var(--pur)}
+.search .btn{width:56px;padding:0;font-size:20px}
+#startInfo{margin:10px 2px 0;font-size:14px}
+.chips{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.chip{min-height:52px;border-radius:14px;border:1px solid var(--line);background:var(--bg2);font-weight:800;font-size:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05}
+.chip small{font-size:11px;font-weight:600;color:var(--mut)}
+.chip[aria-pressed="true"]{background:linear-gradient(180deg,#9b70ff,#7c4ff0);border-color:var(--pur2);color:#fff}
+.chip[aria-pressed="true"] small{color:#e9e0ff}
+#btnBuild{margin-top:14px}
+#viewBanner{margin:2px 0 10px;padding:10px 12px;border-radius:12px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.5);font-size:14.5px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:4px 0 8px}
+.stat{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:8px 4px;text-align:center}
+.stat b{display:block;font-size:20px;line-height:1.1}
+.stat span{display:block;font-size:11.5px;color:var(--mut);margin-top:2px}
+.stat.hl b{color:var(--org)}
+#fitNote{font-size:13.5px;margin:0 2px 10px}
+#routeBlock .row3{margin-top:10px}
+#planToggle{width:100%;margin-top:12px;justify-content:space-between;font-weight:600;font-size:14.5px}
+#planInputs.folded{display:none}
+.foot{margin:14px 0 2px;text-align:center;font-size:12.5px;color:var(--dim)}
+
+/* ---------- haul counter ---------- */
+.haul{display:grid;grid-template-columns:1.25fr 1fr 52px;gap:8px;margin-top:12px}
+.haul .btn{min-height:60px;flex-direction:column;gap:0;line-height:1.1}
+.haul .btn b{font-size:22px}
+.haul .btn span{font-size:12.5px;font-weight:700}
+.haul .js-candy{background:linear-gradient(180deg,#ff8a33,#f26a0c);border-color:#ff9b52;color:#1a0b00}
+.haul .js-house{background:linear-gradient(180deg,#9b70ff,#7c4ff0);border-color:#a78bfa;color:#fff}
+.haul .js-undo{font-size:20px;padding:0}
+.bump{animation:bump .25s}
+@keyframes bump{50%{transform:scale(1.08)}}
+
+/* ---------- floating buttons ---------- */
+#fabs{position:fixed;z-index:1090;right:calc(var(--sar) + 12px);bottom:calc(var(--bottomH) + 14px);display:flex;flex-direction:column;gap:10px;transition:bottom .2s}
+.fab{width:56px;height:56px;border-radius:18px;border:1px solid var(--line);background:rgba(27,20,40,.95);box-shadow:0 6px 24px rgba(0,0,0,.5);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:21px;line-height:1;padding:0}
+.fab span{font-size:10px;font-weight:700;color:var(--mut);margin-top:3px}
+.fab.attn{border-color:var(--org);box-shadow:0 0 0 3px rgba(255,123,28,.35),0 6px 24px rgba(0,0,0,.5)}
+
+/* ---------- pick-mode banner ---------- */
+#pickBanner{position:fixed;z-index:1150;left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);top:calc(var(--topH) + 8px);
+  display:flex;align-items:center;gap:10px;padding:10px 10px 10px 14px;border-color:var(--org)}
+#pickBanner span{flex:1;font-weight:700}
+#drawBar{position:fixed;z-index:1150;left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);top:calc(var(--topH) + 8px);display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-color:var(--pur2)}
+#drawBar[hidden]{display:none}
+#drawBar span{font-weight:700}
+#exploreCard{position:fixed;z-index:1140;left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);top:calc(var(--topH) + 8px);display:flex;align-items:center;gap:10px;padding:10px 10px 10px 14px;border-color:var(--org)}
+#exploreCard[hidden]{display:none}
+.btn[aria-pressed="true"]{background:linear-gradient(180deg,#9b70ff,#7c4ff0);color:#fff;border-color:var(--pur2)}
+.fab[aria-pressed="true"]{background:linear-gradient(180deg,#9b70ff,#7c4ff0);color:#fff}
+body.mode-nav #fabExplore{display:none}
+body.picking #map{cursor:crosshair}
+
+/* ---------- navigation ---------- */
+#navTop{position:fixed;z-index:1100;top:calc(var(--sat) + 8px);left:calc(var(--sal) + 8px);right:calc(var(--sar) + 8px);
+  display:flex;align-items:stretch;gap:12px;padding:12px;background:linear-gradient(180deg,#2a1a45,#1d1430);border:1px solid #4b3778}
+#navArrowBox{flex:none;width:78px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(255,123,28,.12);border-radius:14px;border:1px solid rgba(255,123,28,.4)}
+#navArrow{font-size:44px;line-height:1;color:var(--org);font-weight:900;font-family:-apple-system,"Segoe UI Symbol","Noto Sans Symbols 2","DejaVu Sans",sans-serif}
+#navDist{font-size:16px;font-weight:800;margin-top:4px;white-space:nowrap}
+#navText{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
+#navInstr{font-size:21px;font-weight:800;line-height:1.2;overflow-wrap:anywhere}
+#navThen{font-size:14px;color:var(--mut);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#navFlag{font-size:13px;font-weight:700;margin-top:6px;color:#ffd2b0}
+#navBottom{position:fixed;z-index:1100;left:calc(var(--sal) + 8px);right:calc(var(--sar) + 8px);bottom:calc(var(--sab) + 8px);padding:10px 12px 12px}
+.nstats{display:grid;grid-template-columns:1fr 1fr 1.2fr 76px;gap:6px;align-items:stretch}
+.nstat{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:6px 4px;text-align:center;display:flex;flex-direction:column;justify-content:center}
+.nstat b{font-size:19px;line-height:1.1;font-variant-numeric:tabular-nums}
+.nstat span{font-size:11px;color:var(--mut);margin-top:2px}
+#btnEnd{min-height:56px;padding:0;border-radius:14px}
+#navBottom .haul{margin-top:8px}
+.navtools{display:flex;gap:8px;margin-top:8px}
+.navtools .btn{flex:1;font-size:13px;padding:9px 4px}
+#map.headup{width:150%;height:150%;left:-25%;top:-25%;right:auto;bottom:auto;transition:none;will-change:transform}
+
+/* ---------- my-location marker ---------- */
+.me-wrap{background:none;border:0}
+.me{position:relative;width:64px;height:64px}
+.me-cone{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from -28deg,rgba(255,123,28,.7) 0deg 56deg,transparent 56deg);
+  -webkit-mask:radial-gradient(circle,#000 0 62%,transparent 63%);mask:radial-gradient(circle,#000 0 62%,transparent 63%);opacity:0;transition:opacity .3s}
+.me.has-heading .me-cone{opacity:1}
+.me-pulse{position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:rgba(139,92,246,.55);animation:pulse 2s ease-out infinite}
+.me-dot{position:absolute;left:50%;top:50%;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:var(--pur);border:3px solid #fff;box-shadow:0 0 12px rgba(139,92,246,.9)}
+.me.stale .me-dot{background:#777;box-shadow:none}
+.me.stale .me-pulse{animation:none;opacity:0}
+@keyframes pulse{0%{transform:scale(1);opacity:.8}100%{transform:scale(3.2);opacity:0}}
+
+/* ---------- map markers ---------- */
+.homeicon,.stopicon,.pinicon{background:none;border:0}
+.homeicon div{width:42px;height:42px;border-radius:50% 50% 50% 6px;transform:rotate(-45deg);background:var(--org);border:3px solid #fff;box-shadow:0 4px 14px rgba(0,0,0,.6);display:grid;place-items:center}
+.homeicon div span{transform:rotate(45deg);font-size:20px}
+.stopicon div{width:30px;height:30px;border-radius:50%;background:var(--pur);color:#fff;border:2.5px solid #fff;font-weight:900;font-size:14px;display:grid;place-items:center;box-shadow:0 3px 10px rgba(0,0,0,.6)}
+.stopicon.done div{background:#4b5563;color:#d1d5db}
+.stopicon.next div{background:var(--org);color:#1a0b00;transform:scale(1.15)}
+.pinicon div{width:40px;height:40px;display:grid;place-items:center;font-size:28px;filter:drop-shadow(0 3px 4px rgba(0,0,0,.7))}
+.passdot{background:none;border:0}
+.passdot div{width:24px;height:24px;display:grid;place-items:center;font-size:17px;opacity:.95;filter:drop-shadow(0 2px 3px rgba(0,0,0,.7))}
+.pinicon .teal{width:26px;height:26px;border-radius:50%;background:var(--teal);border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.6)}
+.pinicon .outx{width:28px;height:28px;border-radius:50%;background:#6b7280;border:2.5px solid #e5e7eb;color:#fff;font-size:16px;font-weight:900;display:grid;place-items:center;filter:none;box-shadow:0 3px 10px rgba(0,0,0,.6)}
+
+/* ---------- overlays ---------- */
+.overlay{position:fixed;inset:0;z-index:1300;background:rgba(5,3,10,.6);display:flex;align-items:flex-end;justify-content:center;padding:12px calc(var(--sar) + 10px) calc(var(--sab) + 12px) calc(var(--sal) + 10px)}
+.overlay.center{align-items:center}
+.ocard{width:100%;max-width:480px;padding:18px 16px 16px;max-height:calc(100vh - 40px);overflow-y:auto}
+.ocard h2{margin:0 0 6px;font-size:21px}
+.ocard p{margin:0 0 14px;color:var(--mut);font-size:15px}
+.ocard .btns{display:grid;gap:10px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--bg2);padding:4px;border-radius:16px;border:1px solid var(--line);margin:10px 0 12px}
+.seg button{min-height:48px;border-radius:12px;border:0;background:transparent;font-weight:700;color:var(--mut)}
+.seg button[aria-pressed="true"]{background:var(--card2);color:var(--txt);box-shadow:inset 0 0 0 1px var(--pur)}
+.pingrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.pingrid button{min-height:88px;border-radius:16px;border:1px solid var(--line);background:var(--bg2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-weight:700;font-size:14.5px}
+.pingrid button .e{font-size:32px;line-height:1;height:34px;display:grid;place-items:center}
+.pingrid .teal{width:28px;height:28px;border-radius:50%;background:var(--teal);border:3px solid #fff}
+.pingrid .outx{width:28px;height:28px;border-radius:50%;background:#6b7280;border:2.5px solid #e5e7eb;color:#fff;font-size:15px;font-weight:900;display:grid;place-items:center}
+#pinGpsNote{margin:-4px 2px 10px;font-size:13px}
+
+#busy{position:fixed;inset:0;z-index:1400;background:rgba(5,3,10,.55);display:flex;align-items:center;justify-content:center;padding:20px}
+#busy .ocard{text-align:center;max-width:360px}
+.spin{width:54px;height:54px;margin:4px auto 12px;border-radius:50%;border:5px solid rgba(255,123,28,.2);border-top-color:var(--org);animation:sp 0.9s linear infinite;display:grid;place-items:center}
+.spin::after{content:"🎃";font-size:22px;animation:sp 0.9s linear infinite reverse}
+@keyframes sp{to{transform:rotate(360deg)}}
+#busyText{font-weight:800;font-size:17px;color:var(--txt);margin-bottom:6px}
+#busySub{min-height:18px;font-size:13px;color:var(--mut);margin-bottom:12px}
+#busyElapsed{min-height:16px;font-size:12px;color:var(--org);font-weight:700;margin:-6px 0 10px}
+
+#summary{position:fixed;inset:0;z-index:1250;background:radial-gradient(120% 80% at 50% 0%,#2b1748 0%,var(--bg) 60%);overflow-y:auto;
+  padding:calc(var(--sat) + 22px) calc(var(--sar) + 16px) calc(var(--sab) + 20px) calc(var(--sal) + 16px)}
+#summary .inner{max-width:480px;margin:0 auto;text-align:center}
+#summary .big{font-size:64px;line-height:1;margin-bottom:6px}
+#summary h2{font-size:28px;margin:6px 0 4px}
+#summary .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
+#summary .sbox{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 8px}
+#summary .sbox b{display:block;font-size:34px;color:var(--org);line-height:1.1}
+#summary .sbox span{color:var(--mut);font-size:14px;font-weight:600}
+#summary .btns{display:grid;gap:10px}
+
+#toasts{position:fixed;z-index:1500;left:calc(var(--sal) + 12px);right:calc(var(--sar) + 12px);top:calc(var(--topH) + 10px);display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
+.toast{pointer-events:auto;max-width:520px;width:100%;display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;background:#251b38;border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.6);font-size:15px;font-weight:600;animation:tin .2s ease-out}
+.toast.err{border-color:#f87171;background:#3a1620}
+.toast.warn{border-color:var(--org);background:#3a2312}
+.toast.ok{border-color:#4ade80;background:#14301f}
+.toast span{flex:1}
+.toast button{flex:none;min-height:40px;min-width:48px;padding:0 12px;border-radius:10px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);font-weight:800}
+@keyframes tin{from{opacity:0;transform:translateY(-8px)}}
+#fatal{position:fixed;inset:0;z-index:2000;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}
+
+/* ---------- mode visibility ---------- */
+.nav-only{display:none!important}
+body.mode-nav .nav-only{display:flex!important}
+body.mode-nav #navBottom.nav-only{display:block!important}
+body.mode-nav .plan-only{display:none!important}
+body.mode-view .plan-edit{display:none!important}
+body:not(.mode-view) .view-only{display:none!important}
+body:not(.has-route) .route-only{display:none!important}
+
+@media (min-width:700px){
+  #sheet,#navBottom{left:auto;right:calc(var(--sar) + 16px);width:420px;bottom:calc(var(--sab) + 16px)}
+  #hdr{right:auto;width:420px}
+  #navTop{right:auto;width:440px}
+  #fabs{right:calc(var(--sar) + 452px);bottom:calc(var(--sab) + 16px)}
+  #toasts{left:auto;right:calc(var(--sar) + 16px);width:420px;top:auto;bottom:calc(var(--bottomH) + 16px)}
+}
+@media (max-height:640px){
+  #sheet{max-height:52vh}
+  .stat b{font-size:18px}
+  #navInstr{font-size:19px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- clean-map declutter (v1.1) ---------- */
+#sheet{max-height:50vh}
+.fab{width:52px;height:52px;border-radius:16px;background:rgba(27,20,40,.88)}
+body:not(.mode-nav) #fabMute{display:none}
+body.sheet-collapsed .leaflet-bottom{bottom:86px}
+body.sheet-collapsed #fabs{bottom:100px}
+#hdr{padding:8px 10px 8px 12px}
+#hdr .logo{font-size:24px}
+#hdr h1{font-size:18px}
+.leaflet-control-zoom{display:none}
+/* v2.2 compact sheet: slimmer stats, clamped route notes, tighter buttons */
+.stats{gap:5px;margin:2px 0 6px}
+.stat{padding:5px 2px;border-radius:10px}
+.stat b{font-size:16px}
+.stat span{font-size:10px;margin-top:0}
+#fitNote{font-size:12.5px;line-height:1.35;margin:0 2px 4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#fitNote.open{-webkit-line-clamp:99}
+#btnFitMore{display:block;margin:0 0 6px auto;padding:2px 10px;min-height:24px;font-size:12px}
+.btn-xl{min-height:50px;font-size:17px;border-radius:15px}
+.row3{gap:6px}
+.row3 .btn{min-height:46px;font-size:13px;padding:6px 4px}
+.row3 .btn .ic{font-size:17px}
+#routeBlock .row3{margin-top:8px}
+#planToggle{margin-top:8px}
+.label{margin:10px 2px 6px}
+.haul{margin-top:8px;gap:6px}
+.haul .btn{min-height:48px}
+.haul .btn b{font-size:19px}
+/* v2.2 map-first header: small floating brand pill, compact theme button */
+:root{--topH:56px}
+#hdr{right:auto;max-width:92vw;padding:5px 6px 5px 10px;border-radius:999px}
+#hdr .hrow{gap:7px}
+#hdr .logo{font-size:19px}
+#hdr h1{font-size:15px;flex:0 1 auto}
+#hdr .hbtn{width:30px;height:30px;min-width:30px;border-radius:50%;font-size:15px;padding:0;display:flex;align-items:center;justify-content:center}
+#tagline{font-size:12px;margin:4px 2px 2px}
+/* draw mode: map taps must reach the map, not the markers sitting on it */
+body.drawing .leaflet-marker-icon{pointer-events:none}
+
+/* ===== v3.0 design refresh: Mobbin-style floating chrome, Halloween plum ===== */
+:root{--r:22px}
+.card{border-radius:22px;border:1px solid rgba(255,255,255,.07);box-shadow:0 14px 34px rgba(0,0,0,.42)}
+#hdr{background:rgba(27,20,40,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+#sheet{background:linear-gradient(180deg,var(--card2),var(--card));border-radius:26px 26px 0 0}
+.btn{border-radius:999px}
+.btn-org{background:linear-gradient(180deg,var(--org2),var(--org));box-shadow:0 6px 18px rgba(255,123,28,.35)}
+.btn-pur{background:linear-gradient(180deg,var(--pur2),var(--pur));box-shadow:0 6px 18px rgba(139,92,246,.30)}
+.stat{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);border-radius:16px}
+.chip{border-radius:999px}
+#peek{background:rgba(27,20,40,.90);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.09);color:var(--txt)}
+.fab{background:rgba(27,20,40,.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.10);box-shadow:0 8px 20px rgba(0,0,0,.40)}
+.leaflet-popup-content-wrapper{background:var(--card);color:var(--txt);border-radius:18px;box-shadow:0 14px 30px rgba(0,0,0,.45)}
+.leaflet-popup-tip{background:var(--card)}
+.leaflet-popup-content a{color:var(--org2)}
+.leaflet-bar a{background:var(--card);color:var(--txt);border-color:var(--line)}
+#btnPrefs{display:flex;align-items:center;gap:8px}
+#prefsState{margin-left:auto;font-size:12px}
+#prefsBody{padding:2px 0 4px}
+/* ===== true light mode ===== */
+body.light{--bg:#f6f1e7;--bg2:#fffaf0;--card:#ffffff;--card2:#fdf6ea;--line:#e4d8c4;--txt:#2b1e35;--mut:#71617f;--dim:#a293b5}
+body.light .card{border-color:rgba(60,30,90,.08);box-shadow:0 12px 28px rgba(80,50,20,.14)}
+body.light #sheet{background:linear-gradient(180deg,#ffffff,#fdf6ea)}
+body.light #hdr,body.light #peek,body.light .fab{background:rgba(255,255,255,.92)}
+body.light .stat{background:rgba(90,50,0,.05);border-color:rgba(90,50,0,.07)}
+body.light .leaflet-popup-content-wrapper{background:#ffffff;color:#2b1e35}
+body.light .leaflet-popup-tip{background:#ffffff}
+#logCard{position:fixed;left:10px;right:10px;top:calc(var(--sat) + 64px);z-index:1150;padding:12px 14px;transition:transform .25s ease,opacity .25s ease}
+body.mode-nav #logCard{top:calc(var(--sat) + 158px)}
+#logCard.away{transform:translateY(-14px);opacity:0}
+.lc-head{display:flex;align-items:flex-start;gap:8px}
+.lc-flags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.lc-flags .chip{flex:1 1 40%;padding:9px 6px}
+.lc-row{display:flex;gap:8px;margin-top:8px;align-items:center}
+#lcNote{flex:1;min-width:0;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:9px 12px;color:var(--txt)}
+body.mode-nav #navBottom{padding-bottom:62px}
+#searchPanel{position:fixed;z-index:1350;top:calc(var(--sat) + 64px);left:50%;transform:translateX(-50%);width:min(430px,94vw);padding:12px 14px}
+#findInput{width:100%;min-height:44px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.07);color:var(--txt);padding:8px 10px;font-size:15px;margin:8px 0 4px}
+body.light #findInput{background:#fff}
+#searchResults{max-height:46vh;overflow-y:auto}
+.sr-row{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--line);padding:9px 2px;color:var(--txt);font-size:14.5px;cursor:pointer}
+.sr-e{font-size:20px;line-height:1.2}
+.crowdicon div{font-size:21px;text-align:center;filter:drop-shadow(0 0 3px rgba(255,255,255,.9)) drop-shadow(0 1px 2px rgba(0,0,0,.65))}
+.crowdicon .cout{filter:grayscale(.75) opacity(.85)}
+#btnResume{display:none!important;position:fixed;z-index:1400;right:calc(var(--sar) + 12px);bottom:196px;padding:10px 14px;font-weight:700;font-size:14.5px;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+body.mode-nav.rot-manual #btnResume{display:block!important}
+#sheetHandle,#peek{touch-action:none}
+#sheet{padding-bottom:30px}
+#sheet.collapsed{padding-bottom:10px}
+#sheet.collapsed #peek{min-height:40px;padding-bottom:0}
+#sheet.collapsed #sheetHandle{min-height:22px;padding-top:4px}
+</style>
+</head>
+<body class="mode-plan">
+<div id="map" aria-label="Map"></div>
+
+<header id="hdr" class="card plan-only">
+  <div class="hrow">
+    <span class="logo" aria-hidden="true">🎃</span>
+    <h1>JC Heights Candy Path</h1>
+    <button id="btnTheme" class="hbtn" aria-label="Toggle light and dark mode" title="Toggle light and dark mode">🌙</button>
+  </div>
+  <p id="tagline" hidden><span>Tell us where you start and how long you have. We build the loop that hits the most candy houses.</span><button id="btnIntroOk" aria-label="Dismiss intro">Got it</button></p>
+</header>
+
+<div id="pickBanner" class="card" hidden role="status">
+  <span id="pickText">Tap the map</span>
+  <button id="btnPickCancel" class="btn btn-sm btn-ghost">Cancel</button>
+</div>
+
+<div id="drawBar" class="card" hidden>
+  <span id="drawText">Tap the map to drop points</span>
+  <div class="row2" style="gap:6px">
+    <button id="btnDrawUndo" class="btn btn-sm btn-ghost">&#8626; Undo</button>
+    <button id="btnDrawClear" class="btn btn-sm btn-ghost">&#10006; Clear</button>
+    <button id="btnDrawDone" class="btn btn-sm btn-org">&#10003; Route it</button>
+    <button id="btnDrawCancel" class="btn btn-sm btn-ghost">Cancel</button>
+  </div>
+</div>
+<div id="exploreCard" class="card" hidden>
+  <div style="flex:1;min-width:0"><div id="exploreTitle" style="font-weight:800">Nearby</div><div id="exploreSub" class="muted" style="font-size:13px"></div></div>
+  <button id="btnExploreClose" class="btn btn-sm btn-ghost" aria-label="Dismiss">&#10006;</button>
+</div>
+
+<div id="fabs">
+  <button id="fabPin" class="fab" aria-label="Pin this spot">📌<span>Pin</span></button>
+  <button id="fabSearch" class="fab" aria-label="Find a treat stop">🔍<span>Find</span></button>
+  <button id="fabLog" class="fab" aria-label="Log this stop and add it to your haul">🍬<span>Log</span></button>
+  <button id="fabLocate" class="fab" aria-label="Center on my location">🎯<span id="fabLocateLbl">Me</span></button>
+  <button id="fabExplore" class="fab" aria-label="Explore mode: call out nearby treat spots" aria-pressed="false">&#129517;<span>Explore</span></button>
+  <button id="fabMute" class="fab" aria-label="Toggle voice">🔊<span>Voice</span></button>
+</div>
+
+<!-- ======== plan / view bottom sheet ======== -->
+<section id="sheet" class="card plan-only" aria-label="Plan your route">
+  <button id="sheetHandle" aria-label="Expand or collapse panel"><i></i></button>
+  <button id="peek" aria-label="Expand panel">🍬 Tap to plan your route</button>
+  <div id="sheetBody">
+    <div id="viewBanner" class="view-only">👀 <b>Shared route.</b> Someone sent you this candy loop. Tap <b>Start trick-or-treating</b> below to walk it.</div>
+
+    <div id="routeBlock" class="route-only">
+      <div id="stats" class="stats"></div>
+      <div id="fitNote" class="muted"></div>
+      <button id="btnFitMore" class="btn btn-ghost" aria-label="Show or hide the full route notes">More &#9662;</button>
+      <div id="approxNote" class="warn" hidden>⚠️ Walking directions are unavailable right now, so the route is drawn as straight lines between stops. Navigation is approximate: follow the sidewalks.</div>
+      <button id="btnNewRoute" class="btn btn-pur" style="width:100%;margin-top:8px">&#127922; New route &middot; different streets</button>
+      <button id="btnNav" class="btn btn-org btn-xl" style="margin-top:8px">🚶 Start trick-or-treating</button>
+      <div class="row3">
+        <button id="btnRebuild" class="btn btn-ghost plan-edit"><span class="ic">🔁</span>Rebuild</button>
+        <button id="btnPlanOwn" class="btn btn-ghost view-only"><span class="ic">✏️</span>Plan my own</button>
+        <a id="btnGmaps" class="btn btn-ghost" href="#" target="_blank" rel="noopener"><span class="ic">🗺️</span>Google Maps</a>
+        <button id="btnShare" class="btn btn-ghost"><span class="ic">🔗</span>Share route</button>
+      </div>
+      <button id="planToggle" class="btn btn-ghost route-only plan-edit" aria-expanded="false"><span id="planToggleText">⚙️ Change start or time</span><span>▾</span></button>
+    </div>
+
+    <div id="planInputs" class="plan-edit">
+      <div class="label" style="margin-top:4px">1 · Where do you start?</div>
+      <div class="row2">
+        <button id="btnLocate" class="btn btn-org">📍 Use my location</button>
+        <button id="btnDrop" class="btn btn-ghost">📌 Drop start pin</button>
+      </div>
+      <form id="searchForm" class="search" autocomplete="off">
+        <input id="searchInput" type="search" inputmode="search" enterkeyhint="search" placeholder="…or search an address" aria-label="Search an address">
+        <button class="btn btn-pur" type="submit" aria-label="Search">🔍</button>
+      </form>
+      <div id="startInfo" class="muted">No start yet. Tip: long-press the map to drop your start.</div>
+      <div class="label">2 · How long do you have?</div>
+      <div id="chips" class="chips" role="group" aria-label="Time budget"></div>
+      <button id="btnPrefs" class="btn btn-ghost" style="width:100%;margin-top:10px" aria-expanded="false"><span>&#9881;&#65039; Preferences</span><span id="prefsState" class="muted"></span><span id="prefsCaret">&#9662;</span></button>
+      <div id="prefsBody" hidden>
+        <div class="label">Route style</div>
+        <div id="styleChips" class="chips" style="grid-template-columns:repeat(3,1fr)" role="group" aria-label="Route style">
+          <button class="chip" data-style="best" aria-pressed="true">&#11088;<small>Best route</small></button>
+          <button class="chip" data-style="shuffle" aria-pressed="false">&#127922;<small>Shuffle it</small></button>
+          <button class="chip" data-style="fresh" aria-pressed="false">&#127381;<small>Fresh streets</small></button>
+        </div>
+        <div class="row2" style="margin-top:8px">
+          <button id="tglAllergy" class="btn btn-ghost" aria-pressed="false">&#128153; Allergy-safe</button>
+          <button id="tglStroller" class="btn btn-ghost" aria-pressed="false">&#128118; Stroller</button>
+        </div>
+      </div>
+      <button id="btnDraw" class="btn btn-ghost" style="width:100%;margin-top:10px">&#9999;&#65039; Draw my own route</button>
+      <button id="btnBuild" class="btn btn-org btn-xl">🍬 Build my route</button>
+    </div>
+
+    <div class="label">Tonight's haul</div>
+    <div class="haul">
+      <button class="btn js-candy" aria-label="Add one candy"><b class="js-candy-count">0</b><span>+ 🍬 Candy</span></button>
+      <button class="btn js-house" aria-label="Add one house visited"><b class="js-house-count">0</b><span>🏠 House visited</span></button>
+      <button class="btn btn-ghost js-undo" aria-label="Undo last count">↩︎</button>
+    </div>
+    <button id="btnSummary" class="btn btn-ghost" style="width:100%;margin-top:10px">🌙 End night &amp; see haul</button>
+    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v4.3</div>
+    <p class="foot">Routes are estimates. Stay on sidewalks and cross at corners.</p>
+  </div>
+</section>
+
+<!-- ======== navigation UI ======== -->
+<div id="navTop" class="card nav-only" role="status" aria-live="polite">
+  <div id="navArrowBox"><div id="navArrow">↑</div><div id="navDist">--</div></div>
+  <div id="navText">
+    <div id="navInstr">Waiting for GPS…</div>
+    <div id="navThen"></div>
+    <div id="navFlag" hidden></div>
+  </div>
+</div>
+<button id="btnResume" class="card nav-only" hidden>🧭 Resume compass</button>
+<div id="navBottom" class="card nav-only">
+  <div class="nstats">
+    <div class="nstat"><b id="nElapsed">0:00</b><span>⏱ elapsed</span></div>
+    <div class="nstat"><b id="nStops">0/0</b><span>🍬 stops</span></div>
+    <div class="nstat"><b id="nEta">--</b><span id="nEtaSub">🏠 home at</span></div>
+    <button id="btnEnd" class="btn btn-red">End</button>
+  </div>
+  <div class="haul">
+    <button class="btn js-candy" aria-label="Add one candy"><b class="js-candy-count">0</b><span>+ 🍬 Candy</span></button>
+    <button class="btn js-house" aria-label="Add one house visited"><b class="js-house-count">0</b><span>🏠 House visited</span></button>
+    <button class="btn btn-ghost js-undo" aria-label="Undo last count">↩︎</button>
+  </div>
+  <div class="navtools">
+    <button id="btnHeadHome" class="btn btn-ghost">🏠 Head home</button>
+    <button id="btnSkipStop" class="btn btn-ghost">⏭ Skip stop</button>
+    <button id="btnReroute" class="btn btn-pur">&#128256; New route</button>
+    <button id="btnHeadUp" class="btn btn-ghost" aria-pressed="true">🧭 Heading-up</button>
+  </div>
+</div>
+
+<!-- ======== pin chooser ======== -->
+<div id="pinSheet" class="overlay" hidden>
+  <div class="ocard card" role="dialog" aria-modal="true" aria-labelledby="pinTitle">
+    <h2 id="pinTitle">📌 Pin this spot</h2>
+    <div class="seg" id="pinWhere">
+      <button data-where="gps" aria-pressed="true">📍 My location</button>
+      <button data-where="tap" aria-pressed="false">👆 Tap the map</button>
+    </div>
+    <div id="pinGpsNote" class="muted" hidden></div>
+    <div class="pingrid">
+      <button data-type="candy"><span class="e">🎃</span>Candy here</button>
+      <button data-type="decor"><span class="e">👻</span>Great decorations</button>
+      <button data-type="nonfood"><span class="e"><i class="teal"></i></span>Non-food treats</button>
+      <button data-type="out"><span class="e"><i class="outx">✕</i></span>Out of candy</button>
+    </div>
+    <button id="pinCancel" class="btn btn-ghost" style="width:100%">Cancel</button>
+  </div>
+</div>
+
+<!-- ======== generic dialog ======== -->
+<div id="dlg" class="overlay center" hidden>
+  <div class="ocard card" role="alertdialog" aria-modal="true" aria-labelledby="dlgTitle">
+    <h2 id="dlgTitle"></h2>
+    <p id="dlgText"></p>
+    <div id="dlgBtns" class="btns"></div>
+  </div>
+</div>
+
+<!-- ======== busy ======== -->
+<div id="busy" hidden>
+  <div class="ocard card" role="alert" aria-live="assertive">
+    <div class="spin" aria-hidden="true"></div>
+    <div id="busyText">Working…</div>
+    <div id="busySub"></div>
+    <div id="busyElapsed"></div>
+    <button id="busyCancel" class="btn btn-ghost" style="width:100%">Cancel</button>
+  </div>
+</div>
+
+<div id="searchPanel" class="card" hidden>
+  <div class="lc-head"><b>🔍 Find a treat stop</b><button id="searchClose" class="lc-x" aria-label="Close search">✕</button></div>
+  <input id="findInput" type="search" placeholder="Try Sherman, Ogden, Leonard, a store name…" autocomplete="off">
+  <div id="searchResults"></div>
+</div>
+<div id="logCard" class="card" hidden>
+  <div class="lc-head">
+    <div style="flex:1;min-width:0"><b id="lcTitle">&#127875; Candy here, logged</b><div id="lcSub" class="muted" style="font-size:12px"></div></div>
+    <button id="lcClose" class="btn btn-ghost btn-sm" aria-label="Dismiss">&#10005;</button>
+  </div>
+  <div class="lc-flags" role="group" aria-label="Treat status">
+    <button class="chip lc-flag" data-flag="candy" aria-pressed="true">&#127852; Giving candy</button>
+    <button class="chip lc-flag" data-flag="out" aria-pressed="false">&#128683; Ran out</button>
+    <button class="chip lc-flag" data-flag="nonfood" aria-pressed="false">&#128153; Non-food / allergy-safe</button>
+    <button class="chip lc-flag" data-flag="decor" aria-pressed="false">&#128123; Decor only</button>
+  </div>
+  <div class="lc-row" style="align-items:center;justify-content:space-between">
+    <span style="font-weight:600">Candies from this stop</span>
+    <span style="display:flex;gap:8px;align-items:center">
+      <button id="lcCandyMinus" class="btn btn-ghost btn-sm" aria-label="One fewer candy">−</button>
+      <b id="lcCandyN" style="min-width:22px;text-align:center">0</b>
+      <button id="lcCandyPlus" class="btn btn-ghost btn-sm" aria-label="One more candy">+</button>
+    </span>
+  </div>
+  <div class="lc-row">
+    <input id="lcNote" type="text" placeholder="Add a note (optional)" aria-label="Add a note">
+    <label class="btn btn-ghost btn-sm" style="white-space:nowrap">&#128247; Photo<input id="lcPhoto" type="file" accept="image/*" capture="environment" hidden></label>
+  </div>
+  <img id="lcThumb" hidden alt="Photo of this stop" style="max-width:120px;border-radius:10px;margin-top:6px">
+  <div class="muted" style="font-size:11px;margin-top:4px">📣 Shared live with other trick-or-treaters. Swipe the card away when you're done.</div>
+</div>
+
+<!-- ======== end-of-night summary ======== -->
+<div id="summary" hidden>
+  <div class="inner">
+    <div class="big">🎃</div>
+    <h2>What a night!</h2>
+    <div class="muted" id="sumSub">Here's your haul.</div>
+    <div class="sgrid">
+      <div class="sbox"><b id="sumHouses">0</b><span>🏠 houses visited</span></div>
+      <div class="sbox"><b id="sumCandy">0</b><span>🍬 candies</span></div>
+      <div class="sbox"><b id="sumDist">0</b><span>👣 walked</span></div>
+      <div class="sbox"><b id="sumTime">0</b><span>⏱ time out</span></div>
+    </div>
+    <p class="muted" id="sumExtra"></p>
+    <div class="btns">
+      <button id="btnSumNew" class="btn btn-org btn-xl">🔁 New route</button>
+      <button id="btnSumClose" class="btn btn-ghost btn-xl">Back to map</button>
+    </div>
+    <p class="foot">Routes are estimates. Stay on sidewalks and cross at corners.</p>
+  </div>
+</div>
+
+<div id="toasts" aria-live="polite"></div>
+
+<div id="fatal" hidden>
+  <div><div style="font-size:56px">🎃</div><h2>The map couldn't load</h2><p class="muted">JC Heights Candy Path needs an internet connection to load the map. Check your signal, then reload the page.</p><button class="btn btn-org" onclick="location.reload()">Reload</button></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+var HEIGHTS_STOPS = [{"t":"biz","name":"Tutu School","addr":"499 Palisade Ave","lat":40.74549,"lon":-74.04326,"acts":["candy","decor","costume"],"hours":"2\u20138pm","notes":["Ballet studio!"]},{"t":"biz","name":"Spark Place","addr":"411 Palisade Ave","lat":40.74266,"lon":-74.04524,"acts":["candy","decor"],"hours":"2\u20136pm","extras":["Sponsoring a Pumpkin Contest prize"]},{"t":"biz","name":"StudyCompleteK12","addr":"178 Central Ave","lat":40.74094,"lon":-74.05295,"acts":["candy","decor","costume"],"hours":"9am\u20132pm"},{"t":"biz","name":"Novick Hardware","addr":"302 Central Ave","lat":40.74527,"lon":-74.04978,"acts":["candy"],"hours":"4\u20136pm","notes":["Do the \u201c Monster Walk\u201d at Novick Hardware"]},{"t":"biz","name":"Lucky Honeybee","addr":"487 Palisade Ave","lat":40.74521,"lon":-74.04362,"acts":["candy"],"hours":"2\u20134pm","allergy":"Stickers for allergy sufferers"},{"t":"biz","name":"The Hair Room Jersey City","addr":"467 Palisade Ave","lat":40.74455,"lon":-74.04404,"acts":["candy","decor","costume"],"hours":"2\u20136pm","notes":["Doggie treats too \ud83d\udc3e"],"allergy":"Non-food treats too"},{"t":"biz","name":"Neighborgood","addr":"418 Baldwin Ave","lat":40.73506,"lon":-74.05287,"acts":["candy","decor","costume"],"hours":"2\u20138pm"},{"t":"biz","name":"The Cliff","addr":"38 Congress St","lat":40.74923,"lon":-74.04154,"acts":["candy","decor","pumpkin"],"hours":"8 am - 3 pm, then bowl outside after 3","extras":["Special: vampire blood and spooky themed coffee drinks, matcha and  lemonade","Sponsoring a Pumpkin Contest prize"],"notes":["Includes DOTD window puppet and Ofrenda"],"allergy":"Non-food treats too"},{"t":"biz","name":"Atacama Clay Studio","addr":"273 New York Ave","lat":40.7455,"lon":-74.04448,"acts":["candy"],"hours":"12 noon- 4pm","extras":["Little Hands mini clay pumpkin workshop, 3\u20134pm, ages 5\u20137, $5, 10 kids max, walk-ins only"],"allergy":"Allergy-safe candy (no nuts)"},{"t":"biz","name":"St. John's Lutheran Church","addr":"155 North St","lat":40.7535,"lon":-74.0482,"acts":["candy","costume"],"hours":"2pm-6pm","notes":["On the church steps"],"allergy":"Non-food treats too"},{"t":"biz","name":"New Heights Pilates","addr":"10 South St (corner of Palisade)","lat":40.7474,"lon":-74.04167,"acts":["candy","costume"],"hours":"2\u20136pm","notes":["We will have dog treats and Gluten Free & Nut Free Candy!"],"allergy":"Allergy-safe candy (no nuts)"},{"t":"biz","name":"Renato's Pizza Masters","addr":"278 Central Ave","lat":40.74272,"lon":-74.05154,"acts":["candy","decor","costume"],"hours":"2\u20134pm","extras":["Giving out Pok\u00e9mon card packs"],"allergy":"Non-food treats too"},{"t":"biz","name":"Cub & Fox Playhouse","addr":"367 Central Ave","lat":40.74777,"lon":-74.04823,"acts":["candy","decor","costume"],"hours":"2\u20138pm","allergy":"Non-food treats too"},{"t":"home","addr":"85 Laidlaw Ave","lat":40.73727,"lon":-74.05336,"acts":["candy","costume"]},{"t":"home","addr":"65 Congress St","lat":40.74977,"lon":-74.04296,"acts":["candy","decor","costume","pumpkin"],"notes":["Will have allergy safe treats! we will be trick or treating as well so may not be available all night\u2014 but will still leave candy out when we aren\u2019t home. Will have music and lots of decorations!"]},{"t":"home","addr":"616 Palisade Ave","lat":40.74939,"lon":-74.04092,"acts":["candy","decor"]},{"t":"home","addr":"127 New York Ave","lat":40.74062,"lon":-74.04759,"acts":["candy","costume"]},{"t":"home","addr":"57 South St","lat":40.74824,"lon":-74.04388,"acts":["candy","decor"],"notes":["Handing out candy in person 2 -5, after that honor system there will be a help yourself box!"]},{"t":"home","addr":"80 Bowers St","lat":40.74648,"lon":-74.04611,"acts":["candy","decor"]},{"t":"home","addr":"260 Griffith St","lat":40.74775,"lon":-74.05371,"acts":["candy","decor"],"notes":["Beetle juice sand worm tentacles and a friendly dog guaranteed"]},{"t":"home","addr":"184 Nelson Ave","lat":40.75809,"lon":-74.04922,"acts":["candy","decor","costume"]},{"t":"home","addr":"26 South St","lat":40.74772,"lon":-74.04251,"acts":["candy","decor","costume","pumpkin"],"notes":["Come by if you\u2019re thirsty \ud83e\ude78 \ud83e\uddd9\u200d\u2640\ufe0f"]},{"t":"home","addr":"83 Bowers St","lat":40.74654,"lon":-74.04629,"acts":["candy","decor"]},{"t":"home","addr":"101 Hancock Ave","lat":40.74606,"lon":-74.04713,"acts":["candy","decor"],"notes":["Will leave candy out for kids to grab"]},{"t":"home","addr":"248 New York Ave","lat":40.74464,"lon":-74.04503,"acts":["candy","decor","costume"],"notes":["No need to ring the doorbell, we\u2019ll be outside with candy"]},{"t":"home","addr":"108 Booraem Ave","lat":40.74039,"lon":-74.05068,"acts":["candy","decor","costume"]},{"t":"home","addr":"861 Summit Ave","lat":40.74355,"lon":-74.0542,"acts":["candy","decor","costume"]},{"t":"home","addr":"82 Hancock Ave","lat":40.7454,"lon":-74.04756,"acts":["candy"],"notes":["There will be a table outside\ud83d\udc95"]},{"t":"home","addr":"285 Webster Ave","lat":40.74828,"lon":-74.04376,"acts":["candy","decor"]},{"t":"home","addr":"99 Sherman Pl","lat":40.74547,"lon":-74.05535,"acts":["candy","decor"]},{"t":"home","addr":"151 Manhattan Ave","lat":40.74444,"lon":-74.05534,"acts":["candy","decor","costume"]},{"t":"home","addr":"275 Columbia Ave","lat":40.75716,"lon":-74.05091,"acts":["candy","decor","costume"]},{"t":"home","addr":"247 Griffith St","lat":40.74755,"lon":-74.05319,"acts":["candy","decor"],"notes":["Should be home around 7ish to pass out candy after my kid is done doing trick or treat. Will leave a bowl of candy on the stoop before hand."]},{"t":"home","addr":"31 Griffith St","lat":40.74414,"lon":-74.04475,"acts":["candy","decor"],"notes":["Pumpkin on stoop"]},{"t":"home","addr":"138 South St","lat":40.74988,"lon":-74.04919,"acts":["candy"],"notes":["Will have 2 sets of treats: with and without nuts"]},{"t":"home","addr":"430 Ogden Ave","lat":40.7479,"lon":-74.04066,"acts":["candy","decor","costume"]},{"t":"home","addr":"376 Ogden Ave","lat":40.74508,"lon":-74.04266,"acts":["candy"]},{"t":"home","addr":"82 Manhattan Ave","lat":40.74317,"lon":-74.05223,"acts":["candy","decor","costume"]},{"t":"home","addr":"418 Ogden Ave","lat":40.74757,"lon":-74.04087,"acts":["candy"]},{"t":"home","addr":"28 South St","lat":40.74777,"lon":-74.04263,"acts":["candy"]},{"t":"home","addr":"15 Leonard St","lat":40.75501,"lon":-74.04386,"acts":["candy","decor","costume"],"notes":["Fog machine in full effect and annual window display! All are welcome \ud83d\udc7b"]},{"t":"home","addr":"317 New York Ave","lat":40.74698,"lon":-74.04353,"acts":["candy","decor"]},{"t":"home","addr":"187 Ogden Ave","lat":40.74042,"lon":-74.04547,"acts":["candy","decor"],"notes":["Candy boxes will be out on the stoop for kids to take- one per person please!"]},{"t":"home","addr":"30 Graham St","lat":40.75201,"lon":-74.04685,"acts":["candy","decor","costume"]},{"t":"home","addr":"26 Reservoir Ave","lat":40.73869,"lon":-74.04911,"acts":["candy","decor","costume"]},{"t":"home","addr":"246 Hancock Ave","lat":40.75086,"lon":-74.04424,"acts":["candy","decor","costume"],"notes":["We will have allergy friendly treats!"]},{"t":"home","addr":"254 Hancock Ave","lat":40.75109,"lon":-74.04409,"acts":["candy","decor"]},{"t":"home","addr":"278 Sherman Ave","lat":40.75009,"lon":-74.04371,"acts":["candy"]},{"t":"home","addr":"231 Ogden Ave","lat":40.74146,"lon":-74.04481,"acts":["candy","decor"]},{"t":"home","addr":"371 New York Ave","lat":40.74884,"lon":-74.04234,"acts":["decor"],"notes":["Decorations for the littlest ones"]},{"t":"home","addr":"284 Sherman Ave","lat":40.75016,"lon":-74.04366,"acts":["candy"],"notes":["I will have a bowl of candy out on the doorstep! Honor system!"]},{"t":"home","addr":"295 New York Ave","lat":40.74621,"lon":-74.04402,"acts":["candy","decor"],"notes":["We will have a candy bowl out - we will be trick or treating"]},{"t":"home","addr":"90 Webster Ave","lat":40.74172,"lon":-74.04789,"acts":["candy","decor","costume"],"notes":["Graveyard and skeletons"]},{"t":"home","addr":"48 Lienau Pl","lat":40.74011,"lon":-74.05128,"acts":["candy","costume"],"notes":["Scream will be around"]},{"t":"home","addr":"145 Sherman Ave","lat":40.74576,"lon":-74.04631,"acts":["candy"],"notes":["Allergy and baby friendly treats!"]},{"t":"home","addr":"121 Ogden Ave","lat":40.73855,"lon":-74.04666,"acts":["candy","decor","costume"]},{"t":"home","addr":"170\u00bd Manhattan Ave","lat":40.74477,"lon":-74.05616,"acts":["candy","decor"],"notes":["Play a game to win your treats! No tricks ;)"]},{"t":"home","addr":"49 Ravine Ave","lat":40.74041,"lon":-74.04904,"acts":["candy","decor"],"notes":["Talking skeleton!"]},{"t":"home","addr":"421 Palisade Ave","lat":40.74307,"lon":-74.04498,"acts":["candy","decor"],"notes":["Ring 1B!"]},{"t":"home","addr":"182 Hancock Ave (corner of South St)","lat":40.74862,"lon":-74.04531,"acts":["candy","decor","costume"],"notes":["Ring bell, house on the corner with eyes on window"]},{"t":"home","addr":"103 Waverly St","lat":40.7386,"lon":-74.05297,"acts":["candy","decor"],"notes":["Decorations from the movies Coco and Nightmare before Christmas. There will be a tray in front of the house with treats. No need to climb the stairs"]},{"t":"home","addr":"149 Laidlaw Ave","lat":40.73859,"lon":-74.05629,"acts":["candy","decor","costume"]},{"t":"home","addr":"244 Hancock Ave","lat":40.7508,"lon":-74.04428,"acts":["candy"]},{"t":"home","addr":"157 South St","lat":40.74993,"lon":-74.04932,"acts":["candy"]},{"t":"home","addr":"61 South St","lat":40.74833,"lon":-74.04413,"acts":["candy","decor"]},{"t":"home","addr":"69 South St","lat":40.74846,"lon":-74.04486,"acts":["candy","decor","costume"],"notes":["Singing Skeleton"]},{"t":"home","addr":"13 Graham St","lat":40.75172,"lon":-74.04609,"acts":["candy","decor","costume"]},{"t":"home","addr":"139 Congress St","lat":40.75137,"lon":-74.04678,"acts":["candy","decor","costume"]},{"t":"home","addr":"30 Charles St","lat":40.7484,"lon":-74.04941,"acts":["candy","decor","costume"]},{"t":"home","addr":"38 Charles St","lat":40.74855,"lon":-74.04978,"acts":["candy","decor","costume"]},{"t":"home","addr":"27 Sherman Pl","lat":40.74426,"lon":-74.05209,"acts":["candy","decor","costume"]},{"t":"home","addr":"39 Sherman Pl","lat":40.74447,"lon":-74.05266,"acts":["candy","decor","costume"]},{"t":"home","addr":"110 Sherman Pl","lat":40.74566,"lon":-74.05586,"acts":["candy","decor","costume"]},{"t":"home","addr":"98 Sherman Ave","lat":40.74414,"lon":-74.04734,"acts":["candy","decor","costume"]},{"t":"home","addr":"135 Sherman Ave","lat":40.74541,"lon":-74.04653,"acts":["candy","decor","costume"]},{"t":"home","addr":"179 Sherman Ave","lat":40.74687,"lon":-74.04559,"acts":["candy","decor","costume"]},{"t":"home","addr":"187 Sherman Ave","lat":40.74714,"lon":-74.04542,"acts":["candy","decor","costume"]},{"t":"home","addr":"228 Sherman Ave","lat":40.74847,"lon":-74.04467,"acts":["candy","decor","costume"]},{"t":"home","addr":"240 Sherman Ave","lat":40.74895,"lon":-74.04444,"acts":["candy","decor","costume"]},{"t":"home","addr":"281 Sherman Ave","lat":40.75013,"lon":-74.04368,"acts":["candy","decor","costume"]},{"t":"home","addr":"299 Sherman Ave","lat":40.75035,"lon":-74.04353,"acts":["candy","decor","costume"]},{"t":"home","addr":"368 Webster Ave","lat":40.75101,"lon":-74.04201,"acts":["candy","decor","costume"]},{"t":"home","addr":"357 Webster Ave","lat":40.75065,"lon":-74.04224,"acts":["candy","decor","costume"]},{"t":"home","addr":"105 Paterson St","lat":40.75196,"lon":-74.05054,"acts":["candy","decor","costume"]},{"t":"block","addr":"New York Ave between South St and Congress St","lat":40.74856,"lon":-74.04243,"acts":["candy","decor","costume"],"notes":["We might leave treats out to go trick or treating ourselves"]},{"t":"block","addr":"Corner of Palisade Ave & Ferry St","lat":40.74,"lon":-74.04684,"acts":["candy"]},{"t":"block","addr":"Paterson St between Central Ave and Passaic Ave","lat":40.75069,"lon":-74.0472,"acts":["decor","costume"]},{"t":"block","addr":"Bowers St between Hancock Ave and Cambridge Ave","lat":40.74688,"lon":-74.04701,"acts":["candy","decor"]},{"t":"block","addr":"Corner of Ferry St & Ogden Ave","lat":40.73968,"lon":-74.04601,"acts":["candy","decor","costume"],"notes":["Ring the doorbell at the bottom of the steps. Press the button on the skeleton!"]},{"t":"block","addr":"Charles St between Central Ave and Summit Ave","lat":40.7484,"lon":-74.04924,"acts":["candy","decor","costume","pumpkin"]},{"t":"block","addr":"Hancock Ave between Congress St and North St","lat":40.75109,"lon":-74.044,"acts":["candy","decor"]},{"t":"block","addr":"New York Ave between Hutton St and Griffith St","lat":40.74354,"lon":-74.04563,"acts":["candy"],"notes":["We will be outside with dog that is VERY people and kid friendly - who will also be in a costume."]},{"t":"block","addr":"Ogden Ave between Bowers St and South St","lat":40.74617,"lon":-74.04187,"acts":["candy","decor"],"notes":["We'll be sitting at the end of our driveway with kid friendly Halloween music playing and lots of candy! We will also have small milkbone dog treats for furry friends!"]},{"t":"block","addr":"South St between Hancock Ave and Sherman Ave","lat":40.74859,"lon":-74.04501,"acts":["candy","decor","costume"],"notes":["Ring the bell the dog is friendly","Power to the People!"]},{"t":"block","addr":"Somewhere on Ogden Ave","lat":40.74214,"lon":-74.04446,"acts":["candy","decor"]},{"t":"block","addr":"Graham St between Central Ave and Summit Ave","lat":40.75204,"lon":-74.04672,"acts":["candy","decor"],"notes":["Candy on stoop"]},{"t":"block","addr":"Manhattan Ave between Montrose Ave and Summit Ave","lat":40.74416,"lon":-74.05484,"acts":["candy"]},{"t":"block","addr":"Webster Ave between Bowers St and South St","lat":40.74712,"lon":-74.04435,"acts":["candy","costume"],"notes":["We\u2019ll be sitting on our stoop handing out candy and other fun treats!!","lots of Halloween treats"]},{"t":"block","addr":"Ogden Ave between Wood Pl and Cuneo Pl","lat":40.73887,"lon":-74.04655,"acts":["candy","decor","costume"],"notes":["Doorbell doesn\u2019t work so we\u2019ll all be sitting on the porch!"]},{"t":"block","addr":"Webster Ave between Franklin St and Hutton St","lat":40.74252,"lon":-74.04729,"acts":["candy","decor","costume"]},{"t":"block","addr":"Corner of Ogden Ave & Griffith St","lat":40.74337,"lon":-74.04364,"acts":["candy","decor","costume"]},{"t":"block","addr":"New York Ave between Bowers St and South St","lat":40.74682,"lon":-74.04354,"acts":["candy","decor"]},{"t":"block","addr":"Troy St between Montrose Ave and Reservoir Ave","lat":40.74186,"lon":-74.05656,"acts":["candy","costume"]},{"t":"block","addr":"Pierce Ave between Bleecker St and Paterson St","lat":40.75149,"lon":-74.05024,"acts":["candy","decor"],"notes":["Hello Kitty inflatable"]},{"t":"block","addr":"Corner of Bowers St & Sherman Ave","lat":40.74649,"lon":-74.04572,"acts":["candy","decor","costume"]},{"t":"block","addr":"Griffith St between Milton Ave and Summit Ave","lat":40.74726,"lon":-74.0526,"acts":["candy","decor","costume"]},{"t":"block","addr":"Liberty Ave between Zabriskie St and Lincoln St","lat":40.749,"lon":-74.05759,"acts":["decor","pumpkin"],"notes":["Friendly Halloween decorations and bowls of candy on the front"]},{"t":"block","addr":"Ogden Ave between Griffith St and Franklin St","lat":40.74214,"lon":-74.04446,"acts":["candy","decor"]},{"t":"block","addr":"Sherman Ave between South St and Congress St","lat":40.74921,"lon":-74.04418,"acts":["candy","decor","costume"]},{"t":"block","addr":"New York Ave between Congress St and North St","lat":40.75012,"lon":-74.04141,"acts":["candy","decor","costume"],"notes":["We'll be taking our daughter trick or treating along Central but we'll leave candy on the porch until we get home."]},{"t":"block","addr":"Lincoln St, north side, mid-block","lat":40.74922,"lon":-74.05582,"acts":["candy"]},{"t":"block","addr":"Sherman Pl between Central Ave and Summit Ave","lat":40.74432,"lon":-74.05206,"acts":["candy","decor","costume"],"notes":["Candy shoot"]},{"t":"block","addr":"South St between Passaic Ave and Summit Ave","lat":40.74997,"lon":-74.04923,"acts":["candy","decor","costume"]},{"t":"block","addr":"Somewhere on Troy St","lat":40.74186,"lon":-74.05656,"acts":["candy","decor"],"notes":["Teal pumpkin - allergy safe treats also available"]},{"t":"block","addr":"Sherman Ave between Griffith St and Bowers St","lat":40.74563,"lon":-74.04631,"acts":["candy","decor","costume"],"notes":["Dressed as shrek"]},{"t":"block","addr":"Somewhere on Sherman Pl","lat":40.74525,"lon":-74.05457,"acts":["candy","decor"]},{"t":"block","addr":"Palisade Ave, 200 block","lat":40.73773,"lon":-74.04831,"acts":["candy"]},{"t":"block","addr":"Hopkins Ave between Central Ave and Summit Ave","lat":40.73785,"lon":-74.05773,"acts":["candy","decor"],"notes":["We'll probably be on the porch until around 6 before going out with pals"]},{"t":"block","addr":"Sherman Ave between Bowers St and South St","lat":40.74742,"lon":-74.04515,"acts":["candy","decor","costume"],"notes":["Dog Machine! Decorations! Treats for kids, dogs AND adults!"]},{"t":"block","addr":"South St between Sherman Ave and Webster Ave","lat":40.74827,"lon":-74.04416,"acts":["candy","decor","costume"]},{"t":"block","addr":"South St between Webster Ave and New York Ave","lat":40.74796,"lon":-74.04332,"acts":["candy","decor","costume"],"notes":["Chocolate, non chocolate and peanut free options, plus lots of decorations!"]},{"t":"block","addr":"Lincoln St between Summit Ave and Milton Ave","lat":40.7479,"lon":-74.05216,"acts":["candy","decor","costume"]},{"t":"block","addr":"Central Ave between Graham St and North St","lat":40.75188,"lon":-74.0453,"acts":["candy","decor","costume"]},{"t":"block","addr":"Sherman Pl between Summit Ave and Sanford Pl","lat":40.74525,"lon":-74.05457,"acts":["candy","decor","costume"]},{"t":"block","addr":"Sherman Ave at Hutton St","lat":40.74354,"lon":-74.04763,"acts":["candy","decor","costume"]},{"t":"block","addr":"Sherman Ave between Hutton St and Griffith St","lat":40.74423,"lon":-74.0472,"acts":["candy","decor","costume"]},{"t":"block","addr":"Sherman Ave between Congress St and North St","lat":40.75078,"lon":-74.04316,"acts":["candy","decor","costume"]},{"t":"block","addr":"Webster Ave between Congress St and North St","lat":40.75046,"lon":-74.04228,"acts":["candy","decor","costume"]},{"t":"block","addr":"Paterson St between Pierce Ave and John F Kennedy Blvd","lat":40.75224,"lon":-74.05109,"acts":["candy","decor","costume"]},{"t":"biz","name":"Hudson City Kids","addr":"474 Central Ave, Jersey City","lat":40.751087,"lon":-74.045747,"acts":["candy"],"notes":["Listed as a participating business in the Heights Halloween Trails promo"]},{"t":"biz","name":"Griot Cafe","addr":"398 Central Ave, Jersey City","lat":40.748309,"lon":-74.047628,"acts":["candy"],"notes":["Listed as a participating business in the Heights Halloween Trails promo"]}];
+var HEIGHTS_SEGS = {"c":[40.7508,-74.0455],"r":650,"segs":[[40.753077,-74.040101,40.753582,-74.039802,9],[40.753631,-74.039768,40.753696,-74.039728,8],[40.753696,-74.039728,40.7542,-74.039404,11],[40.754252,-74.039369,40.754315,-74.039329,2],[40.744816,-74.046839,40.744883,-74.04679,3],[40.744883,-74.04679,40.745528,-74.04637,21],[40.745528,-74.04637,40.746375,-74.045825,11],[40.746427,-74.045792,40.74649,-74.04575,10],[40.748344,-74.044565,40.748395,-74.044505,11],[40.748454,-74.044663,40.748525,-74.04462,26],[40.749959,-74.043699,40.750029,-74.043654,15],[40.752464,-74.044914,40.752417,-74.044797,3],[40.752417,-74.044797,40.752239,-74.044315,5],[40.752239,-74.044315,40.752215,-74.044247,5],[40.75195,-74.043554,40.751926,-74.04349,2],[40.751926,-74.04349,40.751888,-74.043391,6],[40.751888,-74.043391,40.751734,-74.042992,9],[40.751734,-74.042992,40.751605,-74.042645,6],[40.751605,-74.042645,40.751572,-74.04256,11],[40.751572,-74.04256,40.751299,-74.041846,10],[40.751299,-74.041846,40.751265,-74.041748,5],[40.751233,-74.041662,40.750969,-74.040954,11],[40.750969,-74.040954,40.75094,-74.040877,4],[40.750914,-74.040806,40.750661,-74.040127,2],[40.753693,-74.048886,40.75363,-74.048729,2],[40.75363,-74.048729,40.75314,-74.047503,5],[40.75314,-74.047503,40.753106,-74.047416,6],[40.752223,-74.045188,40.75219,-74.045103,7],[40.752264,-74.053047,40.752188,-74.052858,4],[40.75118,-74.050353,40.75093,-74.049726,10],[40.75093,-74.049726,40.750743,-74.049257,2],[40.750433,-74.048481,40.750405,-74.048411,3],[40.750405,-74.048411,40.749788,-74.046866,2],[40.749788,-74.046866,40.749752,-74.046777,11],[40.752363,-74.049632,40.751871,-74.049976,8],[40.751819,-74.050012,40.751761,-74.050054,5],[40.751761,-74.050054,40.751277,-74.050399,6],[40.751277,-74.050399,40.751216,-74.050442,2],[40.751216,-74.050442,40.751166,-74.050475,17],[40.751166,-74.050475,40.750623,-74.050834,53],[40.752816,-74.044662,40.752851,-74.04475,16],[40.753773,-74.047053,40.753808,-74.047141,4],[40.753808,-74.047141,40.754139,-74.047964,10],[40.754139,-74.047964,40.754186,-74.048084,5],[40.754186,-74.048084,40.754241,-74.048221,2],[40.754241,-74.048221,40.754439,-74.048723,17],[40.755308,-74.05092,40.75535,-74.051027,4],[40.7541,-74.043776,40.754133,-74.043866,14],[40.755086,-74.046257,40.755389,-74.04705,7],[40.755389,-74.04705,40.755439,-74.047182,2],[40.755439,-74.047182,40.755489,-74.047307,17],[40.756566,-74.050044,40.756616,-74.050172,2],[40.752264,-74.053047,40.752436,-74.052997,2],[40.752445,-74.052994,40.753481,-74.052294,3],[40.753537,-74.052256,40.754015,-74.05194,7],[40.754015,-74.05194,40.754072,-74.051902,3],[40.754072,-74.051902,40.754721,-74.051457,13],[40.754859,-74.051361,40.754917,-74.05132,2],[40.754917,-74.05132,40.754982,-74.051276,9],[40.75535,-74.051027,40.755424,-74.050977,11],[40.755424,-74.050977,40.755976,-74.050608,23],[40.755976,-74.050608,40.756616,-74.050172,7],[40.756616,-74.050172,40.756685,-74.050124,6],[40.754862,-74.047737,40.754812,-74.047608,2],[40.754812,-74.047608,40.754763,-74.047481,3],[40.754763,-74.047481,40.754457,-74.046696,2],[40.754457,-74.046696,40.754423,-74.04661,2],[40.754423,-74.04661,40.754388,-74.046537,4],[40.753495,-74.044309,40.753459,-74.044216,6],[40.751562,-74.045527,40.751596,-74.045615,28],[40.752472,-74.047868,40.752506,-74.047954,4],[40.752506,-74.047954,40.752533,-74.048022,15],[40.753411,-74.050201,40.753477,-74.050363,2],[40.753477,-74.050363,40.75403,-74.051794,13],[40.749163,-74.047183,40.7492,-74.04728,12],[40.7492,-74.04728,40.749843,-74.048884,21],[40.749843,-74.048884,40.750088,-74.0495,3],[40.750088,-74.0495,40.750121,-74.049585,2],[40.750121,-74.049585,40.750153,-74.049664,4],[40.750153,-74.049664,40.750623,-74.050834,6],[40.751517,-74.053051,40.751658,-74.053401,21],[40.751658,-74.053401,40.751715,-74.053543,3],[40.74935,-74.047054,40.749312,-74.04695,5],[40.749043,-74.046241,40.749005,-74.046147,2],[40.748745,-74.04544,40.748714,-74.045365,20],[40.748714,-74.045365,40.748454,-74.044663,14],[40.74843,-74.044601,40.748395,-74.044505,4],[40.748395,-74.044505,40.748142,-74.043853,10],[40.748142,-74.043853,40.748106,-74.04376,7],[40.748106,-74.04376,40.748069,-74.043661,2],[40.748069,-74.043661,40.747827,-74.042996,10],[40.747802,-74.042926,40.747773,-74.042849,9],[40.747773,-74.042849,40.747516,-74.042164,14],[40.747516,-74.042164,40.747482,-74.042074,3],[40.74745,-74.041992,40.747192,-74.041318,2],[40.747192,-74.041318,40.747163,-74.041247,3],[40.746071,-74.045013,40.746127,-74.04498,2],[40.756073,-74.046749,40.756019,-74.04661,2],[40.756019,-74.04661,40.755872,-74.04623,6],[40.755872,-74.04623,40.755714,-74.045822,6],[40.745722,-74.048244,40.746257,-74.047912,11],[40.746257,-74.047912,40.746535,-74.047732,2],[40.746535,-74.047732,40.746643,-74.047666,4],[40.746643,-74.047666,40.746968,-74.047454,5],[40.747021,-74.047419,40.747086,-74.047376,4],[40.747086,-74.047376,40.747497,-74.047106,11],[40.747497,-74.047106,40.747741,-74.046945,5],[40.747741,-74.046945,40.748956,-74.046178,4],[40.750352,-74.046363,40.75039,-74.046452,18],[40.75039,-74.046452,40.751008,-74.047971,20],[40.751043,-74.048057,40.751077,-74.048144,7],[40.751077,-74.048144,40.751286,-74.048672,5],[40.751318,-74.048751,40.751353,-74.04884,4],[40.751353,-74.04884,40.751539,-74.049308,12],[40.751539,-74.049308,40.751792,-74.049945,3],[40.751819,-74.050012,40.751849,-74.050088,2],[40.751849,-74.050088,40.75241,-74.051501,8],[40.75241,-74.051501,40.752437,-74.051568,6],[40.752437,-74.051568,40.752586,-74.051943,5],[40.752586,-74.051943,40.75262,-74.052029,5],[40.75262,-74.052029,40.752676,-74.052172,2],[40.749843,-74.048884,40.749895,-74.048848,12],[40.749895,-74.048848,40.750389,-74.04851,13],[40.750433,-74.048481,40.750482,-74.048447,12],[40.750482,-74.048447,40.750985,-74.048097,4],[40.751086,-74.048027,40.751588,-74.047676,15],[40.751918,-74.048351,40.751881,-74.048259,2],[40.751881,-74.048259,40.751632,-74.047646,12],[40.751632,-74.047646,40.751174,-74.046481,15],[40.748987,-74.041099,40.748954,-74.041008,6],[40.748954,-74.041008,40.748861,-74.040748,4],[40.748861,-74.040748,40.748824,-74.040645,3],[40.747915,-74.048046,40.747952,-74.048144,9],[40.74884,-74.050365,40.748871,-74.050443,3],[40.748871,-74.050443,40.748906,-74.050532,8],[40.748906,-74.050532,40.749525,-74.052085,12],[40.750407,-74.054289,40.750458,-74.05442,2],[40.74609,-74.041473,40.746055,-74.041534,16],[40.745141,-74.042226,40.745209,-74.04241,7],[40.747278,-74.048482,40.74732,-74.048587,11],[40.748203,-74.050804,40.748235,-74.050884,5],[40.748235,-74.050884,40.748269,-74.05097,2],[40.748269,-74.05097,40.748853,-74.052432,5],[40.748885,-74.052513,40.748918,-74.052595,10],[40.748227,-74.040629,40.74848,-74.041315,5],[40.74848,-74.041315,40.748515,-74.04141,7],[40.748252,-74.052945,40.748824,-74.052555,14],[40.748885,-74.052513,40.748958,-74.052464,20],[40.748958,-74.052464,40.749477,-74.052117,25],[40.749477,-74.052117,40.749525,-74.052085,32],[40.751926,-74.04349,40.751873,-74.043524,16],[40.751873,-74.043524,40.750876,-74.044172,30],[40.750876,-74.044172,40.750347,-74.044507,8],[40.750274,-74.044554,40.750214,-74.044594,11],[40.747802,-74.042926,40.747741,-74.042965,12],[40.745827,-74.044173,40.745776,-74.044206,3],[40.745776,-74.044206,40.745096,-74.044639,6],[40.746929,-74.051781,40.747566,-74.051352,11],[40.747566,-74.051352,40.74763,-74.051308,3],[40.74763,-74.051308,40.748172,-74.050928,11],[40.748235,-74.050884,40.748309,-74.050832,13],[40.748309,-74.050832,40.748808,-74.050487,13],[40.748871,-74.050443,40.748939,-74.050396,17],[40.748939,-74.050396,40.749442,-74.050049,22],[40.749442,-74.050049,40.749497,-74.050011,3],[40.749497,-74.050011,40.74957,-74.049961,9],[40.74957,-74.049961,40.750056,-74.049629,11],[40.750056,-74.049629,40.750121,-74.049585,2],[40.750121,-74.049585,40.750183,-74.049542,4],[40.750183,-74.049542,40.75065,-74.049218,10],[40.75065,-74.049218,40.75071,-74.049176,2],[40.75077,-74.049134,40.751265,-74.048789,6],[40.751318,-74.048751,40.751372,-74.048715,8],[40.751372,-74.048715,40.751863,-74.048388,10],[40.751863,-74.048388,40.751918,-74.048351,3],[40.753537,-74.052256,40.7535,-74.052164,4],[40.7535,-74.052164,40.753199,-74.051414,2],[40.748987,-74.041099,40.749026,-74.041197,7],[40.749026,-74.041197,40.749279,-74.041865,15],[40.749309,-74.041945,40.749336,-74.042017,9],[40.749336,-74.042017,40.7496,-74.042716,9],[40.7496,-74.042716,40.749634,-74.042806,2],[40.749634,-74.042806,40.749676,-74.04292,16],[40.749676,-74.04292,40.74993,-74.043617,14],[40.749959,-74.043699,40.749987,-74.043774,12],[40.749987,-74.043774,40.750241,-74.044457,8],[40.750274,-74.044554,40.7503,-74.044623,2],[40.7503,-74.044623,40.750551,-74.0453,12],[40.750581,-74.045381,40.750609,-74.045457,9],[40.750609,-74.045457,40.750795,-74.045946,3],[40.748714,-74.045365,40.74866,-74.0454,10],[40.747226,-74.04631,40.746794,-74.046585,6],[40.746734,-74.046623,40.746679,-74.046657,12],[40.750518,-74.045423,40.750581,-74.045381,2],[40.750581,-74.045381,40.750654,-74.045328,8],[40.752182,-74.044351,40.752239,-74.044315,3],[40.748106,-74.04376,40.748189,-74.043749,29],[40.749634,-74.042806,40.749702,-74.042762,24],[40.751212,-74.041782,40.751265,-74.041748,7],[40.751265,-74.041748,40.751327,-74.04171,7],[40.751327,-74.04171,40.751811,-74.041416,4],[40.745555,-74.043427,40.745804,-74.04411,8],[40.745827,-74.044173,40.74586,-74.044242,9],[40.74586,-74.044242,40.746102,-74.044909,6],[40.746127,-74.04498,40.746157,-74.045063,9],[40.746157,-74.045063,40.746402,-74.045726,5],[40.746453,-74.045862,40.746705,-74.046545,8],[40.746763,-74.046703,40.746997,-74.047354,6],[40.747021,-74.047419,40.747048,-74.047492,4],[40.747048,-74.047492,40.747347,-74.048311,5],[40.747163,-74.041247,40.747515,-74.041018,11],[40.747515,-74.041018,40.74805,-74.040669,2],[40.751283,-74.039609,40.751214,-74.039655,3],[40.751214,-74.039655,40.750628,-74.040036,4],[40.750628,-74.040036,40.750567,-74.040075,4],[40.751121,-74.045828,40.751562,-74.045527,23],[40.751562,-74.045527,40.752131,-74.045143,23],[40.75219,-74.045103,40.752396,-74.044967,16],[40.752464,-74.044914,40.752534,-74.044864,7],[40.752816,-74.044662,40.753403,-74.044253,7],[40.745374,-74.049809,40.745802,-74.049506,8],[40.753114,-74.05129,40.75304,-74.051172,3],[40.75304,-74.051172,40.752408,-74.0496,13],[40.752384,-74.049538,40.751947,-74.048426,11],[40.752568,-74.038783,40.753101,-74.038442,5],[40.751756,-74.040933,40.751869,-74.041231,4],[40.751947,-74.04144,40.7522,-74.042109,3],[40.752296,-74.042259,40.752437,-74.04241,2],[40.755763,-74.043427,40.755915,-74.043478,2],[40.756078,-74.043533,40.756523,-74.043662,2],[40.756591,-74.043682,40.7567,-74.043713,2],[40.755637,-74.045775,40.755115,-74.046135,11],[40.755115,-74.046135,40.755055,-74.046176,6],[40.755055,-74.046176,40.754992,-74.046219,8],[40.754992,-74.046219,40.75448,-74.04657,10],[40.75448,-74.04657,40.754423,-74.04661,2],[40.754423,-74.04661,40.754366,-74.046649,14],[40.754366,-74.046649,40.753831,-74.047014,17],[40.753831,-74.047014,40.753773,-74.047053,5],[40.753773,-74.047053,40.753714,-74.047095,6],[40.753714,-74.047095,40.753201,-74.047459,12],[40.753201,-74.047459,40.75314,-74.047503,7],[40.75314,-74.047503,40.752877,-74.04769,7],[40.752877,-74.04769,40.752569,-74.047909,16],[40.752569,-74.047909,40.752506,-74.047954,5],[40.752476,-74.047974,40.752001,-74.048295,9],[40.752001,-74.048295,40.751918,-74.048351,2],[40.754721,-74.051457,40.754679,-74.051353,4],[40.754219,-74.050201,40.753751,-74.04903,2],[40.754625,-74.042438,40.754731,-74.042739,5],[40.754731,-74.042739,40.754859,-74.043102,4],[40.753659,-74.039842,40.754096,-74.041048,4],[40.754134,-74.041146,40.754165,-74.041228,2],[40.754165,-74.041228,40.754275,-74.041515,7],[40.754275,-74.041515,40.754625,-74.042438,2],[40.753163,-74.038402,40.753184,-74.038518,2],[40.753184,-74.038518,40.753607,-74.039695,4],[40.754683,-74.042399,40.754791,-74.042331,3],[40.755237,-74.042045,40.755305,-74.041997,2],[40.755305,-74.041997,40.755821,-74.041681,6],[40.755868,-74.041655,40.755919,-74.041625,4],[40.754772,-74.040744,40.754743,-74.040665,2],[40.754802,-74.040828,40.754772,-74.040744,2],[40.755416,-74.040434,40.755469,-74.04058,6],[40.755469,-74.04058,40.755618,-74.040988,12],[40.755618,-74.040988,40.755836,-74.041586,3],[40.756033,-74.043258,40.755946,-74.043272,2],[40.746632,-74.048923,40.746672,-74.049028,8],[40.747438,-74.051021,40.747537,-74.051278,3],[40.747566,-74.051352,40.748029,-74.052541,19],[40.748689,-74.040268,40.748748,-74.040243,4],[40.748796,-74.040222,40.749179,-74.039962,11],[40.74504,-74.041857,40.745523,-74.04164,4],[40.745523,-74.04164,40.745838,-74.041498,2],[40.74609,-74.04137,40.746229,-74.041257,2],[40.755603,-74.04285,40.756281,-74.042403,5],[40.756383,-74.044165,40.756635,-74.044819,8],[40.755612,-74.043498,40.755673,-74.04369,6],[40.755673,-74.04369,40.756276,-74.045229,17],[40.756276,-74.045229,40.75631,-74.045315,5],[40.75631,-74.045315,40.756343,-74.0454,4],[40.756343,-74.0454,40.756697,-74.046311,24],[40.755673,-74.04369,40.755729,-74.043674,2],[40.756319,-74.04293,40.756357,-74.043009,2],[40.7511,-74.053985,40.751043,-74.053849,8],[40.749497,-74.050011,40.749464,-74.049928,3],[40.75137,-74.040608,40.751007,-74.040835,3],[40.754923,-74.043193,40.755552,-74.043382,2],[40.745519,-74.043326,40.745611,-74.043269,15],[40.747426,-74.04211,40.747482,-74.042074,4],[40.747482,-74.042074,40.747538,-74.042038,15],[40.747538,-74.042038,40.748515,-74.04141,11],[40.746142,-74.049268,40.746112,-74.049185,3],[40.746672,-74.048115,40.746606,-74.047927,2],[40.746672,-74.048115,40.746367,-74.048307,3],[40.748094,-74.047921,40.748066,-74.047842,6],[40.755326,-74.040389,40.754849,-74.040695,8],[40.754772,-74.040744,40.754704,-74.040786,8],[40.754704,-74.040786,40.754231,-74.041083,8],[40.754093,-74.041171,40.753903,-74.041291,3],[40.751317,-74.039709,40.751461,-74.040121,7],[40.751461,-74.040121,40.751528,-74.040312,2],[40.751584,-74.040473,40.751702,-74.04079,2],[40.746067,-74.049321,40.746142,-74.049268,9],[40.746234,-74.047854,40.746139,-74.047589,7],[40.746139,-74.047589,40.74634,-74.047462,5],[40.748861,-74.040748,40.748805,-74.040775,2],[40.748796,-74.040781,40.748656,-74.040863,2],[40.748755,-74.040689,40.748637,-74.040755,2],[40.746779,-74.048039,40.746661,-74.047714,2],[40.755786,-74.046946,40.755741,-74.046827,2],[40.755622,-74.046511,40.755614,-74.04644,4],[40.755623,-74.046398,40.755752,-74.046307,2],[40.755752,-74.046307,40.755809,-74.046267,7],[40.752908,-74.051701,40.752856,-74.051576,3],[40.752856,-74.051576,40.752727,-74.051273,6],[40.752727,-74.051273,40.752605,-74.05136,3],[40.752605,-74.05136,40.752448,-74.051474,4],[40.754439,-74.048723,40.754483,-74.04868,7],[40.754511,-74.04866,40.754683,-74.048541,28],[40.745472,-74.047753,40.745379,-74.047554,4],[40.751455,-74.053081,40.751305,-74.053169,10],[40.751289,-74.053251,40.751406,-74.053561,9],[40.75142,-74.053596,40.751473,-74.053722,4],[40.747438,-74.051021,40.747491,-74.050989,3],[40.747491,-74.050989,40.74754,-74.050957,15],[40.74754,-74.050957,40.747608,-74.051114,2],[40.751008,-74.049673,40.751491,-74.049342,4],[40.747474,-74.047037,40.747263,-74.046417,31],[40.752413,-74.052478,40.752355,-74.052387,2],[40.752355,-74.052387,40.752312,-74.052271,4],[40.752312,-74.052271,40.752277,-74.052165,4],[40.752277,-74.052165,40.752328,-74.0521,3],[40.752328,-74.0521,40.752375,-74.052046,2],[40.752485,-74.052125,40.752482,-74.052027,2],[40.75307,-74.048197,40.752911,-74.047775,5],[40.754445,-74.050557,40.754677,-74.050389,3],[40.754677,-74.050389,40.754525,-74.049992,24],[40.747493,-74.040958,40.747459,-74.040866,2],[40.74934,-74.039483,40.749516,-74.039949,14],[40.756708,-74.045045,40.756382,-74.045266,9],[40.748549,-74.047615,40.748611,-74.047569,9],[40.748611,-74.047569,40.749163,-74.047183,4],[40.749163,-74.047183,40.749297,-74.04709,6],[40.749297,-74.04709,40.74935,-74.047054,2],[40.74935,-74.047054,40.749694,-74.04682,5],[40.749752,-74.046777,40.750352,-74.046363,8],[40.750352,-74.046363,40.750431,-74.046303,15],[40.750431,-74.046303,40.750762,-74.046076,10],[40.755683,-74.045743,40.75565,-74.045661,5],[40.75631,-74.045315,40.756251,-74.045355,6],[40.756251,-74.045355,40.755752,-74.045695,10],[40.754723,-74.04337,40.754529,-74.043501,6],[40.751382,-74.040182,40.751342,-74.040239,3],[40.75135,-74.040536,40.75137,-74.040608,3],[40.747383,-74.048406,40.747458,-74.048352,8],[40.747458,-74.048352,40.747864,-74.048082,8],[40.747864,-74.048082,40.747915,-74.048046,8],[40.747915,-74.048046,40.748094,-74.047921,11],[40.748094,-74.047921,40.748495,-74.047653,8],[40.751193,-74.046011,40.751156,-74.04591,2],[40.751156,-74.04591,40.751121,-74.045828,8],[40.751128,-74.046229,40.75125,-74.04615,10],[40.74658,-74.04896,40.746632,-74.048923,2],[40.746632,-74.048923,40.746905,-74.048736,7],[40.746905,-74.048736,40.747208,-74.04853,4],[40.756697,-74.046311,40.756137,-74.046704,8],[40.756073,-74.046749,40.756018,-74.046786,8],[40.756018,-74.046786,40.755786,-74.046946,8],[40.755786,-74.046946,40.755504,-74.047138,7],[40.755439,-74.047182,40.75539,-74.047215,10],[40.75539,-74.047215,40.754875,-74.047566,13],[40.754875,-74.047566,40.754812,-74.047608,2],[40.754812,-74.047608,40.754759,-74.047645,14],[40.754759,-74.047645,40.75439,-74.047895,6],[40.75439,-74.047895,40.754276,-74.047987,3],[40.754249,-74.048016,40.754186,-74.048084,2],[40.754186,-74.048084,40.754137,-74.048147,5],[40.754124,-74.048164,40.753906,-74.048457,8],[40.753906,-74.048457,40.753736,-74.048782,2],[40.753667,-74.048969,40.753634,-74.049056,6],[40.753634,-74.049056,40.75358,-74.049252,4],[40.75358,-74.049252,40.75354,-74.049444,17],[40.75354,-74.049444,40.753429,-74.050077,12],[40.753429,-74.050077,40.753411,-74.050201,3],[40.753411,-74.050201,40.753391,-74.050316,9],[40.753391,-74.050316,40.753299,-74.050828,15],[40.753299,-74.050828,40.753257,-74.050977,6],[40.753257,-74.050977,40.753201,-74.051111,3],[40.753201,-74.051111,40.753154,-74.051214,3],[40.753114,-74.05129,40.75308,-74.051357,4],[40.75308,-74.051357,40.752908,-74.051701,2],[40.752908,-74.051701,40.752833,-74.051857,3],[40.752833,-74.051857,40.752676,-74.052172,2],[40.752676,-74.052172,40.752641,-74.052246,3],[40.752641,-74.052246,40.752486,-74.052577,8],[40.752486,-74.052577,40.752348,-74.05287,6],[40.752348,-74.05287,40.752264,-74.053047,17],[40.746127,-74.04498,40.7462,-74.044935,19],[40.748043,-74.043765,40.748106,-74.04376,6],[40.751756,-74.040933,40.751843,-74.040876,2]]};
+/* ============================================================
+   JC Heights Candy Path - app engine (written by Ziggy after the agy
+   Opus run exhausted Steve's Antigravity quota mid-build;
+   shell + design by Claude Opus 5.5 via Antigravity).
+   ============================================================ */
+'use strict';
+if (typeof L === 'undefined') {
+  var f = document.getElementById('fatal');
+  if (f) f.hidden = false;
+  throw new Error('Leaflet failed to load');
+}
+
+/* ---------------- helpers ---------------- */
+var $ = function (id) { return document.getElementById(id); };
+var $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
+var M_PER_MI = 1609.344;
+var KID_PACE_MPS = 2600 / 3600; /* 2.6 km/h including door stops */
+function haversine(a, b) {
+  var R = 6371000, rad = Math.PI / 180;
+  var dLat = (b.lat - a.lat) * rad, dLng = (b.lng - a.lng) * rad;
+  var s = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(s)));
+}
+function toXY(p, origin) { /* meters east/north of origin, equirectangular */
+  var rad = Math.PI / 180;
+  return {
+    x: (p.lng - origin.lng) * rad * 6371000 * Math.cos(origin.lat * rad),
+    y: (p.lat - origin.lat) * rad * 6371000
+  };
+}
+function distToSeg(p, a, b) {
+  var o = a, P = toXY(p, o), A = { x: 0, y: 0 }, B = toXY(b, o);
+  var dx = B.x - A.x, dy = B.y - A.y, len2 = dx * dx + dy * dy;
+  var t = len2 ? Math.max(0, Math.min(1, ((P.x - A.x) * dx + (P.y - A.y) * dy) / len2)) : 0;
+  var cx = A.x + t * dx, cy = A.y + t * dy;
+  return { dist: Math.sqrt((P.x - cx) * (P.x - cx) + (P.y - cy) * (P.y - cy)), t: t };
+}
+function fmtDist(m) {
+  if (m == null || isNaN(m)) return '--';
+  if (m < 160) return Math.max(10, Math.round(m * 3.28084 / 10) * 10) + ' ft';
+  return (m / M_PER_MI).toFixed(m < 1609 ? 2 : 1) + ' mi';
+}
+function fmtDur(sec) {
+  var m = Math.round(sec / 60);
+  if (m < 60) return m + ' min';
+  return Math.floor(m / 60) + ' hr ' + (m % 60) + ' min';
+}
+function fmtClock(d) {
+  var h = d.getHours(), ap = h >= 12 ? 'PM' : 'AM'; h = h % 12; if (!h) h = 12;
+  var mm = d.getMinutes(); return h + ':' + (mm < 10 ? '0' : '') + mm + ' ' + ap;
+}
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+function fetchT(url, opts, ms) {
+  opts = opts || {};
+  var ctl = ('AbortController' in window) ? new AbortController() : null;
+  if (ctl) { opts.signal = ctl.signal; }
+  var to = setTimeout(function () { if (ctl) ctl.abort(); }, ms || 20000);
+  return fetch(url, opts).then(function (r) {
+    clearTimeout(to);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r;
+  }, function (e) { clearTimeout(to); throw e; });
+}
+
+/* ---------------- persistent state ---------------- */
+var store = {
+  get: function (k, dft) {
+    try { var v = localStorage.getItem('cr_' + k); return v == null ? dft : JSON.parse(v); }
+    catch (e) { return dft; }
+  },
+  set: function (k, v) { try { localStorage.setItem('cr_' + k, JSON.stringify(v)); } catch (e) {} }
+};
+var S = {
+  start: store.get('start', null),            /* {lat,lng,label} */
+  budget: store.get('budget', 60),
+  muted: store.get('muted', false),
+  dark: store.get('dark', true),
+  pins: store.get('pins', []),                /* {lat,lng,type,ts} */
+  counts: store.get('counts', { candy: 0, houses: 0, hist: [] }),
+  pos: null,                                  /* last GPS fix {lat,lng,acc,heading,ts} */
+  follow: true,
+  route: null,                                /* built route object */
+  nav: null,                                  /* active navigation state */
+  pickMode: null,                             /* 'start' | 'pin' */
+  pendingPinType: null,
+  stopsOn: store.get('stopsOn', true),
+  viewMode: false
+};
+
+/* ---------------- toasts / dialog / busy ---------------- */
+function toast(msg, kind, btnLabel, btnFn) {
+  var box = $('toasts'), t = document.createElement('div');
+  t.className = 'toast ' + (kind || '');
+  var span = document.createElement('span'); span.textContent = msg; t.appendChild(span);
+  var kill = function () { if (t.parentNode) t.parentNode.removeChild(t); };
+  if (btnLabel) {
+    var b = document.createElement('button'); b.textContent = btnLabel;
+    b.onclick = function () { kill(); if (btnFn) btnFn(); };
+    t.appendChild(b);
+  }
+  var x = document.createElement('button'); x.textContent = '✕'; x.setAttribute('aria-label', 'Dismiss');
+  x.onclick = kill; t.appendChild(x);
+  box.appendChild(t);
+  setTimeout(kill, btnLabel ? 9000 : 4600);
+}
+var dlgCleanup = null;
+function showDlg(title, text, buttons) {
+  $('dlgTitle').textContent = title;
+  $('dlgText').textContent = text;
+  var wrap = $('dlgBtns'); wrap.innerHTML = '';
+  if (dlgCleanup) dlgCleanup();
+  buttons.forEach(function (b) {
+    var btn = document.createElement('button');
+    btn.className = 'btn ' + (b.cls || 'btn-ghost'); btn.textContent = b.label;
+    btn.onclick = function () { $('dlg').hidden = true; if (b.fn) b.fn(); };
+    wrap.appendChild(btn);
+  });
+  $('dlg').hidden = false;
+}
+var busyCtl = null, busyTimer = null, busyT0 = 0;
+function showBusy(text, sub) {
+  $('busyText').textContent = text || 'Working…';
+  $('busySub').textContent = sub || '';
+  $('busyElapsed').textContent = '';
+  $('busy').hidden = false;
+  busyCtl = ('AbortController' in window) ? new AbortController() : null;
+  busyT0 = Date.now();
+  if (busyTimer) clearInterval(busyTimer);
+  busyTimer = setInterval(function () {
+    var s = Math.round((Date.now() - busyT0) / 1000);
+    if (s >= 5) $('busyElapsed').textContent = '⏳ ' + s + 's on this step… still working';
+  }, 1000);
+  return busyCtl;
+}
+function hideBusy() {
+  $('busy').hidden = true; busyCtl = null;
+  if (busyTimer) { clearInterval(busyTimer); busyTimer = null; }
+}
+$('busyCancel').addEventListener('click', function () {
+  if (busyCtl) busyCtl.abort();
+  hideBusy();
+  toast('Cancelled.', 'warn');
+});
+
+/* ---------------- voice ---------------- */
+function speak(text) {
+  if (S.muted || !('speechSynthesis' in window)) return;
+  try {
+    var u = new SpeechSynthesisUtterance(text);
+    u.rate = 1.02; u.volume = 1;
+    window.speechSynthesis.speak(u);
+  } catch (e) {}
+}
+function speakNow(text) {
+  if (S.muted || !('speechSynthesis' in window)) return;
+  try { window.speechSynthesis.cancel(); } catch (e) {}
+  speak(text);
+}
+
+/* ---------------- map ---------------- */
+var map = L.map('map', { zoomControl: false, attributionControl: true });
+var tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+map.setView([40.7484, -74.0452], 15); /* Jersey City Heights default */
+function applyTheme() {
+  /* True dual mode. Dark: plum UI plus a genuinely dark map (standard tiles
+     through an invert/hue-rotate filter on the tile pane only, so markers and
+     the route keep their true colors). Light: warm paper UI, clean tiles. */
+  $('map').classList.toggle('dark-tiles', S.dark);
+  $('map').classList.remove('dim-tiles');
+  document.body.classList.toggle('light', !S.dark);
+  $('btnTheme').textContent = S.dark ? '🌙' : '☀️';
+}
+$('btnTheme').addEventListener('click', function () {
+  S.dark = !S.dark; store.set('dark', S.dark); applyTheme();
+});
+if (S.dark === undefined) S.dark = store.get('dark', true);
+applyTheme();
+map.on('dragstart', function () { if (S.nav) S.follow = false; });
+
+/* layers */
+var routeLayer = L.layerGroup().addTo(map);
+var stopLayer = L.layerGroup().addTo(map);
+var pinLayer = L.layerGroup().addTo(map);
+var heightsLayer = L.layerGroup().addTo(map);
+var crowdLayer = L.layerGroup().addTo(map);
+
+/* my-location marker */
+var meIcon = L.divIcon({
+  className: 'me-wrap', iconSize: [64, 64], iconAnchor: [32, 32],
+  html: '<div class="me" id="meEl"><div class="me-cone"></div><div class="me-pulse"></div><div class="me-dot"></div></div>'
+});
+var meMarker = null, meCircle = null;
+function renderMe() {
+  if (!S.pos) return;
+  var ll = [S.pos.lat, S.pos.lng];
+  if (!meMarker) {
+    meMarker = L.marker(ll, { icon: meIcon, interactive: false, zIndexOffset: 1000 }).addTo(map);
+    meCircle = L.circle(ll, { radius: S.pos.acc || 15, color: '#8b5cf6', weight: 1, opacity: 0.5, fillOpacity: 0.08 }).addTo(map);
+  } else {
+    meMarker.setLatLng(ll); meCircle.setLatLng(ll); meCircle.setRadius(S.pos.acc || 15);
+  }
+  var el = document.getElementById('meEl');
+  if (el) {
+    var stale = (Date.now() - S.pos.ts) > 25000;
+    el.classList.toggle('stale', stale);
+    el.classList.toggle('has-heading', S.pos.heading != null);
+    var cone = el.querySelector('.me-cone');
+    if (cone && S.pos.heading != null) cone.style.transform = 'rotate(' + S.pos.heading + 'deg)';
+  }
+}
+
+/* ---------------- geolocation ---------------- */
+var watchId = null, lastPosTs = 0;
+function ensureWatch() {
+  if (watchId != null || !('geolocation' in navigator)) return;
+  watchId = navigator.geolocation.watchPosition(onPos, onPosErr,
+    { enableHighAccuracy: true, maximumAge: 3000, timeout: 20000 });
+}
+function onPos(p) {
+  var c = p.coords;
+  S.pos = {
+    lat: c.latitude, lng: c.longitude,
+    acc: c.accuracy || 30,
+    heading: (c.heading != null && !isNaN(c.heading) && c.speed > 0.4) ? c.heading : (S.pos ? S.pos.heading : null),
+    ts: Date.now()
+  };
+  lastPosTs = S.pos.ts;
+  renderMe();
+  if (S.nav) navOnPos();
+  else if (S.follow && !S.route) { /* gentle follow pre-route only when user asked */ }
+}
+var posErrShown = false;
+function onPosErr(e) {
+  if (posErrShown) return;
+  posErrShown = true;
+  if (e.code === 1) toast('Location is off for this site. You can still drop a start pin or search an address.', 'warn');
+  else toast('GPS is having trouble. Move near a window or street if you can.', 'warn');
+}
+function getPosOnce() {
+  return new Promise(function (resolve, reject) {
+    if (!('geolocation' in navigator)) { reject({ code: 0, message: 'no geolocation' }); return; }
+    if (S.pos && Date.now() - S.pos.ts < 15000) { resolve(S.pos); return; }
+    navigator.geolocation.getCurrentPosition(function (p) {
+      onPos(p); resolve(S.pos);
+    }, function (e) {
+      if (e.code === 3) { /* timeout: one retry on coarse location */
+        navigator.geolocation.getCurrentPosition(function (p) {
+          onPos(p); resolve(S.pos);
+        }, function (e2) { reject(e2); },
+          { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 });
+      } else reject(e);
+    }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 5000 });
+  });
+}
+function gpsHelpDlg() {
+  if (window.isSecureContext === false) {
+    showDlg('GPS is blocked by how this page opened',
+      'This copy of JC Heights Candy Path was opened as a downloaded file or inside another app, and browsers block GPS there. Open the JC Heights Candy Path link directly in Chrome (Android) or Safari (iPhone) and GPS will work.',
+      [{ label: 'Got it', cls: 'btn-org' }]);
+    return;
+  }
+  showDlg('Location is blocked for this site',
+    'Your browser is set to deny location here. In Chrome: tap the icon at the left of the address bar, then Permissions (or Site settings), set Location to Allow, and tap "Use my location" again. In Safari: Settings app, Privacy & Security, Location Services, make sure Safari Websites is allowed. You can also drop a start pin instead.',
+    [{ label: 'Got it', cls: 'btn-org' }, { label: '📌 Drop a pin instead', cls: 'btn-ghost', fn: function () { enterPick('start', '👆 Tap the map to drop your start'); } }]);
+}
+
+/* ---------------- header / sheet basics ---------------- */
+if (!store.get('introSeen', false)) $('tagline').hidden = false;
+$('btnIntroOk').addEventListener('click', function () {
+  $('tagline').hidden = true; store.set('introSeen', true);
+});
+function setSheetCollapsed(c) {
+  $('sheet').classList.toggle('collapsed', c);
+  document.body.classList.toggle('sheet-collapsed', c);
+}
+$('sheetHandle').addEventListener('click', function () { if ($('sheet').dataset.dragged) return; setSheetCollapsed(!$('sheet').classList.contains('collapsed')); });
+$('peek').addEventListener('click', function () { if ($('sheet').dataset.dragged) return; setSheetCollapsed(false); });
+/* Drag the sheet by its handle (or the collapsed pill): pull down to
+   collapse, pull up to expand. Past the threshold it snaps; the click that
+   follows a real drag is swallowed so it does not toggle straight back. */
+(function () {
+  var sheet = $('sheet');
+  var drag = null;
+  function down(e) { drag = { y: e.clientY, moved: false }; sheet.style.transition = 'none'; try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {} }
+  function move(e) {
+    if (!drag) return;
+    var dy = e.clientY - drag.y;
+    var collapsed = sheet.classList.contains('collapsed');
+    if (!collapsed && dy > 0) { sheet.style.transform = 'translateY(' + Math.min(dy, 340) + 'px)'; drag.moved = dy > 8; }
+    else if (collapsed && dy < 0) { sheet.style.transform = 'translateY(' + Math.max(dy, -60) + 'px)'; drag.moved = dy < -8; }
+  }
+  function up(e) {
+    if (!drag) return;
+    var dy = e.clientY - drag.y;
+    var collapsed = sheet.classList.contains('collapsed');
+    sheet.style.transition = 'transform .18s ease';
+    sheet.style.transform = '';
+    if (!collapsed && dy > 70) setSheetCollapsed(true);
+    else if (collapsed && dy < -50) setSheetCollapsed(false);
+    if (drag.moved) { sheet.dataset.dragged = '1'; setTimeout(function () { delete sheet.dataset.dragged; }, 80); }
+    drag = null;
+  }
+  ['sheetHandle', 'peek'].forEach(function (id) {
+    var el = $(id); if (!el) return;
+    el.addEventListener('pointerdown', down);
+    el.addEventListener('pointermove', move);
+    el.addEventListener('pointerup', up);
+    el.addEventListener('pointercancel', function () { drag = null; sheet.style.transform = ''; });
+  });
+})();
+
+/* mute fab */
+function renderMute() {
+  $('fabMute').firstChild.textContent = S.muted ? '🔇' : '🔊';
+  $('fabMute').querySelector('span').textContent = S.muted ? 'Muted' : 'Voice';
+  $('fabMute').classList.toggle('attn', false);
+}
+$('fabMute').addEventListener('click', function () {
+  S.muted = !S.muted; store.set('muted', S.muted); renderMute();
+  if (!S.muted) speak('Voice on'); else if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+});
+renderMute();
+
+/* locate fab */
+$('fabLocate').addEventListener('click', function () {
+  ensureWatch();
+  getPosOnce().then(function (p) {
+    S.follow = true;
+    map.flyTo([p.lat, p.lng], Math.max(map.getZoom(), 17), { duration: 0.6 });
+  }).catch(function () { toast('Could not get your location.', 'err'); });
+});
+
+/* ---------------- start point ---------------- */
+var homeMarker = null;
+function renderStart() {
+  if (homeMarker) { map.removeLayer(homeMarker); homeMarker = null; }
+  if (S.start) {
+    homeMarker = L.marker([S.start.lat, S.start.lng], {
+      icon: L.divIcon({ className: 'homeicon', iconSize: [42, 42], iconAnchor: [21, 38], html: '<div><span>🏠</span></div>' }),
+      zIndexOffset: 900
+    }).addTo(map);
+    homeMarker.bindPopup('<div class="pop"><b>🏠 Start / home base</b><br>' + esc(S.start.label || '') + '</div>');
+    $('startInfo').innerHTML = '🏠 Start set' + (S.start.label ? ': <b>' + esc(S.start.label) + '</b>' : '') + '. Your loop ends back here.';
+  } else {
+    $('startInfo').textContent = 'No start yet. Tip: long-press the map to drop your start.';
+  }
+}
+function setStart(lat, lng, label, fly) {
+  S.start = { lat: lat, lng: lng, label: label || '' };
+  store.set('start', S.start);
+  renderStart();
+  if (fly) map.flyTo([lat, lng], Math.max(map.getZoom(), 16), { duration: 0.6 });
+}
+$('btnLocate').addEventListener('click', function () {
+  ensureWatch();
+  showBusy('Finding you…', 'GPS can take a few seconds outside.');
+  getPosOnce().then(function (p) {
+    hideBusy();
+    setStart(p.lat, p.lng, 'My location', true);
+    toast('Start set to your location.', 'ok');
+  }).catch(function (e) {
+    hideBusy();
+    if (e && e.code === 1) gpsHelpDlg();
+    else toast('Could not get a GPS fix. Step outside, or drop a pin / search instead.', 'err');
+  });
+});
+
+/* pick mode (start drop / pin tap) */
+function enterPick(mode, text) {
+  S.pickMode = mode;
+  $('pickText').textContent = text;
+  $('pickBanner').hidden = false;
+  document.body.classList.add('picking');
+}
+function exitPick() {
+  S.pickMode = null; S.pendingPinType = null;
+  $('pickBanner').hidden = true;
+  document.body.classList.remove('picking');
+}
+$('btnPickCancel').addEventListener('click', exitPick);
+$('btnDrop').addEventListener('click', function () {
+  enterPick('start', '👆 Tap the map to drop your start');
+});
+map.on('click', function (e) {
+  if (S.draw) { S.draw.pts.push(snapDrawPoint({ lat: e.latlng.lat, lng: e.latlng.lng })); redrawDraw(); return; }
+  if (S.pickMode === 'start') {
+    setStart(e.latlng.lat, e.latlng.lng, 'Dropped pin', false);
+    exitPick();
+    toast('Start set. Now pick your time and build your route.', 'ok');
+  } else if (S.pickMode === 'pin' && S.pendingPinType) {
+    addPin(e.latlng.lat, e.latlng.lng, S.pendingPinType);
+    exitPick();
+  }
+});
+map.on('contextmenu', function (e) {
+  if (S.nav || S.pickMode) return;
+  setStart(e.latlng.lat, e.latlng.lng, 'Dropped pin', false);
+  toast('Start set here. Pick your time and build your route.', 'ok');
+});
+
+/* address search (Nominatim) */
+$('searchForm').addEventListener('submit', function (ev) {
+  ev.preventDefault();
+  var q = $('searchInput').value.trim();
+  if (!q) return;
+  showBusy('Searching…', q);
+  var near = S.pos || S.start;
+  var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q) +
+    (near ? '&viewbox=' + (near.lng - 0.3) + ',' + (near.lat + 0.3) + ',' + (near.lng + 0.3) + ',' + (near.lat - 0.3) : '');
+  fetchT(url, { headers: { 'Accept': 'application/json' } }, 12000).then(function (r) { return r.json(); }).then(function (arr) {
+    hideBusy();
+    if (!arr || !arr.length) { toast('No match for that address. Try adding the city.', 'warn'); return; }
+    var a = arr[0];
+    setStart(parseFloat(a.lat), parseFloat(a.lon), (a.display_name || '').split(',').slice(0, 2).join(','), true);
+    toast('Start set from search.', 'ok');
+  }).catch(function () { hideBusy(); toast('Search failed. Check your connection.', 'err'); });
+});
+
+/* ---------------- budget chips ---------------- */
+(function buildChips() {
+  var wrap = $('chips');
+  [30, 45, 60, 90, 120].forEach(function (m) {
+    var b = document.createElement('button');
+    b.className = 'chip'; b.type = 'button';
+    b.setAttribute('aria-pressed', S.budget === m ? 'true' : 'false');
+    b.innerHTML = m + '<small>min</small>';
+    b.addEventListener('click', function () {
+      S.budget = m; store.set('budget', m);
+      $$('.chip', wrap).forEach(function (c) { c.setAttribute('aria-pressed', 'false'); });
+      b.setAttribute('aria-pressed', 'true');
+    });
+    wrap.appendChild(b);
+  });
+})();
+
+/* ---------------- haul counters ---------------- */
+function renderCounts(bumpEl) {
+  $$('.js-candy-count').forEach(function (e) { e.textContent = S.counts.candy; });
+  $$('.js-house-count').forEach(function (e) { e.textContent = S.counts.houses; });
+  if (bumpEl) { bumpEl.classList.remove('bump'); void bumpEl.offsetWidth; bumpEl.classList.add('bump'); }
+}
+function bumpCount(kind, btn) {
+  S.counts[kind]++; S.counts.hist.push(kind);
+  if (!S.counts.histLog) S.counts.histLog = [];
+  while (S.counts.histLog.length < S.counts.hist.length - 1) S.counts.histLog.push(null);
+  var logRes = kind === 'houses' ? logHouseLocation() : null;
+  S.counts.histLog.push(logRes ? logRes.ts : null);
+  if (logRes) { showLogCard(logRes.pin, logRes.sub); crowdSyncPin(logRes.pin); }
+  store.set('counts', S.counts); renderCounts(btn);
+}
+/* Tapping House visited also logs the spot as a treat location from the GPS
+   fix (Steve, Oct 31): snapped to a known treat stop when he is standing at
+   one, deduped against nearby pins, skipped when the fix is too rough. The
+   pin joins future route building like any candy pin. Returns the pin's ts
+   (for undo) or null. */
+function logHouseLocation() {
+  var c = (S.lastPos && S.lastPos.coords) ? S.lastPos.coords : null;
+  if (!c) return null;
+  var ll = { lat: c.latitude, lng: c.longitude };
+  var stopsData = (typeof HEIGHTS_STOPS !== 'undefined') ? HEIGHTS_STOPS : [];
+  var best = null, bd = 40;
+  stopsData.forEach(function (sx) { var d = haversine(ll, { lat: sx.lat, lng: sx.lon }); if (d < bd) { bd = d; best = sx; } });
+  var sub = 'From your GPS fix';
+  if (best) { ll = { lat: best.lat, lng: best.lon }; sub = best.name || best.addr || 'Treat stop'; }
+  else if (c.accuracy && c.accuracy > 100) return null;
+  for (var i = 0; i < S.pins.length; i++) { if (haversine(ll, S.pins[i]) < 25) return null; }
+  var ts = addPin(ll.lat, ll.lng, 'candy', 'house');
+  return { ts: ts, pin: S.pins[S.pins.length - 1], sub: sub };
+}
+
+/* Optional quick follow-up for a fresh house log: flag the treat status, add
+   a note or a photo to the stop's record. Never blocks: it auto-dismisses,
+   and a swipe or the X closes it instantly. */
+var logCardPin = null, logCardTimer = null;
+function paintLogFlags() {
+  if (!logCardPin) return;
+  document.querySelectorAll('.lc-flag').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-flag') === logCardPin.type)); });
+  $('lcTitle').textContent = { candy: '\uD83C\uDF83 Candy here, logged', out: '\uD83D\uDEAB Logged as ran out', nonfood: '\uD83D\uDC99 Non-food treats, logged', decor: '\uD83D\uDC7B Decor only, logged' }[logCardPin.type] || 'Logged';
+}
+function showLogCard(pin, sub) {
+  logCardPin = pin;
+  $('lcSub').textContent = sub || '';
+  $('lcNote').value = pin.note || '';
+  lcCandy = 0; paintLcCandy();
+  var th = $('lcThumb');
+  if (pin.photo) { th.src = pin.photo; th.hidden = false; } else { th.hidden = true; th.removeAttribute('src'); }
+  paintLogFlags();
+  var card = $('logCard');
+  card.classList.remove('away'); card.hidden = false;
+  armLogCardTimer();
+}
+function armLogCardTimer() {
+  if (logCardTimer) clearTimeout(logCardTimer);
+  logCardTimer = setTimeout(function () {
+    if (document.activeElement === $('lcNote')) { armLogCardTimer(); return; }
+    hideLogCard();
+  }, 12000);
+}
+function hideLogCard() {
+  if (logCardPin && logCardPin._noteDirty) { logCardPin._noteDirty = false; crowdSyncPin(logCardPin); }
+  var card = $('logCard');
+  if (logCardTimer) { clearTimeout(logCardTimer); logCardTimer = null; }
+  card.classList.add('away');
+  setTimeout(function () { card.hidden = true; logCardPin = null; }, 240);
+}
+$('lcClose').addEventListener('click', hideLogCard);
+document.querySelectorAll('.lc-flag').forEach(function (b) {
+  b.addEventListener('click', function () {
+    if (!logCardPin) return;
+    logCardPin.type = b.getAttribute('data-flag');
+    store.set('pins', S.pins); renderPins(); paintLogFlags(); armLogCardTimer(); crowdSyncPin(logCardPin);
+  });
+});
+$('lcNote').addEventListener('input', function () {
+  if (!logCardPin) return;
+  logCardPin.note = $('lcNote').value;
+  logCardPin._noteDirty = true;
+  store.set('pins', S.pins); armLogCardTimer();
+});
+$('lcPhoto').addEventListener('change', function () {
+  var f = $('lcPhoto').files && $('lcPhoto').files[0];
+  if (!f || !logCardPin) return;
+  var pin = logCardPin;
+  var rd = new FileReader();
+  rd.onload = function () {
+    var img = new Image();
+    img.onload = function () {
+      var sc = Math.min(1, 480 / Math.max(img.width, img.height));
+      var cv = document.createElement('canvas');
+      cv.width = Math.round(img.width * sc); cv.height = Math.round(img.height * sc);
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+      pin.photo = cv.toDataURL('image/jpeg', 0.72);
+      store.set('pins', S.pins);
+      var back = store.get('pins', []);
+      var kept = false;
+      for (var i = 0; i < back.length; i++) { if (back[i].ts === pin.ts && back[i].photo) kept = true; }
+      if (!kept) { delete pin.photo; store.set('pins', S.pins); toast('That photo was too big to keep on this device.', 'warn'); }
+      else { var th = $('lcThumb'); th.src = pin.photo; th.hidden = false; renderPins(); crowdSyncPin(pin); }
+      armLogCardTimer();
+    };
+    img.src = rd.result;
+  };
+  rd.readAsDataURL(f);
+});
+(function () {
+  var card = $('logCard'), sx = 0, sy = 0;
+  card.addEventListener('touchstart', function (e) { var t = e.changedTouches[0]; sx = t.clientX; sy = t.clientY; }, { passive: true });
+  card.addEventListener('touchend', function (e) {
+    var t = e.changedTouches[0];
+    if (Math.abs(t.clientY - sy) > 45 || Math.abs(t.clientX - sx) > 70) hideLogCard();
+  }, { passive: true });
+})();
+$$('.js-candy').forEach(function (b) { b.addEventListener('click', function () { bumpCount('candy', b); }); });
+$$('.js-house').forEach(function (b) { b.addEventListener('click', function () { bumpCount('houses', b); }); });
+$$('.js-undo').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var last = S.counts.hist.pop();
+    var loggedTs = (S.counts.histLog && S.counts.histLog.length) ? S.counts.histLog.pop() : null;
+    if (last) {
+      S.counts[last] = Math.max(0, S.counts[last] - 1);
+      if (loggedTs) {
+        for (var i = 0; i < S.pins.length; i++) { if (S.pins[i].ts === loggedTs) { S.pins.splice(i, 1); store.set('pins', S.pins); renderPins(); break; } }
+      }
+      store.set('counts', S.counts); renderCounts();
+    }
+  });
+});
+renderCounts();
+
+/* ---------------- treat pins (user) ---------------- */
+var PIN_TYPES = {
+  candy: { emoji: '🎃', label: 'Candy here' },
+  decor: { emoji: '👻', label: 'Great decorations' },
+  nonfood: { emoji: '', label: 'Non-food treats' },
+  out: { emoji: '', label: 'Out of candy' }
+};
+function pinIconHtml(type) {
+  if (type === 'nonfood') return '<div><i class="teal"></i></div>';
+  if (type === 'out') return '<div><i class="outx">✕</i></div>';
+  return '<div>' + PIN_TYPES[type].emoji + '</div>';
+}
+function renderPins() {
+  pinLayer.clearLayers();
+  S.pins.forEach(function (p, idx) {
+    var m = L.marker([p.lat, p.lng], {
+      icon: L.divIcon({ className: 'pinicon', iconSize: [40, 40], iconAnchor: [20, 34], html: pinIconHtml(p.type) })
+    });
+    var pop = document.createElement('div');
+    pop.className = 'pop';
+    pop.innerHTML = '<b>' + (PIN_TYPES[p.type].emoji || '🎃') + ' ' + esc(PIN_TYPES[p.type].label) + '</b>' + (p.via === 'house' ? '<br><span class="muted" style="font-size:12px">Logged from your GPS when you tapped House visited</span>' : '') + (p.note ? '<br><i>' + esc(p.note) + '</i>' : '') + (p.photo ? '<br><img src="' + p.photo + '" style="max-width:150px;border-radius:10px;margin-top:4px" alt="Stop photo">' : '');
+    var del = document.createElement('button');
+    del.className = 'btn btn-ghost btn-sm'; del.textContent = '🗑 Remove pin';
+    del.onclick = function () {
+      S.pins.splice(idx, 1); store.set('pins', S.pins); renderPins(); map.closePopup();
+    };
+    pop.appendChild(del);
+    m.bindPopup(pop);
+    m.addTo(pinLayer);
+  });
+}
+function addPin(lat, lng, type, via) {
+  var pin = { lat: lat, lng: lng, type: type, ts: Date.now() };
+  if (via) pin.via = via;
+  S.pins.push(pin);
+  store.set('pins', S.pins);
+  renderPins();
+  toast(PIN_TYPES[type].label + ' pinned. Pins make future routes smarter.', 'ok');
+  return pin.ts;
+}
+renderPins();
+
+/* pin sheet */
+var pinWhereMode = 'gps';
+$$('#pinWhere button').forEach(function (b) {
+  b.addEventListener('click', function () {
+    pinWhereMode = b.getAttribute('data-where');
+    $$('#pinWhere button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+    $('pinGpsNote').hidden = !(pinWhereMode === 'gps' && !S.pos);
+  });
+});
+$('fabPin').addEventListener('click', function () {
+  ensureWatch();
+  $('pinGpsNote').hidden = !(pinWhereMode === 'gps' && !S.pos);
+  $('pinGpsNote').textContent = 'No GPS fix yet. Switch to "Tap the map", or step outside and try again.';
+  $('pinSheet').hidden = false;
+});
+$('pinCancel').addEventListener('click', function () { $('pinSheet').hidden = true; });
+$$('.pingrid button').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var type = b.getAttribute('data-type');
+    $('pinSheet').hidden = true;
+    if (pinWhereMode === 'gps') {
+      getPosOnce().then(function (p) { addPin(p.lat, p.lng, type); })
+        .catch(function () {
+          toast('No GPS fix. Switching to tap mode: tap the map to place it.', 'warn');
+          S.pendingPinType = type;
+          enterPick('pin', '👆 Tap the map to place your ' + PIN_TYPES[type].label + ' pin');
+        });
+    } else {
+      S.pendingPinType = type;
+      enterPick('pin', '👆 Tap the map to place your ' + PIN_TYPES[type].label + ' pin');
+    }
+  });
+});
+
+/* ---------------- Heights community treat stops ---------------- */
+/* HEIGHTS_STOPS is injected at build time from heights-stops.json.
+   Source: Heights Halloween Trails community map (Cub & Fox Playhouse,
+   LilCo, CASID and Heights neighbors). */
+var heightsMarkers = [];
+function stopEmoji(s) {
+  if (s.t === 'biz') return '🛍️';
+  if (s.t === 'block') return '🎉';
+  return '🎃';
+}
+function renderHeightsStops() {
+  heightsLayer.clearLayers(); heightsMarkers = [];
+  if (!S.stopsOn || typeof HEIGHTS_STOPS === 'undefined') return;
+  /* fan out co-located stops (same address/block) so they don't stack */
+  var groups = {};
+  HEIGHTS_STOPS.forEach(function (s) {
+    var k = s.lat.toFixed(4) + ',' + s.lon.toFixed(4);
+    (groups[k] = groups[k] || []).push(s);
+  });
+  var placed = [];
+  Object.keys(groups).forEach(function (k) {
+    var g = groups[k];
+    g.forEach(function (s, gi) {
+      if (g.length > 1) {
+        var ang = (gi / g.length) * Math.PI * 2;
+        placed.push({ s: s, lat: s.lat + Math.sin(ang) * 0.00011, lon: s.lon + Math.cos(ang) * 0.00014 });
+      } else placed.push({ s: s, lat: s.lat, lon: s.lon });
+    });
+  });
+  placed.forEach(function (pl) {
+    var s = pl.s;
+    var m = L.marker([pl.lat, pl.lon], {
+      icon: L.divIcon({ className: 'pinicon', iconSize: [40, 40], iconAnchor: [20, 34], html: '<div>' + stopEmoji(s) + '</div>' })
+    });
+    var acts = (s.acts || []).map(function (a) {
+      return { candy: '🍬 candy', decor: '👻 decorations', costume: '🧙 costumes', pumpkin: '🎃 pumpkin' }[a] || a;
+    }).join(' · ');
+    var html = '<div class="pop"><b>' + esc(s.name || 'Treat stop') + '</b>' +
+      (s.addr ? '<br>' + esc(s.addr) : '') +
+      (s.hours ? '<br>🕒 ' + esc(s.hours) : '') +
+      (acts ? '<br>' + esc(acts) : '') +
+      (s.allergy ? '<br>💙 ' + esc(s.allergy) : '') +
+      ((s.notes && s.notes.length) ? '<br>' + esc(s.notes.join(' ')) : '') +
+      ((s.extras && s.extras.length) ? '<br>✨ ' + esc(s.extras.join(' ')) : '') +
+      '<br><span class="muted" style="font-size:12px">From the Heights Halloween Trails community map</span>' +
+      '<br><button class="btn-org goHere" data-lat="' + pl.lat + '" data-lng="' + pl.lon + '" data-name="' + esc(s.name || 'Treat stop') + '" style="margin-top:8px;min-height:38px;padding:6px 14px;font-size:14px">🧭 Go here</button> <button class="btn-ghost crowdOut" data-lat="' + pl.lat + '" data-lng="' + pl.lon + '" style="margin-top:8px;min-height:38px;padding:6px 12px;font-size:14px">🚫 Ran out</button></div>';
+    m.bindPopup(html);
+    m.addTo(heightsLayer);
+    heightsMarkers.push(m);
+  });
+}
+if (!store.get('stopsDefaultMig', false)) { S.stopsOn = true; store.set('stopsOn', true); store.set('stopsDefaultMig', true); }
+renderHeightsStops();
+function ghostHeights(on) {
+  heightsMarkers.forEach(function (m) { try { m.setOpacity(on ? 0.35 : 1); } catch (e) {} });
+}
+(function addStopsFab() {
+  var b = document.createElement('button');
+  b.className = 'fab'; b.id = 'fabStops';
+  b.setAttribute('aria-label', 'Toggle Heights treat stops');
+  b.innerHTML = '🎃<span>Stops</span>';
+  b.classList.toggle('attn', S.stopsOn);
+  b.addEventListener('click', function () {
+    S.stopsOn = !S.stopsOn; store.set('stopsOn', S.stopsOn);
+    b.classList.toggle('attn', S.stopsOn);
+    renderHeightsStops();
+    toast(S.stopsOn ? 'Heights treat stops shown (' + ((typeof HEIGHTS_STOPS !== 'undefined' && HEIGHTS_STOPS) ? HEIGHTS_STOPS.length : 0) + ' community stops).' : 'Treat stops hidden.', S.stopsOn ? 'ok' : '');
+  });
+  $('fabs').appendChild(b);
+})();
+
+/* ---------------- routing engine ---------------- */
+var BUILD_SEQ = 0;
+var OVERPASS_ENDPOINTS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.kumi.systems/api/interpreter',
+  'https://overpass.nchc.org.tw/api/interpreter',
+  'https://overpass.private.coffee/api/interpreter'
+];
+function fetchOverpassPart(query) {
+  var body = 'data=' + encodeURIComponent(query);
+  var i = 0;
+  function tryNext() {
+    if (i >= OVERPASS_ENDPOINTS.length) return Promise.reject(new Error('overpass unavailable'));
+    var url = OVERPASS_ENDPOINTS[i++];
+    /* first endpoint gets a short leash so a swamped server fails over fast */
+    var cap = (i === 1) ? 14000 : 35000;
+    return fetchT(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body
+    }, cap).then(function (resp) { return resp.json(); }).then(function (j) {
+      if (!j || !j.elements) throw new Error('bad overpass reply');
+      return j.elements;
+    }).catch(function (e) { return tryNext(); });
+  }
+  return tryNext();
+}
+function fetchOverpass(lat, lon, r) {
+  var qb = '[out:json][timeout:40];way["building"](around:' + r + ',' + lat + ',' + lon + ');out center;';
+  var qh = '[out:json][timeout:40];way["highway"~"^(residential|unclassified|tertiary|secondary|primary|living_street|service|pedestrian)$"](around:' + r + ',' + lat + ',' + lon + ');out geom;';
+  /* buildings and highways fetch in PARALLEL (was sequential: half the wait) */
+  return Promise.all([fetchOverpassPart(qb), fetchOverpassPart(qh)]).then(function (parts) {
+    return { elements: parts[0].concat(parts[1]) };
+  });
+}
+function gridKey(x, y) { return x + ':' + y; }
+function analyzeArea(data, center) {
+  var segs = [], buildings = [];
+  (data.elements || []).forEach(function (el) {
+    if (el.type !== 'way') return;
+    if (!el.geometry && !el.center) return;
+    var pts = (el.geometry || []).map(function (g) { return { lat: g.lat, lng: g.lon }; });
+    if (el.tags && el.tags.building) {
+      if (el.center) { buildings.push({ lat: el.center.lat, lng: el.center.lon }); return; }
+      var cx = 0, cy = 0;
+      pts.forEach(function (p) { cx += p.lat; cy += p.lng; });
+      buildings.push({ lat: cx / pts.length, lng: cy / pts.length });
+    } else if (el.tags && el.tags.highway) {
+      for (var i = 0; i < pts.length - 1; i++) {
+        var len = haversine(pts[i], pts[i + 1]);
+        if (len < 6 || len > 160) continue;
+        segs.push({ a: pts[i], b: pts[i + 1], len: len, houses: 0, mid: { lat: (pts[i].lat + pts[i + 1].lat) / 2, lng: (pts[i].lng + pts[i + 1].lng) / 2 } });
+      }
+    }
+  });
+  /* grid index over segment midpoints, 90 m cells */
+  var cell = 90, grid = {};
+  function cellOf(p) { var xy = toXY(p, center); return [Math.floor(xy.x / cell), Math.floor(xy.y / cell)]; }
+  segs.forEach(function (s, i) {
+    var c = cellOf(s.mid), k = gridKey(c[0], c[1]);
+    (grid[k] = grid[k] || []).push(i);
+  });
+  function nearestSeg(p, maxD) {
+    var c = cellOf(p), best = -1, bestD = maxD;
+    for (var gx = c[0] - 1; gx <= c[0] + 1; gx++) for (var gy = c[1] - 1; gy <= c[1] + 1; gy++) {
+      var arr = grid[gridKey(gx, gy)]; if (!arr) continue;
+      for (var j = 0; j < arr.length; j++) {
+        var s = segs[arr[j]], d = distToSeg(p, s.a, s.b).dist;
+        if (d < bestD) { bestD = d; best = arr[j]; }
+      }
+    }
+    return best;
+  }
+  buildings.forEach(function (b) {
+    var i = nearestSeg(b, 70);
+    if (i >= 0) segs[i].houses += 1;
+  });
+  return segs;
+}
+/* Boosts are applied fresh at build time (stops/pins change; segment base
+   counts are cacheable). Mutates and returns segs. */
+function applyBoosts(segs, center) {
+  var cell = 90, grid = {};
+  function cellOf(p) { var xy = toXY(p, center); return [Math.floor(xy.x / cell), Math.floor(xy.y / cell)]; }
+  segs.forEach(function (s, i) {
+    var c = cellOf(s.mid), k = gridKey(c[0], c[1]);
+    (grid[k] = grid[k] || []).push(i);
+  });
+  function nearestSeg(p, maxD) {
+    var c = cellOf(p), best = -1, bestD = maxD;
+    for (var gx = c[0] - 1; gx <= c[0] + 1; gx++) for (var gy = c[1] - 1; gy <= c[1] + 1; gy++) {
+      var arr = grid[gridKey(gx, gy)]; if (!arr) continue;
+      for (var j = 0; j < arr.length; j++) {
+        var d = distToSeg(p, segs[arr[j]].a, segs[arr[j]].b).dist;
+        if (d < bestD) { bestD = d; best = arr[j]; }
+      }
+    }
+    return best;
+  }
+  if (typeof HEIGHTS_STOPS !== 'undefined') {
+    HEIGHTS_STOPS.forEach(function (s) {
+      var p = { lat: s.lat, lng: s.lon };
+      if (haversine(p, center) > 2200) return;
+      var i = nearestSeg(p, 80);
+      if (i >= 0) segs[i].houses += 3; /* confirmed treat stop counts triple */
+    });
+  }
+  S.pins.forEach(function (p) {
+    if (p.type !== 'candy' && p.type !== 'decor') return;
+    var i = nearestSeg(p, 80);
+    if (i >= 0) segs[i].houses += (p.type === 'candy' ? 2 : 1);
+  });
+  return segs;
+}
+/* ---- on-phone area cache: analyzed segments per ~500 m cell, 30 days ---- */
+function areaCacheKey(lat, lng) {
+  return 'area_' + Math.round(lat / 0.0045) + '_' + Math.round(lng / 0.0045);
+}
+function readAreaCache(lat, lng, needR) {
+  var raw = store.get(areaCacheKey(lat, lng), null);
+  if (!raw || !raw.ts || Date.now() - raw.ts > 30 * 24 * 3600 * 1000) return null;
+  if (raw.r < needR - 60) return null;
+  return raw.segs.map(function (a) {
+    var A = { lat: a[0], lng: a[1] }, B = { lat: a[2], lng: a[3] };
+    return { a: A, b: B, len: haversine(A, B), houses: a[4], mid: { lat: (A.lat + B.lat) / 2, lng: (A.lng + B.lng) / 2 } };
+  });
+}
+function writeAreaCache(lat, lng, r, segs) {
+  var slim = segs.filter(function (s) { return s.houses >= 1; }).map(function (s) {
+    return [round6(s.a.lat), round6(s.a.lng), round6(s.b.lat), round6(s.b.lng), s.houses];
+  });
+  store.set(areaCacheKey(lat, lng), { ts: Date.now(), r: r, segs: slim });
+}
+function orderStops(start, pts) { /* nearest neighbor + 2-opt on a loop */
+  var remaining = pts.slice(), ordered = [], cur = start;
+  while (remaining.length) {
+    var bi = 0, bd = Infinity;
+    remaining.forEach(function (p, i) { var d = haversine(cur, p); if (d < bd) { bd = d; bi = i; } });
+    cur = remaining.splice(bi, 1)[0]; ordered.push(cur);
+  }
+  function loopLen(arr) {
+    var L = 0, prev = start;
+    arr.forEach(function (p) { L += haversine(prev, p); prev = p; });
+    return L + haversine(prev, start);
+  }
+  var improved = true, guard = 0;
+  while (improved && guard++ < 60) {
+    improved = false;
+    for (var i = 0; i < ordered.length - 1; i++) for (var j = i + 1; j < ordered.length; j++) {
+      var rev = ordered.slice(0, i).concat(ordered.slice(i, j + 1).reverse(), ordered.slice(j + 1));
+      if (loopLen(rev) < loopLen(ordered) - 1) { ordered = rev; improved = true; }
+    }
+  }
+  return { ordered: ordered, loopLen: loopLen(ordered) };
+}
+function modWords(mod) {
+  return { 'sharp left': 'sharply left', 'left': 'left', 'slight left': 'slightly left', 'straight': 'straight', 'slight right': 'slightly right', 'right': 'right', 'sharp right': 'sharply right', 'uturn': 'around' }[mod] || mod || 'straight';
+}
+function arrowFor(mod, type) {
+  if (type === 'arrive') return '🏁';
+  if (type === 'depart') return '🧭';
+  return { 'uturn': '↩', 'sharp left': '↰', 'left': '←', 'slight left': '↖', 'straight': '↑', 'slight right': '↗', 'right': '→', 'sharp right': '↱' }[mod] || '↑';
+}
+function maneuverText(step) {
+  var m = step.maneuver, type = m.type, mod = m.modifier || '';
+  var name = (step.name && step.name !== '-') ? step.name : '';
+  var onto = name ? ' onto ' + name : '', on = name ? ' on ' + name : '';
+  switch (type) {
+    case 'depart': return 'Start' + (name ? ' on ' + name : '') + ' and follow the orange line';
+    case 'arrive': return "You're home! 🏠";
+    case 'turn': return mod === 'straight' ? 'Continue straight' + onto : 'Turn ' + modWords(mod) + onto;
+    case 'new name': return 'Continue' + onto;
+    case 'continue': return 'Continue' + on;
+    case 'merge': return 'Merge' + onto;
+    case 'fork': return 'Keep ' + (mod.indexOf('left') >= 0 ? 'left' : 'right') + onto;
+    case 'end of road': return 'At the end of the road, turn ' + modWords(mod) + onto;
+    case 'roundabout': case 'rotary': return 'At the roundabout, take exit ' + (m.exit || 1) + onto;
+    case 'on ramp': case 'off ramp': return 'Take the ramp' + onto;
+    default: return 'Continue' + on;
+  }
+}
+function osrmRouteOnce(coords) { /* coords: [{lat,lng}...] */
+  var path = coords.map(function (c) { return c.lng + ',' + c.lat; }).join(';');
+  return fetchT('https://router.project-osrm.org/route/v1/foot/' + path + '?overview=full&geometries=geojson&steps=true', {}, 25000)
+    .then(function (r) { return r.json(); })
+    .then(function (j) {
+      if (!j || j.code !== 'Ok' || !j.routes || !j.routes.length) throw new Error('osrm');
+      var rt = j.routes[0];
+      var maneuvers = [];
+      rt.legs.forEach(function (leg) {
+        leg.steps.forEach(function (st) {
+          maneuvers.push({
+            lat: st.maneuver.location[1], lng: st.maneuver.location[0],
+            text: maneuverText(st), arrow: arrowFor(st.maneuver.modifier, st.maneuver.type),
+            type: st.maneuver.type, distAfter: st.distance || 0
+          });
+        });
+      });
+      return {
+        coords: rt.geometry.coordinates.map(function (c) { return { lat: c[1], lng: c[0] }; }),
+        distance: rt.distance, maneuvers: maneuvers,
+        legDist: rt.legs.map(function (l) { return l.distance || 0; })
+      };
+    });
+}
+function osrmRoute(coords) {
+  return osrmRouteOnce(coords).catch(function () {
+    return new Promise(function (res) { setTimeout(res, 1500); }).then(function () { return osrmRouteOnce(coords); });
+  });
+}
+/* OSRM trip service: orders the stops on the REAL street network (TSP).
+   Insertion order guessed from straight lines produced loops with a 5.8x
+   street factor in the Heights (reservoir, cliff, severed grid); the trip
+   optimizer works on actual roads and halves the distance. */
+function osrmTrip(startPt, pts) {
+  return osrmTripOnce(startPt, pts).catch(function () {
+    return new Promise(function (res) { setTimeout(res, 1200); }).then(function () { return osrmTripOnce(startPt, pts); });
+  });
+}
+function osrmTripOnce(startPt, pts) {
+  var coords = [startPt].concat(pts);
+  var path = coords.map(function (c) { return c.lng + ',' + c.lat; }).join(';');
+  return fetchT('https://router.project-osrm.org/trip/v1/foot/' + path + '?roundtrip=true&source=first&overview=full&geometries=geojson&steps=true', {}, 25000)
+    .then(function (r) { return r.json(); })
+    .then(function (j) {
+      if (!j || j.code !== 'Ok' || !j.trips || !j.trips.length) throw new Error('trip');
+      var trip = j.trips[0];
+      var order = j.waypoints.map(function (w, i) { return { i: i, wi: w.waypoint_index }; })
+        .sort(function (a, b) { return a.wi - b.wi; });
+      var ordered = order.slice(1).map(function (o) { return pts[o.i - 1]; });
+      var maneuvers = [];
+      trip.legs.forEach(function (leg) {
+        leg.steps.forEach(function (st) {
+          maneuvers.push({
+            lat: st.maneuver.location[1], lng: st.maneuver.location[0],
+            text: maneuverText(st), arrow: arrowFor(st.maneuver.modifier, st.maneuver.type),
+            type: st.maneuver.type, distAfter: st.distance || 0
+          });
+        });
+      });
+      return {
+        coords: trip.geometry.coordinates.map(function (c) { return { lat: c[1], lng: c[0] }; }),
+        distance: trip.distance, maneuvers: maneuvers,
+        legDist: trip.legs.map(function (l) { return l.distance || 0; }),
+        stops: ordered
+      };
+    });
+}
+/* ---- second routing engine: Valhalla (fallback if OSRM is down) ---- */
+function decodePolyline(str, precision) {
+  var factor = Math.pow(10, precision || 6), points = [], lat = 0, lng = 0, index = 0;
+  while (index < str.length) {
+    var result = 0, shift = 0, byte;
+    do { byte = str.charCodeAt(index++) - 63; result |= (byte & 0x1f) << shift; shift += 5; } while (byte >= 0x20);
+    lat += (result & 1) ? ~(result >> 1) : (result >> 1);
+    result = 0; shift = 0;
+    do { byte = str.charCodeAt(index++) - 63; result |= (byte & 0x1f) << shift; shift += 5; } while (byte >= 0x20);
+    lng += (result & 1) ? ~(result >> 1) : (result >> 1);
+    points.push({ lat: lat / factor, lng: lng / factor });
+  }
+  return points;
+}
+var VALHALLA_ARROWS = { 1: '🧭', 2: '↗', 3: '↖', 4: '🏁', 6: '↑', 7: '↗', 8: '→', 9: '↱', 10: '↩', 11: '↰', 12: '←', 13: '↖', 20: '↑', 21: '↑' };
+function valhallaRoute(coords) {
+  var body = {
+    locations: coords.map(function (c) { return { lat: c.lat, lon: c.lng, type: 'via' }; }),
+    costing: 'pedestrian',
+    directions_options: { units: 'miles', language: 'en-US' },
+    costing_options: { pedestrian: { step_penalty: S.stroller ? 500 : 0 } },
+    shape_format: 'polyline6'
+  };
+  body.locations[0].type = 'break';
+  body.locations[body.locations.length - 1].type = 'break';
+  return fetchT('https://valhalla1.openstreetmap.de/route', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+  }, 25000).then(function (r) { return r.json(); }).then(function (j) {
+    if (!j || !j.trip || !j.trip.legs || !j.trip.legs.length) throw new Error('valhalla');
+    var pts = [], maneuvers = [];
+    j.trip.legs.forEach(function (leg) {
+      var legPts = decodePolyline(leg.shape, 6);
+      var base = pts.length ? pts.length - 1 : 0;
+      leg.maneuvers.forEach(function (mv) {
+        var loc = legPts[mv.begin_shape_index] || legPts[0];
+        maneuvers.push({
+          lat: loc.lat, lng: loc.lng,
+          text: (mv.instruction || 'Continue').replace(/\s+$/, ''),
+          arrow: VALHALLA_ARROWS[mv.type] || '↑',
+          type: mv.type === 4 ? 'arrive' : (mv.type === 1 ? 'depart' : 'turn'),
+          distAfter: (mv.length || 0) * 1609.344
+        });
+      });
+      legPts.forEach(function (p, i) { if (i === 0 && pts.length) return; pts.push(p); });
+      void base;
+    });
+    return {
+      coords: pts, distance: (j.trip.summary.length || 0) * 1609.344, maneuvers: maneuvers,
+      legDist: j.trip.legs.map(function (l) { return (l.summary && l.summary.length || 0) * 1609.344; })
+    };
+  });
+}
+function routeWithEngine(coords) {
+  if (S.stroller) return valhallaRoute(coords).catch(function () { return osrmRoute(coords); });
+  return osrmRoute(coords).catch(function () { return valhallaRoute(coords); });
+}
+function stopIcon(state, n) {
+  return L.divIcon({
+    className: 'stopicon' + (state ? ' ' + state : ''), iconSize: [30, 30], iconAnchor: [15, 15],
+    html: '<div>' + n + '</div>'
+  });
+}
+/* Treats the route walks right past: dense blocks and community stops that
+   were not numbered stops still deserve a marker, or the app looks like it
+   is skipping obvious candy. Computed against the final route geometry. */
+function computePassThrough(route, segs) {
+  var out = [];
+  function nearRoute(p, maxD) {
+    var best = Infinity;
+    for (var j = 0; j < route.coords.length; j += 2) {
+      var d = haversine(p, route.coords[j]);
+      if (d < best) best = d;
+    }
+    return best <= maxD;
+  }
+  function nearStop(p, maxD) {
+    for (var i = 0; i < route.stops.length; i++) {
+      if (haversine(p, route.stops[i]) <= maxD) return true;
+    }
+    return false;
+  }
+  if (typeof HEIGHTS_STOPS !== 'undefined') {
+    HEIGHTS_STOPS.forEach(function (s) {
+      var p = { lat: s.lat, lng: s.lon };
+      if (nearStop(p, 80)) return;
+      if (nearRoute(p, 40)) out.push({ lat: p.lat, lng: p.lng, stop: s });
+    });
+  }
+  var dense = (segs || []).filter(function (s) { return s.houses >= 9 && !nearStop(s.mid, 45) && nearRoute(s.mid, 40); })
+    .sort(function (a, b) { return b.houses - a.houses; })
+    .slice(0, 10)
+    .map(function (s) { return { lat: s.mid.lat, lng: s.mid.lng, houses: s.houses }; });
+  route.passThrough = out.concat(dense).slice(0, 14);
+}
+function renderRoute(route) {
+  routeLayer.clearLayers(); stopLayer.clearLayers();
+  var latlngs = route.coords.map(function (c) { return [c.lat, c.lng]; });
+  L.polyline(latlngs, { color: '#ff7b1c', weight: 19, opacity: 0.16 }).addTo(routeLayer);
+  L.polyline(latlngs, { color: '#0d0a14', weight: 11, opacity: 0.55 }).addTo(routeLayer);
+  L.polyline(latlngs, { color: '#ff7b1c', weight: 5, opacity: 0.95 }).addTo(routeLayer);
+  route.stopMarkers = route.stops.map(function (s, i) {
+    var m = L.marker([s.lat, s.lng], { icon: stopIcon('', i + 1) }).addTo(stopLayer);
+    if (s.stop) {
+      var st = s.stop;
+      var icon = st.t === 'block' ? '🎉 ' : st.t === 'biz' ? '🛍️ ' : '🏠 ';
+      var acts = (st.acts || []).map(function (a) { return a === 'candy' ? '🍬' : a === 'decor' ? '🎃' : '👻'; }).join(' ');
+      var html = '<div class="pop"><b>' + icon + esc(st.name || 'Treat stop') + '</b>' +
+        (st.addr ? '<br>' + esc(st.addr) : '') +
+        (st.hours ? '<br>🕐 ' + esc(st.hours) : '') +
+        (acts ? '<br>' + acts + ' on offer' : '') +
+        (st.notes && st.notes.length ? '<br><i>' + esc(st.notes.join(' ')) + '</i>' : '') +
+        '<br><span class="popnote">Stop ' + (i + 1) + ' on your route · Heights Halloween Trails</span></div>';
+      m.bindPopup(html);
+    } else {
+      m.bindPopup('<div class="pop"><b>🍬 Treat stop ' + (i + 1) + '</b><br>A candy-dense block. Work both sides of the street!</div>');
+    }
+    return m;
+  });
+  (route.passThrough || []).forEach(function (pt) {
+    var m = L.marker([pt.lat, pt.lng], {
+      icon: L.divIcon({ className: 'passdot', iconSize: [24, 24], iconAnchor: [12, 12], html: '<div>' + (pt.stop ? stopEmoji(pt.stop) : '🎃') + '</div>' })
+    }).addTo(stopLayer);
+    if (pt.stop) {
+      m.bindPopup('<div class="pop"><b>' + esc(pt.stop.name || 'Treat stop') + '</b>' +
+        (pt.stop.addr ? '<br>' + esc(pt.stop.addr) : '') +
+        '<br>Right on your route, no detour. Not a numbered stop, just grab it as you pass!</div>');
+    } else {
+      m.bindPopup('<div class="pop"><b>🍬 Candy-dense block on your route</b><br>About ' + pt.houses + ' houses on this stretch. It is right on your way, no detour needed.</div>');
+    }
+  });
+  ghostHeights(true);
+  try { map.flyToBounds(L.latLngBounds(latlngs), { padding: [30, 30], duration: 0.7 }); } catch (e) {}
+}
+function showStats(route) {
+  var mins = Math.round(route.distance / KID_PACE_MPS / 60);
+  var score = mins > 0 ? Math.round(route.houses / (mins / 60)) : 0;
+  var noData = route.degraded && !route.houses;
+  var peekEl = $('peek');
+  if (peekEl) peekEl.textContent = '\uD83C\uDF6C ' + (route.distance / M_PER_MI).toFixed(1) + ' mi \u00B7 ' + mins + ' min \u00B7 ' + (noData ? 'starter loop' : route.houses + ' houses') + ' \u2014 tap to open';
+  $('stats').innerHTML =
+    '<div class="stat"><b>' + (route.distance / M_PER_MI).toFixed(1) + '</b><span>miles</span></div>' +
+    '<div class="stat"><b>' + mins + '</b><span>est. minutes</span></div>' +
+    '<div class="stat"><b>' + (noData ? '–' : route.houses) + '</b><span>est. houses</span></div>' +
+    '<div class="stat hl"><b>' + (noData ? '–' : score) + '</b><span>🍬 houses/hr</span></div>';
+  var spare = S.budget - mins;
+  $('fitNote').textContent = route.degraded ?
+    'The street-data service is swamped right now (it is Halloween, after all), so this is a starter loop. Tap Rebuild in a little while for the fully optimized candy route.' :
+    route.fallback ?
+    'Not many mapped houses nearby, so this is a simple loop. Your pins and the Heights stops still show on the map.' :
+    (spare >= 0 ?
+      'Fits your ' + S.budget + ' minutes with about ' + spare + ' to spare at kid pace. The densest candy streets are in.' :
+      'Heads up: at kid pace this loop runs about ' + mins + ' minutes, over your ' + S.budget + '. You can bail home early any time, the last leg always leads back.') +
+    (route.community ? ' ' + route.community + ' of the stops are community treat stops (homes, block parties and stores) from the Heights trails map.' : '');
+  if (route.baked) $('fitNote').textContent = '⚡ Built instantly from Heights data baked into the app, no map-server wait. ' + $('fitNote').textContent;
+  if (route.bakedFallback) $('fitNote').textContent = 'Live street data is swamped, so this loop is built from the app\'s built-in Heights data instead. ' + $('fitNote').textContent;
+  if (route.passThrough && route.passThrough.length) {
+    $('fitNote').textContent += ' Plus ' + route.passThrough.length + ' more treat spots right along the way (small 🎃 markers), no detour needed.';
+  }
+  if (route.hoursNote) $('fitNote').textContent += ' ' + route.hoursNote;
+  if (route.primeNote) $('fitNote').textContent += ' ' + route.primeNote;
+  if (S.allergy) $('fitNote').textContent += ' Allergy-safe stops were prioritized.';
+  if (S.stroller) $('fitNote').textContent += ' Stroller mode: step-free streets preferred where possible.';
+  if (route.fromHere) $('fitNote').textContent = '\uD83D\uDD00 Re-planned from where you stood, ending back home. ' + $('fitNote').textContent;
+  $('fitNote').classList.remove('open');
+  var bfm = $('btnFitMore'); if (bfm) bfm.innerHTML = 'More &#9662;';
+  $('approxNote').hidden = !route.approx;
+  /* Google Maps deep link */
+  var wps = route.stops.slice(0, 12).map(function (s) { return s.lat + ',' + s.lng; }).join('|');
+  $('btnGmaps').href = 'https://www.google.com/maps/dir/?api=1&origin=' + S.start.lat + ',' + S.start.lng +
+    '&destination=' + S.start.lat + ',' + S.start.lng + '&travelmode=walking' + (wps ? '&waypoints=' + encodeURIComponent(wps) : '');
+  document.body.classList.add('has-route');
+  setSheetCollapsed(false);
+  $('planInputs').classList.add('folded');
+  $('planToggleText').textContent = '⚙️ Change start or time';
+  $('planToggle').setAttribute('aria-expanded', 'false');
+}
+$('planToggle').addEventListener('click', function () {
+  var folded = $('planInputs').classList.toggle('folded');
+  $('planToggle').setAttribute('aria-expanded', folded ? 'false' : 'true');
+});
+
+function buildRoute() {
+  if (!S.start) { toast('Set your start first: use your location, drop a pin, or search.', 'warn'); return; }
+  if (S.nav) return;
+  var seq = ++BUILD_SEQ;
+  showBusy('Building your candy route…', 'Scoring the densest streets near you.');
+  var start = S.start, budgetSec = S.budget * 60;
+  var loopTarget = KID_PACE_MPS * budgetSec;             /* meters of walking */
+  var radius = Math.max(380, Math.min(650, loopTarget / 3.6));
+  function candFromSegs(segs) {
+    applyBoosts(segs, start);
+    return segs.filter(function (s) { return s.houses >= 2; })
+      .sort(function (a, b) { return b.houses - a.houses; });
+  }
+  function segsFor(r) {
+    var hit = readAreaCache(start.lat, start.lng, r);
+    if (hit) return Promise.resolve(hit);
+    return fetchOverpass(start.lat, start.lng, r).then(function (data) {
+      var segs = analyzeArea(data, start);
+      try { writeAreaCache(start.lat, start.lng, r, segs); } catch (e) {}
+      return segs;
+    });
+  }
+  function attempt(r, widened) {
+    return segsFor(Math.round(r)).then(function (segs) {
+      if (seq !== BUILD_SEQ) throw new Error('cancelled');
+      var cand = candFromSegs(segs);
+      if (!cand.length && !widened) return attempt(Math.min(950, r * 1.45), true);
+      return { segs: cand, widened: widened };
+    }).catch(function (e) {
+      if (seq !== BUILD_SEQ || (e && e.message === 'cancelled')) throw e;
+      /* Live data down but we are near the Heights: fall back to the baked
+         density data rather than a blind starter loop. */
+      var fb = bakedCandSegs(1200);
+      if (fb) return { segs: fb, widened: widened, bakedFallback: true };
+      return { segs: [], widened: widened, degraded: true };
+    });
+  }
+  function bakedCandSegs(maxDist) {
+    if (typeof HEIGHTS_SEGS === 'undefined' || !HEIGHTS_SEGS) return null;
+    if (haversine(start, { lat: HEIGHTS_SEGS.c[0], lng: HEIGHTS_SEGS.c[1] }) > maxDist) return null;
+    var objs = HEIGHTS_SEGS.segs.map(function (a) {
+      var A = { lat: a[0], lng: a[1] }, B = { lat: a[2], lng: a[3] };
+      return { a: A, b: B, len: haversine(A, B), houses: a[4], mid: { lat: (A.lat + B.lat) / 2, lng: (A.lng + B.lng) / 2 } };
+    });
+    var c = candFromSegs(objs);
+    return c.length ? c : null;
+  }
+  /* Baked-in Heights data: builds near home skip the map-server entirely. */
+  var lastSegs = [];
+  var bakedRes = null;
+  var bNow = bakedCandSegs(500);
+  if (bNow) bakedRes = { segs: bNow, widened: true, baked: true };
+  (bakedRes ? Promise.resolve(bakedRes) : attempt(radius, false)).then(function (res) {
+    if (seq !== BUILD_SEQ) return;
+    lastSegs = res.segs || [];
+    var vMode = S.forceVariety ? 'fresh' : (S.variety || 'best'); S.forceVariety = false;
+    var stops = [], houses = 0, communityCount = 0;
+    /* Candidate waypoints: real treat stops first-class, plus the densest blocks.
+       Selection is greedy cheapest-insertion by value per extra meter, so the
+       loop physically routes TO parties, stores and confirmed stops instead of
+       passing a street away from them. */
+    var cands = [];
+    if (typeof HEIGHTS_STOPS !== 'undefined') {
+      var stopCands = [];
+      HEIGHTS_STOPS.forEach(function (s) {
+        var p = { lat: s.lat, lng: s.lon };
+        var d = haversine(p, start);
+        if (d <= radius * 1.2 && !crowdOutNear(p.lat, p.lng)) {
+          var v0 = s.t === 'home' ? 4 : 5;
+          if (S.allergy && (s.allergy || /allerg|non-food|teal/i.test(String(s.notes || '') + ' ' + String(s.acts || '')))) v0 += 4;
+          var prm = primeRunFor(s);
+          if (prm) v0 = Math.round(v0 * 1.35);
+          stopCands.push({ lat: p.lat, lng: p.lng, value: v0, housesEst: 3, kind: 'stop', stop: s, d: d, prime: prm ? prm.label : null });
+        }
+      });
+      if (res.degraded) {
+        /* No density data: a wide scatter of stops prices out terribly on
+           real streets. Keep the loop compact: nearest 14 within a cap. */
+        stopCands = stopCands.filter(function (c) { return c.d <= radius * 0.85; })
+          .sort(function (a, b) { return a.d - b.d; }).slice(0, 14);
+      }
+      cands = cands.concat(stopCands);
+    }
+    S.pins.forEach(function (p) {
+      if (haversine(p, start) <= radius * 1.2) {
+        if (p.type === 'candy') cands.push({ lat: p.lat, lng: p.lng, value: 4, housesEst: 2, kind: 'pin' });
+        else if (p.type === 'decor') cands.push({ lat: p.lat, lng: p.lng, value: 2, housesEst: 1, kind: 'pin' });
+      }
+    });
+    crowdFreshStops().forEach(function (rp) {
+      if (haversine(rp, start) > radius * 1.2) return;
+      if (cands.some(function (c) { return haversine(c, rp) <= 25; })) return;
+      var cv = rp.status === 'nonfood' ? (S.allergy ? 6 : 4) : 4;
+      cands.push({ lat: rp.lat, lng: rp.lng, value: cv, housesEst: 2, kind: 'pin' });
+    });
+    res.segs.slice(0, vMode !== 'best' ? 30 : 20).forEach(function (s) {
+      cands.push({ lat: s.mid.lat, lng: s.mid.lng, value: Math.min(6, s.houses / 7), housesEst: s.houses, kind: 'seg' });
+    });
+    /* Snap house/parcel points onto the street: geocoded points often sit
+       mid-block or behind the house, and routing engines detour badly to
+       reach them (the 141-minute bug). Segment midpoints are on-street. */
+    if (res.segs.length) {
+      var mids = res.segs.map(function (s) { return s.mid; });
+      cands.forEach(function (c) {
+        if (c.kind === 'seg') return;
+        var bd = 70, bp = null;
+        for (var mi = 0; mi < mids.length; mi++) {
+          var d = haversine(c, mids[mi]);
+          if (d < bd) { bd = d; bp = mids[mi]; }
+        }
+        if (bp) { c.lat = bp.lat; c.lng = bp.lng; }
+      });
+    }
+    /* Dedupe: stops within 25 m of each other are the same doorstep. */
+    (function () {
+      var byVal = cands.slice().sort(function (a, b) { return b.value - a.value; });
+      var kept = [];
+      byVal.forEach(function (c) {
+        var dup = null;
+        for (var ki = 0; ki < kept.length; ki++) {
+          if (haversine(c, kept[ki]) <= 25) { dup = kept[ki]; break; }
+        }
+        if (dup) dup.housesEst += Math.min(3, c.housesEst);
+        else kept.push(c);
+      });
+      cands = kept;
+    })();
+    /* Route variety: shuffle adds controlled randomness among near-equal
+       candidates; fresh streets also steers away from the previous route's
+       stops (remembered on this device only). */
+    if (vMode !== 'best' && cands.length) {
+      var lastPts = [];
+      try { var lr = store.get('lastRoute', null); if (lr && lr.pts) lastPts = lr.pts; } catch (e) {}
+      cands.forEach(function (c) {
+        var jitter = vMode === 'shuffle' ? (0.6 + Math.random() * 0.8) : (0.7 + Math.random() * 0.6);
+        if (vMode === 'fresh' && lastPts.length) {
+          var again = false;
+          for (var li = 0; li < lastPts.length; li++) { if (haversine(c, { lat: lastPts[li][0], lng: lastPts[li][1] }) < 30) { again = true; break; } }
+          if (again) jitter *= (c.kind === 'stop' ? 0.5 : 0.22);
+        }
+        c.value = Math.max(1, Math.round(c.value * jitter));
+      });
+    }
+    if (cands.length) {
+      var loop = [];
+      function loopLenOf(arr) {
+        var L = 0, prev = start;
+        arr.forEach(function (p) { L += haversine(prev, p); prev = p; });
+        return L + haversine(prev, start);
+      }
+      var curLen = 0;
+      var pool = cands.slice();
+      while (pool.length && loop.length < 18) {
+        var bestI = -1, bestScore = -1, bestDelta = 0, bestPos = 0;
+        for (var ci = 0; ci < pool.length; ci++) {
+          var c = pool[ci], bd = Infinity, bp = loop.length;
+          for (var pos = 0; pos <= loop.length; pos++) {
+            var prevP = pos === 0 ? start : loop[pos - 1];
+            var nextP = pos === loop.length ? start : loop[pos];
+            var d = haversine(prevP, c) + haversine(c, nextP) - haversine(prevP, nextP);
+            if (d < bd) { bd = d; bp = pos; }
+          }
+          var score = c.value / (bd + 40);
+          if (score > bestScore) { bestScore = score; bestI = ci; bestDelta = bd; bestPos = bp; }
+        }
+        if (bestI < 0) break;
+        if ((curLen + bestDelta) * 1.3 > loopTarget * 0.98 && loop.length >= 3) break;
+        var picked = pool.splice(bestI, 1)[0];
+        loop.splice(bestPos, 0, picked);
+        curLen = loopLenOf(loop);
+        houses += picked.housesEst;
+        if (picked.kind === 'stop') communityCount++;
+      }
+      stops = loop.map(function (c) { return { lat: c.lat, lng: c.lng, kind: c.kind, stop: c.stop || null, housesEst: c.housesEst, value: c.value, prime: c.prime || null }; });
+    }
+    var fallback = false;
+    if (!stops.length) { /* simple square loop */
+      fallback = true;
+      var side = loopTarget / 4 / 1.8, dLat = side / 111320, dLng = side / (111320 * Math.cos(start.lat * Math.PI / 180));
+      stops = [
+        { lat: start.lat + dLat, lng: start.lng }, { lat: start.lat + dLat, lng: start.lng + dLng },
+        { lat: start.lat, lng: start.lng + dLng }, { lat: start.lat - dLat * 0.4, lng: start.lng + dLng * 0.4 }
+      ];
+      houses = 0;
+    }
+    $('busySub').textContent = 'Routing the loop on real sidewalks…';
+    function routeAndTrim(list, guard) {
+      return routeWithEngine([start].concat(list, [start])).then(function (r) {
+        /* Trim by REAL street cost: the engine's per-leg distances expose
+           detour stops (cliff edges, fenced blocks) that straight-line math
+           cannot see. Remove the biggest detour, re-route, repeat. */
+        if (r.legDist && r.legDist.length === list.length + 1 &&
+            r.distance > loopTarget * 1.12 && list.length > 3 && guard > 0) {
+          var worstI = 0, worstSave = -1;
+          for (var i = 0; i < list.length; i++) {
+            var prevP = i === 0 ? start : list[i - 1];
+            var nextP = i === list.length - 1 ? start : list[i + 1];
+            var save = (r.legDist[i] || 0) + (r.legDist[i + 1] || 0) - haversine(prevP, nextP) * 1.25;
+            if (save > worstSave) { worstSave = save; worstI = i; }
+          }
+          if (worstSave <= 30) return { r: r, list: list }; /* nothing worth cutting */
+          var trimmed = list.slice(); trimmed.splice(worstI, 1);
+          $('busySub').textContent = 'Trimming detours to fit your time…';
+          return routeAndTrim(trimmed, guard - 1);
+        }
+        return { r: r, list: list };
+      });
+    }
+    function routeAndFit(list, rounds, prevDist) {
+      if (S.stroller) return routeAndTrim(list, 6); /* trip service cannot dodge stairs; the trim path uses the stroller-aware engine order */
+      return osrmTrip(start, list).then(function (t) {
+        var ordered = t.stops;
+        var noProgress = prevDist && (prevDist - t.distance) < prevDist * 0.02;
+        if (t.distance > loopTarget * 1.12 && ordered.length > 3 && rounds > 0 && !noProgress) {
+          var worstI = -1, worstScore = -1;
+          for (var i = 0; i < ordered.length; i++) {
+            var cost = (t.legDist[i] || 0) + (t.legDist[i + 1] || 0);
+            /* community treat stops (the known-great areas) are protected:
+               they are cut last, only if their street cost is extreme */
+            var prot = ordered[i].kind === 'stop' ? 1.6 : 1;
+            if (ordered[i].stop) { var ph2 = parseHours(ordered[i].stop.hours); if (ph2 && nowMinutes() + (t.distance / KID_PACE_MPS) / 60 > ph2.close - 5) prot *= 2.2; }
+            if (ordered[i].prime) prot *= 1.5;
+            var score = cost / (Math.max(1, ordered[i].value || 3) * prot);
+            if (score > worstScore) { worstScore = score; worstI = i; }
+          }
+          var remaining = ordered.slice(); remaining.splice(worstI, 1);
+          $('busySub').textContent = 'Fitting the loop to your ' + S.budget + ' minutes…';
+          return routeAndFit(remaining, rounds - 1, t.distance);
+        }
+        return { r: t, list: ordered };
+      }).catch(function () {
+        return routeAndTrim(list, 6); /* trip service unavailable: route + leg trim */
+      });
+    }
+    return routeAndFit(stops, 6, 0).then(function (out) {
+      stops = out.list;
+      houses = stops.reduce(function (a, s) { return a + (s.housesEst || 0); }, 0);
+      communityCount = stops.filter(function (s) { return s.kind === 'stop'; }).length;
+      var r = out.r;
+      var pc = {}; stops.forEach(function (sx) { if (sx.prime) pc[sx.prime] = (pc[sx.prime] || 0) + 1; });
+        var primeNote = '', bestL = null, bestC = 1;
+        Object.keys(pc).forEach(function (k) { if (pc[k] > bestC) { bestC = pc[k]; bestL = k; } });
+        if (bestL) primeNote = 'Includes ' + bestC + ' stops on ' + bestL + ', a prime trick-or-treat run on right now.';
+        return { coords: r.coords, distance: r.distance, maneuvers: r.maneuvers, legDist: r.legDist, stops: stops, houses: houses, fallback: fallback, degraded: !!res.degraded, baked: !!res.baked, bakedFallback: !!res.bakedFallback, community: communityCount, approx: false, primeNote: primeNote };
+    }).catch(function () {
+      var coords = [start].concat(stops, [start]);
+      var man = [{ lat: start.lat, lng: start.lng, text: 'Start and follow the line', arrow: '🧭', type: 'depart', distAfter: 0 }];
+      stops.forEach(function (s, i) { man.push({ lat: s.lat, lng: s.lng, text: 'Head to treat stop ' + (i + 1), arrow: '🎃', type: 'turn', distAfter: 0 }); });
+      man.push({ lat: start.lat, lng: start.lng, text: "You're home! 🏠", arrow: '🏁', type: 'arrive', distAfter: 0 });
+      var dist = 0; for (var i = 0; i < coords.length - 1; i++) dist += haversine(coords[i], coords[i + 1]);
+      return { coords: coords, distance: dist, maneuvers: man, stops: stops, houses: houses, fallback: fallback, degraded: !!res.degraded, baked: !!res.baked, bakedFallback: !!res.bakedFallback, community: communityCount, approx: true };
+    });
+  }).then(function (route) {
+    if (seq !== BUILD_SEQ || !route) return;
+    hideBusy();
+    S.route = route;
+    hoursRepair(route).then(function () {
+      if (seq !== BUILD_SEQ || S.route !== route) return;
+      if (!route.approx) { try { computePassThrough(route, lastSegs); } catch (e) {} }
+      renderRoute(route);
+      showStats(route);
+      try { store.set('lastRoute', { pts: route.stops.map(function (sx) { return [round6(sx.lat), round6(sx.lng)]; }) }); } catch (e) {}
+      speakNow('Your candy route is ready. ' + route.stops.length + ' treat stops, about ' + Math.round(route.distance / KID_PACE_MPS / 60) + ' minutes.');
+      toast('Route built: ' + route.stops.length + ' treat stops. Tap Start when you head out.', 'ok');
+    });
+  }).catch(function (e) {
+    if (seq !== BUILD_SEQ) return;
+    hideBusy();
+    toast('Route building hit a snag (the map data service may be busy). Try again in a few seconds.', 'err');
+  });
+}
+$('btnBuild').addEventListener('click', buildRoute);
+
+/* ================= Phase 2: variety, hours, draw, explore ================= */
+S.variety = store.get('variety', 'fresh');
+S.allergy = !!store.get('allergy', false);
+S.stroller = !!store.get('stroller', false);
+S.draw = null;
+S.explore = false; S.exploreSeen = {}; S.exploreLast = 0; S.exploreInt = null;
+
+function nowMinutes() { var d = new Date(); return d.getHours() * 60 + d.getMinutes(); }
+/* Prime runs: the organized street runs from the Heights Halloween Trails
+   posts (researched Oct 31, 2026). While a run is on, its stops are worth
+   more to the builder and are trimmed last, and the fit note names it. */
+var PRIME_RUNS = [
+  { streets: ['Sherman Ave'], from: 14, to: 20, label: 'the Sherman Ave stroll', win: '2–8 PM' },
+  { streets: ['South St', 'Charles St'], from: 14, to: 17, label: 'the South St mini loop', win: '2–5 PM' },
+  { streets: ['Sherman Place'], from: 14, to: 20, label: 'the Sherman Place short walk', win: '2–8 PM' },
+  { streets: ['Ogden Ave'], from: 14, to: 20, label: 'the Ogden Ave stroll', win: 'afternoon and evening' }
+];
+function primeRunFor(stop) {
+  if (!stop || !stop.addr) return null;
+  var now = new Date();
+  var h = now.getHours() + now.getMinutes() / 60;
+  for (var i = 0; i < PRIME_RUNS.length; i++) {
+    var r = PRIME_RUNS[i];
+    if (h < r.from || h >= r.to) continue;
+    for (var j = 0; j < r.streets.length; j++) if (stop.addr.indexOf(r.streets[j]) >= 0) return r;
+  }
+  return null;
+}
+function parseHours(str) {
+  if (!str) return null;
+  var m = String(str).match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\s*[\u2013\u2014-]\s*(\d{1,2})(?::(\d{2}))?\s*(am|pm)/i);
+  if (!m) return null;
+  var eMer = m[6].toLowerCase(), sMer = (m[3] || eMer).toLowerCase();
+  function toMin(h, mm, mer) { h = parseInt(h, 10) % 12; if (mer === 'pm') h += 12; return h * 60 + (mm ? parseInt(mm, 10) : 0); }
+  var r = { open: toMin(m[1], m[2], sMer), close: toMin(m[4], m[5], eMer) };
+  return r.close > r.open ? r : null;
+}
+function fmtClock(mins) { var h = Math.floor(mins / 60), m = mins % 60, mer = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; return h + (m ? ':' + ('0' + m).slice(-2) : '') + ' ' + mer; }
+/* If a stop with posted hours would be reached after it closes, try moving
+   the closing-soon stops to the front of the loop (one re-route, kept only
+   if it does not blow up the distance). Otherwise warn in the fit note. */
+function hoursRepair(route) {
+  try {
+    if (!route || route.approx || !route.legDist || !route.stops || !route.stops.length || !S.start) return Promise.resolve();
+    var nowM = nowMinutes(), totalSec = route.distance / KID_PACE_MPS, cum = 0, viol = [];
+    route.stops.forEach(function (sx, i) {
+      cum += (route.legDist[i] || 0);
+      var h = sx.stop ? parseHours(sx.stop.hours) : null;
+      if (h) {
+        var arr = nowM + (route.distance ? (cum / route.distance) * totalSec / 60 : 0);
+        if (arr > h.close - 5) viol.push({ i: i, close: h.close, name: sx.stop.name || 'A treat stop' });
+      }
+    });
+    if (!viol.length) return Promise.resolve();
+    var violIdx = {}; viol.forEach(function (v) { violIdx[v.i] = true; });
+    var front = viol.slice().sort(function (a, b) { return a.close - b.close; }).map(function (v) { return route.stops[v.i]; });
+    var rest = route.stops.filter(function (sx, i) { return !violIdx[i]; });
+    var newOrder = front.concat(rest);
+    return routeWithEngine([S.start].concat(newOrder, [S.start])).then(function (r) {
+      if (r.distance <= route.distance * 1.3) {
+        route.coords = r.coords; route.distance = r.distance; route.maneuvers = r.maneuvers; route.legDist = r.legDist; route.stops = newOrder;
+        route.hoursNote = '\u23F0 Moved ' + viol.map(function (v) { return v.name; }).slice(0, 2).join(' and ') + ' earlier so you reach them before they close.';
+      } else {
+        route.hoursNote = '\u23F0 Heads up: ' + viol[0].name + ' closes at ' + fmtClock(viol[0].close) + ' and may shut before you get there.';
+      }
+    }).catch(function () {
+      route.hoursNote = '\u23F0 Heads up: ' + viol[0].name + ' closes at ' + fmtClock(viol[0].close) + ' and may shut before you get there.';
+    });
+  } catch (e) { return Promise.resolve(); }
+}
+
+/* plan-panel controls */
+function paintStyleChips() { document.querySelectorAll('#styleChips .chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c.getAttribute('data-style') === S.variety)); }); paintPrefs(); }
+document.querySelectorAll('#styleChips .chip').forEach(function (c) { c.addEventListener('click', function () { S.variety = c.getAttribute('data-style'); store.set('variety', S.variety); paintStyleChips(); }); });
+paintStyleChips();
+function paintToggles() { $('tglAllergy').setAttribute('aria-pressed', String(!!S.allergy)); $('tglStroller').setAttribute('aria-pressed', String(!!S.stroller)); paintPrefs(); }
+function paintPrefs() {
+  var el = $('prefsState'); if (!el) return;
+  var styleName = { best: 'Best route', shuffle: 'Shuffle', fresh: 'Fresh streets' }[S.variety] || 'Fresh streets';
+  var parts = [styleName];
+  if (S.allergy) parts.push('Allergy-safe');
+  if (S.stroller) parts.push('Stroller');
+  el.textContent = parts.join(' \u00B7 ');
+}
+$('btnPrefs').addEventListener('click', function () {
+  var body = $('prefsBody'); var open = body.hidden;
+  body.hidden = !open;
+  $('btnPrefs').setAttribute('aria-expanded', String(open));
+  $('prefsCaret').textContent = open ? '\u25B4' : '\u25BE';
+});
+$('tglAllergy').addEventListener('click', function () { S.allergy = !S.allergy; store.set('allergy', S.allergy); paintToggles(); toast(S.allergy ? 'Allergy-safe stops will be prioritized in your routes.' : 'Allergy-safe priority off.', 'ok'); });
+$('tglStroller').addEventListener('click', function () { S.stroller = !S.stroller; store.set('stroller', S.stroller); paintToggles(); toast(S.stroller ? 'Stroller mode on: step-free streets preferred.' : 'Stroller mode off.', 'ok'); });
+paintToggles();
+
+/* draw your own route */
+function enterDraw() {
+  if (!S.start) { toast('Set your start first (location, pin, or search), then draw.', 'warn'); return; }
+  exitPick();
+  S.draw = { pts: [], layer: L.layerGroup().addTo(map) };
+  document.body.classList.add('drawing');
+  $('drawBar').hidden = false;
+  $('sheet').style.display = 'none';
+  updateDrawBar();
+  toast('Draw mode: tap the map to drop the stops you want, in order.', 'ok');
+}
+function exitDraw() {
+  if (S.draw) { try { map.removeLayer(S.draw.layer); } catch (e) {} S.draw = null; }
+  document.body.classList.remove('drawing');
+  $('drawBar').hidden = true;
+  $('sheet').style.display = '';
+}
+function snapDrawPoint(p) {
+  var stopsData = (typeof HEIGHTS_STOPS !== 'undefined') ? HEIGHTS_STOPS : [];
+  var best = null, bd = 60;
+  stopsData.forEach(function (sx) { var d = haversine(p, { lat: sx.lat, lng: sx.lon }); if (d < bd) { bd = d; best = sx; } });
+  if (best) return { lat: best.lat, lng: best.lon, stop: best, name: best.name || best.addr || 'treat stop' };
+  return { lat: p.lat, lng: p.lng };
+}
+function updateDrawBar() {
+  if (!S.draw) return;
+  var n = S.draw.pts.length;
+  var last = n ? S.draw.pts[n - 1] : null;
+  $('drawText').textContent = n ? (n + (n === 1 ? ' point' : ' points') + ' \u00B7 the loop runs from your start, through your points, and back' + (last && last.name ? ' \u00B7 last one snapped to ' + last.name : '')) : 'Tap the map to drop points';
+  $('btnDrawDone').disabled = !n;
+}
+function redrawDraw() {
+  if (!S.draw) return;
+  var g = S.draw.layer; g.clearLayers();
+  S.draw.pts.forEach(function (p, i) { L.marker([p.lat, p.lng], { icon: stopIcon('', i + 1) }).addTo(g); });
+  if (S.draw.pts.length) {
+    var line = [S.start].concat(S.draw.pts, [S.start]).map(function (p) { return [p.lat, p.lng]; });
+    L.polyline(line, { color: '#7c4ff0', weight: 3, dashArray: '6 8', opacity: 0.85 }).addTo(g);
+  }
+  updateDrawBar();
+}
+function finishDraw() {
+  if (!S.draw || !S.draw.pts.length) return;
+  var stopsData = (typeof HEIGHTS_STOPS !== 'undefined') ? HEIGHTS_STOPS : [];
+  var stops = S.draw.pts.map(function (p) {
+    var o = { lat: p.lat, lng: p.lng };
+    if (p.stop) { o.stop = p.stop; return o; }
+    var best = null, bd = 45;
+    stopsData.forEach(function (sx) { var d = haversine(p, { lat: sx.lat, lng: sx.lon }); if (d < bd) { bd = d; best = sx; } });
+    if (best) o.stop = best;
+    return o;
+  });
+  exitDraw();
+  routeFromStops(S.start, stops, S.budget);
+}
+$('btnDraw').addEventListener('click', enterDraw);
+$('btnDrawUndo').addEventListener('click', function () { if (S.draw) { S.draw.pts.pop(); redrawDraw(); } });
+$('btnDrawClear').addEventListener('click', function () { if (S.draw) { S.draw.pts = []; redrawDraw(); } });
+$('btnDrawCancel').addEventListener('click', exitDraw);
+$('btnDrawDone').addEventListener('click', finishDraw);
+
+/* explore mode: free-roam callouts, each place once, well spaced */
+function setExplore(on) {
+  S.explore = on;
+  var fab = $('fabExplore'); if (fab) fab.setAttribute('aria-pressed', String(on));
+  if (S.exploreInt) { clearInterval(S.exploreInt); S.exploreInt = null; }
+  if (on) {
+    ensureWatch();
+    S.exploreInt = setInterval(exploreTick, 2000);
+    toast('Explore mode on: I will call out treat spots once as you get close. Tap the compass to stop.', 'ok');
+  } else { hideExploreCard(); }
+}
+function exploreTick() {
+  if (!S.explore || S.nav || !S.lastPos || !S.lastPos.coords) return;
+  exploreCheck({ lat: S.lastPos.coords.latitude, lng: S.lastPos.coords.longitude });
+}
+var exploreCardTimer = null;
+function showExploreCard(title, sub) {
+  $('exploreTitle').textContent = '\uD83D\uDCCD ' + title;
+  $('exploreSub').textContent = sub || '';
+  $('exploreCard').hidden = false;
+  if (exploreCardTimer) clearTimeout(exploreCardTimer);
+  exploreCardTimer = setTimeout(hideExploreCard, 12000);
+}
+function hideExploreCard() { var c = $('exploreCard'); if (c) c.hidden = true; if (exploreCardTimer) { clearTimeout(exploreCardTimer); exploreCardTimer = null; } }
+function exploreCheck(ll) {
+  var now = Date.now();
+  if (now - S.exploreLast < 45000) return;
+  var best = null, bd = 65;
+  var stops = (typeof HEIGHTS_STOPS !== 'undefined') ? HEIGHTS_STOPS : [];
+  for (var i = 0; i < stops.length; i++) {
+    var sx = stops[i], key = 'h' + sx.lat + ',' + sx.lon;
+    if (S.exploreSeen[key]) continue;
+    var d = haversine(ll, { lat: sx.lat, lng: sx.lon });
+    if (d < bd) {
+      bd = d;
+      var acts = (sx.acts && sx.acts.length) ? sx.acts.map(function (a) { return { candy: '\uD83C\uDF6C candy', decor: '\uD83D\uDC7B decorations', costume: '\uD83E\uDDD9 costumes', pumpkin: '\uD83C\uDF83 pumpkin' }[a] || a; }).join(' \u00B7 ') : '';
+      best = { key: key, title: sx.name || 'Treat stop', sub: [acts, sx.hours ? 'Open ' + sx.hours : '', sx.addr || ''].filter(Boolean).join(' \u00B7 ') };
+    }
+  }
+  S.pins.forEach(function (p) {
+    var key = 'p' + p.lat + ',' + p.lng;
+    if (S.exploreSeen[key]) return;
+    var d2 = haversine(ll, p);
+    if (d2 < bd) { bd = d2; best = { key: key, title: p.type === 'candy' ? 'Candy spot you pinned' : 'Decor spot you pinned', sub: '' }; }
+  });
+  if (!best) return;
+  S.exploreSeen[best.key] = 1;
+  S.exploreLast = now;
+  showExploreCard(best.title, best.sub);
+  speakNow('Nearby: ' + best.title + (best.sub ? '. ' + best.sub : ''));
+}
+$('fabExplore').addEventListener('click', function () { setExplore(!S.explore); });
+$('btnExploreClose').addEventListener('click', hideExploreCard);
+$('btnFitMore').addEventListener('click', function () {
+  var open = $('fitNote').classList.toggle('open');
+  $('btnFitMore').innerHTML = open ? 'Less &#9652;' : 'More &#9662;';
+});
+
+/* Deviated? One press builds a fresh route from where you stand: new stops
+   (skipping ones already visited), sized to the time left, ending at home. */
+function rerouteFromHere() {
+  if (!S.nav) return;
+  var ll = (S.lastPos && S.lastPos.coords) ? { lat: S.lastPos.coords.latitude, lng: S.lastPos.coords.longitude } : null;
+  if (!ll) { toast('Waiting for a GPS fix before I can re-route.', 'warn'); return; }
+  var home = S.start;
+  var elapsedSec = Math.floor((Date.now() - S.nav.startedAt) / 1000);
+  var remainMin = Math.max(15, S.budget - Math.floor(elapsedSec / 60));
+  var remainM = remainMin * 60 * KID_PACE_MPS;
+  var visitedPts = [];
+  if (S.route && S.route.stops) S.route.stops.forEach(function (s2, i2) { if (S.nav.visited.has(i2)) visitedPts.push(s2); });
+  var cands = [];
+  var stopsData = (typeof HEIGHTS_STOPS !== 'undefined') ? HEIGHTS_STOPS : [];
+  stopsData.forEach(function (sx) {
+    var p = { lat: sx.lat, lng: sx.lon };
+    if (haversine(ll, p) > remainM * 0.55) return;
+    for (var vi = 0; vi < visitedPts.length; vi++) { if (haversine(p, visitedPts[vi]) < 30) return; }
+    cands.push({ lat: p.lat, lng: p.lng, value: sx.t === 'home' ? 4 : 5, stop: sx, kind: 'stop', housesEst: 3 });
+  });
+  S.pins.forEach(function (p) {
+    if (haversine(ll, p) <= remainM * 0.55) cands.push({ lat: p.lat, lng: p.lng, value: p.type === 'candy' ? 4 : 2, kind: 'pin', housesEst: 2 });
+  });
+  function pathLen(arr) { var L = 0, prev = ll; arr.forEach(function (p) { L += haversine(prev, p); prev = p; }); return L + haversine(prev, home); }
+  var chosen = [], cur = pathLen(chosen), target = remainM / 1.35, pool = cands.slice();
+  while (pool.length && chosen.length < 10) {
+    var bestI = -1, bestScore = -1, bestDelta = 0, bestPos = 0;
+    for (var ci = 0; ci < pool.length; ci++) {
+      var c = pool[ci], bd = Infinity, bp = chosen.length;
+      for (var pos = 0; pos <= chosen.length; pos++) {
+        var prev = pos === 0 ? ll : chosen[pos - 1];
+        var next = pos === chosen.length ? home : chosen[pos];
+        var dd = haversine(prev, c) + haversine(c, next) - haversine(prev, next);
+        if (dd < bd) { bd = dd; bp = pos; }
+      }
+      var sc = c.value / Math.max(25, bd);
+      if (sc > bestScore) { bestScore = sc; bestI = ci; bestDelta = bd; bestPos = bp; }
+    }
+    if (bestI < 0 || cur + bestDelta > target) break;
+    var pick = pool.splice(bestI, 1)[0];
+    chosen.splice(bestPos, 0, pick); cur += bestDelta;
+  }
+  showBusy('Building a new route from here\u2026', 'Fresh stops, sized to your time left, ending at home.');
+  var attempts = 0;
+  function tryRoute(list) {
+    attempts++;
+    return routeWithEngine([ll].concat(list, [home])).then(function (r) {
+      if (r.distance > remainM * 1.12 && list.length > 1 && attempts <= 3) {
+        var nl = list.slice(); nl.splice(nl.length - 1, 1);
+        return tryRoute(nl);
+      }
+      return { r: r, list: list };
+    });
+  }
+  tryRoute(chosen).then(function (out) {
+    hideBusy();
+    endNav(false);
+    S.route = { coords: out.r.coords, distance: out.r.distance, maneuvers: out.r.maneuvers, legDist: out.r.legDist, stops: out.list, houses: out.list.reduce(function (a, s2) { return a + (s2.housesEst || 0); }, 0), fallback: false, approx: false, fromHere: true };
+    renderRoute(S.route); showStats(S.route);
+    startNav();
+    speakNow(out.list.length ? ('New route ready. ' + out.list.length + ' fresh stops, then home.') : 'New plan: straight home from here.');
+    toast(out.list.length ? ('Re-routed from here: ' + out.list.length + ' fresh stops, then home.') : 'Re-routed: straight home from here.', 'ok');
+  }).catch(function () { hideBusy(); toast('Could not build a new route right now. Your current route is unchanged.', 'err'); });
+}
+$('btnReroute').addEventListener('click', rerouteFromHere);
+$('btnRebuild').addEventListener('click', function () { S.forceVariety = true; buildRoute(); });
+$('btnNewRoute').addEventListener('click', function () { S.forceVariety = true; buildRoute(); });
+
+/* route from explicit stops (shared links) */
+function routeFromStops(start, stops, budget) {
+  showBusy('Loading shared route…', '');
+  return routeWithEngine([start].concat(stops, [start])).then(function (r) {
+    hideBusy();
+    S.route = { coords: r.coords, distance: r.distance, maneuvers: r.maneuvers, stops: stops, houses: stops.length * 6, fallback: false, approx: false };
+    if (budget) { S.budget = budget; }
+    renderRoute(S.route); showStats(S.route);
+  }).catch(function () {
+    hideBusy();
+    toast('Could not load that shared route right now.', 'err');
+  });
+}
+
+/* share */
+function encodeRoute() {
+  if (!S.route || !S.start) return '';
+  var payload = { s: [round6(S.start.lat), round6(S.start.lng)], w: S.route.stops.map(function (s) { return [round6(s.lat), round6(s.lng)]; }), b: S.budget };
+  return btoa(unescape(encodeURIComponent(JSON.stringify(payload)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function round6(n) { return Math.round(n * 1e6) / 1e6; }
+$('btnShare').addEventListener('click', function () {
+  var code = encodeRoute();
+  if (!code) { toast('Build a route first, then share it.', 'warn'); return; }
+  var url = location.href.split('#')[0] + '#r=' + code;
+  if (navigator.share) {
+    navigator.share({ title: 'Our trick-or-treat route 🎃', text: 'Follow our JC Heights Candy Path loop:', url: url }).catch(function () {});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(function () { toast('Route link copied. Send it to the other parents!', 'ok'); },
+      function () { toast('Copy failed. The link is in the address bar.', 'warn'); });
+    try { history.replaceState(null, '', '#r=' + code); } catch (e) {}
+  } else {
+    try { history.replaceState(null, '', '#r=' + code); } catch (e) {}
+    toast('Link is in the address bar, copy it from there.', 'ok');
+  }
+});
+$('btnPlanOwn').addEventListener('click', function () {
+  S.viewMode = false;
+  document.body.classList.remove('mode-view');
+  try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+  $('planInputs').classList.remove('folded');
+  toast('Plan your own: set a start and build.', 'ok');
+});
+
+/* ---------------- navigation ---------------- */
+var wakeLock = null;
+function requestWake() {
+  if (!('wakeLock' in navigator)) return;
+  navigator.wakeLock.request('screen').then(function (wl) { wakeLock = wl; }).catch(function () {});
+}
+document.addEventListener('visibilitychange', function () {
+  if (S.nav && document.visibilityState === 'visible') requestWake();
+});
+$('busyCancel').addEventListener('click', function () { BUILD_SEQ++; });
+
+function startNav() {
+  if (!S.route) { toast('Build a route first.', 'warn'); return; }
+  if (S.explore) setExplore(false);
+  askCompassPermission();
+  ensureWatch();
+  var r = S.route;
+  var nav = S.nav = {
+    steps: r.maneuvers, stepIdx: 1, stops: r.stops, stopIdx: 0,
+    startedAt: Date.now(), trackDist: 0, lastTrack: null,
+    offCount: 0, lastReroute: 0, announced: {}, timer: null, done: false
+  };
+  /* aim at the first maneuver meaningfully ahead of where we stand */
+  if (S.pos) {
+    for (var i = 1; i < nav.steps.length; i++) {
+      if (haversine(S.pos, nav.steps[i]) > 30) { nav.stepIdx = i; break; }
+      nav.stepIdx = i;
+    }
+  }
+  if (nav.stepIdx >= nav.steps.length) nav.stepIdx = Math.max(1, nav.steps.length - 1);
+  document.body.classList.add('mode-nav');
+  S.follow = true;
+  applyHeadUp();
+  requestWake();
+  if (S.pos) map.flyTo([S.pos.lat, S.pos.lng], 17, { duration: 0.6 });
+  else if (S.start) map.flyTo([S.start.lat, S.start.lng], 17, { duration: 0.6 });
+  nav.timer = setInterval(navTick, 1000);
+  updateStopMarkers();
+  navTick();
+  if (S.pos) navOnPos(); /* seed the banner from the last known fix instead of sitting on "Waiting for GPS" */
+  else $('navInstr').textContent = 'Waiting for GPS… step outside for a faster lock.';
+  var cur = nav.steps[nav.stepIdx];
+  speakNow("Let's go trick-or-treating! " + (cur ? cur.text : ''));
+  toast('Navigation on. The map follows you; voice guides each turn.', 'ok');
+}
+function updateStopMarkers() {
+  if (!S.route || !S.route.stopMarkers || !S.nav) return;
+  S.route.stopMarkers.forEach(function (m, i) {
+    m.setIcon(stopIcon(i < S.nav.stopIdx ? 'done' : (i === S.nav.stopIdx ? 'next' : ''), i + 1));
+  });
+  $('nStops').textContent = S.nav.stopIdx + '/' + S.nav.stops.length;
+}
+function remainingMeters() {
+  var nav = S.nav; if (!nav || !S.pos) return 0;
+  var target = nav.steps[nav.stepIdx];
+  var d = target ? haversine(S.pos, target) : 0;
+  for (var j = nav.stepIdx; j < nav.steps.length - 1; j++) d += nav.steps[j].distAfter || 0;
+  return d;
+}
+function navTick() {
+  var nav = S.nav; if (!nav) return;
+  var el = Math.floor((Date.now() - nav.startedAt) / 1000);
+  var hh = Math.floor(el / 3600), mm = Math.floor((el % 3600) / 60), ss = el % 60;
+  $('nElapsed').textContent = (hh ? hh + ':' : '') + (mm < 10 && hh ? '0' : '') + mm + ':' + (ss < 10 ? '0' : '') + ss;
+  /* GPS health: if the fix is stale or coarse, say so in the flag line */
+  var gpsWeak = !S.pos || (Date.now() - S.pos.ts > 12000) || (S.pos.acc || 99) > 120;
+  var tgt = nav.steps[nav.stepIdx];
+  if (gpsWeak) {
+    $('navFlag').hidden = false;
+    $('navFlag').textContent = !S.pos ? '📡 Acquiring GPS…' : '📡 Weak GPS (±' + Math.round(S.pos.acc || 0) + ' m), still guiding';
+  } else if (!(tgt && tgt.type === 'arrive')) {
+    $('navFlag').hidden = true;
+  }
+  if (S.pos) {
+    var rem = remainingMeters();
+    var minsLeft = Math.max(0, Math.round(rem / KID_PACE_MPS / 60));
+    $('nEta').textContent = minsLeft >= 60 ? Math.floor(minsLeft / 60) + 'h ' + (minsLeft % 60) + 'm' : minsLeft + ' min';
+    $('nEtaSub').textContent = '🏠 home at ' + fmtClock(new Date(Date.now() + (rem / KID_PACE_MPS) * 1000));
+  }
+}
+function distToRouteLine(p) {
+  var coords = S.route.coords, best = Infinity;
+  for (var i = 0; i < coords.length - 1; i++) {
+    var d = distToSeg(p, coords[i], coords[i + 1]).dist;
+    if (d < best) best = d;
+  }
+  return best;
+}
+function navOnPos() {
+  var nav = S.nav; if (!nav || nav.done || !S.pos) return;
+  var pos = S.pos;
+  /* walked distance */
+  if (nav.lastTrack) {
+    var dd = haversine(nav.lastTrack, pos);
+    if (dd > 2 && dd < 200 && (pos.acc || 99) < 60) nav.trackDist += dd;
+  }
+  nav.lastTrack = { lat: pos.lat, lng: pos.lng };
+  if (S.follow) map.panTo([pos.lat, pos.lng], { animate: true, duration: 0.4 });
+  rotateMapToHeading();
+  var target = nav.steps[nav.stepIdx];
+  if (!target) { finishNav(); return; }
+  var d = haversine(pos, target);
+  $('navArrow').textContent = target.arrow;
+  $('navInstr').textContent = target.text;
+  $('navDist').textContent = fmtDist(d);
+  var next = nav.steps[nav.stepIdx + 1];
+  $('navThen').textContent = next ? 'Then: ' + next.text : '';
+  $('navFlag').hidden = !(target.type === 'arrive');
+  if (target.type === 'arrive') $('navFlag').textContent = '🏠 Almost home';
+  /* voice: early heads-up, then a closer one, once per step */
+  var keyE = 'e' + nav.stepIdx;
+  if (d < 170 && d >= 75 && !nav.announced[keyE]) {
+    nav.announced[keyE] = true;
+    speak('In ' + fmtDist(d) + ', ' + target.text);
+  }
+  var key = 's' + nav.stepIdx;
+  if (d < 75 && d >= 25 && !nav.announced[key]) {
+    nav.announced[key] = true;
+    speak('In ' + fmtDist(d) + ', ' + target.text);
+  }
+  /* stop arrival: auto check-off, count it, buzz, announce the place */
+  if (nav.stopIdx < nav.stops.length) {
+    var sd = haversine(pos, nav.stops[nav.stopIdx]);
+    var gpsAcc = (S.lastPos && S.lastPos.coords && S.lastPos.coords.accuracy) || 0;
+    var arriveR = Math.min(90, Math.max(35, gpsAcc * 0.9));
+    if (sd < arriveR) {
+      var arrivedStop = nav.stops[nav.stopIdx];
+      nav.stopIdx++;
+      S.counts.houses++; S.counts.hist.push('houses');
+      store.set('counts', S.counts); renderCounts();
+      if (navigator.vibrate) navigator.vibrate(60);
+      updateStopMarkers();
+      if (arrivedStop.stop) {
+        var st = arrivedStop.stop;
+        var actsTxt = (st.acts || []).map(function (a) { return a === 'candy' ? 'candy' : a === 'decor' ? 'decorations' : 'costumes'; }).join(' and ');
+        speakNow('Arrived: ' + (st.name || 'treat stop') + '.' +
+          (actsTxt ? ' Has ' + actsTxt + '.' : '') +
+          (st.hours ? ' Open ' + st.hours + '.' : ''));
+      } else {
+        speakNow('Treat stop ' + nav.stopIdx + ' of ' + nav.stops.length + '. Happy haunting!');
+      }
+      if (nav.stopIdx >= nav.stops.length) toast('That was the last planned stop. The route now leads home.', 'ok');
+    }
+  }
+  /* advance maneuver */
+  if (d < 25) {
+    if (target.type === 'arrive' || nav.stepIdx >= nav.steps.length - 1) { finishNav(); return; }
+    nav.stepIdx++;
+    var nt = nav.steps[nav.stepIdx];
+    if (nt) speakNow(nt.text);
+    return;
+  }
+  /* off-route detection */
+  if (nav.stepIdx < nav.steps.length - 1) {
+    var off = distToRouteLine(pos);
+    if (off > 45) {
+      nav.offCount++;
+      if (nav.offCount >= 2 && Date.now() - nav.lastReroute > 60000) {
+        nav.offCount = 0; nav.lastReroute = Date.now();
+        reroute();
+      }
+    } else nav.offCount = 0;
+  }
+}
+function reroute() {
+  var nav = S.nav; if (!nav || !S.pos || !S.start) return;
+  toast('You wandered off the route. Re-routing…', 'warn');
+  speakNow('Re-routing.');
+  var remaining = nav.stops.slice(nav.stopIdx);
+  routeWithEngine([{ lat: S.pos.lat, lng: S.pos.lng }].concat(remaining, [S.start])).then(function (r) {
+    if (!S.nav) return;
+    S.route.coords = r.coords; S.route.maneuvers = r.maneuvers; S.route.distance = r.distance;
+    nav.steps = r.maneuvers; nav.stepIdx = 1; nav.announced = {};
+    routeLayer.clearLayers();
+    var latlngs = r.coords.map(function (c) { return [c.lat, c.lng]; });
+    L.polyline(latlngs, { color: '#ff7b1c', weight: 19, opacity: 0.16 }).addTo(routeLayer);
+  L.polyline(latlngs, { color: '#0d0a14', weight: 11, opacity: 0.55 }).addTo(routeLayer);
+    L.polyline(latlngs, { color: '#ff7b1c', weight: 5, opacity: 0.95 }).addTo(routeLayer);
+    var cur = nav.steps[nav.stepIdx];
+    if (cur) speakNow(cur.text);
+  }).catch(function () {
+    toast('Re-route failed (connection?). The original line is still on the map.', 'err');
+  });
+}
+/* ---- Phase 1 nav upgrades: heading-up map, head-home, skip stop ---- */
+var headUp = { on: true, angle: 0, target: null, compassAt: 0, raf: null, gotAbsolute: false, manual: false, mAngle: 0 };
+function applyHeadUp() {
+  var el = $('map');
+  var active = !!(S.nav && headUp.on);
+  el.classList.toggle('headup', active);
+  if (!active) { el.style.transform = ''; stopHeadLoop(); headUp.manual = false; document.body.classList.remove('rot-manual'); }
+  else startHeadLoop();
+  try { map.invalidateSize(); } catch (e) {}
+  if (S.nav && S.pos) map.panTo([S.pos.lat, S.pos.lng], { animate: false });
+  $('btnHeadUp').setAttribute('aria-pressed', headUp.on ? 'true' : 'false');
+  $('btnHeadUp').textContent = headUp.on ? '🧭 Heading-up' : '🧭 North-up';
+}
+/* Heading sources: the phone compass is primary (smooth, and it works
+   standing still at a corner); GPS course is the fallback while walking
+   when the compass has been quiet. Rotation is eased every animation
+   frame instead of once per GPS fix, which is what makes it feel like
+   Google Maps rather than stepping. */
+function onOrient(e) {
+  var h = null;
+  if (typeof e.webkitCompassHeading === 'number' && !isNaN(e.webkitCompassHeading)) h = e.webkitCompassHeading;
+  else if (e.absolute) { if (typeof e.alpha === 'number') { h = 360 - e.alpha; headUp.gotAbsolute = true; } }
+  else if (!headUp.gotAbsolute && typeof e.alpha === 'number') h = 360 - e.alpha;
+  if (h == null || isNaN(h)) return;
+  headUp.target = -h;
+  headUp.compassAt = Date.now();
+}
+window.addEventListener('deviceorientationabsolute', onOrient, true);
+window.addEventListener('deviceorientation', onOrient, true);
+function askCompassPermission() {
+  try {
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') DeviceOrientationEvent.requestPermission().catch(function () {});
+  } catch (e) {}
+}
+function headLoop() {
+  headUp.raf = null;
+  if (!S.nav || !headUp.on) return;
+  if (headUp.manual) { headUp.raf = requestAnimationFrame(headLoop); return; }
+  if (headUp.target != null) {
+    var diff = ((headUp.target - headUp.angle + 540) % 360) - 180;
+    headUp.angle += diff * 0.22;
+    $('map').style.transform = 'rotate(' + headUp.angle + 'deg)';
+  }
+  headUp.raf = requestAnimationFrame(headLoop);
+}
+function startHeadLoop() { if (!headUp.raf) headUp.raf = requestAnimationFrame(headLoop); }
+function stopHeadLoop() { if (headUp.raf) cancelAnimationFrame(headUp.raf); headUp.raf = null; }
+function rotateMapToHeading() {
+  if (!S.nav || !headUp.on || !S.pos || S.pos.heading == null) return;
+  if (Date.now() - headUp.compassAt < 4000) return;
+  headUp.target = -S.pos.heading;
+}
+function doHeadHome() {
+  var nav = S.nav; if (!nav || !S.pos || !S.start) return;
+  toast('Routing you home…', 'ok');
+  routeWithEngine([{ lat: S.pos.lat, lng: S.pos.lng }, S.start]).then(function (r) {
+    if (!S.nav) return;
+    S.route.coords = r.coords; S.route.maneuvers = r.maneuvers; S.route.distance = r.distance;
+    nav.steps = r.maneuvers; nav.stepIdx = 1; nav.announced = {};
+    nav.stops = []; nav.stopIdx = 0; nav.headingHome = true;
+    routeLayer.clearLayers();
+    var latlngs = r.coords.map(function (c) { return [c.lat, c.lng]; });
+    L.polyline(latlngs, { color: '#ff7b1c', weight: 19, opacity: 0.16 }).addTo(routeLayer);
+  L.polyline(latlngs, { color: '#0d0a14', weight: 11, opacity: 0.55 }).addTo(routeLayer);
+    L.polyline(latlngs, { color: '#ff7b1c', weight: 5, opacity: 0.95 }).addTo(routeLayer);
+    $('nStops').textContent = '🏠 heading home';
+    speakNow('Heading home. Follow the orange line.');
+  }).catch(function () {
+    toast('Could not route home (connection?). Your route is unchanged.', 'err');
+  });
+}
+$('btnHeadHome').addEventListener('click', function () {
+  if (!S.nav) return;
+  if (!S.pos) { toast('Waiting for a GPS fix first…', 'warn'); return; }
+  showDlg('Head home now?', 'Navigation will route you straight back to your start point.', [
+    { label: 'Keep trick-or-treating', cls: 'btn-ghost' },
+    { label: '🏠 Head home', cls: 'btn-org', fn: doHeadHome }
+  ]);
+});
+$('btnSkipStop').addEventListener('click', function () {
+  var nav = S.nav; if (!nav) return;
+  if (nav.stopIdx >= nav.stops.length) { toast('No more stops to skip.', 'warn'); return; }
+  nav.stopIdx++;
+  updateStopMarkers();
+  speakNow('Skipped. Next stop, ' + (nav.stopIdx + 1) + ' of ' + nav.stops.length + '.');
+});
+$('btnHeadUp').addEventListener('click', function () {
+  askCompassPermission();
+  headUp.on = !headUp.on;
+  applyHeadUp();
+});
+function finishNav() {
+  var nav = S.nav; if (!nav || nav.done) return;
+  nav.done = true;
+  speakNow("You're home. Great trick-or-treating!");
+  endNav(true);
+}
+function endNav(showSummary) {
+  var nav = S.nav;
+  if (nav) {
+    clearInterval(nav.timer);
+    S.lastNav = { trackDist: nav.trackDist, elapsedMs: Date.now() - nav.startedAt };
+    S.nightTotals = S.nightTotals || { trackDist: 0, elapsedMs: 0 };
+    S.nightTotals.trackDist += nav.trackDist;
+    S.nightTotals.elapsedMs += S.lastNav.elapsedMs;
+  }
+  stopHeadLoop();
+  headUp.manual = false; document.body.classList.remove('rot-manual');
+  S.nav = null;
+  document.body.classList.remove('mode-nav');
+  var mapEl = $('map');
+  mapEl.classList.remove('headup'); mapEl.style.transform = '';
+  try { map.invalidateSize(); } catch (e) {}
+  if (wakeLock) { try { wakeLock.release(); } catch (e) {} wakeLock = null; }
+  if (showSummary) openSummary();
+}
+$('btnNav').addEventListener('click', startNav);
+$('btnEnd').addEventListener('click', function () {
+  showDlg('End trick-or-treating?', 'Your route and counts stay saved. The summary shows tonight\'s haul.', [
+    { label: 'Keep going', cls: 'btn-ghost' },
+    { label: '🌙 End night', cls: 'btn-org', fn: function () { endNav(true); } }
+  ]);
+});
+
+/* ---------------- summary ---------------- */
+function openSummary() {
+  var ln = (S.nightTotals && S.nightTotals.trackDist > 0) ? S.nightTotals : (S.lastNav || { trackDist: 0, elapsedMs: 0 });
+  $('sumHouses').textContent = S.counts.houses;
+  $('sumCandy').textContent = S.counts.candy;
+  $('sumDist').textContent = ln.trackDist >= 160 ? (ln.trackDist / M_PER_MI).toFixed(1) + ' mi' : Math.round(ln.trackDist * 3.28084) + ' ft';
+  var mins = Math.round(ln.elapsedMs / 60000);
+  $('sumTime').textContent = mins >= 60 ? Math.floor(mins / 60) + ' hr ' + (mins % 60) + ' min' : mins + ' min';
+  var extra = '';
+  if (S.counts.houses > 0 && S.counts.candy > 0)
+    extra = 'That is about ' + (S.counts.candy / S.counts.houses).toFixed(1) + ' candies per house. Efficient haunting!';
+  else if (S.counts.candy > 0)
+    extra = 'Sweet haul. Tap 🏠 House visited as you go next time for the full picture.';
+  $('sumExtra').textContent = extra;
+  $('summary').hidden = false;
+}
+$('btnSummary').addEventListener('click', openSummary);
+function freshStart(collapseSheet) {
+  $('summary').hidden = true;
+  S.counts = { candy: 0, houses: 0, hist: [], histLog: [] };
+  store.set('counts', S.counts); renderCounts();
+  S.route = null; S.lastNav = null; S.nightTotals = null;
+  routeLayer.clearLayers(); stopLayer.clearLayers();
+  document.body.classList.remove('has-route');
+  ghostHeights(false);
+  $('planInputs').classList.remove('folded');
+  var pk = $('peek'); if (pk) pk.textContent = '\uD83C\uDF6C Tap to plan your route';
+  setSheetCollapsed(!!collapseSheet);
+}
+$('btnSumClose').addEventListener('click', function () { freshStart(true); });
+$('btnSumNew').addEventListener('click', function () {
+  freshStart(false);
+  toast('Fresh start. Set your start and build a new loop.', 'ok');
+});
+
+/* ---------------- boot ---------------- */
+(function boot() {
+  ensureWatch();
+  setSheetCollapsed(true); /* clean map first, Google Maps style: slim peek bar until tapped */
+  if (S.start) { renderStart(); map.setView([S.start.lat, S.start.lng], 15); }
+  var params = new URLSearchParams(location.search);
+  var sp = params.get('start');
+  if (sp) {
+    var parts = sp.split(',').map(Number);
+    if (parts.length === 2 && !isNaN(parts[0])) setStart(parts[0], parts[1], 'Shared start', false);
+  }
+  var m = /#r=([A-Za-z0-9\-_]+)/.exec(location.hash || '');
+  if (m) {
+    try {
+      var payload = JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g, '+').replace(/_/g, '/')))));
+      if (payload && payload.s && payload.w) {
+        S.viewMode = true;
+        document.body.classList.add('mode-view');
+        setStart(payload.s[0], payload.s[1], 'Shared route start', false);
+        var stops = payload.w.map(function (w) { return { lat: w[0], lng: w[1] }; });
+        routeFromStops(S.start, stops, payload.b);
+      }
+    } catch (e) { toast('That shared route link looks broken.', 'err'); }
+  }
+  if (params.get('autoroute') === '1' && S.start && !m) {
+    setTimeout(buildRoute, 600);
+  }
+})();
+
+/* ---- Phase 3: stop search + navigate-to-a-stop ---- */
+function goToStop(lat, lng, name) {
+  var from = S.pos || S.start;
+  if (!from) { toast('Set a start point or let GPS find you first, then Go here works.', 'warn'); return; }
+  if (S.nav) endNav(false);
+  var dest = { lat: lat, lng: lng };
+  showBusy('Routing to ' + (name || 'that stop') + '…', 'A one-stop trip, there and back');
+  routeWithEngine([from, dest, from]).then(function (r) {
+    hideBusy();
+    S.route = { coords: r.coords, distance: r.distance, maneuvers: r.maneuvers, legDist: r.legDist, stops: [{ lat: lat, lng: lng, kind: 'stop', stop: null, housesEst: 0, value: 5 }], houses: 0, community: 0, approx: false };
+    renderRoute(S.route);
+    showStats(S.route);
+    startNav();
+    toast('Heading to ' + (name || 'your stop') + '.', 'ok');
+  }).catch(function () { hideBusy(); toast('Could not route there (connection?).', 'err'); });
+}
+map.on('popupopen', function (e) {
+  var el = e.popup.getElement(); if (!el) return;
+  var b = el.querySelector('.goHere');
+  if (b) b.addEventListener('click', function () {
+    map.closePopup();
+    goToStop(parseFloat(b.getAttribute('data-lat')), parseFloat(b.getAttribute('data-lng')), b.getAttribute('data-name'));
+  });
+  var ob = el.querySelector('.crowdOut');
+  if (ob) ob.addEventListener('click', function () {
+    crowdPost({ lat: parseFloat(ob.getAttribute('data-lat')), lng: parseFloat(ob.getAttribute('data-lng')), status: 'out', note: '', photo: null });
+    map.closePopup();
+    toast('Thanks! Marked as ran out, sharing with everyone.', 'ok');
+  });
+});
+function openSearch() {
+  $('searchPanel').hidden = false;
+  var i = $('findInput'); i.value = '';
+  renderSearch('');
+  setTimeout(function () { try { i.focus(); } catch (e) {} }, 60);
+}
+function closeSearch() { $('searchPanel').hidden = true; }
+function renderSearch(q) {
+  q = String(q || '').trim().toLowerCase();
+  var ref = S.pos || S.start;
+  var out = [];
+  if (typeof HEIGHTS_STOPS !== 'undefined') HEIGHTS_STOPS.forEach(function (st) {
+    if (!q || (String(st.name || '') + ' ' + String(st.addr || '')).toLowerCase().indexOf(q) >= 0)
+      out.push({ lat: st.lat, lng: st.lon, emoji: stopEmoji(st), title: st.name || 'Treat stop', sub: st.addr || '' });
+  });
+  S.pins.forEach(function (pn) {
+    var lbl = pn.type === 'candy' ? 'My candy pin' : pn.type === 'decor' ? 'My decor pin' : 'My pin';
+    if (!q || (lbl + ' ' + String(pn.note || '')).toLowerCase().indexOf(q) >= 0)
+      out.push({ lat: pn.lat, lng: pn.lng, emoji: pn.type === 'candy' ? '🍬' : pn.type === 'decor' ? '👻' : '📌', title: pn.note ? lbl + ': ' + pn.note : lbl, sub: 'Your saved pin' });
+  });
+  out.forEach(function (o) { o.d = ref ? haversine(ref, o) : null; });
+  out.sort(function (a, b) { return (a.d || 0) - (b.d || 0); });
+  out = out.slice(0, 9);
+  $('searchResults').innerHTML = out.length ? out.map(function (o, i) {
+    return '<button class="sr-row" data-i="' + i + '"><span class="sr-e">' + o.emoji + '</span><span><b>' + esc(o.title) + '</b><br><span class="muted">' + esc(o.sub) + (o.d != null ? ' · ' + (o.d < 1000 ? Math.round(o.d) + ' m away' : (o.d / 1609.34).toFixed(1) + ' mi away') : '') + '</span></span></button>';
+  }).join('') : '<div class="muted" style="padding:8px 2px">No stops match. Try a street name.</div>';
+  Array.prototype.forEach.call($('searchResults').querySelectorAll('.sr-row'), function (row) {
+    row.addEventListener('click', function () {
+      var o = out[parseInt(row.getAttribute('data-i'), 10)];
+      closeSearch();
+      focusStop(o);
+    });
+  });
+}
+function focusStop(o) {
+  map.flyTo([o.lat, o.lng], 17, { duration: 0.6 });
+  var mk = L.marker([o.lat, o.lng]).addTo(map);
+  mk.bindPopup('<div class="pop"><b>' + o.emoji + ' ' + esc(o.title) + '</b>' + (o.sub ? '<br>' + esc(o.sub) : '') + '<br><button class="btn-org goHere" data-lat="' + o.lat + '" data-lng="' + o.lng + '" data-name="' + esc(o.title) + '" style="margin-top:8px;min-height:38px;padding:6px 14px;font-size:14px">🧭 Go here</button></div>').openPopup();
+  mk.on('popupclose', function () { try { map.removeLayer(mk); } catch (e) {} });
+}
+$('fabSearch').addEventListener('click', openSearch);
+$('searchClose').addEventListener('click', closeSearch);
+$('findInput').addEventListener('input', function (e) { renderSearch(e.target.value); });
+$('findInput').addEventListener('keyup', function (e) { renderSearch(e.target.value); });
+$('findInput').addEventListener('change', function (e) { renderSearch(e.target.value); });
+
+/* ---- Phase 3b: crowdsourced treat map (Supabase) ----
+   House logs and ran-out reports post to a shared table; everyone's app
+   polls and renders fresh reports with age-based fading. The anon key is
+   public by design; row-level security allows read + insert only. */
+var CROWD = { url: 'https://azvannetqxugvqvtejhe.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6dmFubmV0cXh1Z3ZxdnRlamhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0Nzg4MjMsImV4cCI6MjEwOTA1NDgyM30.QaA3_iLNhfN-PI9hc1Fv9pz2w8jNl2LiISsrQNYLk9A', reports: [] };
+function crowdOn() { return CROWD.url.indexOf('http') === 0 && CROWD.key.length > 20; }
+function crowdHeaders() { return { apikey: CROWD.key, Authorization: 'Bearer ' + CROWD.key, 'Content-Type': 'application/json' }; }
+function crowdAgeMin(r) { return (Date.now() - new Date(r.created_at).getTime()) / 60000; }
+function crowdPost(rep) {
+  if (!crowdOn()) return;
+  CROWD.reports.unshift({ lat: rep.lat, lng: rep.lng, status: rep.status, note: rep.note || '', photo: rep.photo || null, created_at: new Date().toISOString() });
+  renderCrowd();
+  try {
+    fetch(CROWD.url + '/rest/v1/treat_reports', { method: 'POST', headers: crowdHeaders(), body: JSON.stringify({ lat: rep.lat, lng: rep.lng, status: rep.status, note: rep.note || null, photo: rep.photo || null }) }).catch(function () {});
+  } catch (e) {}
+}
+function crowdSyncPin(pin) {
+  if (!pin) return;
+  crowdPost({ lat: pin.lat, lng: pin.lng, status: pin.type, note: String(pin.note || '').slice(0, 120), photo: pin.photo || null });
+}
+function crowdFetch() {
+  if (!crowdOn()) return;
+  fetch(CROWD.url + '/rest/v1/treat_reports?select=id,lat,lng,status,note,photo,created_at&order=created_at.desc&limit=300', { headers: crowdHeaders() })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (rows) { if (Array.isArray(rows)) { CROWD.reports = rows; renderCrowd(); } })
+    .catch(function () {});
+}
+function crowdOutNear(lat, lng) {
+  for (var i = 0; i < CROWD.reports.length; i++) {
+    var r = CROWD.reports[i];
+    if (r.status === 'out' && crowdAgeMin(r) <= 90 && haversine({ lat: lat, lng: lng }, r) <= 30) return true;
+  }
+  return false;
+}
+function crowdFreshStops() {
+  return CROWD.reports.filter(function (r) { return (r.status === 'candy' || r.status === 'nonfood') && crowdAgeMin(r) <= 90; });
+}
+var CROWD_META = {
+  candy: { e: '🍬', label: 'Giving candy' },
+  out: { e: '🚫', label: 'Ran out of candy' },
+  nonfood: { e: '💙', label: 'Non-food / allergy-safe treats' },
+  decor: { e: '👻', label: 'Decorations only' }
+};
+function renderCrowd() {
+  if (!crowdLayer) return;
+  crowdLayer.clearLayers();
+  var placed = [];
+  CROWD.reports.forEach(function (r) {
+    var age = crowdAgeMin(r);
+    if (age > 180) return;
+    for (var i = 0; i < placed.length; i++) if (haversine(placed[i], r) <= 25) return;
+    placed.push(r);
+    var meta = CROWD_META[r.status] || CROWD_META.candy;
+    var op = age < 30 ? 1 : age < 60 ? 0.8 : age < 120 ? 0.6 : 0.45;
+    var m = L.marker([r.lat, r.lng], {
+      icon: L.divIcon({ className: 'crowdicon', iconSize: [30, 30], iconAnchor: [15, 24], html: '<div style="opacity:' + op + '"><span class="' + (r.status === 'out' ? 'cout' : '') + '">' + meta.e + '</span></div>' })
+    });
+    var ago = age < 1 ? 'just now' : Math.round(age) + ' min ago';
+    m.bindPopup('<div class="pop"><b>' + meta.e + ' ' + meta.label + '</b><br><span class="muted">Crowd report · ' + ago + '</span>' +
+      (r.note ? '<br>' + esc(r.note) : '') +
+      (r.photo ? '<br><img src="' + r.photo + '" alt="Photo of this stop" style="max-width:170px;border-radius:10px;margin-top:6px">' : '') + '</div>');
+    m.addTo(crowdLayer);
+  });
+}
+if (crowdOn()) {
+  crowdFetch();
+  setInterval(crowdFetch, 45000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) crowdFetch(); });
+}
+
+/* ---- Manual map rotation in nav (Google Maps style) ----
+   A two-finger twist rotates the map by hand and pauses the compass; the
+   floating Resume compass button (or the Heading-up toggle) eases back to
+   compass follow. Pinch zoom still wins when the gesture is mostly pinch. */
+var twist = { pts: {}, ang: null, lastDist: 0, rotAcc: 0, scaleAcc: 0, claimed: false };
+function twistPts() { var a = []; for (var k in twist.pts) a.push(twist.pts[k]); return a; }
+function resumeCompass() {
+  if (!headUp.manual) return;
+  headUp.manual = false;
+  headUp.angle = headUp.mAngle;
+  document.body.classList.remove('rot-manual');
+  startHeadLoop();
+}
+$('btnResume').addEventListener('click', resumeCompass);
+(function () {
+  var mapEl = $('map');
+  mapEl.addEventListener('pointerdown', function (e) {
+    twist.pts[e.pointerId] = { x: e.clientX, y: e.clientY };
+    var ps = twistPts();
+    if (ps.length === 2) {
+      twist.ang = Math.atan2(ps[1].y - ps[0].y, ps[1].x - ps[0].x);
+      twist.lastDist = Math.max(20, Math.hypot(ps[1].x - ps[0].x, ps[1].y - ps[0].y));
+      twist.rotAcc = 0; twist.scaleAcc = 0;
+    }
+  });
+  mapEl.addEventListener('pointermove', function (e) {
+    if (!twist.pts[e.pointerId]) return;
+    twist.pts[e.pointerId] = { x: e.clientX, y: e.clientY };
+    var ps = twistPts();
+    if (ps.length !== 2 || twist.ang == null || !S.nav || !headUp.on) return;
+    var ang = Math.atan2(ps[1].y - ps[0].y, ps[1].x - ps[0].x);
+    var dAng = ((ang - twist.ang + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+    var dist = Math.max(20, Math.hypot(ps[1].x - ps[0].x, ps[1].y - ps[0].y));
+    twist.rotAcc += Math.abs(dAng);
+    twist.scaleAcc += Math.abs(dist - twist.lastDist) / twist.lastDist;
+    twist.ang = ang; twist.lastDist = dist;
+    if (!twist.claimed) {
+      if (twist.rotAcc > 0.12 && twist.rotAcc > twist.scaleAcc * 1.6) {
+        twist.claimed = true;
+        headUp.manual = true;
+        headUp.mAngle = headUp.angle;
+        try { map.touchZoom.disable(); } catch (err) {}
+        document.body.classList.add('rot-manual');
+      } else return;
+    }
+    headUp.mAngle += dAng * 180 / Math.PI;
+    $('map').style.transform = 'rotate(' + headUp.mAngle + 'deg)';
+  });
+  function twistEnd(e) {
+    delete twist.pts[e.pointerId];
+    if (twistPts().length < 2) {
+      if (twist.claimed) { try { map.touchZoom.enable(); } catch (err) {} }
+      twist.claimed = false; twist.ang = null;
+    }
+  }
+  mapEl.addEventListener('pointerup', twistEnd);
+  mapEl.addEventListener('pointercancel', twistEnd);
+})();
+
+/* ---- Log a stop from anywhere (Steve, Oct 31): the Log fab works with no
+   route built and no panel open; the log card's stepper adds this stop's
+   candies straight into the haul counter. ---- */
+var lcCandy = 0;
+function paintLcCandy() { var el = $('lcCandyN'); if (el) el.textContent = lcCandy; }
+$('fabLog').addEventListener('click', function () {
+  bumpCount('houses', null);
+  if (!logCardPin) toast('House counted. No new pin: no GPS fix yet, fix too rough, or this spot is already logged.', 'warn');
+});
+$('lcCandyPlus').addEventListener('click', function () {
+  lcCandy++;
+  S.counts.candy++; S.counts.hist.push('candy');
+  if (!S.counts.histLog) S.counts.histLog = [];
+  while (S.counts.histLog.length < S.counts.hist.length - 1) S.counts.histLog.push(null);
+  S.counts.histLog.push(null);
+  store.set('counts', S.counts); renderCounts(null); paintLcCandy(); armLogCardTimer();
+});
+$('lcCandyMinus').addEventListener('click', function () {
+  if (lcCandy <= 0) return;
+  lcCandy--;
+  S.counts.candy = Math.max(0, S.counts.candy - 1);
+  for (var i = S.counts.hist.length - 1; i >= 0; i--) {
+    if (S.counts.hist[i] === 'candy') { S.counts.hist.splice(i, 1); if (S.counts.histLog) S.counts.histLog.splice(i, 1); break; }
+  }
+  store.set('counts', S.counts); renderCounts(null); paintLcCandy(); armLogCardTimer();
+});
+
+</script>
+</body>
+</html>
