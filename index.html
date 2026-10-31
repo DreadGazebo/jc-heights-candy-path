@@ -337,6 +337,14 @@ body.mode-nav #logCard{top:calc(var(--sat) + 158px)}
 #partyBar{position:fixed;left:10px;right:10px;top:calc(var(--sat) + 64px);z-index:1240;padding:10px 14px;display:flex;gap:8px;align-items:center}
 #partyBar[hidden]{display:none}
 body.mode-nav #partyBar{display:none}
+#kidView{position:fixed;left:0;right:0;bottom:0;z-index:1250;background:var(--card);border-top:2px solid var(--pur);border-radius:22px 22px 0 0;padding:16px calc(var(--sar) + 16px) calc(var(--sab) + 16px) calc(var(--sal) + 16px);box-shadow:0 -12px 40px rgba(0,0,0,.45);text-align:center}
+#kidView .kid-label{font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--org2)}
+#kidNextName{font-size:30px;font-weight:900;line-height:1.15;margin:4px 0 2px}
+#kidNextDist{font-size:21px;font-weight:700;color:var(--txt2)}
+#kidCounts{font-size:22px;font-weight:800;margin:12px 0}
+#kidCandy{width:100%;min-height:84px;font-size:27px;font-weight:900;border-radius:20px}
+#kidExit{margin-top:10px}
+body.kid #sheet,body.kid #fabs{display:none}
 body.in-party #logCard{top:calc(var(--sat) + 128px)}
 body.in-party #moveBar{top:calc(var(--sat) + 128px)}
 body.in-party.mode-nav #logCard{top:calc(var(--sat) + 222px)}
@@ -448,10 +456,11 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
       <button id="btnPrefs" class="btn btn-ghost" style="width:100%;margin-top:10px" aria-expanded="false"><span>&#9881;&#65039; Preferences</span><span id="prefsState" class="muted"></span><span id="prefsCaret">&#9662;</span></button>
       <div id="prefsBody" hidden>
         <div class="label">Route style</div>
-        <div id="styleChips" class="chips" style="grid-template-columns:repeat(3,1fr)" role="group" aria-label="Route style">
+        <div id="styleChips" class="chips" style="grid-template-columns:repeat(4,1fr)" role="group" aria-label="Route style">
           <button class="chip" data-style="best" aria-pressed="true">&#11088;<small>Best route</small></button>
           <button class="chip" data-style="shuffle" aria-pressed="false">&#127922;<small>Shuffle it</small></button>
           <button class="chip" data-style="fresh" aria-pressed="false">&#127381;<small>Fresh streets</small></button>
+          <button class="chip" data-style="lastyear" aria-pressed="false">&#127875;<small>Last year</small></button>
         </div>
         <div class="row2" style="margin-top:8px">
           <button id="tglAllergy" class="btn btn-ghost" aria-pressed="false">&#128153; Allergy-safe</button>
@@ -469,6 +478,7 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
       <button class="btn js-house" aria-label="Add one house visited"><b class="js-house-count">0</b><span>🏠 House visited</span></button>
       <button class="btn btn-ghost js-undo" aria-label="Undo last count">↩︎</button>
     </div>
+    <button id="btnKid" class="btn btn-pur" style="width:100%;margin-top:14px">👧 Kid view: big buttons for little hands</button>
     <div id="partyBox" style="margin-top:14px"></div>
     <div id="shareBox" style="margin-top:14px">
       <div class="label">📣 Share Candy Path</div>
@@ -482,7 +492,7 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
       </div>
     </div>
     <button id="btnSummary" class="btn btn-ghost" style="width:100%;margin-top:10px">🌙 End night &amp; see haul</button>
-    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v5.6</div>
+    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v5.9</div>
     <p class="foot">Routes are estimates. Stay on sidewalks and cross at corners.</p>
   </div>
 </section>
@@ -626,6 +636,15 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
     <button id="btnSumExport" class="btn btn-ghost" style="width:100%;margin-top:8px">⬇️ Export tonight's spots (for next year's map)</button>
     <p class="foot">Routes are estimates. Stay on sidewalks and cross at corners.</p>
   </div>
+</div>
+
+<div id="kidView" hidden>
+  <div class="kid-label">🎃 Next stop</div>
+  <div id="kidNextName">Finding treats…</div>
+  <div id="kidNextDist"></div>
+  <div id="kidCounts">🏠 0 houses · 🍬 0 candies</div>
+  <button id="kidCandy" class="btn btn-org">🍬 We got candy!</button>
+  <button id="kidExit" class="btn btn-ghost" style="width:100%">Grown-ups: back to the full map</button>
 </div>
 
 <div id="toasts" aria-live="polite"></div>
@@ -1198,7 +1217,7 @@ document.querySelectorAll('.lc-flag').forEach(function (b) {
 });
 $('lcNote').addEventListener('input', function () {
   if (!logCardPin) return;
-  logCardPin.note = $('lcNote').value;
+  logCardPin.note = cleanText($('lcNote').value);
   logCardPin._noteDirty = true;
   store.set('pins', S.pins); armLogCardTimer();
 });
@@ -1265,7 +1284,14 @@ function pinIconHtml(type, kind) {
   if (type === 'out') return '<div><i class="outx">✕</i></div>';
   return '<div>' + PIN_TYPES[type].emoji + '</div>';
 }
+function trimPinPhotos() {
+  var withPhotos = S.pins.filter(function (p) { return p.photo; });
+  if (withPhotos.length <= 40) return;
+  withPhotos.slice(0, withPhotos.length - 40).forEach(function (p) { delete p.photo; });
+  try { store.set('pins', S.pins); } catch (e) {}
+}
 function renderPins() {
+  trimPinPhotos();
   pinLayer.clearLayers();
   S.pins.forEach(function (p, idx) {
     var m = L.marker([p.lat, p.lng], {
@@ -1350,12 +1376,15 @@ function stopEmoji(s) {
   if (s.t === 'block') return '🎉';
   return '🎃';
 }
+/* Verified spots logged by Candy Path visitors on Halloween 2026.
+   This is the seed dataset: it powers Last year routes and grows each season. */
+var SEED_STOPS = [{"t": "home", "name": "Candy spot \u00b7 verified 2026", "addr": "", "lat": 40.74617, "lon": -74.04187, "notes": ["Logged by a Candy Path visitor on Halloween 2026."], "seed": 2026}, {"t": "home", "name": "Candy spot \u00b7 verified 2026", "addr": "", "lat": 40.74549, "lon": -74.04326, "notes": ["Logged by a Candy Path visitor on Halloween 2026."], "seed": 2026}, {"t": "home", "name": "Candy spot \u00b7 verified 2026", "addr": "", "lat": 40.7460062, "lon": -74.0450572, "notes": ["Logged by a Candy Path visitor on Halloween 2026."], "seed": 2026}, {"t": "home", "name": "Candy spot \u00b7 verified 2026", "addr": "", "lat": 40.7460062, "lon": -74.0450572, "notes": ["Logged by a Candy Path visitor on Halloween 2026."], "seed": 2026}, {"t": "home", "name": "Candy spot \u00b7 verified 2026", "addr": "", "lat": 40.7460062, "lon": -74.0450572, "notes": ["Logged by a Candy Path visitor on Halloween 2026."], "seed": 2026}, {"t": "home", "name": "Candy spot \u00b7 verified 2026", "addr": "", "lat": 40.74648, "lon": -74.04611, "notes": ["Logged by a Candy Path visitor on Halloween 2026."], "seed": 2026}, {"t": "home", "name": "Candy spot \u00b7 verified 2026", "addr": "", "lat": 40.74648, "lon": -74.04611, "notes": ["Logged by a Candy Path visitor on Halloween 2026."], "seed": 2026}, {"t": "home", "name": "Candy spot \u00b7 verified 2026", "addr": "", "lat": 40.74688, "lon": -74.04701, "notes": ["Logged by a Candy Path visitor on Halloween 2026."], "seed": 2026}, {"t": "home", "name": "Candy spot \u00b7 verified 2026", "addr": "", "lat": 40.74688, "lon": -74.04701, "notes": ["Logged by a Candy Path visitor on Halloween 2026."], "seed": 2026}, {"t": "home", "name": "Candy spot \u00b7 verified 2026", "addr": "", "lat": 40.7477776, "lon": -74.0498446, "notes": ["Logged by a Candy Path visitor on Halloween 2026."], "seed": 2026}];
 function renderHeightsStops() {
   heightsLayer.clearLayers(); heightsMarkers = [];
   if (!S.stopsOn || typeof HEIGHTS_STOPS === 'undefined') return;
   /* fan out co-located stops (same address/block) so they don't stack */
   var groups = {};
-  HEIGHTS_STOPS.forEach(function (s) {
+  (typeof SEED_STOPS !== 'undefined' ? HEIGHTS_STOPS.concat(SEED_STOPS) : HEIGHTS_STOPS).forEach(function (s) {
     var k = s.lat.toFixed(4) + ',' + s.lon.toFixed(4);
     (groups[k] = groups[k] || []).push(s);
   });
@@ -1905,7 +1934,7 @@ function buildRoute() {
     var cands = [];
     if (typeof HEIGHTS_STOPS !== 'undefined') {
       var stopCands = [];
-      HEIGHTS_STOPS.forEach(function (s) {
+      (typeof SEED_STOPS !== 'undefined' ? HEIGHTS_STOPS.concat(SEED_STOPS) : HEIGHTS_STOPS).forEach(function (s) {
         var p = { lat: s.lat, lng: s.lon };
         var d = haversine(p, start);
         if (d <= radius * 1.2 && !crowdOutNear(p.lat, p.lng)) {
@@ -1913,7 +1942,7 @@ function buildRoute() {
           if (S.allergy && (s.allergy || /allerg|non-food|teal/i.test(String(s.notes || '') + ' ' + String(s.acts || '')))) v0 += 4;
           var prm = primeRunFor(s);
           if (prm) v0 = Math.round(v0 * 1.35);
-          stopCands.push({ lat: p.lat, lng: p.lng, value: v0, housesEst: 3, kind: 'stop', stop: s, d: d, prime: prm ? prm.label : null });
+          stopCands.push({ lat: p.lat, lng: p.lng, value: v0, housesEst: 3, kind: 'stop', stop: s, d: d, prime: prm ? prm.label : null, seed: s.seed || 0 });
         }
       });
       if (res.degraded) {
@@ -1968,6 +1997,13 @@ function buildRoute() {
       });
       cands = kept;
     })();
+    /* Last year mode: route only the verified seed spots; if too few are
+       near, say so and mix in the full map rather than building a stub. */
+    if (vMode === 'lastyear') {
+      var seedOnly = cands.filter(function (c) { return c.seed; });
+      if (seedOnly.length >= 2) cands = seedOnly;
+      else toast('Only ' + seedOnly.length + ' of last year\'s verified spots are near here, so this route mixes in the full map.', 'warn');
+    }
     /* Route variety: shuffle adds controlled randomness among near-equal
        candidates; fresh streets also steers away from the previous route's
        stops (remembered on this device only). */
@@ -2192,7 +2228,7 @@ paintStyleChips();
 function paintToggles() { $('tglAllergy').setAttribute('aria-pressed', String(!!S.allergy)); $('tglStroller').setAttribute('aria-pressed', String(!!S.stroller)); var tc = $('tglCrowd'); if (tc) tc.setAttribute('aria-pressed', String(!!CROWD_PREF)); paintPrefs(); }
 function paintPrefs() {
   var el = $('prefsState'); if (!el) return;
-  var styleName = { best: 'Best route', shuffle: 'Shuffle', fresh: 'Fresh streets' }[S.variety] || 'Fresh streets';
+  var styleName = { best: 'Best route', shuffle: 'Shuffle', fresh: 'Fresh streets', lastyear: 'Last year' }[S.variety] || 'Fresh streets';
   var parts = [styleName];
   if (S.allergy) parts.push('Allergy-safe');
   if (S.stroller) parts.push('Stroller');
@@ -2926,7 +2962,7 @@ function crowdSyncPin(pin) {
 }
 function crowdFetch() {
   if (!crowdOn()) return;
-  fetch(CROWD.url + '/rest/v1/treat_reports?select=id,lat,lng,status,note,photo,created_at&order=created_at.desc&limit=300', { headers: crowdHeaders() })
+  fetch(CROWD.url + '/rest/v1/treat_reports?select=id,lat,lng,status,note,photo,created_at&order=created_at.desc&limit=500', { headers: crowdHeaders() })
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (rows) { if (Array.isArray(rows)) { CROWD.reports = rows; renderCrowd(); } })
     .catch(function () {});
@@ -3188,7 +3224,7 @@ document.querySelectorAll('.lc-kind').forEach(function (b) {
    ~20 s while moving), pins (mirrored from crowdSyncPin), and haul counts.
    Backed by the Supabase party_posts table (public read/insert, rows simply
    age out client-side: positions 45 min, pins 6 h). */
-var PARTY = { code: '', name: '', timer: null, lastPosPost: 0, lastPosLL: null, lastCountJson: '', members: {}, counts: {}, joinTs: 0, kicked: {}, kickedLocal: {}, lastRows: [] };
+var PARTY = { code: '', name: '', timer: null, lastPosPost: 0, lastPosLL: null, lastCountJson: '', members: {}, counts: {}, joinTs: 0, kicked: {}, kickedLocal: {}, lastRows: [], chat: [], trails: {} };
 var partyLayer = L.layerGroup().addTo(map);
 try { var savedParty = store.get('party', null); if (savedParty && savedParty.code) { PARTY.code = String(savedParty.code); PARTY.name = String(savedParty.name || ''); PARTY.joinTs = savedParty.joinTs || Date.now(); } } catch (e) {}
 function partyOn() { return !!(PARTY.code && PARTY.name && crowdOn()); }
@@ -3214,7 +3250,7 @@ function partyPoll() {
   if (cj !== PARTY.lastCountJson) { PARTY.lastCountJson = cj; partyPost({ kind: 'count', houses: S.counts.houses, candy: S.counts.candy }); }
 }
 function partyApply(rows) {
-  var now = Date.now(), pos = {}, counts = {}, pinMap = {}, kicks = {};
+  var now = Date.now(), pos = {}, counts = {}, pinMap = {}, kicks = {}, trails = {}, chats = [];
   rows.forEach(function (r) {
     if (r.kind === 'kick') { var kt = new Date(r.created_at).getTime(); if (!kicks[r.name] || kt > kicks[r.name]) kicks[r.name] = kt; }
   });
@@ -3226,15 +3262,22 @@ function partyApply(rows) {
     var rts = new Date(r.created_at).getTime();
     var age = now - rts;
     if (!live(r.name, rts)) return;
-    if (r.kind === 'pos' && age < 45 * 60000) { if (!pos[r.name]) pos[r.name] = r; }
+    if (r.kind === 'pos' && age < 45 * 60000) { if (!pos[r.name]) pos[r.name] = r; (trails[r.name] = trails[r.name] || []).push(r); }
     else if (r.kind === 'count') { if (!counts[r.name]) counts[r.name] = r; }
+    else if (r.kind === 'chat' && age < 6 * 3600000) { chats.push(r); }
     else if (r.kind === 'pin' && age < 6 * 3600000 && r.name !== PARTY.name) {
       var k = Math.round(r.lat * 2000) + ',' + Math.round(r.lng * 2000) + ',' + r.status;
       if (!pinMap[k]) pinMap[k] = r;
     }
   });
   PARTY.members = pos; PARTY.counts = counts;
+  PARTY.trails = trails;
+  PARTY.chat = chats.slice().reverse().slice(-30);
   partyLayer.clearLayers();
+  Object.keys(trails).forEach(function (name) {
+    var pts = trails[name].slice(0, 14).reverse().map(function (r) { return [r.lat, r.lng]; });
+    if (pts.length >= 2) L.polyline(pts, { color: partyColor(name), weight: 3, opacity: 0.55, dashArray: '1 7', lineCap: 'round' }).addTo(partyLayer);
+  });
   Object.keys(pos).forEach(function (name) {
     if (name === PARTY.name) return;
     var r = pos[name];
@@ -3264,8 +3307,24 @@ function renderPartyInfo() {
   $('partyBarSub').textContent = 'Party haul: ' + t.houses + ' houses · ' + t.candy + ' candies';
   renderPartyBox();
 }
+function rosterHtml() {
+  var roster = {};
+  Object.keys(PARTY.counts).forEach(function (n) { roster[n] = 1; });
+  Object.keys(PARTY.members).forEach(function (n) { roster[n] = 1; });
+  if (PARTY.name) roster[PARTY.name] = 1;
+  var isAdmin = (typeof partyIsAdmin === 'function') && partyIsAdmin();
+  return Object.keys(roster).map(function (n) {
+    var c = PARTY.counts[n];
+    var right = c ? ((c.houses || 0) + ' houses · ' + (c.candy || 0) + ' candies') : 'on the map';
+    var kick = (isAdmin && n !== PARTY.name) ? ' <button class="btn btn-ghost btn-sm partyKick" data-name="' + esc(n) + '">Kick</button>' : '';
+    return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:2px 0"><span>' + (n === PARTY.name ? '⭐ ' : '') + esc(n) + (n === PARTY.name && isAdmin ? ' (host)' : '') + '</span><span class="muted">' + right + kick + '</span></div>';
+  }).join('');
+}
 function renderPartyBox() {
   var box = $('partyBox'); if (!box) return;
+  var keepChat = null, keepFocus = false;
+  var ci0 = $('partyChatInput');
+  if (ci0) { keepChat = ci0.value; keepFocus = document.activeElement === ci0; }
   if (!partyOn()) {
     box.innerHTML = '<div id="partyInvite" class="warn" hidden style="margin-bottom:8px"></div>' +
       '<div class="label">🎉 Party mode</div>' +
@@ -3295,23 +3354,14 @@ function renderPartyBox() {
     return;
   }
   var t = partyTotals();
-  var roster = {};
-  Object.keys(PARTY.counts).forEach(function (n) { roster[n] = 1; });
-  Object.keys(PARTY.members).forEach(function (n) { roster[n] = 1; });
-  if (PARTY.name) roster[PARTY.name] = 1;
-  var isAdmin = (typeof partyIsAdmin === 'function') && partyIsAdmin();
-  var list = Object.keys(roster).map(function (n) {
-    var c = PARTY.counts[n];
-    var right = c ? ((c.houses || 0) + ' houses · ' + (c.candy || 0) + ' candies') : 'on the map';
-    var kick = (isAdmin && n !== PARTY.name) ? ' <button class="btn btn-ghost btn-sm partyKick" data-name="' + esc(n) + '">Kick</button>' : '';
-    return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:2px 0"><span>' + (n === PARTY.name ? '⭐ ' : '') + esc(n) + (n === PARTY.name && isAdmin ? ' (host)' : '') + '</span><span class="muted">' + right + kick + '</span></div>';
-  }).join('');
+  var list = rosterHtml();
   box.innerHTML = '<div class="label">🎉 Party ' + esc(PARTY.code) + '</div>' +
     '<p class="muted" style="margin:2px 0 6px;font-size:13px">Share this code so your group can join. Party haul so far: <b>' + t.houses + ' houses · ' + t.candy + ' candies</b>.</p>' +
-    (list || '<p class="muted" style="font-size:13px">Counts appear as everyone logs.</p>') +
+    '<div id="partyRoster">' + (list || '<p class="muted" style="font-size:13px">Counts appear as everyone logs.</p>') + '</div>' +
     '<button id="partyShareLink" class="btn btn-pur" style="width:100%;margin-top:8px">🔗 Share invite link</button>' +
     '<div class="row2" style="margin-top:8px"><button id="partyCopy" class="btn btn-ghost">📋 Copy code</button><button id="partyLeave2" class="btn btn-ghost">Leave party</button></div>' +
-    ((typeof INVITE_CODE !== 'undefined' && INVITE_CODE && INVITE_CODE !== PARTY.code) ? '<button id="partySwitch" class="btn btn-ghost" style="width:100%;margin-top:8px">🎉 Switch to invited party ' + esc(INVITE_CODE) + '</button>' : '');
+    ((typeof INVITE_CODE !== 'undefined' && INVITE_CODE && INVITE_CODE !== PARTY.code) ? '<button id="partySwitch" class="btn btn-ghost" style="width:100%;margin-top:8px">🎉 Switch to invited party ' + esc(INVITE_CODE) + '</button>' : '') +
+    '<div class="label" style="margin-top:12px">💬 Party chat</div><div id="partyChatLog">' + chatHtml() + '</div><div class="row2" style="margin-top:6px"><input id="partyChatInput" type="text" autocomplete="off" placeholder="Message your party" maxlength="140"><button id="partyChatSend" class="btn btn-org">Send</button></div>';
   var psl = $('partyShareLink');
   if (psl) psl.addEventListener('click', function () {
     var link = APP_LINK + '?party=' + encodeURIComponent(PARTY.code);
@@ -3328,9 +3378,14 @@ function renderPartyBox() {
   box.querySelectorAll('.partyKick').forEach(function (b) {
     b.addEventListener('click', function () { partyKick(b.getAttribute('data-name')); });
   });
+  var pcs = $('partyChatSend');
+  if (pcs) pcs.addEventListener('click', partyChatSend);
+  var pci = $('partyChatInput');
+  if (pci) pci.addEventListener('keydown', function (e) { if (e.key === 'Enter') partyChatSend(); });
+  if (pci && keepChat) { pci.value = keepChat; if (keepFocus) pci.focus(); }
 }
 function partyJoin(code, name) {
-  PARTY.code = code; PARTY.name = name; PARTY.lastCountJson = '';
+  PARTY.code = code; PARTY.name = cleanName(name); PARTY.lastCountJson = '';
   PARTY.joinTs = Date.now();
   try { store.set('party', { code: code, name: name, joinTs: PARTY.joinTs }); } catch (e) {}
   document.body.classList.add('in-party');
@@ -3511,6 +3566,83 @@ function partyEject() {
   renderPartyBox();
   toast('The party host removed you from party ' + code + '.', 'warn');
 }
+
+/* ---------- Text hygiene (v5.7) ----------
+   Public posts (crowd notes, party names) pass a light word filter so the
+   shared map stays family friendly. Local-only text is untouched. */
+var BAD_WORDS = ['fuck', 'shit', 'bitch', 'damn', 'porn', 'sex', 'nigger', 'nigga', 'faggot', 'retard', 'whore', 'slut', 'dick', 'cock', 'pussy', 'bastard', 'asshole'];
+function cleanText(t) {
+  var out = String(t == null ? '' : t).slice(0, 140);
+  BAD_WORDS.forEach(function (w) {
+    out = out.replace(new RegExp(w, 'gi'), '***');
+  });
+  return out;
+}
+function cleanName(t) {
+  var out = cleanText(t).replace(/\*+/g, '').replace(/\s+/g, ' ').trim().slice(0, 24);
+  return out || 'Friend';
+}
+
+/* ---------- Kid view (v5.8) ----------
+   A big-button layer a parent can hand to a kid: next stop in huge type,
+   the running haul, and one giant candy button (the normal Log flow).
+   The crowd layer hides while it is open to keep the map calm. */
+var KID = { on: false };
+function kidNearest() {
+  if (!S.pos || typeof HEIGHTS_STOPS === 'undefined') return null;
+  var all = (typeof SEED_STOPS !== 'undefined') ? HEIGHTS_STOPS.concat(SEED_STOPS) : HEIGHTS_STOPS;
+  var best = null, bd = Infinity;
+  all.forEach(function (st) {
+    var d = haversine(S.pos, { lat: st.lat, lng: st.lon });
+    if (d < bd) { bd = d; best = { name: st.name || 'Treat stop', d: d }; }
+  });
+  return best;
+}
+function kidRender() {
+  if (!KID.on) return;
+  $('kidCounts').textContent = '🏠 ' + S.counts.houses + ' houses · 🍬 ' + S.counts.candy + ' candies';
+  var t = $('navTitle'), sub = $('navSub');
+  if (document.body.classList.contains('navigating') && t && t.textContent) {
+    $('kidNextName').textContent = t.textContent;
+    $('kidNextDist').textContent = sub ? sub.textContent : '';
+    return;
+  }
+  var n = kidNearest();
+  if (n) { $('kidNextName').textContent = n.name; $('kidNextDist').textContent = fmtDist(n.d) + ' away'; }
+  else { $('kidNextName').textContent = 'Finding treats…'; $('kidNextDist').textContent = 'Location will help find the next stop.'; }
+}
+function kidSet(on) {
+  KID.on = on;
+  $('kidView').hidden = !on;
+  document.body.classList.toggle('kid', on);
+  if (on) {
+    if (map.hasLayer(crowdLayer)) map.removeLayer(crowdLayer);
+    kidRender();
+  } else if (typeof applyCrowdVis === 'function') applyCrowdVis();
+}
+$('btnKid').addEventListener('click', function () { kidSet(true); });
+$('kidExit').addEventListener('click', function () { kidSet(false); });
+$('kidCandy').addEventListener('click', function () { $('fabLog').click(); setTimeout(kidRender, 800); });
+setInterval(function () { if (KID.on) kidRender(); }, 3000);
+
+/* ---------- Party trails + chat (v5.9) ---------- */
+function chatHtml() {
+  if (!PARTY.chat || !PARTY.chat.length) return '<p class="muted" style="font-size:13px">No messages yet. Say hi 👋</p>';
+  return PARTY.chat.slice(-8).map(function (r) {
+    var when = new Date(r.created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    return '<div style="font-size:13px;padding:2px 0"><b>' + esc(r.name) + '</b> <span class="muted">' + when + '</span><br>' + esc(r.msg || '') + '</div>';
+  }).join('');
+}
+function partyChatSend() {
+  var inp = $('partyChatInput'); if (!inp) return;
+  var text = inp.value.trim(); if (!text) return;
+  inp.value = '';
+  partyPost({ kind: 'chat', msg: cleanText(text) });
+  setTimeout(partyPoll, 700);
+}
+document.addEventListener('visibilitychange', function () {
+  if (!document.hidden && typeof partyOn === 'function' && partyOn()) partyPoll();
+});
 
 </script>
 </body>
