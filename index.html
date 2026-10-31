@@ -449,7 +449,7 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
       <button class="btn btn-ghost js-undo" aria-label="Undo last count">↩︎</button>
     </div>
     <button id="btnSummary" class="btn btn-ghost" style="width:100%;margin-top:10px">🌙 End night &amp; see haul</button>
-    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v4.8</div>
+    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v4.9</div>
     <p class="foot">Routes are estimates. Stay on sidewalks and cross at corners.</p>
   </div>
 </section>
@@ -1062,14 +1062,18 @@ function logHouseLocation() {
   logFailReason = '';
   var c = (S.lastPos && S.lastPos.coords) ? S.lastPos.coords : null;
   if (!c) { logFailReason = 'nofix'; return null; }
-  var ll = { lat: c.latitude, lng: c.longitude };
+  var raw = { lat: c.latitude, lng: c.longitude };
   var stopsData = (typeof HEIGHTS_STOPS !== 'undefined') ? HEIGHTS_STOPS : [];
-  var best = null, bd = 60;
-  stopsData.forEach(function (sx) { var d = haversine(ll, { lat: sx.lat, lng: sx.lon }); if (d < bd) { bd = d; best = sx; } });
-  var sub = 'From your GPS fix';
+  var best = null, bd = 25;
+  stopsData.forEach(function (sx) { var d = haversine(raw, { lat: sx.lat, lng: sx.lon }); if (d < bd) { bd = d; best = sx; } });
+  var ll = raw, sub = 'From your GPS fix';
   if (best) { ll = { lat: best.lat, lng: best.lon }; sub = best.name || best.addr || 'Treat stop'; }
   else if (c.accuracy && c.accuracy > 250) { logFailReason = 'rough'; return null; }
-  for (var i = 0; i < S.pins.length; i++) { if (haversine(ll, S.pins[i]) < 25) { logFailReason = 'dupe'; return null; } }
+  function occupied(p) { for (var i = 0; i < S.pins.length; i++) { if (haversine(p, S.pins[i]) < 8) return true; } return false; }
+  if (occupied(ll)) {
+    if (best && !occupied(raw)) { ll = raw; sub = 'From your GPS fix'; }
+    else { logFailReason = 'dupe'; return null; }
+  }
   var ts = addPin(ll.lat, ll.lng, 'candy', 'house');
   return { ts: ts, pin: S.pins[S.pins.length - 1], sub: sub };
 }
