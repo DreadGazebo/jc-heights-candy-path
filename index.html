@@ -446,7 +446,7 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
       <button class="btn btn-ghost js-undo" aria-label="Undo last count">↩︎</button>
     </div>
     <button id="btnSummary" class="btn btn-ghost" style="width:100%;margin-top:10px">🌙 End night &amp; see haul</button>
-    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v4.3</div>
+    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v4.4</div>
     <p class="foot">Routes are estimates. Stay on sidewalks and cross at corners.</p>
   </div>
 </section>
@@ -818,6 +818,7 @@ function onPos(p) {
     ts: Date.now()
   };
   lastPosTs = S.pos.ts;
+  S.lastPos = p;
   renderMe();
   if (S.nav) navOnPos();
   else if (S.follow && !S.route) { /* gentle follow pre-route only when user asked */ }
@@ -2917,8 +2918,22 @@ $('btnResume').addEventListener('click', resumeCompass);
 var lcCandy = 0;
 function paintLcCandy() { var el = $('lcCandyN'); if (el) el.textContent = lcCandy; }
 $('fabLog').addEventListener('click', function () {
-  bumpCount('houses', null);
-  if (!logCardPin) toast('House counted. No new pin: no GPS fix yet, fix too rough, or this spot is already logged.', 'warn');
+  ensureWatch();
+  if (S.pos && Date.now() - S.pos.ts < 60000) {
+    bumpCount('houses', null);
+    if (!logCardPin) toast('House counted. No new pin: the fix is too rough here, or this spot is already logged.', 'warn');
+    return;
+  }
+  if (!navigator.geolocation) { toast('This browser cannot share location.', 'err'); return; }
+  toast('Getting your location…', 'ok');
+  navigator.geolocation.getCurrentPosition(function (pos) {
+    onPos(pos);
+    bumpCount('houses', null);
+    if (!logCardPin) toast('House counted. No new pin: the fix is too rough here, or this spot is already logged.', 'warn');
+  }, function (err) {
+    if (err && err.code === 1) toast('Location is blocked for this site. Tap the lock or tune icon in the address bar, allow Location, then tap Log again.', 'err');
+    else toast('No GPS fix yet. Give it a few seconds outside and tap Log again.', 'err');
+  }, { enableHighAccuracy: true, timeout: 9000, maximumAge: 10000 });
 });
 $('lcCandyPlus').addEventListener('click', function () {
   lcCandy++;
