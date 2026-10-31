@@ -396,7 +396,6 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
 </div>
 
 <div id="fabs">
-  <button id="fabPin" class="fab" aria-label="Pin this spot">📌<span>Pin</span></button>
   <button id="fabSearch" class="fab" aria-label="Find a treat stop">🔍<span>Find</span></button>
   <button id="fabLog" class="fab" aria-label="Log this stop and add it to your haul">🍬<span>Log</span></button>
   <button id="fabLocate" class="fab" aria-label="Center on my location">🎯<span id="fabLocateLbl">Me</span></button>
@@ -437,7 +436,7 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
         <input id="searchInput" type="search" inputmode="search" enterkeyhint="search" placeholder="…or search an address" aria-label="Search an address">
         <button class="btn btn-pur" type="submit" aria-label="Search">🔍</button>
       </form>
-      <div id="startInfo" class="muted">No start yet. Tip: long-press the map to drop your start.</div>
+      <div id="startInfo" class="muted">No start yet. Tip: long-press the map to set your start or mark a spot.</div>
       <div class="label">2 · How long do you have?</div>
       <div id="chips" class="chips" role="group" aria-label="Time budget"></div>
       <button id="btnPrefs" class="btn btn-ghost" style="width:100%;margin-top:10px" aria-expanded="false"><span>&#9881;&#65039; Preferences</span><span id="prefsState" class="muted"></span><span id="prefsCaret">&#9662;</span></button>
@@ -451,6 +450,7 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
         <div class="row2" style="margin-top:8px">
           <button id="tglAllergy" class="btn btn-ghost" aria-pressed="false">&#128153; Allergy-safe</button>
           <button id="tglStroller" class="btn btn-ghost" aria-pressed="false">&#128118; Stroller</button>
+          <button id="tglCrowd" class="btn btn-ghost" aria-pressed="true">&#128101; Crowd reports</button>
         </div>
       </div>
       <button id="btnDraw" class="btn btn-ghost" style="width:100%;margin-top:10px">&#9999;&#65039; Draw my own route</button>
@@ -464,8 +464,19 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
       <button class="btn btn-ghost js-undo" aria-label="Undo last count">↩︎</button>
     </div>
     <div id="partyBox" style="margin-top:14px"></div>
+    <div id="shareBox" style="margin-top:14px">
+      <div class="label">📣 Share Candy Path</div>
+      <p class="muted" style="margin:2px 0 8px;font-size:13px">Know another family out tonight? Send them the map, or show them this code to scan.</p>
+      <div style="display:flex;gap:10px;align-items:center">
+        <img id="shareQr" alt="QR code that opens Candy Path" width="104" height="104" style="border-radius:12px;background:#fff;padding:5px">
+        <div style="flex:1">
+          <button id="btnShareApp" class="btn btn-pur" style="width:100%">🔗 Share the app</button>
+          <button id="btnCopyLink" class="btn btn-ghost" style="width:100%;margin-top:8px">📋 Copy link</button>
+        </div>
+      </div>
+    </div>
     <button id="btnSummary" class="btn btn-ghost" style="width:100%;margin-top:10px">🌙 End night &amp; see haul</button>
-    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v5.1</div>
+    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v5.2</div>
     <p class="foot">Routes are estimates. Stay on sidewalks and cross at corners.</p>
   </div>
 </section>
@@ -503,12 +514,13 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
 <!-- ======== pin chooser ======== -->
 <div id="pinSheet" class="overlay" hidden>
   <div class="ocard card" role="dialog" aria-modal="true" aria-labelledby="pinTitle">
-    <h2 id="pinTitle">📌 Pin this spot</h2>
+    <h2 id="pinTitle">✥ Mark this spot</h2>
     <div class="seg" id="pinWhere">
       <button data-where="gps" aria-pressed="true">📍 My location</button>
       <button data-where="tap" aria-pressed="false">👆 Tap the map</button>
     </div>
     <div id="pinGpsNote" class="muted" hidden></div>
+    <div id="pinPressNote" class="muted" hidden>📍 Marking the spot you pressed on the map. Pick what kind of spot it is.</div>
     <div class="pingrid">
       <button data-type="candy"><span class="e">🎃</span>Candy here</button>
       <button data-type="decor"><span class="e">👻</span>Great decorations</button>
@@ -1023,8 +1035,20 @@ map.on('click', function (e) {
 });
 map.on('contextmenu', function (e) {
   if (S.nav || S.pickMode) return;
-  setStart(e.latlng.lat, e.latlng.lng, 'Dropped pin', false);
-  toast('Start set here. Pick your time and build your route.', 'ok');
+  var ll = e.latlng;
+  var div = document.createElement('div');
+  div.className = 'pop';
+  div.innerHTML = '<b>This spot?</b>';
+  var b1 = document.createElement('button');
+  b1.className = 'btn btn-pur btn-sm'; b1.style.cssText = 'width:100%;margin-top:8px;min-height:40px';
+  b1.textContent = '🏠 Set start here';
+  b1.onclick = function () { map.closePopup(); setStart(ll.lat, ll.lng, 'Dropped pin', false); toast('Start set here. Pick your time and build your route.', 'ok'); };
+  var b2 = document.createElement('button');
+  b2.className = 'btn btn-ghost btn-sm'; b2.style.cssText = 'width:100%;margin-top:6px;min-height:40px';
+  b2.textContent = '✥ Mark this spot';
+  b2.onclick = function () { map.closePopup(); openMarkSheet(ll); };
+  div.appendChild(b1); div.appendChild(b2);
+  L.popup().setLatLng(ll).setContent(div).openOn(map);
 });
 
 /* address search (Nominatim) */
@@ -1277,18 +1301,24 @@ $$('#pinWhere button').forEach(function (b) {
     $('pinGpsNote').hidden = !(pinWhereMode === 'gps' && !S.pos);
   });
 });
-$('fabPin').addEventListener('click', function () {
-  ensureWatch();
-  $('pinGpsNote').hidden = !(pinWhereMode === 'gps' && !S.pos);
-  $('pinGpsNote').textContent = 'No GPS fix yet. Switch to "Tap the map", or step outside and try again.';
+var pinPressLL = null;
+function openMarkSheet(ll) {
+  pinPressLL = { lat: ll.lat, lng: ll.lng };
+  pinWhereMode = 'press';
+  $('pinPressNote').hidden = false;
+  $('pinGpsNote').hidden = true;
   $('pinSheet').hidden = false;
-});
+}
 $('pinCancel').addEventListener('click', function () { $('pinSheet').hidden = true; });
 $$('.pingrid button').forEach(function (b) {
   b.addEventListener('click', function () {
     var type = b.getAttribute('data-type');
     $('pinSheet').hidden = true;
-    if (pinWhereMode === 'gps') {
+    $('pinPressNote').hidden = true;
+    if (pinWhereMode === 'press' && pinPressLL) {
+      addPin(pinPressLL.lat, pinPressLL.lng, type);
+      pinPressLL = null;
+    } else if (pinWhereMode === 'gps') {
       getPosOnce().then(function (p) { addPin(p.lat, p.lng, type); })
         .catch(function () {
           toast('No GPS fix. Switching to tap mode: tap the map to place it.', 'warn');
@@ -1347,7 +1377,7 @@ function renderHeightsStops() {
       ((s.notes && s.notes.length) ? '<br>' + esc(s.notes.join(' ')) : '') +
       ((s.extras && s.extras.length) ? '<br>✨ ' + esc(s.extras.join(' ')) : '') +
       '<br><span class="muted" style="font-size:12px">From the Heights Halloween Trails community map</span>' +
-      '<br><button class="btn-org goHere" data-lat="' + pl.lat + '" data-lng="' + pl.lon + '" data-name="' + esc(s.name || 'Treat stop') + '" style="margin-top:8px;min-height:38px;padding:6px 14px;font-size:14px">🧭 Go here</button> <button class="btn-ghost crowdOut" data-lat="' + pl.lat + '" data-lng="' + pl.lon + '" style="margin-top:8px;min-height:38px;padding:6px 12px;font-size:14px">🚫 Ran out</button></div>';
+      '<br><button class="btn-org goHere" data-lat="' + pl.lat + '" data-lng="' + pl.lon + '" data-name="' + esc(s.name || 'Treat stop') + '" style="margin-top:8px;min-height:38px;padding:6px 14px;font-size:14px">🧭 Go here</button> <button class="btn-ghost crowdOut" data-lat="' + pl.lat + '" data-lng="' + pl.lon + '" style="margin-top:8px;min-height:38px;padding:6px 12px;font-size:14px">🚫 Ran out</button> <button class=\"btn-ghost crowdStill\" data-lat=\"' + pl.lat + '\" data-lng=\"' + pl.lon + '\" data-status=\"candy\" style=\"margin-top:8px;min-height:38px;padding:6px 12px;font-size:14px\">👍 Still giving</button></div>';
     m.bindPopup(html);
     m.addTo(heightsLayer);
     heightsMarkers.push(m);
@@ -1368,6 +1398,7 @@ function ghostHeights(on) {
     S.stopsOn = !S.stopsOn; store.set('stopsOn', S.stopsOn);
     b.classList.toggle('attn', S.stopsOn);
     renderHeightsStops();
+    if (typeof applyCrowdVis === 'function') applyCrowdVis();
     toast(S.stopsOn ? 'Heights treat stops shown (' + ((typeof HEIGHTS_STOPS !== 'undefined' && HEIGHTS_STOPS) ? HEIGHTS_STOPS.length : 0) + ' community stops).' : 'Treat stops hidden.', S.stopsOn ? 'ok' : '');
   });
   $('fabs').appendChild(b);
@@ -2150,13 +2181,14 @@ function hoursRepair(route) {
 function paintStyleChips() { document.querySelectorAll('#styleChips .chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c.getAttribute('data-style') === S.variety)); }); paintPrefs(); }
 document.querySelectorAll('#styleChips .chip').forEach(function (c) { c.addEventListener('click', function () { S.variety = c.getAttribute('data-style'); store.set('variety', S.variety); paintStyleChips(); }); });
 paintStyleChips();
-function paintToggles() { $('tglAllergy').setAttribute('aria-pressed', String(!!S.allergy)); $('tglStroller').setAttribute('aria-pressed', String(!!S.stroller)); paintPrefs(); }
+function paintToggles() { $('tglAllergy').setAttribute('aria-pressed', String(!!S.allergy)); $('tglStroller').setAttribute('aria-pressed', String(!!S.stroller)); var tc = $('tglCrowd'); if (tc) tc.setAttribute('aria-pressed', String(!!CROWD_PREF)); paintPrefs(); }
 function paintPrefs() {
   var el = $('prefsState'); if (!el) return;
   var styleName = { best: 'Best route', shuffle: 'Shuffle', fresh: 'Fresh streets' }[S.variety] || 'Fresh streets';
   var parts = [styleName];
   if (S.allergy) parts.push('Allergy-safe');
   if (S.stroller) parts.push('Stroller');
+  if (!CROWD_PREF) parts.push('Crowd reports off');
   el.textContent = parts.join(' \u00B7 ');
 }
 $('btnPrefs').addEventListener('click', function () {
@@ -2166,6 +2198,7 @@ $('btnPrefs').addEventListener('click', function () {
   $('prefsCaret').textContent = open ? '\u25B4' : '\u25BE';
 });
 $('tglAllergy').addEventListener('click', function () { S.allergy = !S.allergy; store.set('allergy', S.allergy); paintToggles(); toast(S.allergy ? 'Allergy-safe stops will be prioritized in your routes.' : 'Allergy-safe priority off.', 'ok'); });
+$('tglCrowd').addEventListener('click', function () { CROWD_PREF = !CROWD_PREF; store.set('prefCrowd', CROWD_PREF); paintToggles(); applyCrowdVis(); toast(CROWD_PREF ? 'Crowd reports shown.' : 'Crowd reports hidden. Your own pins and party still show.', 'ok'); });
 $('tglStroller').addEventListener('click', function () { S.stroller = !S.stroller; store.set('stroller', S.stroller); paintToggles(); toast(S.stroller ? 'Stroller mode on: step-free streets preferred.' : 'Stroller mode off.', 'ok'); });
 paintToggles();
 
@@ -2795,6 +2828,13 @@ map.on('popupopen', function (e) {
     map.closePopup();
     goToStop(parseFloat(b.getAttribute('data-lat')), parseFloat(b.getAttribute('data-lng')), b.getAttribute('data-name'));
   });
+  var stb = el.querySelector('.crowdStill');
+  if (stb) stb.addEventListener('click', function () {
+    crowdPost({ lat: parseFloat(stb.getAttribute('data-lat')), lng: parseFloat(stb.getAttribute('data-lng')), status: stb.getAttribute('data-status') || 'candy', note: '', photo: null });
+    map.closePopup();
+    toast('Thanks! Confirmed as still giving, sharing with everyone.', 'ok');
+    setTimeout(crowdFetch, 900);
+  });
   var ob = el.querySelector('.crowdOut');
   if (ob) ob.addEventListener('click', function () {
     crowdPost({ lat: parseFloat(ob.getAttribute('data-lat')), lng: parseFloat(ob.getAttribute('data-lng')), status: 'out', note: '', photo: null });
@@ -2854,6 +2894,13 @@ $('findInput').addEventListener('change', function (e) { renderSearch(e.target.v
    public by design; row-level security allows read + insert only. */
 var CROWD = { url: 'https://azvannetqxugvqvtejhe.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6dmFubmV0cXh1Z3ZxdnRlamhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0Nzg4MjMsImV4cCI6MjEwOTA1NDgyM30.QaA3_iLNhfN-PI9hc1Fv9pz2w8jNl2LiISsrQNYLk9A', reports: [] };
 function crowdOn() { return CROWD.url.indexOf('http') === 0 && CROWD.key.length > 20; }
+var CROWD_PREF = true;
+try { CROWD_PREF = store.get('prefCrowd', true) !== false; } catch (e) {}
+function applyCrowdVis() {
+  var show = S.stopsOn && CROWD_PREF;
+  if (show) { if (!map.hasLayer(crowdLayer)) map.addLayer(crowdLayer); renderCrowd(); }
+  else if (map.hasLayer(crowdLayer)) map.removeLayer(crowdLayer);
+}
 function crowdHeaders() { return { apikey: CROWD.key, Authorization: 'Bearer ' + CROWD.key, 'Content-Type': 'application/json' }; }
 function crowdAgeMin(r) { return (Date.now() - new Date(r.created_at).getTime()) / 60000; }
 function crowdPost(rep) {
@@ -2909,11 +2956,12 @@ function renderCrowd() {
     var ago = age < 1 ? 'just now' : Math.round(age) + ' min ago';
     m.bindPopup('<div class="pop"><b>' + meta.e + ' ' + meta.label + '</b><br><span class="muted">Crowd report · ' + ago + '</span>' +
       (r.note ? '<br>' + esc(r.note) : '') +
-      (r.photo ? '<br><img src="' + r.photo + '" alt="Photo of this stop" style="max-width:170px;border-radius:10px;margin-top:6px">' : '') + '</div>');
+      (r.photo ? '<br><img src="' + r.photo + '" alt="Photo of this stop" style="max-width:170px;border-radius:10px;margin-top:6px">' : '')  + ((r.status === 'candy' || r.status === 'nonfood') ? '<br><button class=\"btn-ghost crowdStill\" data-lat=\"' + r.lat + '\" data-lng=\"' + r.lng + '\" data-status=\"' + r.status + '\" style=\"margin-top:8px;min-height:38px;padding:6px 12px;font-size:14px\">👍 Still giving</button>' : '')+ '</div>');
     m.addTo(crowdLayer);
   });
 }
 if (crowdOn()) {
+  applyCrowdVis();
   crowdFetch();
   setInterval(crowdFetch, 45000);
   document.addEventListener('visibilitychange', function () { if (!document.hidden) crowdFetch(); });
@@ -3302,6 +3350,22 @@ $('lcQuickUndo').addEventListener('click', function () {
   }, 600);
   setTimeout(function () { clearInterval(iv); }, 12000);
   map.on('dragstart', function () { done = true; clearInterval(iv); });
+})();
+
+/* ---------- Share the app (v5.2) ---------- */
+var APP_LINK = 'https://dreadgazebo.github.io/jc-heights-candy-path/';
+(function () {
+  var qr = $('shareQr');
+  if (qr) qr.src = 'https://api.qrserver.com/v1/create-qr-code/?size=208x208&margin=0&data=' + encodeURIComponent(APP_LINK);
+  var bs = $('btnShareApp');
+  if (bs) bs.addEventListener('click', function () {
+    if (navigator.share) navigator.share({ title: 'JC Heights Candy Path', text: 'Live trick-or-treat map: routes, crowd reports, and party mode.', url: APP_LINK }).catch(function () {});
+    else if (navigator.clipboard) navigator.clipboard.writeText(APP_LINK).then(function () { toast('Link copied.', 'ok'); });
+  });
+  var bc = $('btnCopyLink');
+  if (bc) bc.addEventListener('click', function () {
+    if (navigator.clipboard) navigator.clipboard.writeText(APP_LINK).then(function () { toast('Link copied.', 'ok'); });
+  });
 })();
 
 </script>
