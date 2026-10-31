@@ -449,7 +449,7 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
       <button class="btn btn-ghost js-undo" aria-label="Undo last count">↩︎</button>
     </div>
     <button id="btnSummary" class="btn btn-ghost" style="width:100%;margin-top:10px">🌙 End night &amp; see haul</button>
-    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v4.9</div>
+    <div style="text-align:center;font-size:11px;color:var(--mut);margin-top:8px">JC Heights Candy Path v4.10</div>
     <p class="foot">Routes are estimates. Stay on sidewalks and cross at corners.</p>
   </div>
 </section>
@@ -532,6 +532,10 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
   <div class="lc-head">
     <div style="flex:1;min-width:0"><b id="lcTitle">&#127875; Candy here, logged</b><div id="lcSub" class="muted" style="font-size:12px"></div></div>
     <button id="lcClose" class="btn btn-ghost btn-sm" aria-label="Dismiss">&#10005;</button>
+  </div>
+  <div class="lc-flags" role="group" aria-label="House or shop">
+    <button class="chip lc-kind" data-kind="house" aria-pressed="true">🏠 House</button>
+    <button class="chip lc-kind" data-kind="shop" aria-pressed="false">🛍️ Shop</button>
   </div>
   <div class="lc-flags" role="group" aria-label="Treat status">
     <button class="chip lc-flag" data-flag="candy" aria-pressed="true">&#127852; Giving candy</button>
@@ -1075,7 +1079,9 @@ function logHouseLocation() {
     else { logFailReason = 'dupe'; return null; }
   }
   var ts = addPin(ll.lat, ll.lng, 'candy', 'house');
-  return { ts: ts, pin: S.pins[S.pins.length - 1], sub: sub };
+  var newPin = S.pins[S.pins.length - 1];
+  if (best && best.t === 'biz') { newPin.kind = 'shop'; store.set('pins', S.pins); renderPins(); }
+  return { ts: ts, pin: newPin, sub: sub };
 }
 function logFailToast() {
   if (logFailReason === 'dupe') return 'House counted. This spot is already logged.';
@@ -1099,7 +1105,7 @@ function showLogCard(pin, sub) {
   lcCandy = 0; paintLcCandy();
   var th = $('lcThumb');
   if (pin.photo) { th.src = pin.photo; th.hidden = false; } else { th.hidden = true; th.removeAttribute('src'); }
-  paintLogFlags();
+  paintLogFlags(); paintLogKind();
   var card = $('logCard');
   card.classList.remove('away'); card.hidden = false;
   armLogCardTimer();
@@ -1189,7 +1195,8 @@ var PIN_TYPES = {
   nonfood: { emoji: '', label: 'Non-food treats' },
   out: { emoji: '', label: 'Out of candy' }
 };
-function pinIconHtml(type) {
+function pinIconHtml(type, kind) {
+  if (kind === 'shop' && type === 'candy') return '<div>🛍️</div>';
   if (type === 'nonfood') return '<div><i class="teal"></i></div>';
   if (type === 'out') return '<div><i class="outx">✕</i></div>';
   return '<div>' + PIN_TYPES[type].emoji + '</div>';
@@ -1198,11 +1205,12 @@ function renderPins() {
   pinLayer.clearLayers();
   S.pins.forEach(function (p, idx) {
     var m = L.marker([p.lat, p.lng], {
-      icon: L.divIcon({ className: 'pinicon', iconSize: [40, 40], iconAnchor: [20, 34], html: pinIconHtml(p.type) })
+      icon: L.divIcon({ className: 'pinicon', iconSize: [40, 40], iconAnchor: [20, 34], html: pinIconHtml(p.type, p.kind) })
     });
     var pop = document.createElement('div');
     pop.className = 'pop';
-    pop.innerHTML = '<b>' + (PIN_TYPES[p.type].emoji || '🎃') + ' ' + esc(PIN_TYPES[p.type].label) + '</b>' + (p.via === 'house' ? '<br><span class="muted" style="font-size:12px">Logged from your GPS when you tapped House visited</span>' : '') + (p.note ? '<br><i>' + esc(p.note) + '</i>' : '') + (p.photo ? '<br><img src="' + p.photo + '" style="max-width:150px;border-radius:10px;margin-top:4px" alt="Stop photo">' : '');
+    var popHead = (p.kind === 'shop' && p.type === 'candy') ? '🛍️ Shop with treats' : (PIN_TYPES[p.type].emoji || '🎃') + ' ' + esc(PIN_TYPES[p.type].label);
+    pop.innerHTML = '<b>' + popHead + '</b>' + (p.via === 'house' ? '<br><span class="muted" style="font-size:12px">Logged from your GPS when you tapped House visited</span>' : '') + (p.note ? '<br><i>' + esc(p.note) + '</i>' : '') + (p.photo ? '<br><img src="' + p.photo + '" style="max-width:150px;border-radius:10px;margin-top:4px" alt="Stop photo">' : '');
     var del = document.createElement('button');
     del.className = 'btn btn-ghost btn-sm'; del.textContent = '🗑 Remove pin';
     del.onclick = function () {
@@ -3021,7 +3029,7 @@ function startMovePin(pin) {
   if (map.hasLayer(pinLayer)) map.removeLayer(pinLayer);
   moveMarker = L.marker([pin.lat, pin.lng], {
     draggable: true, zIndexOffset: 900,
-    icon: L.divIcon({ className: 'pinicon', iconSize: [40, 40], iconAnchor: [20, 34], html: pinIconHtml(pin.type) })
+    icon: L.divIcon({ className: 'pinicon', iconSize: [40, 40], iconAnchor: [20, 34], html: pinIconHtml(pin.type, pin.kind) })
   }).addTo(map);
   $('moveBar').hidden = false;
   map.panTo([pin.lat, pin.lng]);
@@ -3065,6 +3073,23 @@ $('lcRemove').addEventListener('click', function () {
   renderPins(); renderCounts();
   hideLogCard();
   toast('Log removed: pin deleted and counters adjusted.', 'ok');
+});
+
+/* ---------- House vs shop (Steve, Oct 31, 2026) ----------
+   One toggle in the log card, House by default, auto-set to Shop when the
+   log snapped to a business stop. Zero extra taps for ordinary houses. */
+function paintLogKind() {
+  if (!logCardPin) return;
+  var k = logCardPin.kind || 'house';
+  document.querySelectorAll('.lc-kind').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-kind') === k ? 'true' : 'false'); });
+  $('lcTitle').textContent = (k === 'shop') ? '🛍️ Shop with treats, logged' : '🎃 Candy here, logged';
+}
+document.querySelectorAll('.lc-kind').forEach(function (b) {
+  b.addEventListener('click', function () {
+    if (!logCardPin) return;
+    logCardPin.kind = b.getAttribute('data-kind');
+    store.set('pins', S.pins); renderPins(); paintLogKind(); armLogCardTimer();
+  });
 });
 
 </script>
