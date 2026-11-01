@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0A16">
-<meta name="version" content="7.0">
+<meta name="version" content="7.1">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -42,7 +42,7 @@
   --cau:#F5A524; --cau2:#FFD166;
   --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
   --sal:env(safe-area-inset-left,0px); --sar:env(safe-area-inset-right,0px);
-  --topH:114px; --bottomH:132px;
+  --topH:64px; --bottomH:132px;
   --r:22px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -106,25 +106,66 @@ body.light .leaflet-container a.leaflet-popup-close-button:active::after{backgro
 .empty b{display:block;font-size:16px}
 .empty p{color:var(--mut);font-size:14px;margin:4px 0 10px;line-height:1.45}
 
-/* ---------- Lantern top chrome ---------- */
-#topChrome{position:fixed;z-index:1100;top:calc(var(--sat) + 10px);left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);display:flex;flex-direction:column;gap:8px}
-.tc-row{display:flex;gap:8px;align-items:center}
-#btnFind{flex:1;min-width:0;max-width:430px;display:flex;align-items:center;gap:10px;min-height:48px;padding:0 16px 0 10px;border-radius:999px;background:var(--card);border:1px solid var(--line2);color:var(--mut);font-size:16px;font-weight:500;box-shadow:0 10px 26px rgba(0,0,0,.45);text-align:left}
-#btnFind .mark{width:26px;height:26px;flex:none;display:grid;place-items:center}
-#btnFind .mark svg{width:24px;height:24px}
-.roundbtn{width:48px;height:48px;border-radius:50%;border:1px solid var(--line2);background:var(--card);display:grid;place-items:center;color:var(--txt);flex:none;box-shadow:0 10px 26px rgba(0,0,0,.45);padding:0}
-.roundbtn svg{width:22px;height:22px}
-#layerChips{display:flex;gap:6px;flex-wrap:wrap}
-.lchip{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:6px 12px;border-radius:999px;border:1px solid var(--line2);background:var(--card);color:var(--mut);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 6px 18px rgba(0,0,0,.35)}
-.lchip svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.lchip[aria-pressed="true"]{border-color:var(--org);color:var(--org2);background:rgba(232,93,38,.13)}
-#chipParty[aria-pressed="true"]{border-color:var(--pur);color:var(--pur2);background:rgba(139,123,184,.14)}
-.lchip .cnt{background:var(--org);color:var(--ink);border-radius:99px;font-size:10px;font-weight:800;padding:1px 6px;letter-spacing:0}
+/* ---------- Unified top bar (v7.1 Fix 14) ---------- */
+#topBar{position:fixed;z-index:1100;top:calc(var(--sat) + 8px);left:calc(var(--sal) + 12px);right:calc(var(--sar) + 12px);height:40px;display:flex;align-items:center;gap:2px;padding:0 4px;border-radius:999px;background:rgba(22,16,28,.82);-webkit-backdrop-filter:blur(12px) saturate(140%);backdrop-filter:blur(12px) saturate(140%);border:1px solid rgba(245,240,235,.10);box-shadow:0 4px 12px rgba(0,0,0,.35);color:var(--txt)}
+#topBar .barbtn{position:relative;flex:none;width:40px;height:40px;border:0;background:transparent;color:var(--txt);display:grid;place-items:center;cursor:pointer;padding:0}
+#topBar .barbtn::after{content:"";position:absolute;left:0;right:0;top:-4px;bottom:-4px}
+#topBar .barbtn svg{width:20px;height:20px}
+#topBar .barbtn .fdot{position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--org);z-index:1}
+#topBar .barbtn .fdot[hidden]{display:none}
+#topBar #fabLocate.degraded{border:1.5px dashed var(--org);color:var(--org2)}
+#barMid{flex:1;min-width:0;display:flex;align-items:center;height:40px}
+.bar-occ{display:flex;align-items:center;gap:7px;min-width:0;flex:1;height:40px;border:0;background:transparent;color:var(--txt);font:inherit;font-size:14px;text-align:left;padding:0 6px}
+button.bar-occ{cursor:pointer}
+.bar-occ[hidden]{display:none}
+#barSearch{color:var(--mut);font-size:14.5px}
+#barSearch>svg{width:16px;height:16px;flex:none}
+#barSearchTxt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#barIdle{display:flex;align-items:center;flex:1;min-width:0}
+#barIdle[hidden]{display:none}
+#barIdle #barSearch{flex:1;min-width:0}
+.bar-hair{flex:none;width:1px;height:20px;background:rgba(245,240,235,.14);margin:0 3px}
+.bar-hair[hidden]{display:none}
+.bar-seg{display:flex;align-items:center;gap:6px;flex:none;height:40px;padding:0 6px 0 2px;border:0;background:transparent;color:var(--txt);font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.bar-seg[hidden]{display:none}
+.bar-seg>svg{width:14px;height:14px;color:var(--mut)}
+.sdot{flex:none;width:8px;height:8px;border-radius:50%;background:#7BE382}
+.sdot.amber{background:#F5B04C}
+#barStripTxt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700}
+#barStrip .chev{flex:none;color:var(--mut);display:grid;place-items:center}
+#barStrip .chev svg{width:14px;height:14px}
+#barBackMap>svg{width:16px;height:16px;flex:none;color:var(--mut)}
+#barBackMap span{font-weight:700}
+#barPreview{color:#FFD2B0;font-size:13.5px}
+#barPreview>svg{width:16px;height:16px;flex:none}
+#barPreviewTxt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#barWeak{color:var(--cau2);font-size:13.5px;font-weight:700}
+#barNavTxt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700}
+#navArrow{font-size:16px;line-height:1;color:var(--org2);flex:none;min-width:18px;text-align:center}
+#barNavX{flex:none;width:32px;height:32px;border-radius:50%;border:1px solid var(--line2);background:var(--card2);color:var(--txt);display:grid;place-items:center;padding:0;cursor:pointer}
+#barNavX svg{width:15px;height:15px}
+#barForm{display:flex;align-items:center;gap:2px;flex:1;min-width:0}
+#barForm[hidden]{display:none}
+#barInput{flex:1;min-width:0;height:40px;border:0;background:transparent;color:var(--txt);font-size:16px;outline:none;padding:0 4px;font-family:inherit}
+#barInput::placeholder{color:var(--mut)}
+/* ---------- Party drawer + filters tray (v7.1 Fix 14) ---------- */
+.map-panel{position:fixed;z-index:1120;top:calc(var(--sat) + 52px);left:calc(var(--sal) + 12px);right:calc(var(--sar) + 12px);border-radius:18px;background:rgba(22,16,28,.92);-webkit-backdrop-filter:blur(12px) saturate(140%);backdrop-filter:blur(12px) saturate(140%);border:1px solid rgba(245,240,235,.12);box-shadow:0 14px 34px rgba(0,0,0,.5);color:var(--txt);padding:10px 12px}
+.map-panel[hidden]{display:none}
+#drawerRows{display:flex;flex-wrap:wrap;gap:6px}
+.dw-row{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:6px 12px 6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(245,238,230,.05);color:var(--txt);font:inherit;font-size:13.5px;font-weight:700;cursor:pointer}
+.dw-dot{width:9px;height:9px;border-radius:50%;flex:none}
+.dw-foot{display:flex;align-items:center;gap:8px;margin-top:10px}
+#drawerHouses{flex:1;min-width:0;font-size:13px;color:var(--mut);font-variant-numeric:tabular-nums}
+#drawerChat{flex:none;width:42px;height:42px;border-radius:50%;background:rgba(245,238,230,.07);border:1px solid rgba(245,240,235,.16);color:var(--txt);display:grid;place-items:center;cursor:pointer;padding:0}
+#drawerChat svg{width:19px;height:19px}
+#filtersTray .pref-row{border-bottom:1px solid var(--line)}
+#filtersTray .pref-row:last-child{border-bottom:0}
 
 /* ---------- Log FAB ---------- */
-#fabSpot{position:fixed;z-index:1200;right:calc(var(--sar) + 16px);bottom:calc(var(--sab) + 178px);height:48px;border-radius:999px;background:var(--org);border:2px solid rgba(245,239,230,.28);color:var(--ink);display:inline-flex;align-items:center;gap:7px;padding:0 18px 0 14px;font-size:15px;font-weight:600;box-shadow:0 12px 28px rgba(0,0,0,.55);transition:transform .18s ease,opacity .18s ease,bottom .2s;cursor:pointer}
-#fabSpot svg{width:20px;height:20px;stroke-width:2;flex:none}
+#fabSpot{position:fixed;z-index:1200;right:calc(var(--sar) + 16px);bottom:calc(var(--sab) + 166px);width:48px;height:48px;border-radius:50%;background:var(--org);border:2px solid rgba(245,239,230,.28);color:var(--ink);display:grid;place-items:center;padding:0;box-shadow:0 12px 28px rgba(0,0,0,.55);transition:transform .18s ease,opacity .18s ease,bottom .2s;cursor:pointer}
+#fabSpot svg{width:23px;height:23px;stroke-width:2.1;flex:none}
 body.fab-hide #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
+body.is-recording #fabSpot{bottom:calc(var(--sab) + 218px)}
 body.mode-nav #fabSpot{bottom:calc(var(--sab) + 268px);transform:none;opacity:1;pointer-events:auto}
 body.kid #fabSpot{display:none}
 
@@ -132,23 +173,32 @@ body.kid #fabSpot{display:none}
 #sheet{position:fixed;z-index:1100;left:calc(var(--sal) + 8px);right:calc(var(--sar) + 8px);bottom:calc(var(--sab) + 8px + var(--kbH, 0px));
   display:flex;flex-direction:column;padding:0 14px 10px;overflow:hidden;background:linear-gradient(180deg,var(--card2),var(--card));border-radius:26px 26px 0 0;transition:height .22s ease}
 #sheet.dragging{transition:none}
-#sheet.snap-peek{height:162px}
+#sheet.snap-peek{height:142px}
 #sheet.snap-half{height:48dvh}
 #sheet.snap-full{height:88dvh}
-#sheetHandle{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;min-height:22px;border:0;background:transparent;padding:5px 0 1px;touch-action:none;flex:none}
-#sheetHandle i{display:block;width:44px;height:5px;border-radius:3px;background:var(--line2)}
-#sheetBrand{display:flex;align-items:center;gap:9px;padding:3px 0 7px;flex:none}
-#sheetBrand .mark{width:28px;height:28px;flex:none}
-#sheetBrand .wordmark{font-size:19px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#btnSheetLog{flex:none;white-space:nowrap}
-#sheet.snap-peek #sheetBrand{display:none}
-#btnSheetLog{margin-left:auto;display:none;min-height:40px;padding:6px 14px;font-size:14px}
-#sheet.logpill #btnSheetLog{display:inline-flex}
-#sheetTabs{display:flex;gap:4px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:4px;margin:0 0 6px;flex:none}
-#sheetTabs button{flex:1;min-height:48px;border:0;border-radius:9px;background:transparent;color:var(--mut);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 4px}
-#sheetTabs button svg{width:15px;height:15px}
+#sheetHandle{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;min-height:20px;border:0;background:transparent;padding:8px 0 0;touch-action:none;flex:none}
+#sheetHandle i{display:block;width:44px;height:4px;border-radius:3px;background:var(--line2)}
+#sheetTabs{display:flex;gap:2px;background:var(--bg2);border:1px solid var(--line);border-radius:999px;padding:3px;margin:0 auto 8px;width:fit-content;max-width:100%;flex:none}
+#sheetTabs button{position:relative;height:28px;border:0;border-radius:999px;background:transparent;color:var(--mut);font-size:9.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:4px;padding:0 9px;white-space:nowrap}
+#sheetTabs button::after{content:"";position:absolute;left:0;right:0;top:-10px;bottom:-10px}
+#sheetTabs button svg{width:12px;height:12px;stroke-width:1.5}
 #sheetTabs button[aria-selected="true"]{background:var(--pur);color:var(--ink)}
-#sheetTabs .cnt{background:var(--org);color:var(--ink);border-radius:99px;font-size:10px;font-weight:800;padding:1px 6px;letter-spacing:0}
+#sheetTabs .cnt{background:var(--org);color:var(--ink);border-radius:99px;font-size:8.5px;font-weight:800;height:12px;display:inline-flex;align-items:center;padding:0 4px;letter-spacing:0}
+#sheetTabs .cnt[hidden]{display:none}
+/* ---------- walk deck row (v7.1: replaces the floating rec bar) ---------- */
+#deckRow{flex:none;display:flex;align-items:center;gap:8px;margin:0 0 8px;padding:6px 6px 6px 12px;border:1px solid var(--line);border-radius:14px;background:var(--bg2)}
+#deckRow[hidden]{display:none}
+#deckMain{flex:1;min-width:0;display:flex;align-items:center;gap:9px;min-height:40px;border:0;background:transparent;color:var(--txt);font:inherit;text-align:left;padding:0;cursor:pointer}
+#deckMain .recdot{background:var(--red2)}
+#deckMain.paused .recdot{background:var(--cau);animation:none}
+#deckPauseIc{display:grid;place-items:center;color:var(--txt);flex:none}
+#deckPauseIc svg{width:17px;height:17px}
+#recTime{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+#recDist{color:var(--mut);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+#btnRecHouse{flex:none;min-height:40px;border-radius:999px;border:0;background:var(--org);color:var(--ink);font:inherit;font-weight:800;font-size:13.5px;padding:0 14px;cursor:pointer;font-variant-numeric:tabular-nums}
+#deckRow #recConfirm{flex:none;display:flex;gap:8px;align-items:center}
+#deckRow #recConfirm[hidden]{display:none}
+#deckRow #recConfirm .btn{min-height:40px}
 #peek{display:none;width:100%;min-height:68px;align-items:stretch;gap:10px;padding:2px 0}
 #sheet.snap-peek #peek{display:flex}
 #peekMain{flex:1;min-width:0;border:0;background:transparent;text-align:left;padding:4px 2px;color:var(--txt);display:flex;flex-direction:column;justify-content:center;gap:1px;touch-action:none;cursor:pointer}
@@ -296,57 +346,17 @@ dialog .row .btn{flex:1;min-width:130px}
 /* ---------- context menu / banners ---------- */
 #ctxMenu{position:fixed;z-index:1600;display:flex;flex-direction:column;gap:8px;padding:10px;min-width:210px}
 #ctxMenu .btn{justify-content:flex-start}
-/* (v6.6 Phase 4A, Argon ruling A: the two-line fuzzy banner is deleted.
-   GPS degradation folds into the Locate button and the party pill.) */
-#partyPill{position:fixed;z-index:1120;top:calc(var(--topH) + 8px);left:50%;transform:translateX(-50%);max-width:88vw;height:48px;
-  display:flex;align-items:center;gap:8px;padding:0 14px 0 10px;border-radius:999px;background:rgba(20,14,28,.90);
-  border:1px solid var(--line2);color:var(--txt);font-size:13px;font-weight:700;box-shadow:0 8px 22px rgba(0,0,0,.45);cursor:pointer}
-#partyPill[hidden]{display:none}
-#partyPillDots{display:flex;align-items:center;flex:none}
-#partyPillDots i{width:14px;height:14px;border-radius:50%;border:2px solid #16101E;margin-left:-5px;display:block}
-#partyPillDots i:first-child{margin-left:0}
-#partyPillText{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-/* ---------- v6.6 Phase 4A: pill card, walk chrome, update bar, zone lock ---------- */
-#partyPillDots i.gpsdot{background:transparent;border:2px dashed var(--org);width:12px;height:12px}
-#fabLocate.degraded{color:var(--org);border:1.5px dashed var(--org)}
-#partyCard{position:fixed;z-index:1120;top:calc(var(--topH) + 8px);left:50%;transform:translateX(-50%);width:300px;max-width:88vw;background:rgba(20,14,28,.97);border:1px solid var(--line2);border-radius:18px;box-shadow:0 16px 40px rgba(0,0,0,.55);color:var(--txt);overflow:hidden}
-#partyCard[hidden]{display:none}
-#partyCard.pop{animation:pcpop .18s ease}
-@keyframes pcpop{from{opacity:.4;transform:translateX(-50%) scale(.96)}to{opacity:1;transform:translateX(-50%) scale(1)}}
-#pcHead{display:flex;align-items:center;gap:8px;width:100%;min-height:48px;padding:6px 8px 6px 14px;background:transparent;border:0;color:var(--txt);cursor:pointer;text-align:left;font-family:inherit}
-#pcTitle{font-weight:800;font-size:14.5px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#pcWalking{color:var(--mut);font-size:12.5px;font-weight:700;white-space:nowrap}
-#pcChev{flex:none;display:grid;place-items:center;width:32px;height:32px;color:var(--mut)}
-#pcRows{max-height:192px;overflow-y:auto;border-top:1px solid var(--line)}
-.pc-row{display:flex;align-items:center;gap:9px;width:100%;min-height:48px;padding:4px 8px 4px 14px;background:transparent;border:0;border-bottom:1px solid var(--line);color:var(--txt);cursor:pointer;text-align:left;font-family:inherit}
-.pc-row:last-child{border-bottom:0}
-.pc-dot{flex:none;width:10px;height:10px;border-radius:50%}
-.pc-name{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px;font-weight:700}
-.pc-state{color:var(--mut);font-size:12px;white-space:nowrap}
-.pc-houses{font-size:12.5px;font-weight:700;white-space:nowrap}
-.pc-x{flex:none;display:grid;place-items:center;width:32px;height:32px;color:var(--mut)}
-#pcFoot{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
-#pcChat{flex:1;min-height:48px}
-#pcChat .cnt{background:#241631;color:var(--ink);border-radius:99px;font-size:10px;font-weight:800;padding:1px 6px;margin-left:6px}
-#pcInvite{flex:none;width:96px;min-height:48px}
+
 #updateBar{display:flex;align-items:center;gap:9px;width:100%;min-height:48px;margin:0 0 4px;padding:6px 4px;background:#241631;border:1px solid var(--org);border-radius:14px;color:var(--ink);font-size:14.5px;font-weight:700;font-family:inherit;cursor:pointer;flex:none;text-align:left}
 #updateBar[hidden]{display:none}
 #updateBar .udot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--org);margin-left:8px}
 #updateBar .utxt{flex:1;min-width:0}
 #updateBar .uref{flex:none;color:var(--org);font-weight:800;padding-right:10px}
-body.has-update #sheet.snap-peek{height:214px}
-body.walk-slim #sheet.snap-peek{height:104px}
-body.walk-slim #sheetHandle{min-height:10px;padding:1px 0 0}
-body.walk-slim #sheetTabs{padding:2px;margin:0}
-body.walk-slim #sheetTabs button{min-height:26px}
-body.walk-slim #peek{min-height:52px}
-body.walk-slim:not(.mode-nav) #fabSpot{bottom:calc(var(--sab) + 120px)}
-body.walk-on #btnFind,body.walk-on #btnPrefsOpen,body.walk-on #layerChips{display:none}
-body.walk-on #fabLocate{position:fixed;right:calc(var(--sar) + 16px);bottom:calc(var(--sab) + 234px);z-index:1200}
-body.walk-on.walk-slim #fabLocate{bottom:calc(var(--sab) + 176px)}
-body.walk-on.snap-half #fabLocate{bottom:calc(48dvh + var(--sab) + 24px)}
-#topChrome,#partyPill,#partyCard,#exploreCard,#drawPill{transition:opacity .2s ease}
-body.snap-full #topChrome,body.snap-full #partyPill,body.snap-full #partyCard,body.snap-full #fabSpot,body.snap-full #fabLocate,body.snap-full #exploreCard,body.snap-full #drawPill,body.snap-full #pickBanner{opacity:0;pointer-events:none}
+body.has-update #sheet.snap-peek{height:194px}
+body.is-recording #sheet.snap-peek{height:194px}
+body.has-update.is-recording #sheet.snap-peek{height:246px}
+#topBar,#exploreCard,#drawPill{transition:opacity .2s ease}
+body.snap-full #fabSpot,body.snap-full #exploreCard,body.snap-full #drawPill,body.snap-full #pickBanner,body.snap-half #fabSpot,body.snap-half #exploreCard,body.snap-half #drawPill,body.snap-half #pickBanner{opacity:0;pointer-events:none}
 #zoneLockBar{flex:none;display:flex;align-items:center;justify-content:center;gap:6px;min-height:48px;margin-top:8px;padding:6px 12px;border:1px solid var(--line);border-radius:14px;background:var(--bg2);color:var(--mut);font-size:13.5px}
 #zoneLockBar[hidden]{display:none}
 .zone-lock-pin{border:0;background:transparent;color:var(--org2);font-weight:800;font-size:13.5px;font-family:inherit;min-height:48px;padding:0 6px;cursor:pointer;text-decoration:underline}
@@ -410,19 +420,44 @@ body.snap-full #topChrome,body.snap-full #partyPill,body.snap-full #partyCard,bo
 .cb-ts{font-size:11px;color:#8A7F96;margin-top:1px}
 .cb-jumbo{font-size:32px;line-height:1.25}
 .cb-img{display:block;max-width:210px;max-height:230px;width:100%;border-radius:10px;object-fit:cover;cursor:pointer;background:#16101E}
-#chatComposer{flex:none;display:flex;gap:8px;align-items:stretch;padding-top:8px}
-#chatComposer input[type=text]{flex:1;min-width:0;min-height:50px;border-radius:14px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:0 12px;font-size:16px}
-#chatPhotoBtn{display:grid;place-items:center;width:50px;min-height:50px;border-radius:14px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);cursor:pointer;flex:none}
-#chatPhotoBtn svg{width:21px;height:21px}
-#chatSend{flex:none;min-width:76px}
+#chatComposer{flex:none;display:flex;flex-direction:column;margin-top:8px;background:#231A2B;border:1px solid rgba(245,239,230,.12);border-radius:16px;padding:0 6px 6px}
+#chatComposer:focus-within{border-color:rgba(232,93,38,.55)}
+#chatInput{width:100%;border:0;background:transparent;color:var(--txt);font-size:16px;line-height:22px;padding:10px 8px 8px;resize:none;outline:none;font-family:inherit;max-height:106px;overflow-y:auto;overscroll-behavior:contain}
+.cmp-row{display:flex;align-items:center;gap:4px;min-height:48px}
+.cmp-left{display:flex;align-items:center;gap:4px;flex:1;min-width:0}
+.cmp-right{display:flex;align-items:center;gap:6px;flex:none}
+.cmp-btn{width:48px;height:48px;border:0;background:transparent;color:var(--txt);display:grid;place-items:center;cursor:pointer;padding:0;flex:none}
+.cmp-btn .disc{width:32px;height:32px;border-radius:50%;background:rgba(245,238,230,.07);border:1px solid rgba(245,240,235,.16);display:grid;place-items:center}
+.cmp-btn svg{width:17px;height:17px}
+.cmp-btn[hidden]{display:none}
+.cmp-plusmenu{display:flex;gap:6px;align-items:center}
+.cmp-plusmenu[hidden]{display:none}
+.cmp-pill{display:inline-flex;align-items:center;gap:6px;height:48px;padding:0 14px;border-radius:999px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);font-size:14px;font-weight:600;cursor:pointer}
+.cmp-pill svg{width:16px;height:16px}
+#chatSend{width:48px;height:48px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer;padding:0;flex:none}
+#chatSend .disc{width:32px;height:32px;border-radius:50%;background:#2E2338;color:rgba(245,239,230,.25);display:grid;place-items:center}
+#chatSend svg{width:16px;height:16px}
+#chatSend.ready .disc{background:var(--org);color:var(--ink)}
+#chatSend.sending .disc{background:rgba(232,93,38,.75);color:var(--ink)}
+#chatSend.sending svg{animation:cmpspin .8s linear infinite}
+@keyframes cmpspin{to{transform:rotate(360deg)}}
+.cmp-photo{display:flex;padding:8px 8px 0}
+.cmp-photo[hidden]{display:none}
+.cmp-photo .thumb{position:relative;width:56px;height:56px}
+.cmp-photo img{width:56px;height:56px;border-radius:10px;object-fit:cover;display:block}
+.cmp-photo button{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;border:1px solid var(--line2);background:var(--card2);color:var(--txt);display:grid;place-items:center;padding:0;cursor:pointer}
+.cmp-photo button svg{width:11px;height:11px}
 
 /* ---------- Heights Live (v6.5 Phase 3B) ---------- */
 .cb-sub{display:flex;align-items:center;gap:6px;color:#9E93A8;font-size:11.5px;margin-top:2px;max-width:100%}
 .cb-mod{margin-left:auto;flex:none;width:32px;height:32px;border-radius:50%;border:1px solid var(--line2);background:var(--bg2);color:var(--mut);font-size:15px;line-height:1;display:grid;place-items:center;cursor:pointer;padding:0}
-#chatPersonaBtn{flex:none;display:grid;place-items:center;width:50px;min-height:50px;border-radius:14px;border:1.5px solid var(--line2);background:#16101E;--av-stage:#16101E;padding:0;cursor:pointer}
+#chatPersonaBtn{flex:none;display:flex;align-items:center;gap:7px;max-width:168px;height:32px;border-radius:999px;border:1.5px solid var(--line2);background:#16101E;--av-stage:#16101E;padding:0 10px 0 4px;cursor:pointer;color:var(--txt)}
 #chatPersonaBtn[hidden]{display:none}
-#chatPersonaBtn .avatar-glyph{width:26px;height:26px}
-#chatCount{flex:none;align-self:center;color:var(--mut);font-size:12px;font-variant-numeric:tabular-nums;min-width:26px;text-align:center}
+#chatPersonaBtn .avatar-glyph{width:24px;height:24px;flex:none}
+#chatPersonaBtn .cp-name{font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#chatCount{flex:none;color:rgba(245,239,230,.55);font-size:12px;font-variant-numeric:tabular-nums;min-width:22px;text-align:right}
+#chatCount.warn{color:var(--org);font-weight:600}
+#chatCount.over{color:#FF4D4D;font-weight:600}
 #chatCount[hidden]{display:none}
 #zonePop input[type=text]{width:100%;min-height:48px;border-radius:12px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:0 12px;font-size:16px;margin-top:10px}
 #zonePop .zp-note{color:var(--mut);font-size:12.5px;line-height:1.45;margin:12px 0 0}
@@ -431,15 +466,7 @@ body.snap-full #topChrome,body.snap-full #partyPill,body.snap-full #partyCard,bo
 #zoneModPop button{width:100%;margin-top:6px}
 
 /* ---------- nav mode ---------- */
-#navTop{position:fixed;z-index:1100;top:calc(var(--sat) + 10px);left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);padding:14px 16px;display:none}
-body.mode-nav #navTop{display:block}
-body.mode-nav #sheet,body.mode-nav #topChrome{display:none}
-#btnNavExit{position:absolute;top:12px;right:12px;width:48px;height:48px;border-radius:50%;border:1px solid var(--line2);background:var(--card2);color:var(--txt);display:grid;place-items:center;padding:0}
-#btnNavExit svg{width:21px;height:21px}
-#navArrow{font-size:38px;line-height:1;color:var(--org2);min-width:46px;text-align:center}
-#navInstr{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:26px;line-height:1.15;letter-spacing:-0.01em;padding-right:52px}
-#navSub{color:var(--mut);font-size:14.5px;margin-top:4px}
-#navFlag{color:var(--cau2);font-size:13.5px;font-weight:700;margin-top:5px}
+body.mode-nav #sheet{display:none}
 #navBottom{position:fixed;z-index:1100;left:calc(var(--sal) + 8px);right:calc(var(--sar) + 8px);bottom:calc(var(--sab) + 8px);padding:12px 14px calc(12px + 56px);display:none}
 body.mode-nav #navBottom{display:block}
 #nStats{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:10px;text-align:center}
@@ -453,8 +480,8 @@ body.mode-nav #navBottom{display:block}
 #spotSheet{position:fixed;z-index:1250;left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);top:calc(var(--topH) + 8px);padding:14px;transition:opacity .22s ease,transform .22s ease}
 #spotSheet.away{opacity:0;transform:translateY(-6px)}
 body.in-party #spotSheet{top:calc(var(--topH) + 64px)}
-body.mode-nav #spotSheet{top:calc(var(--sat) + 140px)}
-body.mode-nav.in-party #spotSheet{top:calc(var(--sat) + 200px)}
+body.mode-nav #spotSheet{top:calc(var(--sat) + 64px)}
+body.mode-nav.in-party #spotSheet{top:calc(var(--sat) + 128px)}
 .lc-head{display:flex;align-items:flex-start;gap:8px}
 #spotTitle{flex:1;font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:19px;display:flex;align-items:center;gap:7px}
 .xbtn{width:44px;height:44px;flex:none;border-radius:50%;border:1px solid var(--line2);background:var(--card2);display:grid;place-items:center;padding:0}
@@ -643,7 +670,13 @@ body.light .mk-regring{border-color:rgba(14,10,22,.45)}
 #shareQr{display:block;width:168px;height:168px;margin:4px auto;border-radius:14px;background:#fff;padding:8px}
 
 /* ---------- search overlay ---------- */
-#searchPanel{position:fixed;z-index:1260;left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);top:calc(var(--sat) + 10px);padding:14px;max-height:calc(100dvh - 24px);overflow-y:auto}
+#searchPanel{position:fixed;z-index:1260;left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);top:calc(var(--sat) + 56px);padding:14px;max-height:calc(100dvh - 24px);overflow-y:auto}
+#searchPanel.from-bar .lc-head,#searchPanel.from-bar #findInput{display:none}
+#searchAddr{margin-top:6px}
+#searchAddr .sp-alabel{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:10px 2px 4px}
+#searchAddr button{display:block;width:100%;padding:11px 12px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--txt);font-size:14px;font-family:inherit;text-align:left;cursor:pointer}
+#searchAddr button:last-child{border-bottom:0}
+#searchAddr button .muted{color:var(--mut);font-size:12.5px}
 #searchPanel .sp-h{display:flex;align-items:center;gap:8px}
 #searchPanel .sp-h svg{width:20px;height:20px;color:var(--mut)}
 #findInput{flex:1;min-width:0;min-height:50px;border:0;background:transparent;font-size:16px;color:var(--txt);outline:none;padding:0}
@@ -679,7 +712,10 @@ body.light .mk-regring{border-color:rgba(14,10,22,.45)}
 /* ---------- kid view ---------- */
 #kidView{position:fixed;inset:0;z-index:1700;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:calc(var(--sat) + 20px) 22px calc(var(--sab) + 20px);text-align:center}
 body.kid #kidView{display:flex}
-body.kid #sheet,body.kid #topChrome,body.kid #navTop,body.kid #navBottom{display:none}
+body.kid #sheet,body.kid #navBottom{display:none}
+body.kid #topBar{z-index:1800;background:transparent;border-color:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+body.kid #topBar>*{visibility:hidden}
+body.kid #topBar #fabLocate{visibility:visible}
 #kidView .klabel{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
 #kidNextName{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:34px;line-height:1.15}
 #kidNextDist{font-size:20px;color:var(--mut)}
@@ -749,9 +785,10 @@ body.light .dark-tiles .leaflet-tile-pane{filter:none}
 .db-cancel{flex:none;background:none;border:0;color:var(--mut);font-weight:700;font-size:14px;padding:0 12px;min-height:48px}
 /* ---------- desktop ---------- */
 @media (min-width:760px){
-  #topChrome{width:452px;right:auto}
+  #topBar{width:452px;right:auto}
+  .map-panel{width:452px;right:auto}
   #sheet{left:auto;width:452px;max-height:88dvh}
-  #navTop,#navBottom{left:auto;width:452px}
+  #navBottom{left:auto;width:452px}
   #spotSheet,#searchPanel{left:auto;width:430px}
   #fabSpot{right:calc(var(--sar) + 472px)}
   #toasts{left:auto;width:430px}
@@ -768,12 +805,6 @@ body:not(.has-route) .route-only{display:none!important}
 body.mode-view .plan-edit{display:none!important}
 body:not(.mode-view) .view-only{display:none!important}
 body.has-route #routeEmpty{display:none}
-#navTop{align-items:stretch;gap:12px;padding:12px}
-#navArrowBox{flex:none;width:78px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(232,93,38,.12);border-radius:14px;border:1px solid rgba(232,93,38,.4)}
-#navArrow{font-size:44px;line-height:1;color:var(--org2);font-weight:900;font-family:-apple-system,"Segoe UI Symbol","Noto Sans Symbols 2","DejaVu Sans",sans-serif}
-#navDist{font-size:16px;font-weight:800;margin-top:4px;white-space:nowrap;font-variant-numeric:tabular-nums}
-#navText{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;padding-right:54px}
-#navInstr{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:23px;line-height:1.15;letter-spacing:-0.01em;overflow-wrap:anywhere}
 #navThen{font-size:14px;color:var(--mut);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #navFlag{font-size:13px;font-weight:700;margin-top:6px;color:var(--cau2)}
 #btnResume{position:fixed;z-index:1400;right:calc(var(--sar) + 12px);bottom:300px;padding:10px 14px;font-weight:700;font-size:14.5px;border-radius:999px;align-items:center;gap:8px}
@@ -794,8 +825,9 @@ body.has-route #routeEmpty{display:none}
 #btnMicNav[hidden]{display:none}
 .micbtn.listening{background:var(--org)!important;color:#16101E!important;border-color:var(--org)!important;animation:micpulse 1.1s ease-in-out infinite}
 @keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(232,93,38,.55)}50%{box-shadow:0 0 0 9px rgba(232,93,38,0)}}
-#voiceChip{position:fixed;z-index:1300;left:50%;transform:translateX(-50%);bottom:calc(var(--sab) + 236px);display:flex;align-items:center;gap:8px;max-width:88vw;padding:10px 16px;border-radius:999px;background:rgba(20,14,28,.94);border:1px solid var(--line2);color:var(--txt);font-size:14.5px;box-shadow:0 10px 30px rgba(0,0,0,.5);white-space:nowrap;overflow:hidden}
+#voiceChip{position:fixed;z-index:1300;left:50%;transform:translateX(-50%);bottom:calc(var(--sab) + 216px);display:flex;align-items:center;gap:8px;max-width:88vw;padding:10px 16px;border-radius:999px;background:rgba(20,14,28,.94);border:1px solid var(--line2);color:var(--txt);font-size:14.5px;box-shadow:0 10px 30px rgba(0,0,0,.5);white-space:nowrap;overflow:hidden}
 body.mode-nav #voiceChip{bottom:calc(var(--sab) + 262px)}
+body.is-recording #voiceChip{bottom:calc(var(--sab) + 268px)}
 #voiceChip[hidden]{display:none}
 #voiceChip .vc-dot{flex:none;width:9px;height:9px;border-radius:50%;background:var(--org);animation:micpulse 1.1s ease-in-out infinite}
 #voiceChipTxt{overflow:hidden;text-overflow:ellipsis}
@@ -858,16 +890,9 @@ body.mode-nav #voiceChip{bottom:calc(var(--sab) + 262px)}
 @media (min-width:760px){#btnResume{right:calc(var(--sar) + 472px)}}
 
 /* ---------- v6.3: record walk bar + haul photo ---------- */
-#recBar{position:fixed;z-index:1180;left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);bottom:calc(var(--bottomH,132px) + 8px);min-height:56px;display:flex;align-items:center;gap:10px;padding:6px 8px 6px 14px;background:var(--card);border:1px solid var(--line2);border-radius:16px;box-shadow:0 14px 34px rgba(0,0,0,.5)}
-#recBar[hidden]{display:none}
-#recBar .rectime{font-weight:700;font-variant-numeric:tabular-nums;font-size:16px;white-space:nowrap}
-#recBar .recdist{color:var(--mut);font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
-#recConfirm{display:flex;gap:8px}
-#recConfirm[hidden]{display:none}
 .recdot{width:10px;height:10px;border-radius:50%;background:var(--org);flex:none;animation:recpulse 1.6s ease-in-out infinite}
 .recdot-sm{width:9px;height:9px;border-radius:50%;background:var(--org);display:inline-block;flex:none}
 @keyframes recpulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.78)}}
-body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
 #haulMode{color:var(--mut);font-size:13px;margin-top:2px}
 #haulPhotoRow{margin-top:12px}
 #haulPhotoAdd{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:48px}
@@ -877,12 +902,12 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
 .loop-meta{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:.09em;color:var(--mut)}
 #loopHint{color:#f59e0b;letter-spacing:.02em;font-weight:700}
 #loopHint[hidden]{display:none}
-.loop-main{display:flex;gap:8px;align-items:stretch;margin-top:4px;min-height:48px}
-#loopReadout{flex:1;min-width:0;display:flex;align-items:center;gap:8px;padding:0 12px;border:1px solid var(--line2);border-radius:14px;background:var(--bg2);color:var(--txt);font-size:14.5px;font-weight:600;font-family:inherit;cursor:pointer;text-align:left}
+.loop-main{display:block;margin-top:4px;min-height:48px}
+#loopReadout{width:100%;min-width:0;display:flex;align-items:center;gap:8px;padding:0 12px;border:1px solid var(--line2);border-radius:14px;background:var(--bg2);color:var(--txt);font-size:14.5px;font-weight:600;font-family:inherit;cursor:pointer;text-align:left}
 #loopReadout[hidden]{display:none}
 #loopReadout svg{flex:none;color:var(--org2)}
 #loopValue{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.loop-form{flex:1;min-width:0;position:relative;display:flex;align-items:center}
+.loop-form{width:100%;min-width:0;position:relative;display:flex;align-items:center}
 .loop-form[hidden]{display:none}
 .loop-form input{flex:1;min-width:0;min-height:48px;border-radius:14px;border:1px solid var(--org);background:var(--bg2);color:var(--txt);padding:0 44px 0 12px;font-size:16px}
 #loopClear{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;border-radius:50%;background:transparent;color:var(--mut);font-size:20px;font-family:inherit;cursor:pointer}
@@ -890,8 +915,13 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
 #loopSugg[hidden]{display:none}
 #loopSugg button{display:block;width:100%;padding:11px 12px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--txt);font-size:13.5px;font-family:inherit;text-align:left;cursor:pointer}
 #loopSugg button:last-child{border-bottom:0}
+.loop-subrow{display:flex;align-items:center;gap:8px;margin-top:8px}
+.loop-sub-label{flex:1;min-width:0;font-size:10.5px;font-weight:800;letter-spacing:.09em;color:var(--mut);text-transform:uppercase}
 .loop-actions{display:flex;gap:8px;flex:none}
-.loop-pill{min-height:48px;padding:0 14px;white-space:nowrap}
+#loopBar .loop-pill{min-height:36px;padding:0 12px;white-space:nowrap;font-size:13px;background:transparent;border:1px solid var(--line2);color:var(--txt)}
+#loopBar .loop-pill.btn-org{background:var(--org);border-color:var(--org);color:var(--ink)}
+.start-row{display:flex;justify-content:flex-end;margin:0 0 12px}
+#btnStart{padding:12px 20px;min-height:48px}
 .loop-pill[hidden]{display:none}
 #btnDrop.loop-outline{border:1.5px solid var(--org);color:var(--org2)}
 /* ---------- v6.7 Phase 4B: share sheet ---------- */
@@ -940,6 +970,14 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
 <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M17.5 7H20M4 17h3.5M12 17h8"/><circle cx="15" cy="7" r="2.4"/><circle cx="9.5" cy="17" r="2.4"/></symbol>
 <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11A6.5 6.5 0 0 1 12 3.5 6.5 6.5 0 0 1 18.5 10c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.4"/></symbol>
 <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.4"/><path d="M3.2 19.5c.7-3.2 3-4.8 5.8-4.8s5.1 1.6 5.8 4.8"/><path d="M16 5.6a3.4 3.4 0 0 1 0 5.9M17.8 15c1.7.7 2.7 2.1 3.1 4.2"/></symbol>
+<symbol id="i-users-sm" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.25"/><path d="M3 19.5c0-3 2.7-5.5 6-5.5s6 2.5 6 5.5"/><path d="M16 5.5a3.25 3.25 0 0 1 0 6"/><path d="M18.5 14.5c2 .7 3.5 2.5 3.5 5"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+<symbol id="i-chev-d" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></symbol>
+<symbol id="i-chev-l" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></symbol>
+<symbol id="i-sendup" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></symbol>
+<symbol id="i-candy" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.6"/><path d="M15.2 9.8 20 6.5v11l-4.8-3.3M8.8 9.8 4 6.5v11l4.8-3.3"/></symbol>
+<symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.3S4.6 15.6 3 11.4A5.1 5.1 0 0 1 12 6.7a5.1 5.1 0 0 1 9 4.7c-1.6 4.2-9 8.9-9 8.9Z"/></symbol>
+<symbol id="i-img" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m5 18 5-5 3 3 3-3 3 3"/></symbol>
 <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
 <symbol id="i-route" viewBox="0 0 24 24"><circle cx="5.5" cy="18.5" r="2.4"/><circle cx="18.5" cy="5.5" r="2.4"/><path d="M5.5 16V9.5A2.5 2.5 0 0 1 8 7h8"/></symbol>
 <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11.2 12 4l8 7.2"/><path d="M6.2 9.8V20h11.6V9.8"/></symbol>
@@ -976,21 +1014,45 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
 
 <div id="map" aria-label="Map"></div>
 
-<div id="topChrome">
-  <div class="tc-row">
-    <button id="btnFind" type="button" aria-label="Find a stop or street"><span class="mark"><svg viewBox="0 0 48 48" style="fill:none" aria-hidden="true"><use href="#i-ribbon-ui"/></svg></span><span style="flex:1">Find a stop or street</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-search"/></svg></button>
-    <button id="fabLocate" class="roundbtn" type="button" title="Center on my location" aria-label="Center on my location"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-locate"/></svg></button>
-    <button id="btnPrefsOpen" class="roundbtn" type="button" title="Preferences" aria-label="Preferences"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sliders"/></svg></button>
+<div id="topBar">
+  <button id="btnMenu" class="barbtn" type="button" aria-label="Open menu and settings"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-menu"/></svg></button>
+  <div id="barMid">
+    <button id="barBackMap" class="bar-occ" type="button" hidden><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chev-d"/></svg><span>Back to Map</span></button>
+    <div id="barNav" class="bar-occ" hidden><span id="navArrow" aria-hidden="true">&#8593;</span><span id="barNavTxt">Starting navigation</span><span id="navInstr" hidden></span><span id="navDist" hidden></span><span id="navThen" hidden></span><span id="navFlag" hidden></span><button id="barNavX" type="button" aria-label="End navigation"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+    <button id="barPreview" class="bar-occ" type="button" hidden><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chat"/></svg><span id="barPreviewTxt"></span></button>
+    <div id="barWeak" class="bar-occ" hidden><span>Weak GPS signal</span></div>
+    <button id="barStrip" class="bar-occ" type="button" hidden><span class="sdot" id="barStripDot"></span><span id="barStripTxt"></span><span class="chev"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chev-d"/></svg></span></button>
+    <div id="barIdle">
+      <button id="barSearch" class="bar-occ" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-search"/></svg><span id="barSearchTxt">Search streets or spots</span></button>
+      <span class="bar-hair" id="barHair" hidden></span>
+      <button id="barPartySeg" class="bar-seg" type="button" hidden><span class="sdot" id="barSegDot"></span><span id="barSegCount">0</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chev-d"/></svg></button>
+    </div>
+    <form id="barForm" hidden>
+      <button id="barBack" class="barbtn" type="button" aria-label="Back to the map bar"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chev-l"/></svg></button>
+      <input id="barInput" type="search" placeholder="Search streets or spots" autocomplete="off" enterkeyhint="search" aria-label="Search streets or spots">
+      <button id="barClear" class="barbtn" type="button" aria-label="Clear search"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-x"/></svg></button>
+    </form>
   </div>
-  <div id="layerChips">
-    <button id="chipCrowd" class="lchip" type="button" aria-pressed="true" title="Crowd reports from other families"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-users"/></svg>Crowd</button>
-    <button id="fabExplore" class="lchip" type="button" aria-pressed="false" title="Explore: find the best nearby candy spots"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-compass"/></svg>Explore</button>
-    <button id="chipParty" class="lchip" type="button" aria-pressed="false" title="Open the Party tab"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-users"/></svg>Party<span class="cnt" id="partyChipCount" hidden>0</span></button>
-  </div>
+  <button id="btnFilters" class="barbtn" type="button" aria-label="Map filters"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sliders"/></svg><span class="fdot" id="filterDot" hidden></span></button>
+  <button id="fabLocate" class="barbtn" type="button" title="Center on my location" aria-label="Center on my location"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-locate"/></svg></button>
+</div>
+<div id="partyDrawer" class="map-panel" hidden>
+  <div id="drawerRows"></div>
+  <div class="dw-foot"><span id="drawerHouses"></span><button id="drawerChat" type="button" aria-label="Open party chat"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chat"/></svg></button></div>
+</div>
+<div id="filtersTray" class="map-panel" hidden>
+  <button id="trayCrowd" class="pref-row" type="button" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-users"/></svg><span class="pl">Crowd reports<small>Live candy spots from other families</small></span><span class="sw" aria-hidden="true"></span></button>
+  <button id="trayStops" class="pref-row" type="button" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-pin"/></svg><span class="pl">Community treat stops<small>The seeded map for this neighborhood</small></span><span class="sw" aria-hidden="true"></span></button>
+  <button id="trayCandy" class="pref-row" type="button" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-candy"/></svg><span class="pl">Candy stops</span><span class="sw" aria-hidden="true"></span></button>
+  <button id="trayTeal" class="pref-row" type="button" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-heart"/></svg><span class="pl">Teal &amp; allergy-friendly</span><span class="sw" aria-hidden="true"></span></button>
+  <button id="trayFull" class="pref-row" type="button" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-star"/></svg><span class="pl">Full-size bars</span><span class="sw" aria-hidden="true"></span></button>
+  <button id="trayDecor" class="pref-row" type="button" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-spark"/></svg><span class="pl">Decor &amp; lights</span><span class="sw" aria-hidden="true"></span></button>
+  <button id="trayReg" class="pref-row" type="button" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-home"/></svg><span class="pl">Registered porches</span><span class="sw" aria-hidden="true"></span></button>
+  <button id="trayExplore" class="pref-row" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-compass"/></svg><span class="pl">Explore mode<small>Find the best nearby candy spots</small></span><span class="sw" aria-hidden="true"></span></button>
 </div>
 
 
-<button id="fabSpot" type="button" aria-label="Mark a spot at your location"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6c-3.7 0-6.4 2.8-6.4 6.3 0 4.3 6.4 10.5 6.4 10.5s6.4-6.2 6.4-10.5c0-3.5-2.7-6.3-6.4-6.3Z"/><path d="M12 8.2v5M9.5 10.7h5"/></svg><span>Mark Spot</span></button>
+<button id="fabSpot" type="button" aria-label="Mark spot"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6c-3.7 0-6.4 2.8-6.4 6.3 0 4.3 6.4 10.5 6.4 10.5s6.4-6.2 6.4-10.5c0-3.5-2.7-6.3-6.4-6.3Z"/><path d="M12 8.2v5M9.5 10.7h5"/></svg></button>
 
 <div id="pickBanner" class="card" hidden role="status">
   <span id="pickText">Tap the map</span>
@@ -1012,42 +1074,26 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
   <button id="btnExploreClose" class="btn-close" type="button" aria-label="Dismiss"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button>
 </div>
 
-<button id="partyPill" type="button" hidden aria-label="Open party">
-  <span id="partyPillDots" aria-hidden="true"></span><span id="partyPillText"></span>
-</button>
 
-<div id="partyCard" hidden role="dialog" aria-label="Party summary">
-  <button id="pcHead" type="button"><span id="pcTitle">Party</span><span id="pcWalking"></span><span id="pcChev"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chev"/></svg></span></button>
-  <div id="pcRows"></div>
-  <div id="pcFoot"><button id="pcChat" class="btn btn-org" type="button">Chat<span class="cnt" id="pcChatCnt" hidden>0</span></button><button id="pcInvite" class="btn btn-ghost" type="button">Invite</button></div>
-</div>
 
-<div id="recBar" hidden role="status">
-  <span class="recdot" aria-hidden="true"></span>
-  <span class="rectime" id="recTime">0:00</span>
-  <span class="recdist" id="recDist">0 ft</span>
-  <span style="flex:1"></span>
-  <button id="btnRecHouse" class="btn btn-pur btn-sm" type="button">+1 House</button>
-  <button id="btnRecFinish" class="btn btn-org btn-sm" type="button">End</button>
-  <span id="recConfirm" hidden>
-    <button id="btnRecFinishYes" class="btn btn-org btn-sm" type="button">End walk</button>
-    <button id="btnRecResume" class="btn btn-ghost btn-sm" type="button">Resume</button>
-  </span>
-</div>
+
 
 <div id="sheet" class="card snap-peek">
   <button id="updateBar" type="button" hidden><span class="udot" aria-hidden="true"></span><span class="utxt">New version ready</span><span class="uref">Refresh</span></button>
   <button id="sheetHandle" type="button" aria-label="Expand or collapse the panel"><i></i></button>
-  <div id="sheetBrand">
-    <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon"/></svg>
-    <span class="wordmark">Candy Trail</span>
-    <button id="btnSheetLog" class="btn btn-org" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-plus"/></svg>Mark</button>
-  </div>
   <div id="sheetTabs" role="tablist">
     <button type="button" role="tab" data-tab="route" aria-selected="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-route"/></svg>Route</button>
-    <button type="button" role="tab" data-tab="party" aria-selected="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-users"/></svg>Party<span class="cnt" id="partyTabCount" hidden>0</span></button>
+    <button type="button" role="tab" data-tab="party" aria-selected="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-users-sm"/></svg>Party</button>
     <button type="button" role="tab" data-tab="chat" aria-selected="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-chat"/></svg>Chat<span class="cnt" id="chatTabCount" hidden>0</span></button>
     <button type="button" role="tab" data-tab="haul" aria-selected="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-bag"/></svg>Haul</button>
+  </div>
+  <div id="deckRow" hidden>
+    <button id="deckMain" type="button" aria-label="Pause or resume recording. Press and hold to end the walk."><span class="recdot" aria-hidden="true"></span><span id="deckPauseIc"></span><span id="recTime">0:00</span><span id="recDist">0 ft</span></button>
+    <button id="btnRecHouse" type="button">+1 House &middot; 0</button>
+    <span id="recConfirm" hidden>
+      <button id="btnRecFinishYes" class="btn btn-org" type="button">End walk</button>
+      <button id="btnRecResume" class="btn btn-ghost" type="button">Resume</button>
+    </span>
   </div>
   <div id="peek">
     <button id="peekMain" type="button"><span id="peekTitle">Tonight's Route</span><span id="peekSub">Free Walk &middot; Ready</span></button>
@@ -1087,9 +1133,8 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
         <button id="planToggle" class="btn btn-ghost route-only plan-edit" type="button" aria-expanded="false"><span id="planToggleText">Change start or time</span><span>&#9662;</span></button>
       </div>
       <div id="planInputs" class="plan-edit">
-        <button id="btnStart" class="btn btn-org btn-xl" type="button" style="width:100%;margin-bottom:12px"><svg class="ic" viewBox="0 0 24 24"><use href="#i-flag"/></svg>Start</button>
         <div id="loopBar">
-          <div class="loop-meta"><span>START &amp; END &middot; LOOP</span><span id="loopHint" hidden>Fuzzy GPS &middot; drag pin to fix</span></div>
+          <div class="loop-meta"><span>Start point</span><span id="loopHint" hidden>Fuzzy GPS &middot; drag pin to fix</span></div>
           <div class="loop-main">
             <button id="loopReadout" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-pin"/></svg><span id="loopValue">Type an address or use GPS</span></button>
             <form class="search loop-form" id="searchForm" hidden>
@@ -1097,12 +1142,13 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
               <button id="loopClear" type="button" aria-label="Clear address">&times;</button>
               <div id="loopSugg" hidden></div>
             </form>
-            <span class="loop-actions">
+          </div>
+          <div class="loop-subrow"><span class="loop-sub-label">Start &amp; end &middot; Loop</span><span class="loop-actions">
               <button id="btnLocate" class="btn btn-org loop-pill" type="button">Use GPS</button>
               <button id="btnDrop" class="btn loop-pill" type="button">Drop pin</button>
-            </span>
-          </div>
+            </span></div>
         </div>
+        <div class="start-row"><button id="btnStart" class="btn btn-org" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-flag"/></svg>Start</button></div>
         <div class="place-row"><span id="placeNow">Neighborhood: The Heights</span><button id="btnPlace" class="btn btn-ghost btn-sm" type="button">Change place</button></div>
         <div class="label">How long do we have?</div>
         <div class="budgetCtl">
@@ -1128,7 +1174,7 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
       </div>
       <div class="sheetfoot">
         <div class="wm">Candy Trail</div>
-        <div class="ver" id="appVer">Candy Trail v7.0</div>
+        <div class="ver" id="appVer">Candy Trail v7.1</div>
       </div>
     </div>
 
@@ -1142,12 +1188,25 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
       <div id="zoneBar" hidden>In Jersey City Heights &middot; Visible to nearby walkers &middot; Clears in 4h</div>
       <div id="chatScroll"><div id="chatLog"></div></div>
       <div id="chatComposer">
-        <button id="chatPersonaBtn" type="button" hidden aria-label="Your Local walker"></button>
-        <label id="chatPhotoBtn" for="chatPhoto" aria-label="Send a photo"><svg class="ic" viewBox="0 0 24 24"><use href="#i-camera"/></svg></label>
-        <input id="chatPhoto" type="file" accept="image/*" hidden>
-        <input id="chatInput" type="text" autocomplete="off" placeholder="Message your party" maxlength="140">
-        <span id="chatCount" hidden></span>
-        <button id="chatSend" class="btn btn-org" type="button">Send</button>
+        <div class="cmp-photo" id="chatPhotoPrev" hidden><span class="thumb"><img id="chatPhotoImg" alt="Photo to send"><button id="chatPhotoX" type="button" aria-label="Remove photo"><svg class="ic" viewBox="0 0 24 24"><use href="#i-x"/></svg></button></span></div>
+        <textarea id="chatInput" rows="1" autocomplete="off" placeholder="Message your party" maxlength="140" aria-label="Message"></textarea>
+        <div class="cmp-row">
+          <span class="cmp-left">
+            <button class="cmp-btn" id="chatPlus" type="button" aria-label="Add a photo" aria-expanded="false"><span class="disc"><svg class="ic" viewBox="0 0 24 24"><use href="#i-plus"/></svg></span></button>
+            <span class="cmp-plusmenu" id="chatPlusMenu" hidden>
+              <label class="cmp-pill" id="chatPhotoBtn" for="chatPhoto"><svg class="ic" viewBox="0 0 24 24"><use href="#i-camera"/></svg>Camera</label>
+              <label class="cmp-pill" id="chatPhotosBtn" for="chatPhotoLib"><svg class="ic" viewBox="0 0 24 24"><use href="#i-img"/></svg>Photos</label>
+            </span>
+            <button class="cmp-btn" id="chatMic" type="button" aria-label="Voice command: tap and speak"><span class="disc"><svg class="ic" viewBox="0 0 24 24"><use href="#i-mic"/></svg></span></button>
+            <button id="chatPersonaBtn" type="button" hidden aria-label="Your Local walker"></button>
+          </span>
+          <span class="cmp-right">
+            <span id="chatCount" hidden></span>
+            <button id="chatSend" type="button" aria-label="Send message"><span class="disc"><svg class="ic" viewBox="0 0 24 24"><use href="#i-sendup"/></svg></span></button>
+          </span>
+        </div>
+        <input id="chatPhoto" type="file" accept="image/*" capture="environment" hidden>
+        <input id="chatPhotoLib" type="file" accept="image/*" hidden>
       </div>
       <div id="zoneLockBar" hidden></div>
     </div>
@@ -1211,6 +1270,7 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
   <div class="lc-head"><b style="display:flex;align-items:center;gap:8px"><svg class="ic" viewBox="0 0 24 24"><use href="#i-search"/></svg>Find a treat stop</b><button id="searchClose" class="btn-close" type="button" aria-label="Close search"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button></div>
   <input id="findInput" type="search" placeholder="Try Sherman, Ogden, a street or a store name" autocomplete="off">
   <div id="searchResults"></div>
+  <div id="searchAddr" hidden></div>
 </div>
 
 <div id="prefsScrim" hidden></div>
@@ -1235,19 +1295,11 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
   <div class="prefs-foot">
     <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon-mono"/></svg>
     <div class="crest">Candy Trail</div>
-    <div class="ver">Version 6.5</div>
+    <div class="ver">Version 7.1</div>
   </div>
 </div>
 
-<div id="navTop" class="card nav-only">
-  <div id="navArrowBox"><div id="navArrow">&#8593;</div><div id="navDist">--</div></div>
-  <div id="navText">
-    <div id="navInstr">Waiting for GPS&hellip;</div>
-    <div id="navThen"></div>
-    <div id="navFlag" hidden></div>
-  </div>
-  <button id="btnNavExit" type="button" title="Find a stop, or end navigation" aria-label="Find a stop, or end navigation"><svg class="ic" viewBox="0 0 24 24"><use href="#i-search"/></svg></button>
-</div>
+
 <button id="btnResume" class="card nav-only" type="button" hidden><svg class="ic" viewBox="0 0 24 24"><use href="#i-compass"/></svg>Resume compass</button>
 
 <div id="navBottom" class="card nav-only">
@@ -2094,7 +2146,7 @@ $('prefTheme').addEventListener('click', function () {
 });
 if (S.dark === undefined) S.dark = store.get('dark', true);
 applyTheme();
-map.on('dragstart', function () { if (S.nav) S.follow = false; });
+map.on('dragstart', function () { if (S.nav) S.follow = false; if (typeof LOC !== 'undefined' && LOC.centered) { LOC.centered = false; if (typeof paintBar === 'function') paintBar(); } });
 
 /* layers */
 var routeLayer = L.layerGroup().addTo(map);
@@ -2284,12 +2336,16 @@ $('btnIntroOk').addEventListener('click', function () {
 });
 /* Lantern sheet: 3 snap points (peek / half / full). setSheetCollapsed keeps
    its v5 contract for existing callers: true -> peek, false -> last open snap. */
-var SHEET_SNAPS = { peek: 162, half: function () { return Math.round(window.innerHeight * 0.48); }, full: function () { return Math.round(window.innerHeight * 0.88); } };
+var SHEET_SNAPS = { peek: 142, half: function () { return Math.round(window.innerHeight * 0.48); }, full: function () { return Math.round(window.innerHeight * 0.88); } };
 var sheetSnap = 'peek', lastSnap = 'half';
 /* One chrome state for every floating control (v6.6 Phase 4A): walk-on
    while a walk or a party is live (search + chips collapse away, the
    Locate button docks by the sheet lip); the snap classes set in
    applySnap drive the overlay fade past ~65% viewport height. */
+/* v7.1 bar state, declared early: applySnap repaints the bar and runs
+   during boot, before the party section below assigns its state. */
+var BAR = { previewUntil: 0, previewTimer: null, altShow: false, searching: false };
+var LOC = { centered: false };
 function paintChromeState() {
   var on = !!S.nav || (typeof REC !== 'undefined' && !!REC.on) || (typeof partyOn === 'function' && partyOn());
   document.body.classList.toggle('walk-on', on);
@@ -2307,8 +2363,9 @@ function applySnap(name) {
   document.body.classList.add('snap-' + name);
   if (name === 'full' && typeof partyCardClose === 'function') partyCardClose();
   sh.classList.toggle('logpill', name !== 'peek');
-  document.documentElement.style.setProperty('--bottomH', name === 'peek' ? '172px' : (name === 'half' ? '52vh' : '92vh'));
+  document.documentElement.style.setProperty('--bottomH', name === 'peek' ? ((typeof REC !== 'undefined' && REC.on) ? '204px' : '152px') : (name === 'half' ? '52vh' : '92vh'));
   try { map.invalidateSize(); } catch (e) {}
+  if (typeof paintBar === 'function') paintBar();
 }
 function setSheetCollapsed(c) { applySnap(c ? 'peek' : lastSnap); }
 $('sheetHandle').addEventListener('click', function () { if ($('sheet').dataset.dragged) return; applySnap(sheetSnap === 'peek' ? lastSnap : 'peek'); });
@@ -2317,7 +2374,7 @@ $('peekStart').addEventListener('pointerdown', function (e) { e.stopPropagation(
 $('peekStart').addEventListener('click', function (e) {
   e.stopPropagation();
   if (S.nav) { $('btnEnd').click(); return; }
-  if (typeof REC !== 'undefined' && REC.on) { $('btnRecFinish').click(); return; }
+  if (typeof REC !== 'undefined' && REC.on) { recSetConfirm(true); return; }
   if (S.route) startNav(); else recStart();
   updatePeek();
 });
@@ -2376,6 +2433,7 @@ $('fabLocate').addEventListener('click', function () {
   ensureWatch();
   getPosOnce().then(function (p) {
     S.follow = true;
+    if (typeof LOC !== 'undefined') { LOC.centered = true; if (typeof paintBar === 'function') paintBar(); }
     map.flyTo([p.lat, p.lng], Math.max(map.getZoom(), 17), { duration: 0.6 });
   }).catch(function () { toast('Could not get your location.', 'err'); });
 });
@@ -2485,6 +2543,7 @@ $('btnDrop').addEventListener('click', function () {
 });
 map.on('click', function (e) {
   if (typeof PC !== 'undefined' && PC.open) partyCardClose();
+  filtersTrayClose();
   if (S.draw) { drawAdd(snapDrawPoint({ lat: e.latlng.lat, lng: e.latlng.lng })); return; }
   if (S.pickMode === 'start') {
     setStart(e.latlng.lat, e.latlng.lng, 'Dropped pin', false);
@@ -3016,6 +3075,7 @@ function renderHeightsStops() {
   });
   placed.forEach(function (pl) {
     var s = pl.s;
+    if (typeof MAP_FILTERS !== 'undefined' && !catsVisible(stopCatsOf(s.acts, s.full))) return;
     var m = L.marker([pl.lat, pl.lon], {
       icon: heightsIconFor(s, pl.lat, pl.lon)
     });
@@ -3045,20 +3105,19 @@ function ghostHeights(on) {
   renderHeightsStops();
 }
 (function addStopsFab() {
-  var b = document.createElement('button');
-  b.className = 'lchip'; b.id = 'fabStops'; b.type = 'button';
-  b.setAttribute('aria-label', 'Toggle community treat stops');
+  /* v7.1: the Stops chip lived in the old #layerChips row; the toggle
+     is a Filters tray row now (#trayStops), same state and behavior. */
+  var b = $('trayStops');
+  if (!b) return;
   b.setAttribute('aria-pressed', S.stopsOn ? 'true' : 'false');
-  b.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11A6.5 6.5 0 0 1 12 3.5 6.5 6.5 0 0 1 18.5 10c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>Stops';
   b.addEventListener('click', function () {
     S.stopsOn = !S.stopsOn; store.set('stopsOn', S.stopsOn);
     b.setAttribute('aria-pressed', S.stopsOn ? 'true' : 'false');
     renderHeightsStops();
     if (typeof applyCrowdVis === 'function') applyCrowdVis();
+    if (typeof paintTray === 'function') paintTray();
     toast(S.stopsOn ? 'Community treat stops shown' + ((typeof zoneSeededActive !== 'function' || zoneSeededActive()) && typeof HEIGHTS_STOPS !== 'undefined' && HEIGHTS_STOPS ? ' (' + HEIGHTS_STOPS.length + ' community stops).' : '.') : 'Treat stops hidden.', S.stopsOn ? 'ok' : '');
   });
-  var chipsRow = $('layerChips');
-  if (chipsRow) chipsRow.insertBefore(b, chipsRow.firstChild);
 })();
 
 /* ---------------- routing engine ---------------- */
@@ -3872,7 +3931,45 @@ function hoursRepair(route) {
 function paintStyleChips() { document.querySelectorAll('#styleChips .chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c.getAttribute('data-style') === S.variety)); }); paintPrefs(); }
 document.querySelectorAll('#styleChips .chip').forEach(function (c) { c.addEventListener('click', function () { S.variety = c.getAttribute('data-style'); store.set('variety', S.variety); paintStyleChips(); }); });
 paintStyleChips();
-function paintToggles() { $('tglAllergy').setAttribute('aria-pressed', String(!!S.allergy)); $('tglStroller').setAttribute('aria-pressed', String(!!S.stroller)); var tc = $('tglCrowd'); if (tc) tc.setAttribute('aria-pressed', String(!!CROWD_PREF)); var cc = $('chipCrowd'); if (cc) cc.setAttribute('aria-pressed', String(!!CROWD_PREF)); paintPrefs(); }
+/* Map filters (v7.1 Fix 14): the tray under the top bar carries the
+   map-layer switches. Crowd and Explore keep their existing single
+   sources of truth (CROWD_PREF / S.explore); the category gates below
+   are new, default on, and persist per device. */
+var MAP_FILTERS = { candy: true, teal: true, full: true, decor: true, registered: true };
+try { var mfSaved = store.get('mapFilters'); if (mfSaved) Object.keys(MAP_FILTERS).forEach(function (k) { if (typeof mfSaved[k] === 'boolean') MAP_FILTERS[k] = mfSaved[k]; }); } catch (e) {}
+function filtersAdjusted() {
+  return !CROWD_PREF || !S.stopsOn || !!S.explore || Object.keys(MAP_FILTERS).some(function (k) { return !MAP_FILTERS[k]; });
+}
+function paintTray() {
+  var map1 = { trayCrowd: !!CROWD_PREF, trayStops: !!S.stopsOn, trayCandy: MAP_FILTERS.candy, trayTeal: MAP_FILTERS.teal, trayFull: MAP_FILTERS.full, trayDecor: MAP_FILTERS.decor, trayReg: MAP_FILTERS.registered, trayExplore: !!S.explore };
+  Object.keys(map1).forEach(function (id) { var el = $(id); if (el) el.setAttribute('aria-pressed', String(!!map1[id])); });
+  var dot = $('filterDot'); if (dot) dot.hidden = !filtersAdjusted();
+}
+function filtersTrayOpen() { partyCardClose(); var t = $('filtersTray'); if (t) t.hidden = false; paintTray(); }
+function filtersTrayClose() { var t = $('filtersTray'); if (t) t.hidden = true; }
+function filtersTrayToggle() { var t = $('filtersTray'); if (t && t.hidden) filtersTrayOpen(); else filtersTrayClose(); }
+function mapFilterSet(key, on) {
+  MAP_FILTERS[key] = on;
+  try { store.set('mapFilters', MAP_FILTERS); } catch (e) {}
+  renderCrowd();
+  renderHeightsStops();
+  if (typeof renderRegs === 'function') renderRegs();
+  paintTray();
+}
+function stopCatsOf(acts, full) {
+  var cats = [];
+  (acts || []).forEach(function (a) {
+    if (a === 'candy') cats.push('candy');
+    if (a === 'decor' || a === 'decorations') cats.push('decor');
+  });
+  if (full) cats.push('full');
+  return cats;
+}
+function catsVisible(cats) {
+  if (!cats.length) return true;
+  return cats.some(function (c) { return MAP_FILTERS[c] !== false; });
+}
+function paintToggles() { $('tglAllergy').setAttribute('aria-pressed', String(!!S.allergy)); $('tglStroller').setAttribute('aria-pressed', String(!!S.stroller)); var tc = $('tglCrowd'); if (tc) tc.setAttribute('aria-pressed', String(!!CROWD_PREF)); paintTray(); paintPrefs(); }
 function paintPrefs() {
   var el = $('prefsState'); if (!el) return;
   var styleName = { best: 'Best route', shuffle: 'Shuffle', fresh: 'Fresh streets', lastyear: 'Last year' }[S.variety] || 'Fresh streets';
@@ -4058,7 +4155,8 @@ function exploreCheck(ll) {
   showExploreCard(best.title, best.sub);
   speakNow('Nearby: ' + best.title + (best.sub ? '. ' + best.sub : ''));
 }
-$('fabExplore').addEventListener('click', function () { setExplore(!S.explore); });
+/* v7.1: the Explore chip is gone with #layerChips; #trayExplore in the
+   filters tray calls setExplore now (see the tray wiring). */
 $('btnExploreClose').addEventListener('click', hideExploreCard);
 $('btnFitMore').addEventListener('click', function () {
   var open = $('fitNote').classList.toggle('open');
@@ -4232,8 +4330,8 @@ function startNav() {
   }
   if (nav.stepIdx >= nav.steps.length) nav.stepIdx = Math.max(1, nav.steps.length - 1);
   document.body.classList.add('mode-nav');
-  document.body.classList.add('walk-slim');
   paintChromeState();
+  if (typeof paintBar === 'function') paintBar();
   versionMaybeShow();
   S.follow = true;
   applyHeadUp();
@@ -4501,7 +4599,7 @@ function endNav(showSummary) {
   headUp.manual = false; document.body.classList.remove('rot-manual');
   S.nav = null;
   document.body.classList.remove('mode-nav');
-  document.body.classList.remove('walk-slim');
+  if (typeof paintBar === 'function') paintBar();
   var mapEl = $('map');
   mapEl.classList.remove('headup'); mapEl.style.transform = '';
   try { map.invalidateSize(); } catch (e) {}
@@ -4634,7 +4732,57 @@ function openSearch() {
   renderSearch('');
   setTimeout(function () { try { i.focus(); } catch (e) {} }, 60);
 }
-function closeSearch() { $('searchPanel').hidden = true; }
+function closeSearch() { $('searchPanel').hidden = true; $('searchPanel').classList.remove('from-bar'); }
+/* Bar search (v7.1 Fix 14): tapping the bar's search field morphs the
+   bar into input mode and opens the Find panel under it (header and
+   panel input hidden; the bar input drives it). Local results keep
+   their Find behavior; the Addresses section runs the v7.0 zone-scoped
+   Nominatim search and sets the start, like the Loop Bar search. */
+var barAddrTimer = null;
+function renderBarAddr(q) {
+  var box = $('searchAddr'); if (!box) return;
+  q = String(q || '').trim();
+  if (!q) { box.hidden = true; box.innerHTML = ''; return; }
+  zoneGeocode(q, 5).then(function (rows) {
+    if (!BAR.searching) return;
+    if (!rows || !rows.length) { box.hidden = true; box.innerHTML = ''; return; }
+    box.innerHTML = '<div class="sp-alabel">Addresses</div>' + rows.map(function (r, i) {
+      return '<button type="button" data-i="' + i + '"><b>' + esc(r.name) + '</b>' + (r.inZone ? '' : ' <span class="muted">· outside ' + esc(ZONE.zoneDef ? ZONE.zoneDef.place : 'this area') + '</span>') + '</button>';
+    }).join('');
+    box.hidden = false;
+    box.querySelectorAll('button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var r = rows[parseInt(b.getAttribute('data-i'), 10)];
+        if (!r) return;
+        closeBarSearch();
+        setStart(r.lat, r.lng, r.name, true);
+        try { map.flyTo([r.lat, r.lng], Math.max(map.getZoom ? map.getZoom() : 16, 16), { duration: 0.5 }); } catch (e) {}
+      });
+    });
+  }).catch(function () {});
+}
+function openBarSearch() {
+  filtersTrayClose(); partyCardClose();
+  BAR.searching = true;
+  $('btnMenu').style.visibility = 'hidden'; $('btnFilters').style.visibility = 'hidden'; $('fabLocate').style.visibility = 'hidden';
+  paintBar();
+  var p = $('searchPanel');
+  p.classList.add('from-bar');
+  p.hidden = false;
+  var i = $('findInput');
+  i.placeholder = (typeof zoneSeededActive !== 'function' || zoneSeededActive()) ? 'Try Sherman, Ogden, a street or a store name' : 'Try a street or a place name nearby';
+  var bi = $('barInput');
+  bi.value = i.value || '';
+  renderSearch(bi.value);
+  renderBarAddr(bi.value);
+  setTimeout(function () { try { bi.focus(); } catch (e) {} }, 60);
+}
+function closeBarSearch() {
+  BAR.searching = false;
+  $('btnMenu').style.visibility = ''; $('btnFilters').style.visibility = ''; $('fabLocate').style.visibility = '';
+  closeSearch();
+  paintBar();
+}
 /* Find (v7.0 Phase 4D): searches the ACTIVE ZONE's world, not just the
    seeded layer: seeded stops (only where the zone is seeded), live
    crowd reports inside the zone, the walker's own logged houses, and
@@ -4695,8 +4843,24 @@ function focusStop(o) {
   mk.bindPopup('<div class="pop"><b>' + esc(o.title) + '</b>' + (o.sub ? '<br>' + esc(o.sub) : '') + '<br><button class="btn-org goHere" data-lat="' + o.lat + '" data-lng="' + o.lng + '" data-name="' + esc(o.title) + '" style="margin-top:8px;min-height:38px;padding:6px 14px;font-size:14px">Go here</button></div>').openPopup();
   mk.on('popupclose', function () { try { map.removeLayer(mk); } catch (e) {} });
 }
-$('btnFind').addEventListener('click', openSearch);
-$('searchClose').addEventListener('click', closeSearch);
+$('barSearch').addEventListener('click', openBarSearch);
+$('barBack').addEventListener('click', closeBarSearch);
+$('barClear').addEventListener('click', function () { var bi = $('barInput'); bi.value = ''; $('findInput').value = ''; renderSearch(''); renderBarAddr(''); try { bi.focus(); } catch (e) {} });
+$('barInput').addEventListener('input', function (e) {
+  $('findInput').value = e.target.value;
+  renderSearch(e.target.value);
+  if (barAddrTimer) clearTimeout(barAddrTimer);
+  barAddrTimer = setTimeout(function () { renderBarAddr(e.target.value); }, 350);
+});
+$('barInput').addEventListener('keydown', function (e) { if (e.key === 'Escape') closeBarSearch(); });
+$('barForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var first = $('searchAddr') && $('searchAddr').querySelector('button');
+  if (first) { first.click(); return; }
+  var row = $('searchResults') && $('searchResults').querySelector('.sr-row');
+  if (row) row.click();
+});
+$('searchClose').addEventListener('click', function () { if (BAR.searching) closeBarSearch(); else closeSearch(); });
 $('findInput').addEventListener('input', function (e) { renderSearch(e.target.value); });
 $('findInput').addEventListener('keyup', function (e) { renderSearch(e.target.value); });
 $('findInput').addEventListener('change', function (e) { renderSearch(e.target.value); });
@@ -4709,6 +4873,7 @@ var CROWD = { url: 'https://azvannetqxugvqvtejhe.supabase.co', key: 'eyJhbGciOiJ
 function crowdOn() { return CROWD.url.indexOf('http') === 0 && CROWD.key.length > 20; }
 var CROWD_PREF = true;
 try { CROWD_PREF = store.get('prefCrowd', true) !== false; } catch (e) {}
+try { paintTray(); } catch (e) {} /* v7.1: repaint now that CROWD_PREF is real (the boot-time paintToggles ran before this var initialized) */
 function applyCrowdVis() {
   var show = S.stopsOn && CROWD_PREF;
   if (show) { if (!map.hasLayer(crowdLayer)) map.addLayer(crowdLayer); renderCrowd(); }
@@ -4759,6 +4924,10 @@ function renderCrowd() {
   CROWD.reports.forEach(function (r) {
     var age = crowdAgeMin(r);
     if (age > 180) return;
+    if (typeof MAP_FILTERS !== 'undefined') {
+      var cat = r.status === 'candy' ? 'candy' : r.status === 'nonfood' ? 'teal' : r.status === 'decor' ? 'decor' : null;
+      if (cat && !MAP_FILTERS[cat]) return;
+    }
     /* v6.9: a registered place carries its own marker, so a same-place
        crowd report (other than a live Ran Out) does not double-draw. */
     if (typeof REG !== 'undefined' && REG.ok && r.status !== 'out' && regNearLatLng(r.lat, r.lng, 25)) return;
@@ -4964,7 +5133,12 @@ function chatIngest(rows, initial) {
     if (!initial) {
       var add = 0;
       fresh.forEach(function (r) { if (r.name !== PARTY.name) add++; });
-      if (add && !(S.sheetTab === 'chat' && CHAT.channel === 'party')) { PARTY.unread += add; paintChatBadge(); }
+      if (add && !(S.sheetTab === 'chat' && CHAT.channel === 'party')) {
+        PARTY.unread += add; paintChatBadge();
+        var others = fresh.filter(function (r) { return r.name !== PARTY.name; });
+        var last = others[others.length - 1];
+        if (last) barPreviewShow(last.name || 'Party', String(last.msg || '').indexOf('img1|') === 0 ? 'sent a photo' : String(last.msg || ''));
+      }
     }
   }
   if (initial) PARTY.chatInit = true;
@@ -4973,7 +5147,7 @@ function chatIngest(rows, initial) {
 function paintChatBadge() {
   var b = $('chatTabCount'); if (!b) return;
   b.textContent = PARTY.unread;
-  b.hidden = !(PARTY.unread > 0);
+  b.hidden = !(PARTY.unread > 0) || S.sheetTab === 'chat';
 }
 function partyChatReset() {
   PARTY.chat = []; PARTY.chatInit = false; PARTY.chatCursor = ''; PARTY.unread = 0; PARTY.leaveConfirm = false;
@@ -5325,31 +5499,93 @@ function partyRosterNames() {
   if (PARTY.name) roster[PARTY.name] = 1;
   return Object.keys(roster);
 }
-/* Floating map status pill (v6.5 Phase 2): one line, member dots +
-   walking count + pooled pieces. It replaces the tall party bar, and
-   it is never on screen while the Party tab itself is open, so party
-   stats are never shown twice (R3-3, R3-5). Tapping it opens Party. */
+/* Unified top bar (v7.1 Fix 14): the bar's middle slot has exactly one
+   occupant at a time, in strict priority: nav, Back to Map (sheet at
+   full), an unread party message preview (4 s), the weak-GPS warning
+   (walking), the live party strip (walking), or the idle search plus
+   party segment. paintPartyPill keeps its name: it is the repaint entry
+   every party/GPS/snap change already calls. (BAR and LOC are declared
+   up by paintChromeState: applySnap runs during boot.) */
+function partyLag() {
+  var names = partyRosterNames();
+  for (var i = 0; i < names.length; i++) {
+    var n = names[i];
+    if (n === PARTY.name) continue;
+    var pos = PARTY.posRows[n];
+    var fresh = !!(pos && pos.created_at && (Date.now() - new Date(pos.created_at).getTime() < 180000));
+    if (!fresh) return n;
+    if (S.pos && pos.lat != null && haversine(S.pos, { lat: pos.lat, lng: pos.lng }) > 152) return n;
+  }
+  return null;
+}
+function paintBarNav() {
+  var el = $('barNavTxt'); if (!el) return;
+  var ins = $('navInstr'), dis = $('navDist');
+  var txt = ins ? ins.textContent : '';
+  var d = dis ? dis.textContent : '';
+  el.textContent = (d && d !== '--') ? (d + ' · ' + txt) : (txt || 'Starting navigation');
+}
+function paintBar() {
+  var occ = { backmap: $('barBackMap'), nav: $('barNav'), prev: $('barPreview'), weak: $('barWeak'), strip: $('barStrip'), idle: $('barIdle'), form: $('barForm') };
+  if (!occ.idle) return;
+  var inParty = false;
+  try { inParty = !!partyOn(); } catch (e) { inParty = false; }
+  Object.keys(occ).forEach(function (k) { if (occ[k]) occ[k].hidden = true; });
+  var menu = $('btnMenu'), fil = $('btnFilters'), loc = $('fabLocate');
+  if (menu) menu.hidden = BAR.searching;
+  if (fil) fil.hidden = BAR.searching;
+  if (loc) { loc.hidden = BAR.searching; loc.style.color = (LOC.centered || !S.pos) ? '' : 'var(--org2)'; }
+  if (BAR.searching) { occ.form.hidden = false; return; }
+  if (S.nav) { occ.nav.hidden = false; paintBarNav(); return; }
+  if (sheetSnap === 'full') { occ.backmap.hidden = false; return; }
+  if (BAR.previewUntil > Date.now() && inParty) { occ.prev.hidden = false; return; }
+  var walking = (typeof REC !== 'undefined' && !!REC.on);
+  if (walking && GPS_DEGRADED) { occ.weak.hidden = false; return; }
+  var seg = $('barPartySeg'), hair = $('barHair'), stxt = $('barSearchTxt');
+  if (inParty && walking) {
+    occ.strip.hidden = false;
+    var t = partyTotals();
+    var lag = partyLag();
+    var dot = $('barStripDot'); if (dot) dot.className = 'sdot' + (lag ? ' amber' : '');
+    var txtEl = $('barStripTxt');
+    if (txtEl) txtEl.textContent = (lag && BAR.altShow) ? (lag + ' paused') : (t.people + ' walking · ' + t.houses + ' houses');
+    return;
+  }
+  occ.idle.hidden = false;
+  if (inParty) {
+    var t2 = partyTotals();
+    if (seg) seg.hidden = false;
+    if (hair) hair.hidden = false;
+    var cnt = $('barSegCount'); if (cnt) cnt.textContent = t2.people;
+    var sdot = $('barSegDot'); if (sdot) sdot.className = 'sdot' + (partyLag() ? ' amber' : '');
+    if (stxt) stxt.textContent = 'Search...';
+  } else {
+    if (seg) seg.hidden = true;
+    if (hair) hair.hidden = true;
+    if (stxt) stxt.textContent = 'Search streets or spots';
+  }
+}
+/* The walking strip alternates its text with the lagging member's name
+   every 4 s while the amber state holds. */
+setInterval(function () { BAR.altShow = !BAR.altShow; var st = $('barStrip'); if (st && !st.hidden) paintBar(); }, 4000);
+function barPreviewShow(name, text) {
+  var tx = $('barPreviewTxt'); if (!tx) return;
+  tx.textContent = name + ': ' + text;
+  BAR.previewUntil = Date.now() + 4000;
+  paintBar();
+  if (BAR.previewTimer) clearTimeout(BAR.previewTimer);
+  BAR.previewTimer = setTimeout(function () { BAR.previewUntil = 0; paintBar(); }, 4000);
+}
 function paintPartyPill() {
-  var pill = $('partyPill'); if (!pill) return;
   paintChromeState();
-  var show = partyOn() && S.sheetTab !== 'party';
-  if (typeof PC !== 'undefined' && PC.open) show = false;
-  pill.hidden = !show;
-  if (!show) { if (!partyOn()) partyCardClose(); return; }
-  var t = partyTotals();
-  $('partyPillDots').innerHTML = partyRosterNames().slice(0, 4).map(function (n) {
-    return '<i style="background:' + partyMetaFor(n).color + '"></i>';
-  }).join('') + (GPS_DEGRADED ? '<i class="gpsdot" title="Weak GPS"></i>' : '');
-  $('partyPillText').textContent = GPS_DEGRADED ? (t.people + ' walking · Weak GPS') : (t.people + ' walking · ' + t.houses + ' houses');
+  if (!partyOn()) partyCardClose();
+  paintBar();
   paintPartyCard();
 }
 function renderPartyInfo() {
   if (!partyOn()) return;
   var t = partyTotals();
   paintPartyPill();
-  var tc2 = $('partyChipCount'); if (tc2) { tc2.textContent = t.people; tc2.hidden = t.people < 2; }
-  var tt2 = $('partyTabCount'); if (tt2) { tt2.textContent = t.people; tt2.hidden = t.people < 2; }
-  var cp3 = $('chipParty'); if (cp3) cp3.setAttribute('aria-pressed', 'true');
   if (typeof updatePeek === 'function') updatePeek();
   renderPartyBox();
 }
@@ -5550,10 +5786,11 @@ function partyTick() {
   }
   partyPoll();
 }
-/* Party pill + card (v6.6 Phase 4A, fix 10): the pill no longer just
-   duplicates the Party tab. One tap expands it in place into a floating
-   party card (the sheet never moves); a double-tap fits the map to
-   everyone walking. A 260 ms tap timer separates the two gestures. */
+/* Party drawer (v7.1 Fix 14): the pill and its expand-in-place card are
+   gone. The bar's party segment or walking strip opens a frosted drawer
+   under the bar: roster pills (tap one to jump to that walker) plus a
+   pooled-houses line and a single chat button. The Party tab still owns
+   Invite and Leave. Function names keep the v6.6 call sites working. */
 var PC = { open: false, tapTimer: null };
 function partyInviteShare() {
   var link = mapShareUrl('party=' + encodeURIComponent(PARTY.code));
@@ -5562,36 +5799,33 @@ function partyInviteShare() {
 }
 function partyCardOpen() {
   if (typeof PC === 'undefined' || !partyOn()) return;
+  filtersTrayClose();
   PC.open = true;
   paintPartyCard();
-  var c = $('partyCard');
-  if (c) { c.hidden = false; c.classList.remove('pop'); void c.offsetWidth; c.classList.add('pop'); }
-  var p = $('partyPill'); if (p) p.hidden = true;
+  var d = $('partyDrawer');
+  if (d) d.hidden = false;
+  if (sheetSnap !== 'peek') applySnap('peek');
 }
 function partyCardClose() {
   if (typeof PC === 'undefined') return;
-  var was = PC.open;
   PC.open = false;
-  var c = $('partyCard'); if (c) c.hidden = true;
-  if (was) paintPartyPill();
+  var d = $('partyDrawer'); if (d) d.hidden = true;
 }
 function paintPartyCard() {
   if (typeof PC === 'undefined' || !PC.open) return;
   var t = partyTotals();
-  var title = $('pcTitle'); if (title) title.textContent = 'Party · ' + t.houses + ' houses';
-  var walk = $('pcWalking'); if (walk) walk.textContent = t.people + ' walking';
-  var box = $('pcRows'); if (!box) return;
-  box.innerHTML = partyRosterNames().map(function (n) {
-    var c = PARTY.counts[n] || {};
+  var box = $('drawerRows'); if (!box) return;
+  var names = partyRosterNames().slice();
+  names.sort(function (a, b) { return (a === PARTY.name ? 0 : 1) - (b === PARTY.name ? 0 : 1); });
+  box.innerHTML = names.map(function (n) {
     var pos = PARTY.posRows[n];
-    var fresh = !!(pos && pos.created_at && (Date.now() - new Date(pos.created_at).getTime() < 180000));
-    return '<button type="button" class="pc-row" data-name="' + esc(n) + '"><span class="pc-dot" style="background:' + partyMetaFor(n).color + '"></span><span class="pc-name">' + esc(n) + '</span><span class="pc-state">' + (fresh ? 'Walking' : 'Paused') + '</span><span class="pc-houses">' + (c.houses || 0) + ' houses</span><span class="pc-x"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-locate"/></svg></span></button>';
+    var fresh = n === PARTY.name || !!(pos && pos.created_at && (Date.now() - new Date(pos.created_at).getTime() < 180000));
+    return '<button type="button" class="dw-row" data-name="' + esc(n) + '"><span class="dw-dot" style="background:' + (fresh ? '#7BE382' : '#F5B04C') + '"></span>' + esc(n) + '</button>';
   }).join('');
-  box.querySelectorAll('.pc-row').forEach(function (r) {
+  box.querySelectorAll('.dw-row').forEach(function (r) {
     r.addEventListener('click', function () { partyCardFocus(r.getAttribute('data-name')); });
   });
-  var cnt = $('pcChatCnt');
-  if (cnt) { cnt.hidden = !(PARTY.unread > 0); cnt.textContent = PARTY.unread; }
+  var dh = $('drawerHouses'); if (dh) dh.textContent = t.houses + (t.houses === 1 ? ' house' : ' houses') + ' pooled';
 }
 function partyCardFocus(n) {
   partyCardClose();
@@ -5616,13 +5850,39 @@ function partyFitMembers() {
   if (pts.length > 1) { try { map.flyToBounds(L.latLngBounds(pts), { padding: [40, 40] }); } catch (e) {} }
   else if (pts.length === 1) { try { map.flyTo(pts[0], 16, { duration: 0.5 }); } catch (e) {} }
 }
-$('partyPill').addEventListener('click', function () {
+function partySegTap() {
   if (PC.tapTimer) { clearTimeout(PC.tapTimer); PC.tapTimer = null; partyFitMembers(); return; }
-  PC.tapTimer = setTimeout(function () { PC.tapTimer = null; partyCardOpen(); }, 260);
-});
-$('pcHead').addEventListener('click', partyCardClose);
-$('pcChat').addEventListener('click', function () { partyCardClose(); setChatChannel('party'); switchTab('chat'); });
-$('pcInvite').addEventListener('click', function () { partyInviteShare(); });
+  PC.tapTimer = setTimeout(function () {
+    PC.tapTimer = null;
+    if (PC.open) partyCardClose(); else partyCardOpen();
+  }, 260);
+}
+$('barStrip').addEventListener('click', partySegTap);
+$('barPartySeg').addEventListener('click', partySegTap);
+$('drawerChat').addEventListener('click', function () { partyCardClose(); setChatChannel('party'); switchTab('chat'); });
+$('barPreview').addEventListener('click', function () { BAR.previewUntil = 0; if (BAR.previewTimer) clearTimeout(BAR.previewTimer); setChatChannel('party'); switchTab('chat'); paintBar(); });
+$('barBackMap').addEventListener('click', function () { applySnap('peek'); });
+$('barNavX').addEventListener('click', function () { endNav(false); openBarSearch(); });
+/* Pull-down on the bar's middle slot opens the drawer (24px threshold);
+   a swipe up on the drawer closes it. */
+(function () {
+  var mid = $('barMid'); if (!mid) return;
+  var y0 = null;
+  mid.addEventListener('pointerdown', function (e) { y0 = e.clientY; });
+  mid.addEventListener('pointermove', function (e) {
+    if (y0 == null || BAR.searching) return;
+    if (e.clientY - y0 > 24) { y0 = null; if (partyOn() && !PC.open) partyCardOpen(); }
+  });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) { mid.addEventListener(ev, function () { y0 = null; }); });
+  var dr = $('partyDrawer'); if (!dr) return;
+  var dy0 = null;
+  dr.addEventListener('pointerdown', function (e) { dy0 = e.clientY; });
+  dr.addEventListener('pointermove', function (e) {
+    if (dy0 == null) return;
+    if (dy0 - e.clientY > 24) { dy0 = null; partyCardClose(); }
+  });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) { dr.addEventListener(ev, function () { dy0 = null; }); });
+})();
 map.on('zoomend', function () { var c = map.getZoom() < 15; if (c !== PARTY.compact) { PARTY.compact = c; if (partyOn()) partyRefreshMarkers(true); } });
 $('identityDone').addEventListener('click', closeIdentity);
 $('identityPop').addEventListener('click', function (e) { if (e.target === this) closeIdentity(); });
@@ -5742,7 +6002,7 @@ function haulModeText() {
   return parts.join(' · ');
 }
 
-var REC = { on: false, mode: 'free', startedAt: 0, origStartedAt: 0, baseElapsed: 0, seeded: false, points: [], houses: [], timer: null, layer: L.layerGroup().addTo(map), wake: null, confirming: false };
+var REC = { on: false, mode: 'free', startedAt: 0, origStartedAt: 0, baseElapsed: 0, seeded: false, points: [], houses: [], timer: null, layer: L.layerGroup().addTo(map), wake: null, confirming: false, paused: false, pausedAt: 0, pausedMs: 0, holdTimer: null, holdFired: false };
 /* Haul tab trail (v6.4 phase 2, R2-5): opening Haul draws tonight's
    recorded trail on the main map and fits to it + tonight's pins, once
    per opening; leaving the tab restores the view that was there. While
@@ -5770,7 +6030,7 @@ function hideHaulTrail() {
   if (haulTrailShown && haulViewSave && haulViewSave.c) { try { map.setView(haulViewSave.c, haulViewSave.z); } catch (e) {} }
   haulTrailShown = false; haulViewSave = null;
 }
-function recPersist() { lsRawSet('ct_track_active', { startedAt: REC.startedAt, origStartedAt: REC.origStartedAt, baseElapsed: REC.baseElapsed, points: REC.points, houses: REC.houses }); }
+function recPersist() { lsRawSet('ct_track_active', { startedAt: REC.startedAt, origStartedAt: REC.origStartedAt, baseElapsed: REC.baseElapsed, points: REC.points, houses: REC.houses, paused: REC.paused, pausedMs: REC.pausedMs }); }
 /* The walker's own trail (v6.8, Fix 13): the newest segment's tail
    (last ~40 fixes) draws street-matched when a match is on file, with
    the raw fixes as faint crumbs under it; everything older, and every
@@ -5819,9 +6079,38 @@ function recClock(ms) {
   var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), ss = sec % 60;
   return (h > 0 ? h + ':' + (m < 10 ? '0' : '') : '') + m + ':' + (ss < 10 ? '0' : '') + ss;
 }
+function recElapsedNow() {
+  var ms = Date.now() - REC.startedAt - (REC.pausedMs || 0);
+  if (REC.paused) ms -= (Date.now() - REC.pausedAt);
+  return Math.max(0, ms);
+}
+var DECK_PAUSE_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg>';
+var DECK_PLAY_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+function paintDeck() {
+  var row = $('deckRow'); if (!row) return;
+  row.hidden = !REC.on;
+  paintDeckPause();
+  paintDeckHouse();
+}
+function paintDeckPause() {
+  var m = $('deckMain'); if (m) m.classList.toggle('paused', !!REC.paused);
+  var ic = $('deckPauseIc'); if (ic) ic.innerHTML = REC.paused ? DECK_PLAY_SVG : DECK_PAUSE_SVG;
+}
+function paintDeckHouse() {
+  var b = $('btnRecHouse'); if (b) b.textContent = '+1 House · ' + (S.counts ? S.counts.houses : 0);
+}
+function recPauseToggle() {
+  if (!REC.on || REC.confirming) return;
+  if (REC.paused) { REC.pausedMs += Date.now() - REC.pausedAt; REC.paused = false; }
+  else { REC.paused = true; REC.pausedAt = Date.now(); }
+  recPersist();
+  paintDeckPause();
+  recTick();
+}
 function recTick() {
-  var rt = $('recTime'); if (rt) rt.textContent = recClock(Date.now() - REC.startedAt);
+  var rt = $('recTime'); if (rt) rt.textContent = recClock(recElapsedNow());
   var rd = $('recDist'); if (rd) rd.textContent = fmtWalkDist(trackDistOf(REC.points));
+  paintDeckHouse();
   renderCounts();
 }
 function recWakeReq() {
@@ -5831,14 +6120,15 @@ function recWakeReq() {
 function recWakeRel() { if (REC.wake) { try { REC.wake.release(); } catch (e) {} REC.wake = null; } }
 function recSetConfirm(onOff) {
   REC.confirming = onOff;
+  var dm = $('deckMain'); if (dm) dm.hidden = onOff;
   $('btnRecHouse').hidden = onOff;
-  $('btnRecFinish').hidden = onOff;
   $('recConfirm').hidden = !onOff;
 }
 function recBegin(mode) {
   if (REC.on) {
-    /* Guided nav takes over the session quietly: bar away, keep sampling. */
-    if (mode === 'nav') { REC.mode = 'nav'; $('recBar').hidden = true; document.body.classList.remove('is-recording'); }
+    /* Guided nav takes over the session quietly: the sheet (and with it
+       the deck row) is hidden in nav mode; sampling keeps going. */
+    if (mode === 'nav') { REC.mode = 'nav'; document.body.classList.remove('is-recording'); }
     return;
   }
   /* Append into the night's existing track when there is one. */
@@ -5850,7 +6140,10 @@ function recBegin(mode) {
   REC.origStartedAt = REC.seeded ? last.startedAt : Date.now();
   REC.startedAt = Date.now();
   REC.on = true; REC.mode = mode; REC.confirming = false;
+  REC.paused = false; REC.pausedAt = 0; REC.pausedMs = 0;
   paintChromeState();
+  paintDeck();
+  applySnap(sheetSnap);
   versionMaybeShow();
   recDrawPts(REC.points);
   ensureWatch();
@@ -5862,8 +6155,7 @@ function recBegin(mode) {
   recWakeReq();
   if (mode === 'free') {
     document.body.classList.add('is-recording');
-    document.body.classList.add('walk-slim');
-    $('recBar').hidden = false; recSetConfirm(false);
+    paintDeck(); recSetConfirm(false);
     toast('Recording your walk. The trail draws itself as you go.', 'ok');
   }
 }
@@ -5875,7 +6167,7 @@ function recBeginNav() { recBegin('nav'); }
 /* Called from onPos on every fix. Filter: accuracy <= 25 m and at least
    6 m from the last recorded point, so porch standing does not scribble. */
 function recSample() {
-  if (!REC.on || !S.pos) return;
+  if (!REC.on || REC.paused || !S.pos) return;
   if ((S.pos.acc || 99) > 25) return;
   var n = REC.points.length;
   if (n > 0) {
@@ -5895,6 +6187,7 @@ function recHouse() {
   if (ts) { for (var i = 0; i < S.pins.length; i++) { if (S.pins[i].ts === ts) { pos = { lat: S.pins[i].lat, lng: S.pins[i].lng }; break; } } }
   if (!pos && S.pos) pos = { lat: S.pos.lat, lng: S.pos.lng };
   if (pos) { REC.houses.push({ lat: pos.lat, lng: pos.lng, t: Date.now() }); recPersist(); }
+  paintDeckHouse();
 }
 function recFinish(opts) {
   if (!REC.on) return;
@@ -5903,9 +6196,10 @@ function recFinish(opts) {
   if (REC.timer) { clearInterval(REC.timer); REC.timer = null; }
   recWakeRel();
   document.body.classList.remove('is-recording');
-  document.body.classList.remove('walk-slim');
-  $('recBar').hidden = true;
-  var walk = { startedAt: REC.origStartedAt || REC.startedAt, endedAt: Date.now(), elapsedMs: REC.baseElapsed + (Date.now() - REC.startedAt), points: REC.points, houses: REC.houses };
+  var walk = { startedAt: REC.origStartedAt || REC.startedAt, endedAt: Date.now(), elapsedMs: REC.baseElapsed + recElapsedNow(), points: REC.points, houses: REC.houses };
+  REC.paused = false; REC.pausedAt = 0; REC.pausedMs = 0;
+  paintDeck();
+  applySnap(sheetSnap);
   lsRawDel('ct_track_active');
   if (REC.points.length >= 2) {
     lsRawSet('ct_walk_last', walk);
@@ -5932,7 +6226,21 @@ $('btnStart').addEventListener('click', function () {
 });
 $('btnEmptyRecord').addEventListener('click', recStart);
 $('btnRecHouse').addEventListener('click', recHouse);
-$('btnRecFinish').addEventListener('click', function () { recSetConfirm(true); });
+(function () {
+  var dm = $('deckMain'); if (!dm) return;
+  dm.addEventListener('pointerdown', function () {
+    REC.holdFired = false;
+    if (REC.holdTimer) clearTimeout(REC.holdTimer);
+    REC.holdTimer = setTimeout(function () { REC.holdFired = true; recSetConfirm(true); }, 550);
+  });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) {
+    dm.addEventListener(ev, function () { if (REC.holdTimer) { clearTimeout(REC.holdTimer); REC.holdTimer = null; } });
+  });
+  dm.addEventListener('click', function () {
+    if (REC.holdFired) { REC.holdFired = false; return; }
+    recPauseToggle();
+  });
+})();
 $('btnRecResume').addEventListener('click', function () { recSetConfirm(false); });
 $('btnRecFinishYes').addEventListener('click', recFinish);
 document.addEventListener('visibilitychange', function () {
@@ -5947,10 +6255,10 @@ document.addEventListener('visibilitychange', function () {
     var lastTs = REC.points.length ? (REC.points[REC.points.length - 1][2] || a.startedAt) : a.startedAt;
     REC.baseElapsed = (a.baseElapsed || 0) + Math.max(0, lastTs - a.startedAt);
     REC.startedAt = Date.now();
+    REC.paused = !!a.paused; REC.pausedMs = a.pausedMs || 0; REC.pausedAt = REC.paused ? Date.now() : 0;
     document.body.classList.add('is-recording');
-    document.body.classList.add('walk-slim');
     paintChromeState();
-    $('recBar').hidden = false; recSetConfirm(false);
+    paintDeck(); recSetConfirm(false);
     recDrawPts(REC.points);
     REC.timer = setInterval(recTick, 1000); recTick();
     recWakeReq();
@@ -6327,7 +6635,7 @@ setInterval(function () { if (KID.on) kidRender(); }, 3000);
    a canvas re-encode strips EXIF/GPS and caps the payload, and the
    image rides the post's msg field with an img1|<w>x<h>| prefix, so
    no new backend columns are needed. The zone channel is text-only. */
-var CHAT = { channel: 'party' };
+var CHAT = { channel: 'party', pendingPhoto: null, sending: false };
 var CHAT_IMG_CAP = 120 * 1024; /* data-URL chars, roughly 90 KB of image */
 function fmtChatTime(ts, full) {
   var d = new Date(ts);
@@ -6427,12 +6735,44 @@ function renderChat() {
   });
 }
 function scrollChatBottom() { var sc = $('chatScroll'); if (sc) sc.scrollTop = sc.scrollHeight; }
+function chatPaintSend() {
+  var b = $('chatSend'), inp = $('chatInput'); if (!b) return;
+  var has = !!((inp && String(inp.value || '').trim()) || CHAT.pendingPhoto);
+  var over = (typeof zoneVisible === 'function' && zoneVisible()) && !!inp && String(inp.value || '').length > ZONE_MAXLEN;
+  b.classList.toggle('ready', has && !over && !CHAT.sending);
+  b.classList.toggle('sending', !!CHAT.sending);
+  b.classList.toggle('locked', !!over);
+  b.disabled = !!over || !!CHAT.sending;
+}
+function chatGrow() {
+  var inp = $('chatInput'); if (!inp) return;
+  inp.style.height = 'auto';
+  var lines = Math.round(((inp.scrollHeight || 40) - 18) / 22) || 1;
+  lines = Math.max(1, Math.min(4, lines));
+  inp.style.height = (lines * 22 + 18) + 'px';
+}
+function paintPhotoPrev() {
+  var pv = $('chatPhotoPrev'), im = $('chatPhotoImg');
+  if (!pv) return;
+  pv.hidden = !CHAT.pendingPhoto;
+  if (CHAT.pendingPhoto && im) im.src = CHAT.pendingPhoto.url;
+  chatPaintSend();
+}
 function chatSend() {
-  if (typeof zoneVisible === 'function' && zoneVisible()) { zoneSend(); return; }
+  if (typeof zoneVisible === 'function' && zoneVisible()) { zoneSend(); chatGrow(); chatPaintSend(); return; }
+  if (CHAT.sending) return;
   var inp = $('chatInput'); if (!inp || !partyOn()) return;
-  var text = inp.value.trim(); if (!text) return;
-  inp.value = '';
-  partyPost({ kind: 'chat', msg: cleanText(text) });
+  var text = inp.value.trim();
+  var photo = CHAT.pendingPhoto;
+  if (!text && !photo) return;
+  CHAT.sending = true; chatPaintSend();
+  if (photo && chatSendPhoto(photo.url, photo.w, photo.h)) { CHAT.pendingPhoto = null; paintPhotoPrev(); }
+  if (text) {
+    inp.value = '';
+    partyPost({ kind: 'chat', msg: cleanText(text) });
+  }
+  chatGrow(); chatPaintSend();
+  setTimeout(function () { CHAT.sending = false; chatPaintSend(); }, 900);
   setTimeout(chatPoll, 500);
 }
 function chatEncodePhoto(img, cb) {
@@ -6461,10 +6801,22 @@ function chatSendPhoto(dataUrl, w, h) {
   return true;
 }
 $('chatSend').addEventListener('click', chatSend);
-$('chatInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') chatSend(); });
-$('chatPhoto').addEventListener('change', function () {
-  var f = $('chatPhoto').files && $('chatPhoto').files[0];
-  $('chatPhoto').value = '';
+/* v7.1 composer: Return inserts a newline (never send-on-Return); the
+   input auto-grows 1 to 4 lines in 22px steps with no transition. */
+$('chatInput').addEventListener('input', function () { chatGrow(); zoneCountPaint(); chatPaintSend(); });
+$('chatPlus').addEventListener('click', function () {
+  var m = $('chatPlusMenu'); if (!m) return;
+  m.hidden = !m.hidden;
+  $('chatPlus').setAttribute('aria-expanded', String(!m.hidden));
+});
+$('chatMic').addEventListener('pointerdown', function (e) { e.preventDefault(); voiceListen(); });
+$('chatMic').addEventListener('click', function () { voiceListen(); });
+$('chatPhotoX').addEventListener('click', function () { CHAT.pendingPhoto = null; paintPhotoPrev(); });
+function chatPhotoPicked(input) {
+  var f = input.files && input.files[0];
+  input.value = '';
+  var m = $('chatPlusMenu'); if (m) m.hidden = true;
+  $('chatPlus').setAttribute('aria-expanded', 'false');
   if (!f || !partyOn()) return;
   if (Date.now() - (PARTY.lastImgTs || 0) < 30000) { toast('One photo every 30 seconds in party chat.', 'warn'); return; }
   var rd = new FileReader();
@@ -6473,13 +6825,16 @@ $('chatPhoto').addEventListener('change', function () {
     img.onload = function () {
       chatEncodePhoto(img, function (url, w, h) {
         if (!url) { toast('That photo is too large to send, even compressed.', 'warn'); return; }
-        chatSendPhoto(url, w, h);
+        CHAT.pendingPhoto = { url: url, w: w, h: h };
+        paintPhotoPrev();
       });
     };
     img.src = rd.result;
   };
   rd.readAsDataURL(f);
-});
+}
+$('chatPhoto').addEventListener('change', function () { chatPhotoPicked($('chatPhoto')); });
+$('chatPhotoLib').addEventListener('change', function () { chatPhotoPicked($('chatPhotoLib')); });
 /* ---------- Heights Live zone chat (v6.5 Phase 3 Stage B) ----------
    The neighborhood channel, wired into the Phase 2 chat surface.
    Identity is a pseudonymous walker persona seeded deterministically
@@ -6700,30 +7055,39 @@ function zonePaintPersonaBtn() {
   if (!b || !ZONE.persona) return;
   b.style.color = ZONE.persona.color;
   b.style.borderColor = ZONE.persona.color;
-  b.innerHTML = avatarSvg(ZONE.persona.avatar);
+  b.innerHTML = avatarSvg(ZONE.persona.avatar) + '<span class="cp-name">' + esc(ZONE.persona.name) + '</span>';
   b.title = ZONE.persona.name;
 }
 function zoneCountPaint() {
   var cnt = $('chatCount'), inp = $('chatInput');
   if (!cnt || !inp) return;
-  if (!zoneVisible()) { cnt.hidden = true; return; }
+  if (!zoneVisible()) { cnt.hidden = true; cnt.className = ''; return; }
   var left = ZONE_MAXLEN - String(inp.value || '').length;
-  cnt.hidden = left > 40;
+  cnt.hidden = left >= 40;
   cnt.textContent = left;
+  cnt.className = left < 0 ? 'over' : (left <= 9 ? 'warn' : '');
 }
 function chatComposerMode(mode) {
-  var photo = $('chatPhotoBtn'), per = $('chatPersonaBtn'), cnt = $('chatCount'), inp = $('chatInput');
+  var per = $('chatPersonaBtn'), cnt = $('chatCount'), inp = $('chatInput');
+  var plus = $('chatPlus'), mic = $('chatMic'), menu = $('chatPlusMenu');
   if (mode === 'zone') {
-    if (photo) photo.style.display = 'none';
+    if (plus) plus.hidden = true;
+    if (mic) mic.hidden = true;
+    if (menu) menu.hidden = true;
     if (per) { per.hidden = false; zonePaintPersonaBtn(); }
-    if (inp) { inp.placeholder = 'Message ' + ZONE_INFO.placeLower; inp.maxLength = ZONE_MAXLEN; }
+    /* No hard maxlength in Local: a paste may run over, and the counter
+       turns red and locks Send (zoneSend also guards). */
+    if (inp) { inp.placeholder = 'Message ' + ZONE_INFO.placeLower; inp.removeAttribute('maxlength'); }
     zoneCountPaint();
   } else {
-    if (photo) photo.style.display = '';
+    if (plus) plus.hidden = false;
+    if (mic) mic.hidden = false;
     if (per) per.hidden = true;
     if (cnt) cnt.hidden = true;
     if (inp) { inp.placeholder = 'Message your party'; inp.maxLength = 140; }
   }
+  chatPaintSend();
+  chatGrow();
 }
 /* ---------- transport (zone_posts / zone_reports) ---------- */
 function zoneKey(r) {
@@ -7335,7 +7699,15 @@ function renderPinsList() {
 /* Preferences slide-over */
 function openPrefs() { $('prefsMenu').hidden = false; $('prefsScrim').hidden = false; }
 function closePrefs() { $('prefsMenu').hidden = true; $('prefsScrim').hidden = true; }
-$('btnPrefsOpen').addEventListener('click', openPrefs);
+$('btnMenu').addEventListener('click', openPrefs);
+$('btnFilters').addEventListener('click', filtersTrayToggle);
+$('trayCrowd').addEventListener('click', function () { var t = $('tglCrowd'); if (t) t.click(); paintTray(); });
+$('trayCandy').addEventListener('click', function () { mapFilterSet('candy', !MAP_FILTERS.candy); });
+$('trayTeal').addEventListener('click', function () { mapFilterSet('teal', !MAP_FILTERS.teal); });
+$('trayFull').addEventListener('click', function () { mapFilterSet('full', !MAP_FILTERS.full); });
+$('trayDecor').addEventListener('click', function () { mapFilterSet('decor', !MAP_FILTERS.decor); });
+$('trayReg').addEventListener('click', function () { mapFilterSet('registered', !MAP_FILTERS.registered); });
+$('trayExplore').addEventListener('click', function () { setExplore(!S.explore); paintTray(); });
 $('prefsClose').addEventListener('click', closePrefs);
 $('prefsScrim').addEventListener('click', closePrefs);
 $('photoViewClose').addEventListener('click', closePhotoView);
@@ -7345,11 +7717,7 @@ $('prefShare').addEventListener('click', function () { var b = $('btnShareApp');
 $('prefExport').addEventListener('click', function () { var b = $('btnSumExport'); if (b) b.click(); });
 $('prefEndNight').addEventListener('click', function () { closePrefs(); openSummary(); });
 $('btnHaulExport').addEventListener('click', function () { var b = $('btnSumExport'); if (b) b.click(); });
-$('chipCrowd').addEventListener('click', function () { var t = $('tglCrowd'); if (t) t.click(); });
-$('chipParty').addEventListener('click', function () { switchTab('party'); if (sheetSnap === 'peek') applySnap(lastSnap); });
-$('btnSheetLog').addEventListener('click', function () { $('fabSpot').click(); });
 $('btnEmptyLog').addEventListener('click', function () { $('fabSpot').click(); });
-$('btnNavExit').addEventListener('click', function () { endNav(false); openSearch(); });
 renderPinsList();
 updatePeek();
 
@@ -8051,6 +8419,7 @@ function renderRegs() {
   if (!REG.layer) { try { REG.layer = L.layerGroup().addTo(map); } catch (e) { return; } }
   REG.layer.clearLayers();
   if (!REG.ok) return;
+  if (typeof MAP_FILTERS !== 'undefined' && !MAP_FILTERS.registered) return;
   REG.all.forEach(function (reg) {
     var html = crowdOutNear(reg.lat, reg.lng)
       ? '<div class="mk-regwrap">' + pinIconHtml('out', 'house') + '<span class="mk-regring"></span></div>'
@@ -8231,7 +8600,7 @@ function regSocialTemplates(reg) {
   ];
 }
 function regBadgeSnippet(reg) {
-  return '<a href="' + regLink(reg) + '"><img src="candy-trail-badge.png" alt="On Candy Trail" width="220" height="60"></a>';
+  return '<a href="' + regLink(reg) + '"><img src="https://dreadgazebo.github.io/jc-heights-candy-path/badge-ontrail.png" alt="On Candy Trail" width="220" height="60"></a>';
 }
 function regDrawBadge(cb) {
   try {
@@ -8613,12 +8982,34 @@ function zoneReverseInto(lat, lng, prov, key) {
    zone offers a switch instead of silently mixing feeds. Boundary
    grazes (inside the zone, or within 3 km of its center across an
    edge) never nag. One offer per start point per session. */
+function zoneKnownDefAt(lat, lng) {
+  var hd = zoneDefaultDef();
+  if (zoneDefContains(hd, lat, lng)) return hd;
+  var stored = null;
+  try { stored = store.get('zoneDef', null); } catch (e) {}
+  if (zoneDefOk(stored) && stored.id !== 'heights' && !stored.provisional && zoneDefContains(stored, lat, lng)) return stored;
+  return null;
+}
 function zoneOnStartSet(lat, lng) {
   try { paintZoneChrome(); } catch (e) {}
   if (!ZRES.ready || ZRES.onboarding) return;
   var def = ZONE.zoneDef;
   if (!def) return;
   if (zoneDefContains(def, lat, lng)) return;
+  /* v7.1 Fix 15c: a start inside another KNOWN zone (the Heights
+     polygon, or the stored dynamic zone) switches in-session right
+     away instead of waiting for the next boot. A party or a walk in
+     progress is never interrupted. Points outside every known zone
+     keep the offer dialog below. */
+  var known = zoneKnownDefAt(lat, lng);
+  if (known && known.id !== def.id) {
+    if (partyOn() || (typeof REC !== 'undefined' && REC.on) || S.nav) return;
+    zoneActivate(known);
+    ZRES.ready = true;
+    try { paintZoneChrome(); } catch (e) {}
+    toast('Switched to ' + (known.place || 'your new area'), 'ok');
+    return;
+  }
   if (haversine({ lat: lat, lng: lng }, def.center) < 3000) return;
   var key = lat.toFixed(3) + ',' + lng.toFixed(3);
   if (ZRES.offeredKey === key) return;
@@ -8750,9 +9141,11 @@ function paintPioneer(def) {
 function paintWpNote(def) {
   var el = $('wpNote');
   if (!el) return;
-  if (!S.start) { el.hidden = true; return; }
+  var bbT = $('btnBuild') ? $('btnBuild').querySelector('.plancard-t') : null;
+  if (!S.start) { el.hidden = true; if (bbT) bbT.textContent = 'Auto-plan a loop'; return; }
   var n = routePoolCount(S.start);
-  if (n >= 3) { el.hidden = true; return; }
+  if (n >= 3) { el.hidden = true; if (bbT) bbT.textContent = 'Auto-plan a loop'; return; }
+  if (bbT) bbT.textContent = 'Draw your route';
   el.innerHTML = '<b>Waypoint mode.</b> Only ' + n + ' stop' + (n === 1 ? '' : 's') +
     ' mapped near your start, so Auto-plan drops waypoints instead of guessing. Tap the map, or mark spots as you go, and we connect the loop.';
   el.hidden = false;
@@ -8935,7 +9328,7 @@ paintChromeState();
 /* v6.4.1 boot self-check marker: the shell's checker script verifies this
    was set. If boot died anywhere above, the repair overlay appears instead
    of a silently half-dead app. */
-window.__ctBootOK = '7.0';
+window.__ctBootOK = '7.1';
 
 </script>
 <script>
