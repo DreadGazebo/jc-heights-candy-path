@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0A16">
-<meta name="version" content="6.4.1">
+<meta name="version" content="6.5">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -144,14 +144,12 @@ body.kid #fabLog{display:none}
 .search input{flex:1;min-width:0;min-height:52px;border-radius:999px;border:1px solid var(--line2);background:var(--bg2);padding:0 16px;font-size:16px;color:var(--txt);outline:none}
 .search input:focus{border-color:var(--org2)}
 .search .btn{width:56px;padding:0}
-#startInfo{margin:10px 2px 0;font-size:14px}
 .chips{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
 .chip{min-height:52px;border-radius:999px;border:1px solid var(--line2);background:var(--bg2);font-weight:700;font-size:15px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05;color:var(--txt);gap:5px;padding:8px 6px}
 .chip small{font-size:11px;font-weight:600;color:var(--mut)}
 .chip svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .chip[aria-pressed="true"]{background:rgba(232,93,38,.15);border-color:var(--org);color:var(--org2)}
 .chip[aria-pressed="true"] small{color:var(--org2)}
-#btnBuild{margin-top:14px}
 #viewBanner{margin:2px 0 10px;padding:10px 12px;border-radius:12px;background:rgba(139,123,184,.15);border:1px solid rgba(139,123,184,.5);font-size:14.5px}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:2px 0 6px}
 .stat{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:16px;padding:5px 2px;text-align:center}
@@ -281,6 +279,9 @@ dialog .row .btn{flex:1;min-width:130px}
 #moveBar{position:fixed;z-index:1180;left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);top:calc(var(--topH) + 8px);
   display:flex;align-items:center;gap:10px;padding:10px 10px 10px 14px;border-color:var(--org)}
 #moveBar span{flex:1;font-weight:700}
+#gpsFuzzy{position:fixed;z-index:1115;left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);top:calc(var(--topH) + 8px);display:flex;flex-direction:column;gap:1px;padding:9px 14px;border:1px solid #f59e0b;border-radius:12px;font-size:13px}
+#gpsFuzzy[hidden]{display:none}
+#gpsFuzzy span{color:var(--mut);font-size:12px}
 #partyBar{position:fixed;z-index:1120;left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);top:calc(var(--topH) + 8px);
   display:flex;align-items:center;gap:8px;padding:8px 12px;border-color:var(--pur2)}
 #partyBarText{flex:1;font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -356,14 +357,18 @@ body.mode-nav.in-party #logCard,body.mode-nav.in-party #pinSheet{top:calc(var(--
 .pinrow-del svg{width:18px;height:18px}
 /* ---------- party avatars (v6.4 phase 2, Argon spec) ---------- */
 .partyicon{transition:transform 1s linear}
-.puck{position:relative;width:32px;height:32px;border-radius:50%;background:rgba(20,18,24,.96);border:1.5px solid #0B0A0E;box-shadow:inset 0 0 0 2px var(--pc,#F5EFE6),0 2px 6px rgba(0,0,0,.55);color:#F4EFE6;display:grid;place-items:center}
-.avatar-glyph{fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;display:block}
+.puck{position:relative;width:32px;height:32px;border-radius:50%;background:#16101E;--av-stage:#16101E;border:1.5px solid #0B0A0E;box-shadow:inset 0 0 0 2.5px var(--pc,#F5EFE6),0 2px 6px rgba(0,0,0,.55);color:var(--pc,#F4EFE6);display:grid;place-items:center}
+.avatar-glyph{fill:currentColor;stroke:none;display:block}
+.av-cut{fill:var(--av-stage,#16101E)}
+.av-bone{fill:#F4EFE6}
+.av-line{fill:none;stroke:var(--av-stage,#16101E);stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.av-str{fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:round}
 .puck .avatar-glyph{width:20px;height:20px}
 .puck-compact{width:24px;height:24px}
-.puck-compact .avatar-glyph{width:15px;height:15px;stroke-width:2.2}
+.puck-compact .avatar-glyph{width:15px;height:15px}
 .puck-compact .avatar-detail{display:none}
 .puck-lg{width:48px;height:48px}
-.puck-lg .avatar-glyph{width:28px;height:28px;stroke-width:1.8}
+.puck-lg .avatar-glyph{width:28px;height:28px}
 .puck-ini{font-weight:800;font-size:12px;letter-spacing:.02em}
 .puck-pipwrap{position:absolute;inset:0;pointer-events:none}
 .puck-pip{position:absolute;left:50%;top:-5px;transform:translateX(-50%);width:0;height:0;border-left:3px solid transparent;border-right:3px solid transparent;border-bottom:4px solid var(--pc,#F5EFE6);filter:drop-shadow(0 0 1px #0B0A0E)}
@@ -380,7 +385,7 @@ body.mode-nav.in-party #logCard,body.mode-nav.in-party #pinSheet{top:calc(var(--
 .party-colors .cdot{width:26px;height:26px;border-radius:50%;border:2px solid transparent;padding:0;cursor:pointer}
 .party-colors .cdot[aria-pressed="true"]{border-color:#F5EFE6;box-shadow:0 0 0 2px #0E0A16}
 .walker-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
-.walker-tile{position:relative;height:56px;border-radius:12px;border:2px solid transparent;background:#18151E;color:#F4EFE6;display:grid;place-items:center;padding:0;cursor:pointer}
+.walker-tile{position:relative;height:56px;border-radius:12px;border:2px solid transparent;background:#18151E;--av-stage:#18151E;color:#F4EFE6;display:grid;place-items:center;padding:0;cursor:pointer}
 .walker-tile .avatar-glyph{width:30px;height:30px}
 .walker-tile[aria-pressed="true"]{border-color:var(--selc,#E85D26);background:radial-gradient(circle at 50% 45%,rgba(232,93,38,.14),#18151E 78%)}
 .walker-tile.taken{background:#100E14;cursor:default}
@@ -388,11 +393,11 @@ body.mode-nav.in-party #logCard,body.mode-nav.in-party #pinSheet{top:calc(var(--
 .walker-claim{position:absolute;right:3px;bottom:3px;display:flex;align-items:center;gap:3px;font-size:9px;font-weight:700;background:rgba(11,10,14,.85);padding:2px 5px;border-radius:999px;color:#F4EFE6}
 .walker-claim i{width:6px;height:6px;border-radius:50%;display:block;flex:none}
 .party-collar{position:absolute;inset:-4px;border:2px solid;border-radius:14px;pointer-events:none}
-.chat-av{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:#141218;border:1.5px solid;vertical-align:-3px;margin-right:4px;color:#F4EFE6}
-.chat-av .avatar-glyph{width:10px;height:10px;stroke-width:2.6}
+.chat-av{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:#141218;--av-stage:#141218;border:1.5px solid;vertical-align:-3px;margin-right:4px;color:#F4EFE6}
+.chat-av .avatar-glyph{width:10px;height:10px}
 .chat-av .avatar-detail,.roster-av .avatar-detail{display:none}
-.roster-av{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#141218;border:1.5px solid;vertical-align:-5px;margin-right:5px;color:#F4EFE6}
-.roster-av .avatar-glyph{width:13px;height:13px;stroke-width:2.4}
+.roster-av{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#141218;--av-stage:#141218;border:1.5px solid;vertical-align:-5px;margin-right:5px;color:#F4EFE6}
+.roster-av .avatar-glyph{width:13px;height:13px}
 
 .lc-sec{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:12px 0 6px}
 .lc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -516,9 +521,14 @@ body.light .dark-tiles .leaflet-tile-pane{filter:none}
 .plan-head{padding:14px 2px 0;text-align:left}
 .plan-title{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:20px;margin:0;color:var(--txt)}
 .plan-sub{color:var(--mut);font-size:13px;margin:4px 0 0;line-height:1.45}
-#startRow{display:flex;align-items:center;gap:10px;min-height:48px;margin-top:8px;padding:0 4px 0 12px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;font-size:13px;color:var(--mut)}
-#startRow span{flex:1}
-#btnClearStart{flex:none;min-height:44px;padding:0 12px;background:none;border:0;color:var(--org2);font-weight:700;font-size:13px}
+#homeRow{display:flex;align-items:center;gap:10px;min-height:48px;margin-top:10px;padding:0 4px 0 12px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;font-size:13px;color:var(--mut)}
+#homeRow span{flex:1}
+#homeRowBtn{flex:none;min-height:44px;padding:0 12px;background:none;border:0;color:var(--org2);font-weight:700;font-size:13px;cursor:pointer}
+.plancard{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;min-height:56px;padding:10px 16px;margin-top:10px;border-radius:14px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);cursor:pointer;text-align:left}
+.plancard-t{font-size:15px;font-weight:700}
+.plancard-s{font-size:12px;color:var(--mut)}
+.plancard-primary{background:var(--org);border-color:var(--org);color:#0E0A16}
+.plancard-primary .plancard-s{color:rgba(14,10,22,.72)}
 .homeicon.draglift .tdh{transform:rotate(-45deg) scale(1.1);box-shadow:0 10px 22px rgba(0,0,0,.6)}
 .party-actions{margin-top:24px;display:flex;flex-direction:column;gap:12px}
 .party-actions .btn{width:100%;min-height:48px}
@@ -722,6 +732,8 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
   </div>
 </div>
 
+<div id="gpsFuzzy" class="card" hidden role="status"><b>Weak GPS signal (usually indoors)</b><span>Showing your general area &middot; Step outside or drag your start pin.</span></div>
+
 <button id="fabLog" type="button" title="House visited: log a stop" aria-label="Log a stop: house visited"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6c-3.7 0-6.4 2.8-6.4 6.3 0 4.3 6.4 10.5 6.4 10.5s6.4-6.2 6.4-10.5c0-3.5-2.7-6.3-6.4-6.3Z"/><path d="M12 8v6.4M8.8 11.2h6.4"/></svg></button>
 
 <div id="pickBanner" class="card" hidden role="status">
@@ -809,8 +821,7 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
           <input id="searchInput" type="search" placeholder="Or type an address or place" autocomplete="off" enterkeyhint="search" aria-label="Start address">
           <button class="btn" type="submit" aria-label="Search address"><svg class="ic" viewBox="0 0 24 24"><use href="#i-search"/></svg></button>
         </form>
-        <p id="startInfo" class="muted">No start set yet.</p>
-        <div id="startRow" hidden><span>Home base set &middot; Drag pin to move</span><button id="btnClearStart" type="button">Remove</button></div>
+        <div id="homeRow"><span id="homeRowLabel">Start &amp; end: My GPS location</span><button id="homeRowBtn" type="button">Set on map</button></div>
         <div class="label">How long do we have?</div>
         <div class="budgetCtl">
           <div class="budgetHead"><span class="budgetLbl">Walk time</span><span id="budgetReadout" class="budgetVal">60 min</span></div>
@@ -830,12 +841,12 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
           <button class="chip" data-style="fresh" type="button" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-spark"/></svg><small>Fresh streets</small></button>
           <button class="chip" data-style="lastyear" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-history"/></svg><small>Last year</small></button>
         </div>
-        <button id="btnDraw" class="btn btn-ghost btn-xl" type="button" style="margin-top:10px"><svg class="ic" viewBox="0 0 24 24"><use href="#i-draw"/></svg>Draw my own route</button>
-        <button id="btnBuild" class="btn btn-org btn-xl" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-route"/></svg>Build my route</button>
+        <button id="btnBuild" class="plancard plancard-primary" type="button"><span class="plancard-t">Auto-plan a loop</span><span class="plancard-s">We pick and order stops for your time budget</span></button>
+        <button id="btnDraw" class="plancard" type="button"><span class="plancard-t">Pick stops on map</span><span class="plancard-s">Tap houses yourself &middot; we connect the path</span></button>
       </div>
       <div class="sheetfoot">
         <div class="wm">Candy Trail</div>
-        <div class="ver" id="appVer">Candy Trail v6.4.1</div>
+        <div class="ver" id="appVer">Candy Trail v6.5</div>
       </div>
     </div>
 
@@ -921,7 +932,7 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
   <div class="prefs-foot">
     <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon-mono"/></svg>
     <div class="crest">Candy Trail</div>
-    <div class="ver">Version 6.4.1</div>
+    <div class="ver">Version 6.5</div>
   </div>
 </div>
 
@@ -1412,6 +1423,10 @@ function renderMe() {
   } else {
     meMarker.setLatLng(ll); meCircle.setLatLng(ll); meCircle.setRadius(S.pos.acc || 15);
   }
+  if (meCircle.setStyle) {
+    var dashed = S.locTier === 3 && !(bestTrustedFix && (Date.now() - bestTrustedFix.ts) < 60000);
+    try { meCircle.setStyle({ dashArray: dashed ? '5 7' : '' }); } catch (e) {}
+  }
   var el = document.getElementById('meEl');
   if (el) {
     var stale = (Date.now() - S.pos.ts) > 25000;
@@ -1429,20 +1444,75 @@ function ensureWatch() {
   watchId = navigator.geolocation.watchPosition(function (p) { try { onPos(p); } catch (e) { console.error('onPos failed', e); } }, onPosErr,
     { enableHighAccuracy: true, maximumAge: 3000, timeout: 20000 });
 }
+/* v6.5 Phase 1 location honesty (R3-8): three accuracy tiers around a
+   bestTrustedFix. Tier 1 (<= 35 m) drives everything, as before. Tier 2
+   (35-65 m) moves the puck and the nav banner but never fires the
+   proximity behaviors (stop check-off, step advance) and never appends
+   walk-recorder points. Tier 3 (> 65 m) holds the puck on the trusted
+   fix while it is fresh (< 60 s); with no fresh trusted fix the coarse
+   fix shows with a dashed ring, proximity behaviors pause, and the
+   fuzzy pill appears after 4 s of sustained coarse fixes. A <= 35 m
+   fix dismisses the pill at once. */
+var bestTrustedFix = null, fuzzySince = 0, fuzzyTimer = null;
+var FUZZY_PILL_DELAY_MS = 4000;
+function accTier(acc) { acc = (acc == null ? 999 : acc); return acc <= 35 ? 1 : (acc <= 65 ? 2 : 3); }
+function showFuzzyPill() { var el = $('gpsFuzzy'); if (el) el.hidden = false; }
+function hideFuzzyPill() { var el = $('gpsFuzzy'); if (el) el.hidden = true; }
+function noteFuzzyFix() {
+  if (!fuzzySince) fuzzySince = Date.now();
+  if (fuzzyTimer) return;
+  var ms = (typeof window !== 'undefined' && window.__FUZZY_DELAY_MS) || FUZZY_PILL_DELAY_MS;
+  fuzzyTimer = setTimeout(function () {
+    fuzzyTimer = null;
+    if (S.locTier === 3) showFuzzyPill();
+  }, ms);
+}
+function clearFuzzy() {
+  fuzzySince = 0;
+  if (fuzzyTimer) { clearTimeout(fuzzyTimer); fuzzyTimer = null; }
+  hideFuzzyPill();
+}
 function onPos(p) {
   var c = p.coords;
-  S.pos = {
+  var fix = {
     lat: c.latitude, lng: c.longitude,
     acc: c.accuracy || 30,
     heading: (c.heading != null && !isNaN(c.heading) && c.speed > 0.4) ? c.heading : (S.pos ? S.pos.heading : null),
     ts: Date.now()
   };
-  lastPosTs = S.pos.ts;
+  var tier = accTier(fix.acc);
+  S.locTier = tier;
   S.lastPos = p;
+  if (tier === 1) {
+    bestTrustedFix = fix;
+    S.posTrusted = true;
+    clearFuzzy();
+    S.pos = fix; lastPosTs = fix.ts;
+    renderMe();
+    recSample();
+    if (S.nav) navOnPos();
+    return;
+  }
+  if (tier === 2) {
+    S.posTrusted = false;
+    clearFuzzy();
+    S.pos = fix; lastPosTs = fix.ts;
+    renderMe();
+    if (S.nav) navOnPos();
+    return;
+  }
+  /* tier 3: coarse. Hold the trusted fix while it is fresh. */
+  noteFuzzyFix();
+  if (bestTrustedFix && (Date.now() - bestTrustedFix.ts) < 60000) {
+    S.posTrusted = true;
+    S.pos = bestTrustedFix;
+    renderMe();
+    if (S.nav) navOnPos();
+    return;
+  }
+  S.posTrusted = false;
+  S.pos = fix; lastPosTs = fix.ts;
   renderMe();
-  recSample();
-  if (S.nav) navOnPos();
-  else if (S.follow && !S.route) { /* gentle follow pre-route only when user asked */ }
 }
 var posErrShown = false;
 function onPosErr(e) {
@@ -1584,9 +1654,16 @@ $('fabLocate').addEventListener('click', function () {
 
 /* ---------------- start point ---------------- */
 var homeMarker = null;
+function startIsCustom() { return !!(S.start && S.start.label !== 'My location'); }
+function paintHomeRow() {
+  var lbl = $('homeRowLabel'), btn = $('homeRowBtn');
+  if (!lbl || !btn) return;
+  if (startIsCustom()) { lbl.textContent = 'Start & end: Custom pin · Drag on map'; btn.textContent = 'Use GPS'; }
+  else { lbl.textContent = 'Start & end: My GPS location'; btn.textContent = 'Set on map'; }
+}
 function renderStart() {
   if (homeMarker) { map.removeLayer(homeMarker); homeMarker = null; }
-  var srow = $('startRow'); if (srow) srow.hidden = !S.start;
+  paintHomeRow();
   if (S.start) {
     homeMarker = L.marker([S.start.lat, S.start.lng], {
       icon: L.divIcon({ className: 'homeicon', iconSize: [42, 42], iconAnchor: [21, 38], html: '<div class="tdh"><svg viewBox="0 0 24 24"><path d="M4 11.2 12 4l8 7.2"/><path d="M6.2 9.8V20h11.6V9.8"/></svg></div>' }),
@@ -1607,9 +1684,6 @@ function renderStart() {
       setStart(ll.lat, ll.lng, 'Dropped pin', false);
       toast('Start moved.', 'ok');
     });
-    $('startInfo').innerHTML = 'Start set' + (S.start.label ? ': <b>' + esc(S.start.label) + '</b>' : '') + '. Your loop ends back here.';
-  } else {
-    $('startInfo').textContent = 'No start yet. Tip: long-press the map to drop your start.';
   }
 }
 function clearStart() {
@@ -1624,7 +1698,15 @@ function setStart(lat, lng, label, fly) {
   renderStart();
   if (fly) map.flyTo([lat, lng], Math.max(map.getZoom(), 16), { duration: 0.6 });
 }
-$('btnClearStart').addEventListener('click', function () { clearStart(); });
+$('homeRowBtn').addEventListener('click', function () {
+  if (startIsCustom()) {
+    var p = S.pos;
+    S.start = null; store.set('start', null);
+    if (p) setStart(p.lat, p.lng, 'My location', false); else renderStart();
+  } else {
+    enterPick('start', 'Tap the map to drop your start');
+  }
+});
 $('btnLocate').addEventListener('click', function () {
   ensureWatch();
   showBusy('Finding you…', 'GPS can take a few seconds outside.');
@@ -2521,8 +2603,21 @@ $('planToggle').addEventListener('click', function () {
 });
 
 function buildRoute() {
-  if (!S.start) { toast('Set your start first: use your location, drop a pin, or search.', 'warn'); return; }
   if (S.nav) return;
+  /* v6.5 location honesty: never build from a coarse (tier 3) fix with
+     no custom pin. Drop a draggable start pin at the map center and
+     let the user place it on their block instead. */
+  if (S.locTier === 3 && !startIsCustom()) {
+    var ctr = null;
+    try { ctr = map.getCenter ? map.getCenter() : null; } catch (e) {}
+    if (!ctr && S.pos) ctr = { lat: S.pos.lat, lng: S.pos.lng };
+    if (ctr) {
+      setStart(ctr.lat, ctr.lng, 'Dropped pin', false);
+      showDlg('Weak GPS signal', 'GPS is fuzzy indoors — drag your Start pin to your block', [{ label: 'Got it', cls: 'btn-org' }]);
+      return;
+    }
+  }
+  if (!S.start) { toast('Set your start first: use your location, drop a pin, or search.', 'warn'); return; }
   var seq = ++BUILD_SEQ;
   showBusy('Building your candy route…', 'Scoring the densest streets near you.');
   var start = S.start, budgetSec = S.budget * 60;
@@ -3302,7 +3397,7 @@ function navOnPos() {
     speak('In ' + fmtDist(d) + ', ' + target.text);
   }
   /* stop arrival: auto check-off, count it, buzz, announce the place */
-  if (nav.stopIdx < nav.stops.length) {
+  if (S.posTrusted && nav.stopIdx < nav.stops.length) {
     var sd = haversine(pos, nav.stops[nav.stopIdx]);
     var gpsAcc = (S.lastPos && S.lastPos.coords && S.lastPos.coords.accuracy) || 0;
     var arriveR = Math.min(90, Math.max(35, gpsAcc * 0.9));
@@ -3326,7 +3421,7 @@ function navOnPos() {
     }
   }
   /* advance maneuver */
-  if (d < 25) {
+  if (d < 25 && S.posTrusted) {
     if (target.type === 'arrive' || nav.stepIdx >= nav.steps.length - 1) { finishNav(); return; }
     nav.stepIdx++;
     var nt = nav.steps[nav.stepIdx];
@@ -3943,7 +4038,10 @@ function partyGenCode() {
   var words = ['PUMPKIN', 'GHOST', 'CANDY', 'WITCH', 'TREAT', 'MOON', 'SPOOKY', 'BOO'];
   return words[Math.floor(Math.random() * words.length)] + Math.floor(100 + Math.random() * 900);
 }
-var PARTY_COLORS = ['#f59e0b', '#38bdf8', '#4ade80', '#f472b6', '#a78bfa', '#facc15', '#f0abfc', '#bef264'];
+/* v6.5: lightness floor HSL L >= 62% so every color reads as a filled
+   silhouette on the dark puck. Lifted from the v6.4 pool: #f59e0b ->
+   #f8ba4f, #38bdf8 -> #4ce0ff, #4ade80 -> #69f0ae, #facc15 -> #ffd54f. */
+var PARTY_COLORS = ['#f8ba4f', '#4ce0ff', '#69f0ae', '#f472b6', '#a78bfa', '#ffd54f', '#f0abfc', '#bef264'];
 function partyColor(name) { var h = 0; for (var i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0; return PARTY_COLORS[h % PARTY_COLORS.length]; }
 function partyAge(ts) { var m = Math.max(0, Math.round((Date.now() - ts) / 60000)); return m < 1 ? 'just now' : (m + ' min ago'); }
 function partyPoll() {
@@ -3955,20 +4053,24 @@ function partyPoll() {
   var cj = JSON.stringify({ h: S.counts.houses, c: S.counts.candy });
   if (cj !== PARTY.lastCountJson) { PARTY.lastCountJson = cj; partyPost({ kind: 'count', houses: S.counts.houses, candy: S.counts.candy }); }
 }
-/* ---------- Party avatars (v6.4 phase 2, Argon spec) ----------
-   Eight walkers on the 24 grid, stroke currentColor 1.9, solid micro
-   accents for eyes/fangs, .avatar-detail lines hidden at small sizes. */
+/* ---------- Party avatars (v6.4 phase 2; v6.5 Phase 1 recolor) ----------
+   Eight walkers on the 24 grid. v6.5: filled silhouettes in the member
+   color (fill currentColor via .avatar-glyph); eyes/features are dark
+   cutouts (.av-cut, painted in the stage color), fine lines are dark
+   (.av-line) or silhouette-color strokes (.av-str), and bone is kept
+   only for tiny highlights (.av-bone: fangs, teeth). .avatar-detail
+   lines still hide at small sizes. */
 var AVATAR_ORDER = ['wisp', 'gourd', 'jinx', 'vesper', 'marrow', 'volt', 'hex', 'lazlo'];
 var AVATAR_NAMES = { wisp: 'Wisp', gourd: 'Gourd', jinx: 'Jinx', vesper: 'Vesper', marrow: 'Marrow', volt: 'Volt', hex: 'Hex', lazlo: 'Lazlo' };
 var AVATAR_BODY = {
-  wisp: '<path d="M6 19.5 L6 10.5 C6 6.2 8.8 3.5 12.5 3.5 C15.8 3.5 18 6.2 18 10.5 L18 19.5 C16.5 19.5 15.8 17.6 14.5 17.6 C13.2 17.6 13 20.2 12 20.2 C11 20.2 10.8 17.6 9.5 17.6 C8.2 17.6 7.5 19.5 6 19.5 Z"/><ellipse cx="10.2" cy="10.5" rx="1.1" ry="1.5" fill="currentColor" stroke="none"/><ellipse cx="14.2" cy="10.5" rx="1.1" ry="1.5" fill="currentColor" stroke="none"/><circle cx="12.2" cy="13.8" r="0.85" fill="currentColor" stroke="none"/>',
-  gourd: '<path d="M12 7 C9.5 6.5 3.5 7.5 3.5 13.8 C3.5 19.2 8.5 20.5 12 19.8 C15.5 20.5 20.5 19.2 20.5 13.8 C20.5 7.5 14.5 6.5 12 7 Z"/><path d="M12 7 C12 4.8 13.2 3.5 15 3.5"/><path class="avatar-detail" d="M8.2 15.8 C9.8 17.4 14.2 17.4 15.8 15.8"/><path d="M7.8 13 L9.4 10.4 L10.8 13 Z" fill="currentColor" stroke="none"/><path d="M13.2 13 L14.6 10.4 L16.2 13 Z" fill="currentColor" stroke="none"/>',
-  jinx: '<path d="M5.5 13.8 C5.5 17.8 8.3 20 12 20 C15.7 20 18.5 17.8 18.5 13.8 L18.5 5 L14.6 8.6 C13.8 8.3 12.9 8.2 12 8.2 C11.1 8.2 10.2 8.3 9.4 8.6 L5.5 5 Z"/><path class="avatar-detail" d="M2.5 13.2 L5.5 13.8 M2.8 16 L5.8 15.6 M21.5 13.2 L18.5 13.8 M21.2 16 L18.2 15.6"/><circle cx="9.3" cy="13.5" r="1.25" fill="currentColor" stroke="none"/><circle cx="14.7" cy="13.5" r="1.25" fill="currentColor" stroke="none"/><path d="M11.1 15.6 L12.9 15.6 L12 16.8 Z" fill="currentColor" stroke="none"/>',
-  vesper: '<path d="M12 8.8 L10.2 6 L9.2 9.2 C6.5 7.8 3.5 8.5 2 11.5 C4.6 11.6 5.8 13 6 15.2 C8 14 10 15 12 17.8 C14 15 16 14 18 15.2 C18.2 13 19.4 11.6 22 11.5 C20.5 8.5 17.5 7.8 14.8 9.2 L13.8 6 Z"/><circle cx="10.6" cy="11.8" r="0.95" fill="currentColor" stroke="none"/><circle cx="13.4" cy="11.8" r="0.95" fill="currentColor" stroke="none"/>',
-  marrow: '<path d="M8.5 17.2 L8.5 20.2 L15.5 20.2 L15.5 17.2 C18 16 19.5 13.6 19.5 10.8 C19.5 6.5 16.1 3.5 12 3.5 C7.9 3.5 4.5 6.5 4.5 10.8 C4.5 13.6 6 16 8.5 17.2 Z"/><path class="avatar-detail" d="M10.8 17.8 L10.8 20.2 M13.2 17.8 L13.2 20.2"/><circle cx="9.2" cy="11.2" r="1.55" fill="currentColor" stroke="none"/><circle cx="14.8" cy="11.2" r="1.55" fill="currentColor" stroke="none"/><path d="M11.1 14.8 L12.9 14.8 L12 13.1 Z" fill="currentColor" stroke="none"/>',
-  volt: '<path d="M6.5 4 L17.5 4 L17 17 C17 19.2 15 20.5 12 20.5 C9 20.5 7 19.2 7 17 Z"/><path class="avatar-detail" d="M6.6 8.2 L9.5 9.2 L11.5 7.6 L13.8 9.2 L17.4 8.2 M10 17.2 L14 17.2"/><path d="M6.8 14.5 L3 14.5 M3 12.8 L3 16.2 M17.2 14.5 L21 14.5 M21 12.8 L21 16.2"/><circle cx="9.6" cy="12.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="14.4" cy="12.5" r="1.2" fill="currentColor" stroke="none"/>',
-  hex: '<path d="M7 13.5 L10.5 5.2 C11.1 3.8 12.6 3.3 14.2 4 L17.8 5.8 L14.5 7.5 L17 13.5"/><path d="M3 13.8 C8.5 12.2 15.5 12.2 21 13.8"/><path d="M7.5 14 C7.5 18.2 9.4 20.5 12 20.5 C14.6 20.5 16.5 18.2 16.5 14"/><circle cx="10" cy="16.5" r="1.15" fill="currentColor" stroke="none"/><circle cx="14" cy="16.5" r="1.15" fill="currentColor" stroke="none"/>',
-  lazlo: '<path d="M7.2 10.5 L3.5 8.5 L6.5 16.5 L12 20.5 L17.5 16.5 L20.5 8.5 L16.8 10.5"/><path d="M7.2 11.5 C7.2 7.2 9.2 4.2 12 5.8 C14.8 4.2 16.8 7.2 16.8 11.5 C16.8 14.8 14.8 16.8 12 16.8 C9.2 16.8 7.2 14.8 7.2 11.5 Z"/><circle cx="10" cy="11.2" r="1.1" fill="currentColor" stroke="none"/><circle cx="14" cy="11.2" r="1.1" fill="currentColor" stroke="none"/><path d="M9.8 14.2 L10.6 15.6 L11.4 14.2 Z" fill="currentColor" stroke="none"/><path d="M12.6 14.2 L13.4 15.6 L14.2 14.2 Z" fill="currentColor" stroke="none"/>'
+  wisp: '<path d="M6 19.5 L6 10.5 C6 6.2 8.8 3.5 12.5 3.5 C15.8 3.5 18 6.2 18 10.5 L18 19.5 C16.5 19.5 15.8 17.6 14.5 17.6 C13.2 17.6 13 20.2 12 20.2 C11 20.2 10.8 17.6 9.5 17.6 C8.2 17.6 7.5 19.5 6 19.5 Z"/><ellipse class="av-cut" cx="10.2" cy="10.5" rx="1.1" ry="1.5"/><ellipse class="av-cut" cx="14.2" cy="10.5" rx="1.1" ry="1.5"/><circle class="av-cut" cx="12.2" cy="13.8" r="0.85"/>',
+  gourd: '<path d="M12 7 C9.5 6.5 3.5 7.5 3.5 13.8 C3.5 19.2 8.5 20.5 12 19.8 C15.5 20.5 20.5 19.2 20.5 13.8 C20.5 7.5 14.5 6.5 12 7 Z"/><path d="M11.3 7.1 C11.2 4.9 12.5 3.2 15.2 3.1 C13.9 4.2 13.4 5.5 13.7 7.2 C12.9 6.9 12.1 6.9 11.3 7.1 Z"/><path class="av-cut" d="M7.8 13 L9.4 10.4 L10.8 13 Z"/><path class="av-cut" d="M13.2 13 L14.6 10.4 L16.2 13 Z"/><path class="av-cut" d="M8 15.4 C9.8 17.4 14.2 17.4 16 15.4 C15 18.6 9 18.6 8 15.4 Z"/><path class="avatar-detail av-line" d="M8.6 8.6 C7.6 11 7.6 16.6 8.6 18.6 M15.4 8.6 C16.4 11 16.4 16.6 15.4 18.6"/>',
+  jinx: '<path d="M5.5 13.8 C5.5 17.8 8.3 20 12 20 C15.7 20 18.5 17.8 18.5 13.8 L18.5 5 L14.6 8.6 C13.8 8.3 12.9 8.2 12 8.2 C11.1 8.2 10.2 8.3 9.4 8.6 L5.5 5 Z"/><path class="avatar-detail av-str" d="M2.5 13.2 L5.5 13.8 M2.8 16 L5.8 15.6 M21.5 13.2 L18.5 13.8 M21.2 16 L18.2 15.6"/><circle class="av-cut" cx="9.3" cy="13.5" r="1.25"/><circle class="av-cut" cx="14.7" cy="13.5" r="1.25"/><path class="av-cut" d="M11.1 15.6 L12.9 15.6 L12 16.8 Z"/>',
+  vesper: '<path d="M12 8.8 L10.2 6 L9.2 9.2 C6.5 7.8 3.5 8.5 2 11.5 C4.6 11.6 5.8 13 6 15.2 C8 14 10 15 12 17.8 C14 15 16 14 18 15.2 C18.2 13 19.4 11.6 22 11.5 C20.5 8.5 17.5 7.8 14.8 9.2 L13.8 6 Z"/><circle class="av-cut" cx="10.6" cy="11.8" r="0.95"/><circle class="av-cut" cx="13.4" cy="11.8" r="0.95"/><path class="av-bone" d="M10.8 13.4 L11.6 13.4 L11.2 14.4 Z"/><path class="av-bone" d="M12.4 13.4 L13.2 13.4 L12.8 14.4 Z"/>',
+  marrow: '<path d="M8.5 17.2 L8.5 20.2 L15.5 20.2 L15.5 17.2 C18 16 19.5 13.6 19.5 10.8 C19.5 6.5 16.1 3.5 12 3.5 C7.9 3.5 4.5 6.5 4.5 10.8 C4.5 13.6 6 16 8.5 17.2 Z"/><ellipse class="av-cut" cx="9.2" cy="11.2" rx="1.55" ry="1.75"/><ellipse class="av-cut" cx="14.8" cy="11.2" rx="1.55" ry="1.75"/><path class="av-cut" d="M11.1 14.8 L12.9 14.8 L12 13.1 Z"/><path class="av-line" d="M10.8 17.6 L10.8 20 M13.2 17.6 L13.2 20"/>',
+  volt: '<path d="M6.5 4 L17.5 4 L17 17 C17 19.2 15 20.5 12 20.5 C9 20.5 7 19.2 7 17 Z"/><path d="M2.8 13.4 L7 13.4 L7 16 L2.8 16 Z"/><path d="M17 13.4 L21.2 13.4 L21.2 16 L17 16 Z"/><path class="av-cut" d="M6.6 4.2 L17.4 4.2 L17.3 8.2 L13.9 7 L11.6 8.6 L9.6 7 L6.8 8.2 Z"/><circle class="av-cut" cx="9.6" cy="12.5" r="1.2"/><circle class="av-cut" cx="14.4" cy="12.5" r="1.2"/><path class="av-line" d="M10 17.2 L14 17.2"/>',
+  hex: '<path d="M7.5 14 L16.5 14 C16.5 18.2 14.6 20.5 12 20.5 C9.4 20.5 7.5 18.2 7.5 14 Z"/><path d="M7 13.6 L10.5 5.2 C11.1 3.8 12.6 3.3 14.2 4 L17.8 5.8 L14.6 7.6 L17.2 13.6 Z"/><path d="M3 13.9 C8.5 12.3 15.5 12.3 21 13.9 L21 15.1 C15.5 13.7 8.5 13.7 3 15.1 Z"/><circle class="av-cut" cx="10" cy="16.8" r="1.15"/><circle class="av-cut" cx="14" cy="16.8" r="1.15"/>',
+  lazlo: '<path d="M7.2 10.5 L3.5 8.5 L6.5 16.5 L12 20.5 L17.5 16.5 L20.5 8.5 L16.8 10.5 Z"/><path d="M7.2 11.5 C7.2 7.2 9.2 4.2 12 5.8 C14.8 4.2 16.8 7.2 16.8 11.5 C16.8 14.8 14.8 16.8 12 16.8 C9.2 16.8 7.2 14.8 7.2 11.5 Z"/><circle class="av-cut" cx="10" cy="11.2" r="1.1"/><circle class="av-cut" cx="14" cy="11.2" r="1.1"/><path class="av-bone" d="M9.8 14.2 L10.6 15.6 L11.4 14.2 Z"/><path class="av-bone" d="M12.6 14.2 L13.4 15.6 L14.2 14.2 Z"/>'
 };
 function avatarSvg(id) {
   if (!AVATAR_BODY[id]) return '';
@@ -4214,16 +4316,16 @@ function rosterHtml() {
     var right = c ? ((c.houses || 0) + ' houses · ' + (c.candy || 0) + ' candies') : 'on the map';
     var kick = (isAdmin && n !== PARTY.name) ? ' <button class="btn btn-ghost btn-sm partyKick" data-name="' + esc(n) + '">Kick</button>' : '';
     var meta = partyMetaFor(n);
-    var av = meta.avatar ? '<span class="roster-av" style="border-color:' + meta.color + '">' + avatarSvg(meta.avatar) + '</span>' : '';
+    var av = meta.avatar ? '<span class="roster-av" style="border-color:' + meta.color + ';color:' + meta.color + '">' + avatarSvg(meta.avatar) + '</span>' : '';
     var idBtn = (n === PARTY.name) ? ' <button class="btn btn-ghost btn-sm partyIdentityBtn" type="button">Walker</button>' : '';
     return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:2px 0"><span>' + av + esc(n) + (n === PARTY.name && isAdmin ? ' (host)' : '') + '</span><span class="muted">' + right + kick + idBtn + '</span></div>';
   }).join('');
 }
 /* Walker picker (join sheet) + identity popover (mid-party changes). */
-function walkerTilesHtml(selected, taken) {
+function walkerTilesHtml(selected, taken, colorCss) {
   return AVATAR_ORDER.map(function (id) {
     var by = taken && taken[id];
-    return '<button type="button" class="walker-tile' + (by ? ' taken' : '') + '" data-avatar="' + id + '" aria-pressed="' + String(selected === id) + '" aria-label="' + AVATAR_NAMES[id] + (by ? ', taken by ' + esc(by) : '') + '">' + avatarSvg(id) +
+    return '<button type="button" class="walker-tile' + (by ? ' taken' : '') + '" data-avatar="' + id + '" aria-pressed="' + String(selected === id) + '" aria-label="' + AVATAR_NAMES[id] + (by ? ', taken by ' + esc(by) : '') + '"' + (colorCss ? ' style="color:' + colorCss + '"' : '') + '>' + avatarSvg(id) +
       (by ? '<span class="walker-claim"><i style="background:' + partyMetaFor(by).color + '"></i>' + esc(String(by).slice(0, 4).toUpperCase()) + '</span>' : '') + '</button>';
   }).join('');
 }
@@ -4241,7 +4343,7 @@ function paintPartyDraft() {
   var col = PARTY.colorDraft || partyColor(nm === 'You' ? '' : nm);
   pv.innerHTML = '<div class="puck puck-lg" style="--pc:' + col + '">' + avatarSvg(PARTY.avatarDraft) + '</div>';
   cr.innerHTML = colorsHtml(col);
-  gr.innerHTML = walkerTilesHtml(PARTY.avatarDraft, {});
+  gr.innerHTML = walkerTilesHtml(PARTY.avatarDraft, {}, col);
   cr.querySelectorAll('.cdot').forEach(function (b) { b.addEventListener('click', function () { PARTY.colorDraft = b.getAttribute('data-color'); paintPartyDraft(); }); });
   gr.querySelectorAll('.walker-tile').forEach(function (b) { b.addEventListener('click', function () { PARTY.avatarDraft = b.getAttribute('data-avatar'); PARTY.avatarExplicit = true; paintPartyDraft(); }); });
 }
@@ -4258,7 +4360,7 @@ function paintIdentity() {
   var col = PARTY.color || partyColor(PARTY.name);
   pv.innerHTML = '<div class="puck puck-lg" style="--pc:' + col + '">' + (PARTY.avatar ? avatarSvg(PARTY.avatar) : '<span class="puck-ini">' + esc(partyInitials(PARTY.name)) + '</span>') + '</div>';
   cr.innerHTML = colorsHtml(col);
-  gr.innerHTML = walkerTilesHtml(PARTY.avatar, partyTakenMap(PARTY.name));
+  gr.innerHTML = walkerTilesHtml(PARTY.avatar, partyTakenMap(PARTY.name), col);
   cr.querySelectorAll('.cdot').forEach(function (b) { b.addEventListener('click', function () { PARTY.color = b.getAttribute('data-color'); partyIdentitySaved(); paintIdentity(); }); });
   gr.querySelectorAll('.walker-tile').forEach(function (b) {
     b.addEventListener('click', function () {
@@ -5078,7 +5180,7 @@ function chatHtml() {
   return PARTY.chat.slice(-8).map(function (r) {
     var when = new Date(r.created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
     var cm = partyMetaFor(r.name);
-    var av = cm.avatar ? '<span class="chat-av" style="border-color:' + cm.color + '">' + avatarSvg(cm.avatar) + '</span>' : '';
+    var av = cm.avatar ? '<span class="chat-av" style="border-color:' + cm.color + ';color:' + cm.color + '">' + avatarSvg(cm.avatar) + '</span>' : '';
     return '<div style="font-size:13px;padding:2px 0">' + av + '<b>' + esc(r.name) + '</b> <span class="muted">' + when + '</span><br>' + esc(r.msg || '') + '</div>';
   }).join('');
 }
@@ -5107,6 +5209,13 @@ function updatePeek() {
     pk.textContent = S._routePeek || 'Tap to plan your route';
   }
 }
+/* v6.5 Phase 1: deterministic sheet height per tab. A tab switch never
+   inherits whatever snap the previous tab left behind. Route keeps its
+   existing behavior while a nav is running (the nav UI owns the sheet). */
+function tabEntrySnap(name) {
+  if (name === 'route' && S.nav) return;
+  applySnap('half');
+}
 function switchTab(name) {
   S.sheetTab = name;
   $$('#sheetTabs button').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-tab') === name)); });
@@ -5121,12 +5230,17 @@ function switchTab(name) {
     else hideHaulTrail();
   } catch (e) { console.error('tab render failed', e); }
   updatePeek();
+  tabEntrySnap(name);
 }
 $$('#sheetTabs button').forEach(function (b) {
-  b.addEventListener('click', function () {
-    switchTab(b.getAttribute('data-tab'));
-    if (sheetSnap === 'peek') applySnap(lastSnap);
-  });
+  b.addEventListener('click', function () { switchTab(b.getAttribute('data-tab')); });
+});
+/* v6.5 Phase 1: while joining (not yet in a party), focusing the name
+   or code field raises the sheet to full so the keyboard never covers
+   the form. Delegated: renderPartyBox rebuilds these inputs per render. */
+$('partyBox').addEventListener('focusin', function (e) {
+  if (partyOn() || !e.target) return;
+  if ((e.target.id === 'partyName' || e.target.id === 'partyCode') && sheetSnap !== 'full') applySnap('full');
 });
 /* Photo viewer (v6.4 phase 2): one overlay surface, closed by the
    Argon overlay-mode close component, a backdrop tap, or swipe. */
@@ -5239,7 +5353,7 @@ updatePeek();
 /* v6.4.1 boot self-check marker: the shell's checker script verifies this
    was set. If boot died anywhere above, the repair overlay appears instead
    of a silently half-dead app. */
-window.__ctBootOK = '6.4.1';
+window.__ctBootOK = '6.5';
 
 </script>
 <script>
