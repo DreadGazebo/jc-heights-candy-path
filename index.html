@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0A16">
-<meta name="version" content="7.1">
+<meta name="version" content="7.2">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -248,10 +248,11 @@ body.kid #fabSpot{display:none}
 .haul .js-undo{font-size:20px;padding:0}
 .bump{animation:bump .25s}
 @keyframes bump{50%{transform:scale(1.08)}}
-.heroNums{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
-.heroNum{background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:10px 6px;text-align:center}
-.heroNum b{display:block;font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:34px;line-height:1.05;color:var(--org2);font-variant-numeric:tabular-nums}
-.heroNum span{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.statpanel{margin-top:14px;background:var(--bg2);border:1px solid var(--line);border-radius:16px;display:grid;grid-template-columns:1fr 1fr 1fr}
+.statcell{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px 4px;text-align:center;min-height:78px}
+.statcell + .statcell{border-left:1px solid var(--line)}
+.statcell b{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:28px;line-height:1.05;color:var(--bone);font-variant-numeric:tabular-nums}
+.statcell span{font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--mut)}
 .pinrow{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--line);padding:8px 2px;color:var(--txt);font-size:14.5px;cursor:pointer}
 .pinrow .pinrow-ic{flex:none;width:34px;height:34px;position:relative}
 .pinrow .pinrow-ic .mk{transform:scale(.92);transform-origin:top left}
@@ -667,7 +668,6 @@ body.light .mk-regring{border-color:rgba(14,10,22,.45)}
 .chatmsg b{font-size:12.5px}
 .chatempty{color:var(--mut);font-size:13.5px;text-align:center;padding:8px}
 #shareBlock{margin-top:4px}
-#shareQr{display:block;width:168px;height:168px;margin:4px auto;border-radius:14px;background:#fff;padding:8px}
 
 /* ---------- search overlay ---------- */
 #searchPanel{position:fixed;z-index:1260;left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);top:calc(var(--sat) + 56px);padding:14px;max-height:calc(100dvh - 24px);overflow-y:auto}
@@ -893,10 +893,55 @@ body.is-recording #voiceChip{bottom:calc(var(--sab) + 268px)}
 .recdot{width:10px;height:10px;border-radius:50%;background:var(--org);flex:none;animation:recpulse 1.6s ease-in-out infinite}
 .recdot-sm{width:9px;height:9px;border-radius:50%;background:var(--org);display:inline-block;flex:none}
 @keyframes recpulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.78)}}
-#haulMode{color:var(--mut);font-size:13px;margin-top:2px}
-#haulPhotoRow{margin-top:12px}
-#haulPhotoAdd{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:48px}
-#haulPhotoBar label.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px}
+#haulPhotoBar{display:flex;gap:8px;margin-top:10px}
+#haulPhotoBar[hidden]{display:none}
+#haulPhotoBar .btn{flex:1;min-height:40px;font-size:14px;padding:6px 10px;position:relative}
+#haulPhotoBar .btn::after{content:"";position:absolute;left:0;right:0;top:-4px;bottom:-4px}
+/* ---------- v7.2 Fix 16: haul pane + summary redesign ---------- */
+.haul-hdr{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:36px;margin-top:2px}
+.haul-hdr .hh-t{font-size:18px;font-weight:600;color:var(--bone);display:flex;align-items:baseline;gap:7px;min-width:0}
+#haulMode{color:var(--mut);font-size:13px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.haul-hdr .hh-acts{display:flex;gap:8px;flex:none}
+.icobtn{position:relative;width:32px;height:32px;border-radius:999px;background:var(--bg2);border:1px solid var(--line);color:var(--bone);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none;font-family:inherit}
+.icobtn::after{content:"";position:absolute;inset:-8px}
+.icobtn svg{width:17px;height:17px}
+.icobtn.sm{width:28px;height:28px}
+.icobtn.sm::after{inset:-10px}
+.icobtn.sm svg{width:15px;height:15px}
+.icobtn.v{background:var(--pur);border-color:var(--pur);color:var(--ink)}
+.icobtn:active{transform:scale(.94)}
+.logrow{display:flex;gap:8px;margin-top:12px}
+.logrow .js-house{flex:1;height:40px;min-height:40px;padding:0 14px;font-size:14px;font-weight:600;border-radius:12px;position:relative;background:var(--pur);border-color:var(--pur);color:var(--ink)}
+.logrow .js-house::after{content:"";position:absolute;left:0;right:0;top:-4px;bottom:-4px}
+.logrow .js-undo{width:40px;height:40px;min-height:40px;padding:0;border-radius:12px;position:relative;flex:none;font-size:20px}
+.logrow .js-undo::after{content:"";position:absolute;inset:-4px}
+body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFDF8}
+.pins-hdr{display:flex;align-items:center;justify-content:space-between;min-height:28px;margin-top:18px}
+.pins-hdr .label{margin:0}
+.pins-hdr .acts{display:flex;gap:8px}
+#btnSummary{width:100%;height:40px;min-height:40px;margin-top:14px;font-size:15px;border-radius:12px;position:relative}
+#btnSummary::after{content:"";position:absolute;left:0;right:0;top:-4px;bottom:-4px}
+.sumhdr{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;text-align:left}
+.sumhdr .tt{display:flex;gap:10px;align-items:flex-start;min-width:0}
+.sumhdr .moondisc{width:34px;height:34px;border-radius:999px;background:rgba(255,122,26,.16);color:var(--emb);display:flex;align-items:center;justify-content:center;flex:none}
+.sumhdr .moondisc svg{width:19px;height:19px}
+#summary .sumhdr h2{font-size:22px;margin:0;line-height:1.1;text-align:left}
+#sumSub{color:var(--mut);font-size:13px;margin-top:3px;text-align:left}
+.sumhdr .acts{display:flex;gap:8px;align-items:center;flex:none}
+#btnSumShareIcon{width:36px;height:36px}
+#btnSumShareIcon::after{inset:-6px}
+#btnSumShareIcon svg{width:19px;height:19px}
+.sumseg{display:flex;background:var(--bg2);border:1px solid var(--line);border-radius:999px;padding:2px;height:28px;align-items:center}
+.sumseg[hidden]{display:none}
+.sumseg button{border:0;background:transparent;color:var(--mut);font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:999px;font-family:inherit;cursor:pointer;height:22px;display:flex;align-items:center}
+.sumseg button.on{background:var(--pur);color:var(--ink)}
+.recap{margin-top:14px;background:var(--bg2);border:1px solid var(--line);border-top:2px solid var(--emb);border-radius:16px;overflow:hidden;text-align:left}
+.recap .statpanel{margin:0;border:0;border-radius:0;background:transparent}
+.sumfun{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px 12px}
+#sumExtra{font-family:"Fraunces",Georgia,serif;font-style:italic;font-size:15px;color:var(--bone);margin:0;flex:1}
+.sumnav{display:flex;gap:12px;margin-top:14px}
+.sumnav .btn{flex:1;height:40px;min-height:40px;font-size:14px;border-radius:12px;position:relative;padding:0 10px}
+.sumnav .btn::after{content:"";position:absolute;left:0;right:0;top:-4px;bottom:-4px}
 /* ---------- v6.6 Phase 4A fix 11: Unified Loop Bar ---------- */
 #loopBar{margin:2px 0 10px}
 .loop-meta{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:.09em;color:var(--mut)}
@@ -981,7 +1026,7 @@ body.is-recording #voiceChip{bottom:calc(var(--sab) + 268px)}
 <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
 <symbol id="i-route" viewBox="0 0 24 24"><circle cx="5.5" cy="18.5" r="2.4"/><circle cx="18.5" cy="5.5" r="2.4"/><path d="M5.5 16V9.5A2.5 2.5 0 0 1 8 7h8"/></symbol>
 <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11.2 12 4l8 7.2"/><path d="M6.2 9.8V20h11.6V9.8"/></symbol>
-<symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V3.5M8 6.5 12 3l4 3.5"/><path d="M5 12.5v7a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19.5v-7"/></symbol>
+<symbol id="i-share" viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.6"/><circle cx="17.5" cy="5.5" r="2.6"/><circle cx="17.5" cy="18.5" r="2.6"/><path d="M8.3 10.8l6.9-4M8.3 13.2l6.9 4"/></symbol>
 <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M8 11.5l4 4 4-4"/><path d="M5 19.5h14"/></symbol>
 <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5Z"/></symbol>
 <symbol id="i-smile" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M8.6 14.4c.9 1.5 2 2.2 3.4 2.2s2.5-.7 3.4-2.2"/><path d="M9 9.6h.01M15 9.6h.01"/></symbol>
@@ -1174,7 +1219,7 @@ body.is-recording #voiceChip{bottom:calc(var(--sab) + 268px)}
       </div>
       <div class="sheetfoot">
         <div class="wm">Candy Trail</div>
-        <div class="ver" id="appVer">Candy Trail v7.1</div>
+        <div class="ver" id="appVer">Candy Trail v7.2</div>
       </div>
     </div>
 
@@ -1212,15 +1257,20 @@ body.is-recording #voiceChip{bottom:calc(var(--sab) + 268px)}
     </div>
 
     <div id="tabHaul" role="tabpanel" hidden>
-      <div class="label" style="margin-top:2px">Tonight's haul</div>
-      <div id="haulMode" hidden></div>
-      <div class="heroNums">
-        <div class="heroNum" id="haulHousesCard"><b id="haulHouses">0</b><span>houses visited</span></div>
-        <div class="heroNum"><b id="haulDist">0.0 mi</b><span>tonight's walk</span></div>
-        <div class="heroNum"><b id="haulTime">0 min</b><span>out tonight</span></div>
+      <div class="haul-hdr">
+        <div class="hh-t">Tonight's haul <span id="haulMode" hidden></span></div>
+        <div class="hh-acts">
+          <button id="btnHaulKid" class="icobtn" type="button" aria-label="Kid view"><svg class="ic" viewBox="0 0 24 24"><use href="#i-smile"/></svg></button>
+          <button id="btnHaulShare" class="icobtn" type="button" aria-label="Share tonight's card"><svg class="ic" viewBox="0 0 24 24"><use href="#i-share"/></svg></button>
+        </div>
       </div>
-      <div class="haul">
-        <button class="btn js-house" type="button"><b class="js-house-count">0</b><span><svg class="ic" viewBox="0 0 24 24"><use href="#i-home"/></svg>House visited</span></button>
+      <div class="statpanel">
+        <div class="statcell" id="haulHousesCard"><b id="haulHouses">0</b><span>houses visited</span></div>
+        <div class="statcell"><b id="haulDist">0.0 mi</b><span>tonight's walk</span></div>
+        <div class="statcell"><b id="haulTime">0 min</b><span>out tonight</span></div>
+      </div>
+      <div class="logrow">
+        <button class="btn js-house" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-plus"/></svg>Log house</button>
         <button class="btn js-undo" type="button" aria-label="Undo last count"><svg class="ic" viewBox="0 0 24 24"><use href="#i-undo"/></svg></button>
       </div>
       <div id="haulEmpty" class="empty">
@@ -1231,37 +1281,21 @@ body.is-recording #voiceChip{bottom:calc(var(--sab) + 268px)}
         <button id="btnEmptyRecord" class="btn btn-ghost btn-sm" type="button"><span class="recdot-sm"></span>Start a walk</button>
       </div>
       <div id="pinsWrap">
-        <div class="label">My spots</div>
-        <div id="pinsList"></div>
-      </div>
-      <div id="haulPhotoRow">
+        <div class="pins-hdr">
+          <span class="label">My spots</span>
+          <span class="acts">
+            <label class="icobtn sm" for="haulPhoto" role="button" aria-label="Add haul photo"><svg class="ic" viewBox="0 0 24 24"><use href="#i-camera"/></svg></label>
+            <button id="btnSpotsExport" class="icobtn sm" type="button" aria-label="Export my spots"><svg class="ic" viewBox="0 0 24 24"><use href="#i-download"/></svg></button>
+          </span>
+        </div>
         <input id="haulPhoto" type="file" accept="image/*" hidden>
-        <label id="haulPhotoAdd" class="btn btn-ghost" for="haulPhoto"><svg class="ic" viewBox="0 0 24 24"><use href="#i-camera"/></svg>Add haul photo</label>
-        <div id="haulPhotoBar" class="row2" hidden>
+        <div id="haulPhotoBar" hidden>
           <label class="btn btn-ghost" for="haulPhoto"><svg class="ic" viewBox="0 0 24 24"><use href="#i-camera"/></svg>Change photo</label>
           <button id="btnPhotoRemove" class="btn btn-ghost" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-trash"/></svg>Remove photo</button>
         </div>
+        <div id="pinsList"></div>
       </div>
-      <div class="row2" style="margin-top:12px">
-        <button id="btnKid" class="btn btn-pur" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-smile"/></svg>Kid view</button>
-        <button id="btnSummary" class="btn btn-org" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-moon"/></svg>End night &amp; see haul</button>
-      </div>
-      <button id="btnHaulCard" class="btn btn-ghost" type="button" style="width:100%;margin-bottom:10px"><svg class="ic" viewBox="0 0 24 24"><use href="#i-share"/></svg>Share tonight's card</button>
-      <div id="shareBox">
-        <div class="label">Share Candy Trail</div>
-        <img id="shareQr" alt="QR code for the Candy Trail app" width="168" height="168">
-        <div class="row2">
-          <button id="btnShareApp" class="btn" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-share"/></svg>Share the app</button>
-          <button id="btnCopyLink" class="btn btn-ghost" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-link"/></svg>Copy link</button>
-        </div>
-        <button id="btnHaulExport" class="btn btn-ghost" type="button" style="width:100%;margin-top:8px"><svg class="ic" viewBox="0 0 24 24"><use href="#i-download"/></svg>Export my spots</button>
-      </div>
-      <div id="regBox" hidden>
-        <div class="label">Your porch &amp; storefront</div>
-        <p class="muted" style="font-size:13.5px;line-height:1.45;margin:0">Places you claim show on the map before the night, with your treats, hours and flags, so families can plan around you.</p>
-        <div id="regMine"></div>
-        <button id="btnClaim" class="btn btn-org" type="button" style="width:100%;margin-top:10px"><svg class="ic" viewBox="0 0 24 24"><use href="#i-pin"/></svg>Claim your porch or storefront</button>
-      </div>
+      <button id="btnSummary" class="btn btn-org" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-moon"/></svg>End night</button>
     </div>
   </div>
 </div>
@@ -1292,10 +1326,16 @@ body.is-recording #voiceChip{bottom:calc(var(--sab) + 268px)}
   <button id="prefExport" class="pref-row" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-download"/></svg><span class="pl">Export my spots<small>Save tonight's pins as a file</small></span><svg class="ic chev" viewBox="0 0 24 24"><use href="#i-chev"/></svg></button>
   <div class="grp">Night</div>
   <button id="prefEndNight" class="pref-row" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-moon"/></svg><span class="pl">End night<small>See the haul card and share it</small></span><svg class="ic chev" viewBox="0 0 24 24"><use href="#i-chev"/></svg></button>
+  <div id="regBox" hidden>
+    <div class="grp">Your porch &amp; storefront</div>
+    <p class="muted" style="font-size:13.5px;line-height:1.45;margin:0">Places you claim show on the map before the night, with your treats, hours and flags, so families can plan around you.</p>
+    <div id="regMine"></div>
+    <button id="btnClaim" class="btn btn-org" type="button" style="width:100%;margin-top:10px"><svg class="ic" viewBox="0 0 24 24"><use href="#i-pin"/></svg>Claim your porch or storefront</button>
+  </div>
   <div class="prefs-foot">
     <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon-mono"/></svg>
     <div class="crest">Candy Trail</div>
-    <div class="ver">Version 7.1</div>
+    <div class="ver">Version 7.2</div>
   </div>
 </div>
 
@@ -1363,23 +1403,37 @@ body.is-recording #voiceChip{bottom:calc(var(--sab) + 268px)}
 
 <div id="summary" hidden>
   <div class="inner">
-    <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon"/></svg>
-    <h2>What a night!</h2>
-    <div class="muted" id="sumSub">Here's your haul.</div>
-    <div class="sgrid">
-      <div class="sbox"><b id="sumHouses">0</b><span>houses visited</span></div>
-      <div class="sbox"><b id="sumDist">0</b><span>walked</span></div>
-      <div class="sbox"><b id="sumTime">0</b><span>time out</span></div>
+    <div class="sumhdr">
+      <div class="tt">
+        <span class="moondisc"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-moon"/></svg></span>
+        <div>
+          <h2>What a night!</h2>
+          <div id="sumSub">Here's your haul.</div>
+        </div>
+      </div>
+      <div class="acts">
+        <span class="sumseg" id="sumSeg" hidden>
+          <button id="sumSegMe" type="button" class="on">Me</button>
+          <button id="sumSegParty" type="button">Party</button>
+        </span>
+        <button id="btnSumShareIcon" class="icobtn v" type="button" aria-label="Share my haul"><svg class="ic" viewBox="0 0 24 24"><use href="#i-share"/></svg></button>
+      </div>
     </div>
-    <p class="muted" id="sumExtra"></p>
-    <div class="btns">
-      <button id="btnSumShare" class="btn btn-pur btn-xl" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-share"/></svg>Share my haul</button>
-      <button id="btnSumParty" class="btn btn-ghost btn-xl" type="button" hidden><svg class="ic" viewBox="0 0 24 24"><use href="#i-users"/></svg>Share party recap</button>
-      <button id="btnSumNew" class="btn btn-org btn-xl" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-shuffle"/></svg>New route</button>
-      <button id="btnSumClose" class="btn btn-ghost btn-xl" type="button">Back to map</button>
+    <div class="recap">
+      <div class="statpanel">
+        <div class="statcell"><b id="sumHouses">0</b><span>houses visited</span></div>
+        <div class="statcell"><b id="sumDist">0</b><span>walked</span></div>
+        <div class="statcell"><b id="sumTime">0</b><span>time out</span></div>
+      </div>
+      <div class="sumfun">
+        <p id="sumExtra"></p>
+        <button id="btnSumPhoto" class="icobtn sm" type="button" aria-label="Add haul photo"><svg class="ic" viewBox="0 0 24 24"><use href="#i-camera"/></svg></button>
+      </div>
     </div>
-    <button id="btnSumExport" class="btn btn-ghost" type="button" style="width:100%;margin-top:8px"><svg class="ic" viewBox="0 0 24 24"><use href="#i-download"/></svg>Export tonight's spots (for next year's map)</button>
-    <p class="foot">Routes are estimates. Stay on sidewalks and cross at corners.</p>
+    <div class="sumnav">
+      <button id="btnSumClose" class="btn btn-ghost" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-home"/></svg>Back to map</button>
+      <button id="btnSumNew" class="btn btn-org" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-plus"/></svg>New route</button>
+    </div>
   </div>
 </div>
 
@@ -4628,12 +4682,17 @@ function openSummary() {
   if (S.counts.houses > 0)
     extra = S.counts.houses + (S.counts.houses === 1 ? ' house' : ' houses') + ' visited in one night. Efficient haunting!';
   $('sumExtra').textContent = extra;
-  var bpSum = $('btnSumParty'); if (bpSum) bpSum.hidden = !partyOn();
+  var seg = $('sumSeg'); if (seg) seg.hidden = !partyOn();
+  if (!partyOn()) sumShareKind = 'haul';
+  paintSumSeg();
+  paintSumPhoto();
   maybeSpotSharePrompt();
   $('summary').hidden = false;
+  candyBurst();
 }
 $('btnSummary').addEventListener('click', openSummary);
 function freshStart(collapseSheet) {
+  candyBurstStop();
   $('summary').hidden = true;
   S.counts = { candy: 0, houses: 0, hist: [], histLog: [] };
   store.set('counts', S.counts); renderCounts();
@@ -4650,6 +4709,103 @@ $('btnSumNew').addEventListener('click', function () {
   freshStart(false);
   toast('Fresh start. Set your start and build a new loop.', 'ok');
 });
+
+/* ---------- Summary share (v7.2 Fix 16): one icon, Me | Party segment ---------- */
+var sumShareKind = 'haul';
+function paintSumSeg() {
+  var me = $('sumSegMe'), pa = $('sumSegParty');
+  if (me) me.classList.toggle('on', sumShareKind !== 'party');
+  if (pa) pa.classList.toggle('on', sumShareKind === 'party');
+}
+$('btnSumShareIcon').addEventListener('click', function () { openShareSheet(sumShareKind === 'party' && partyOn() ? 'party' : 'haul'); });
+$('sumSegMe').addEventListener('click', function () { sumShareKind = 'haul'; paintSumSeg(); });
+$('sumSegParty').addEventListener('click', function () { sumShareKind = 'party'; paintSumSeg(); });
+$('btnSumPhoto').addEventListener('click', function () { var i = $('haulPhoto'); if (i) i.click(); });
+
+/* ---------- Candy burst (v7.2 Fix 16): one celebratory burst when the
+   night ends. Hand-rolled canvas particles (wrapped candies, lollipops,
+   round candies) in the brand + party palette; no library, no assets.
+   Reduced-motion safe; never stacks; dies with the summary. ---------- */
+var ctBurst = null; /* {cv, raf, last} while a burst is live */
+function candyBurstStop() {
+  if (!ctBurst) return;
+  cancelAnimationFrame(ctBurst.raf);
+  if (ctBurst.cv && ctBurst.cv.parentNode) ctBurst.cv.parentNode.removeChild(ctBurst.cv);
+  ctBurst = null;
+}
+function candyBurst() {
+  if (ctBurst) return; /* never stack a second canvas */
+  try { if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) {}
+  var W = window.innerWidth || 360, H = window.innerHeight || 640;
+  var cv = document.createElement('canvas');
+  cv.id = 'ctConfetti';
+  cv.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1600;';
+  document.body.appendChild(cv);
+  var g = null;
+  try { g = cv.getContext('2d'); } catch (e) { g = null; }
+  if (!g) { if (cv.parentNode) cv.parentNode.removeChild(cv); return; }
+  var dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  g.scale(dpr, dpr);
+  var COLORS = ['#FF7A1A', '#A78BFA', '#F5EFE6', '#F472B6', '#69F0AE'];
+  var N = W < 360 ? 70 : 110; /* 90-130 pieces; capped on small viewports */
+  var ox = W * 0.5, oy = H * 0.18; /* burst from the summary header */
+  var ps = [];
+  for (var i = 0; i < N; i++) {
+    var ang = (-90 + (Math.random() * 140 - 70)) * Math.PI / 180; /* up, fanned out */
+    var spd = 260 + Math.random() * 420;
+    ps.push({
+      x: ox + (Math.random() * 30 - 15), y: oy + (Math.random() * 14 - 7),
+      vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd,
+      rot: Math.random() * Math.PI * 2, vr: (Math.random() * 10 - 5),
+      s: 5 + Math.random() * 6, kind: i % 3, color: COLORS[i % COLORS.length],
+      ph: Math.random() * Math.PI * 2
+    });
+  }
+  var LIFE = 2200;
+  var t0 = (window.performance && performance.now) ? performance.now() : Date.now();
+  var state = { cv: cv, raf: 0, last: 0 };
+  ctBurst = state;
+  function frame(now) {
+    if (ctBurst !== state) return; /* stopped or replaced */
+    var el = now - t0;
+    if (el >= LIFE) { candyBurstStop(); return; }
+    var dt = Math.min(0.033, state.last ? (now - state.last) / 1000 : 0.016);
+    state.last = now;
+    var t = el / 1000;
+    var fade = el > LIFE - 500 ? (LIFE - el) / 500 : 1; /* fade the last 500ms */
+    g.clearRect(0, 0, W, H);
+    for (var j = 0; j < ps.length; j++) {
+      var p = ps[j];
+      p.vy += 620 * dt; /* gravity */
+      p.vx *= (1 - 0.6 * dt); p.vy *= (1 - 0.25 * dt); /* drag */
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      p.rot += p.vr * dt;
+      if (p.kind === 0) p.rot += Math.sin(t * 9 + p.ph) * 2.2 * dt; /* wrapped candies flutter */
+      g.save();
+      g.globalAlpha = Math.max(0, fade);
+      g.translate(p.x, p.y); g.rotate(p.rot);
+      g.fillStyle = p.color; g.strokeStyle = p.color;
+      var s = p.s;
+      if (p.kind === 0) { /* wrapped candy: ellipse body + two triangle twists */
+        g.beginPath(); g.moveTo(-s * 1.5, 0); g.lineTo(-s * 0.55, -s * 0.62); g.lineTo(-s * 0.55, s * 0.62); g.closePath(); g.fill();
+        g.beginPath(); g.moveTo(s * 1.5, 0); g.lineTo(s * 0.55, -s * 0.62); g.lineTo(s * 0.55, s * 0.62); g.closePath(); g.fill();
+        g.beginPath(); g.ellipse(0, 0, s * 0.72, s * 0.52, 0, 0, Math.PI * 2); g.fill();
+      } else if (p.kind === 1) { /* lollipop: circle on a stick */
+        g.lineWidth = Math.max(1.4, s * 0.18);
+        g.beginPath(); g.moveTo(0, s * 0.4); g.lineTo(0, s * 1.7); g.stroke();
+        g.beginPath(); g.arc(0, 0, s * 0.62, 0, Math.PI * 2); g.fill();
+      } else { /* round candy with an ink core */
+        g.beginPath(); g.arc(0, 0, s * 0.55, 0, Math.PI * 2); g.fill();
+        g.globalAlpha = Math.max(0, fade) * 0.55; g.fillStyle = '#0E0A16';
+        g.beginPath(); g.arc(0, 0, s * 0.26, 0, Math.PI * 2); g.fill();
+      }
+      g.restore();
+    }
+    state.raf = requestAnimationFrame(frame);
+  }
+  state.raf = requestAnimationFrame(frame);
+}
 
 /* ---------------- boot ---------------- */
 var DEEP_VIEW = null; /* v6.7 Phase 4B: parsed ?view= viewport, set in boot */
@@ -5913,21 +6069,13 @@ if (partyOn()) {
   map.on('dragstart', function () { done = true; clearInterval(iv); });
 })();
 
-/* ---------- Share the app (v5.2) ---------- */
+/* ---------- Share the app (v5.2; v7.2 Fix 16: named function, the
+   haul pane's QR share box is retired; Preferences calls this directly) ---------- */
 var APP_LINK = 'https://dreadgazebo.github.io/jc-heights-candy-path/';
-(function () {
-  var qr = $('shareQr');
-  if (qr) qr.src = 'https://api.qrserver.com/v1/create-qr-code/?size=208x208&margin=0&data=' + encodeURIComponent(APP_LINK);
-  var bs = $('btnShareApp');
-  if (bs) bs.addEventListener('click', function () {
-    if (navigator.share) navigator.share({ title: 'Candy Trail', text: 'Live trick-or-treat map: routes, crowd reports, and party mode.', url: mapShareUrl() }).catch(function () {});
-    else if (navigator.clipboard) navigator.clipboard.writeText(mapShareUrl()).then(function () { toast('Link copied.', 'ok'); });
-  });
-  var bc = $('btnCopyLink');
-  if (bc) bc.addEventListener('click', function () {
-    if (navigator.clipboard) navigator.clipboard.writeText(mapShareUrl()).then(function () { toast('Link copied.', 'ok'); });
-  });
-})();
+function shareAppLink() {
+  if (navigator.share) navigator.share({ title: 'Candy Trail', text: 'Live trick-or-treat map: routes, crowd reports, and party mode.', url: mapShareUrl() }).catch(function () {});
+  else if (navigator.clipboard) navigator.clipboard.writeText(mapShareUrl()).then(function () { toast('Link copied.', 'ok'); });
+}
 
 /* ---------- Service worker (v5.3 PWA) ---------- */
 if ('serviceWorker' in navigator) {
@@ -6274,9 +6422,10 @@ document.addEventListener('visibilitychange', function () {
    only when the device refuses the store). */
 var haulPhotoImg = null;
 function paintHaulPhoto() {
-  var add = $('haulPhotoAdd'); if (add) add.hidden = !!haulPhotoImg;
   var bar = $('haulPhotoBar'); if (bar) bar.hidden = !haulPhotoImg;
+  paintSumPhoto();
 }
+function paintSumPhoto() { var b = $('btnSumPhoto'); if (b) b.hidden = !!haulPhotoImg; }
 function setHaulPhoto(dataUrl, persist) {
   var img = new Image();
   img.onload = function () { haulPhotoImg = img; paintHaulPhoto(); };
@@ -6506,16 +6655,17 @@ function drawHaulCard(cb) {
   }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(go); else go();
 }
-$('btnSumShare').addEventListener('click', function () { openShareSheet('haul'); });
-$('btnSumParty').addEventListener('click', function () { openShareSheet('party'); });
-$('btnSumExport').addEventListener('click', function () {
+/* Spots export (v7.2 Fix 16: extracted from the old summary button;
+   the haul pane's My spots download icon and Preferences both call it). */
+function exportSpots() {
   var data = { exportedAt: new Date().toISOString(), app: 'Candy Trail', counts: { houses: S.counts.houses, candy: S.counts.candy }, pins: S.pins };
   var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob); a.download = 'candy-trail-spots-2026.json'; a.click();
   setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
   toast('Exported ' + S.pins.length + ' spots. Files like this seed next year’s built-in map.', 'ok');
-});
+}
+$('btnSpotsExport').addEventListener('click', exportSpots);
 
 /* ---------- Party host + kick (v5.6) ----------
    The device that created the party is its host (remembered locally).
@@ -6609,7 +6759,7 @@ function kidSet(on) {
     kidRender();
   } else if (typeof applyCrowdVis === 'function') applyCrowdVis();
 }
-$('btnKid').addEventListener('click', function () { kidSet(true); });
+$('btnHaulKid').addEventListener('click', function () { kidSet(true); });
 /* Kid exit is press-and-hold (2s) with a progress ring, so a kid cannot
    leave the big-button view with one stray tap. */
 (function () {
@@ -7715,10 +7865,9 @@ $('prefsScrim').addEventListener('click', closePrefs);
 $('photoViewClose').addEventListener('click', closePhotoView);
 $('photoView').addEventListener('click', function (e) { if (e.target === this) closePhotoView(); });
 $('prefKid').addEventListener('click', function () { closePrefs(); kidSet(true); });
-$('prefShare').addEventListener('click', function () { var b = $('btnShareApp'); if (b) b.click(); });
-$('prefExport').addEventListener('click', function () { var b = $('btnSumExport'); if (b) b.click(); });
+$('prefShare').addEventListener('click', function () { shareAppLink(); });
+$('prefExport').addEventListener('click', function () { exportSpots(); });
 $('prefEndNight').addEventListener('click', function () { closePrefs(); openSummary(); });
-$('btnHaulExport').addEventListener('click', function () { var b = $('btnSumExport'); if (b) b.click(); });
 $('btnEmptyLog').addEventListener('click', function () { $('fabSpot').click(); });
 renderPinsList();
 updatePeek();
@@ -8184,7 +8333,7 @@ $('shareSave').addEventListener('click', function () {
   else toast('Could not make the card on this browser.', 'err');
 });
 $('btnRouteCard').addEventListener('click', function () { openShareSheet('route'); });
-$('btnHaulCard').addEventListener('click', function () { openShareSheet('haul'); });
+$('btnHaulShare').addEventListener('click', function () { openShareSheet('haul'); });
 
 /* --- third marked spot: a one-time, gentle card offer ---
    The counter is lifetime and lives in the store. The third mark arms
@@ -9330,7 +9479,7 @@ paintChromeState();
 /* v6.4.1 boot self-check marker: the shell's checker script verifies this
    was set. If boot died anywhere above, the repair overlay appears instead
    of a silently half-dead app. */
-window.__ctBootOK = '7.1';
+window.__ctBootOK = '7.2';
 
 </script>
 <script>
