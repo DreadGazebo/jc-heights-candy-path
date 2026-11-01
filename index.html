@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0A16">
-<meta name="version" content="6.2">
+<meta name="version" content="6.3">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -565,6 +565,22 @@ body.has-route #routeEmpty{display:none}
 #fatal{display:grid;place-items:center}
 #fatal[hidden]{display:none}
 @media (min-width:760px){#btnResume{right:calc(var(--sar) + 472px)}}
+
+/* ---------- v6.3: record walk bar + haul photo ---------- */
+#recBar{position:fixed;z-index:1180;left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);bottom:calc(var(--bottomH,132px) + 8px);min-height:56px;display:flex;align-items:center;gap:10px;padding:6px 8px 6px 14px;background:var(--card);border:1px solid var(--line2);border-radius:16px;box-shadow:0 14px 34px rgba(0,0,0,.5)}
+#recBar[hidden]{display:none}
+#recBar .rectime{font-weight:700;font-variant-numeric:tabular-nums;font-size:16px;white-space:nowrap}
+#recBar .recdist{color:var(--mut);font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+#recConfirm{display:flex;gap:8px}
+#recConfirm[hidden]{display:none}
+.recdot{width:10px;height:10px;border-radius:50%;background:var(--org);flex:none;animation:recpulse 1.6s ease-in-out infinite}
+.recdot-sm{width:9px;height:9px;border-radius:50%;background:var(--org);display:inline-block;flex:none}
+@keyframes recpulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.78)}}
+body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
+#haulMode{color:var(--mut);font-size:13px;margin-top:2px}
+#haulPhotoRow{margin-top:12px}
+#haulPhotoAdd{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:48px}
+#haulPhotoBar label.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px}
 </style>
 </head>
 <body class="mode-plan">
@@ -650,6 +666,19 @@ body.has-route #routeEmpty{display:none}
   <button id="partyLeave" class="btn btn-ghost btn-sm" type="button">Leave</button>
 </div>
 
+<div id="recBar" hidden role="status">
+  <span class="recdot" aria-hidden="true"></span>
+  <span class="rectime" id="recTime">0:00</span>
+  <span class="recdist" id="recDist">0 ft</span>
+  <span style="flex:1"></span>
+  <button id="btnRecHouse" class="btn btn-pur btn-sm" type="button">+1 House</button>
+  <button id="btnRecFinish" class="btn btn-org btn-sm" type="button">End</button>
+  <span id="recConfirm" hidden>
+    <button id="btnRecFinishYes" class="btn btn-org btn-sm" type="button">End walk</button>
+    <button id="btnRecResume" class="btn btn-ghost btn-sm" type="button">Resume</button>
+  </span>
+</div>
+
 <div id="sheet" class="card snap-peek">
   <button id="sheetHandle" type="button" aria-label="Expand or collapse the panel"><i></i></button>
   <div id="sheetBrand">
@@ -687,6 +716,7 @@ body.has-route #routeEmpty{display:none}
         <button id="planToggle" class="btn btn-ghost route-only plan-edit" type="button" aria-expanded="false"><span id="planToggleText">Change start or time</span><span>&#9662;</span></button>
       </div>
       <div id="planInputs" class="plan-edit">
+        <button id="btnStart" class="btn btn-org btn-xl" type="button" style="width:100%;margin-bottom:12px"><svg class="ic" viewBox="0 0 24 24"><use href="#i-flag"/></svg>Start</button>
         <div class="label">Where do we start?</div>
         <div class="row2">
           <button id="btnLocate" class="btn btn-org" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-locate"/></svg>Use my location</button>
@@ -722,7 +752,7 @@ body.has-route #routeEmpty{display:none}
       </div>
       <div class="sheetfoot">
         <div class="wm">Candy Trail</div>
-        <div class="ver" id="appVer">Candy Trail v6.2</div>
+        <div class="ver" id="appVer">Candy Trail v6.3</div>
       </div>
     </div>
 
@@ -732,8 +762,9 @@ body.has-route #routeEmpty{display:none}
 
     <div id="tabHaul" role="tabpanel" hidden>
       <div class="label" style="margin-top:2px">Tonight's haul</div>
+      <div id="haulMode" hidden></div>
       <div class="heroNums">
-        <div class="heroNum"><b id="haulHouses">0</b><span>houses visited</span></div>
+        <div class="heroNum" id="haulHousesCard"><b id="haulHouses">0</b><span>houses visited</span></div>
         <div class="heroNum"><b id="haulCandy">0</b><span>candies</span></div>
         <div class="heroNum"><b id="haulDist">0.0 mi</b><span>tonight's walk</span></div>
         <div class="heroNum"><b id="haulTime">0 min</b><span>out tonight</span></div>
@@ -748,10 +779,19 @@ body.has-route #routeEmpty{display:none}
         <b>Nothing logged yet</b>
         <p>Tap the big + button on the map whenever a house gives out candy. Your haul builds here.</p>
         <button id="btnEmptyLog" class="btn btn-ghost btn-sm" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-plus"/></svg>Log your first stop</button>
+        <button id="btnEmptyRecord" class="btn btn-ghost btn-sm" type="button"><span class="recdot-sm"></span>Start a walk</button>
       </div>
       <div id="pinsWrap">
         <div class="label">My pins</div>
         <div id="pinsList"></div>
+      </div>
+      <div id="haulPhotoRow">
+        <input id="haulPhoto" type="file" accept="image/*" hidden>
+        <label id="haulPhotoAdd" class="btn btn-ghost" for="haulPhoto"><svg class="ic" viewBox="0 0 24 24"><use href="#i-camera"/></svg>Add haul photo</label>
+        <div id="haulPhotoBar" class="row2" hidden>
+          <label class="btn btn-ghost" for="haulPhoto"><svg class="ic" viewBox="0 0 24 24"><use href="#i-camera"/></svg>Change photo</label>
+          <button id="btnPhotoRemove" class="btn btn-ghost" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-trash"/></svg>Remove photo</button>
+        </div>
       </div>
       <div class="row2" style="margin-top:12px">
         <button id="btnKid" class="btn btn-pur" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-smile"/></svg>Kid view</button>
@@ -798,7 +838,7 @@ body.has-route #routeEmpty{display:none}
   <div class="prefs-foot">
     <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon-mono"/></svg>
     <div class="crest">Candy Trail</div>
-    <div class="ver">Version 6.0</div>
+    <div class="ver">Version 6.3</div>
   </div>
 </div>
 
@@ -1281,6 +1321,7 @@ function onPos(p) {
   lastPosTs = S.pos.ts;
   S.lastPos = p;
   renderMe();
+  recSample();
   if (S.nav) navOnPos();
   else if (S.follow && !S.route) { /* gentle follow pre-route only when user asked */ }
 }
@@ -1544,10 +1585,12 @@ function renderCounts(bumpEl) {
   $$('.js-house-count').forEach(function (e) { e.textContent = S.counts.houses; });
   var hh = $('haulHouses'); if (hh) hh.textContent = S.counts.houses;
   var hc = $('haulCandy'); if (hc) hc.textContent = S.counts.candy;
-  var ln2 = (S.nightTotals && S.nightTotals.trackDist > 0) ? S.nightTotals : (S.lastNav || { trackDist: 0, elapsedMs: 0 });
+  var ln2 = nightWalk();
   var hd = $('haulDist'); if (hd) hd.textContent = ln2.trackDist >= 160 ? (ln2.trackDist / M_PER_MI).toFixed(1) + ' mi' : Math.round(ln2.trackDist * 3.28084) + ' ft';
   var ht = $('haulTime'); if (ht) { var mn2 = Math.round(ln2.elapsedMs / 60000); ht.textContent = mn2 >= 60 ? Math.floor(mn2 / 60) + ' hr ' + (mn2 % 60) + ' min' : mn2 + ' min'; }
-  var he = $('haulEmpty'); if (he) he.hidden = S.pins.length > 0 || S.counts.houses > 0 || S.counts.candy > 0;
+  var he = $('haulEmpty'); if (he) he.hidden = S.pins.length > 0 || S.counts.houses > 0 || S.counts.candy > 0 || walkPresent();
+  var hcard = $('haulHousesCard'); if (hcard) hcard.hidden = S.counts.houses === 0 && walkPresent();
+  var hmode = $('haulMode'); if (hmode) { var hmt = haulModeText(); hmode.textContent = hmt; hmode.hidden = !hmt; }
   if (typeof updatePeek === 'function') updatePeek();
   if (bumpEl) { bumpEl.classList.remove('bump'); void bumpEl.offsetWidth; bumpEl.classList.add('bump'); }
 }
@@ -3031,6 +3074,7 @@ function startNav() {
   var cur = nav.steps[nav.stepIdx];
   speakNow("Let's go trick-or-treating! " + (cur ? cur.text : ''));
   toast('Navigation on. The map follows you; voice guides each turn.', 'ok');
+  recBeginNav();
 }
 function updateStopMarkers() {
   if (!S.route || !S.route.stopMarkers || !S.nav) return;
@@ -3283,6 +3327,7 @@ function endNav(showSummary) {
   mapEl.classList.remove('headup'); mapEl.style.transform = '';
   try { map.invalidateSize(); } catch (e) {}
   if (wakeLock) { try { wakeLock.release(); } catch (e) {} wakeLock = null; }
+  recEndSession();
   if (showSummary) openSummary();
 }
 $('btnNav').addEventListener('click', startNav);
@@ -3295,7 +3340,7 @@ $('btnEnd').addEventListener('click', function () {
 
 /* ---------------- summary ---------------- */
 function openSummary() {
-  var ln = (S.nightTotals && S.nightTotals.trackDist > 0) ? S.nightTotals : (S.lastNav || { trackDist: 0, elapsedMs: 0 });
+  var ln = nightWalk();
   $('sumHouses').textContent = S.counts.houses;
   $('sumCandy').textContent = S.counts.candy;
   $('sumDist').textContent = ln.trackDist >= 160 ? (ln.trackDist / M_PER_MI).toFixed(1) + ' mi' : Math.round(ln.trackDist * 3.28084) + ' ft';
@@ -4006,43 +4051,452 @@ if ('serviceWorker' in navigator) {
 var RIBBON_P1 = 'M24.4 43.2 C17.2 34.4 10 26.2 10 18.6 C10 10.4 16.1 4.4 24 4.4 C31.9 4.4 38 10.4 38 18.6 C38 23.4 36.7 27.1 34.4 29.8';
 var RIBBON_P2 = 'M29.2 33.2 C22.6 35.4 17.6 29.2 17.6 21.0 C17.6 15.1 21.1 11.8 24.8 12.2';
 var RIBBON_TICKS = 'M19.8 14.6 L21.0 15.8 M27.0 21.8 L28.2 23.0';
-function drawHaulCard(cb) {
-  function go() {
-    var cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1080;
-    var g = cv.getContext('2d');
-    var grad = g.createLinearGradient(0, 0, 0, 1080);
-    grad.addColorStop(0, '#2A2140'); grad.addColorStop(1, '#0E0A16');
-    g.fillStyle = grad; g.fillRect(0, 0, 1080, 1080);
-    /* Ribbon Pin brandmark, drawn from the finalized SVG geometry */
+/* ---------- Record walk + Share Card v2 (v6.3) ----------
+   Free GPS recording for walkers who never planned a route. The active
+   track persists under the raw localStorage key ct_track_active on every
+   appended point, so a refresh mid-walk resumes instead of losing the
+   night; finishing moves it to ct_walk_last. Raw keys (not the cr_
+   store) per the v6.3 brief. */
+function lsRaw(k) { try { var v = localStorage.getItem(k); return v == null ? null : JSON.parse(v); } catch (e) { return null; } }
+function lsRawSet(k, v) { try { var t = JSON.stringify(v); localStorage.setItem(k, t); return localStorage.getItem(k) === t; } catch (e) { return false; } }
+function lsRawDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+function segBreak(p, q) {
+  if (haversine({ lat: p[0], lng: p[1] }, { lat: q[0], lng: q[1] }) > 200) return true;
+  if (p[2] && q[2] && (q[2] - p[2]) > 300000) return true;
+  return false;
+}
+function splitSegments(pts) {
+  var segs = [], cur = [];
+  pts.forEach(function (p) {
+    if (cur.length && segBreak(cur[cur.length - 1], p)) { segs.push(cur); cur = []; }
+    cur.push(p);
+  });
+  if (cur.length) segs.push(cur);
+  return segs;
+}
+function trackDistOf(pts) {
+  var d = 0;
+  for (var i = 1; i < pts.length; i++) { if (!segBreak(pts[i - 1], pts[i])) d += haversine({ lat: pts[i - 1][0], lng: pts[i - 1][1] }, { lat: pts[i][0], lng: pts[i][1] }); }
+  return d;
+}
+function walkObjStats(o) {
+  if (!o || !o.startedAt) return null;
+  var pts = o.points || [];
+  return { trackDist: trackDistOf(pts), elapsedMs: o.elapsedMs != null ? o.elapsedMs : Math.max(0, (o.endedAt || Date.now()) - o.startedAt), points: pts.length };
+}
+function currentWalkObj() {
+  if (typeof REC !== 'undefined' && REC && REC.on) return { startedAt: REC.origStartedAt || REC.startedAt, endedAt: Date.now(), elapsedMs: REC.baseElapsed + (Date.now() - REC.startedAt), points: REC.points, houses: REC.houses };
+  return walkLastObj() || walkActiveObj();
+}
+function walkActiveObj() { return lsRaw('ct_track_active'); }
+function walkLastObj() { return lsRaw('ct_walk_last'); }
+function walkPresent() { return !!(walkActiveObj() || walkLastObj()); }
+function fmtWalkDist(m) { return m >= 160 ? (m / M_PER_MI).toFixed(1) + ' mi' : Math.round(m * 3.28084) + ' ft'; }
+function fmtWalkTime(ms) { var mn = Math.round(ms / 60000); return mn >= 60 ? Math.floor(mn / 60) + ' hr ' + (mn % 60) + ' min' : mn + ' min'; }
+/* Tonight's walk numbers: a nav session wins (never double count); a
+   recorded walk fills in when there is no nav session. */
+function nightWalk() {
+  var ln = (S.nightTotals && S.nightTotals.trackDist > 0) ? S.nightTotals : (S.lastNav || null);
+  if (ln && (ln.trackDist > 0 || ln.elapsedMs > 0)) return { trackDist: ln.trackDist, elapsedMs: ln.elapsedMs, src: 'nav' };
+  var o = currentWalkObj();
+  var ws = walkObjStats(o);
+  if (ws && (ws.trackDist > 0 || ws.points > 0)) return { trackDist: ws.trackDist, elapsedMs: ws.elapsedMs, src: 'walk' };
+  return { trackDist: 0, elapsedMs: 0, src: 'none' };
+}
+function haulModeText() {
+  var parts = [];
+  if (S.route && S.route.stops) parts.push('Planned loop · ' + S.route.stops.length + (S.route.stops.length === 1 ? ' stop' : ' stops'));
+  var rec = (typeof REC !== 'undefined' && REC && REC.on);
+  var o = currentWalkObj();
+  var ws = walkObjStats(o);
+  if (ws && (ws.points > 0 || rec)) parts.push((rec ? 'Recording walk · ' : 'Recorded walk · ') + fmtWalkTime(ws.elapsedMs));
+  return parts.join(' · ');
+}
+
+var REC = { on: false, mode: 'free', startedAt: 0, origStartedAt: 0, baseElapsed: 0, seeded: false, points: [], houses: [], timer: null, layer: L.layerGroup().addTo(map), wake: null, confirming: false };
+function recPersist() { lsRawSet('ct_track_active', { startedAt: REC.startedAt, origStartedAt: REC.origStartedAt, baseElapsed: REC.baseElapsed, points: REC.points, houses: REC.houses }); }
+function recDrawPts(pts) {
+  REC.layer.clearLayers();
+  splitSegments(pts).forEach(function (seg) {
+    var lls = seg.map(function (p) { return [p[0], p[1]]; });
+    if (lls.length >= 2) {
+      L.polyline(lls, { color: '#0E0A16', weight: 10, opacity: 0.9 }).addTo(REC.layer);
+      L.polyline(lls, { color: '#E85D26', weight: 5, opacity: 0.95 }).addTo(REC.layer);
+    } else if (lls.length === 1) {
+      L.circleMarker(lls[0], { radius: 4, color: '#0E0A16', weight: 2, fillColor: '#E85D26', fillOpacity: 1 }).addTo(REC.layer);
+    }
+  });
+}
+function recClock(ms) {
+  var sec = Math.max(0, Math.round(ms / 1000));
+  var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), ss = sec % 60;
+  return (h > 0 ? h + ':' + (m < 10 ? '0' : '') : '') + m + ':' + (ss < 10 ? '0' : '') + ss;
+}
+function recTick() {
+  var rt = $('recTime'); if (rt) rt.textContent = recClock(Date.now() - REC.startedAt);
+  var rd = $('recDist'); if (rd) rd.textContent = fmtWalkDist(trackDistOf(REC.points));
+  renderCounts();
+}
+function recWakeReq() {
+  if (!('wakeLock' in navigator)) return;
+  navigator.wakeLock.request('screen').then(function (wl) { REC.wake = wl; }).catch(function () {});
+}
+function recWakeRel() { if (REC.wake) { try { REC.wake.release(); } catch (e) {} REC.wake = null; } }
+function recSetConfirm(onOff) {
+  REC.confirming = onOff;
+  $('btnRecHouse').hidden = onOff;
+  $('btnRecFinish').hidden = onOff;
+  $('recConfirm').hidden = !onOff;
+}
+function recBegin(mode) {
+  if (REC.on) {
+    /* Guided nav takes over the session quietly: bar away, keep sampling. */
+    if (mode === 'nav') { REC.mode = 'nav'; $('recBar').hidden = true; document.body.classList.remove('is-recording'); }
+    return;
+  }
+  /* Append into the night's existing track when there is one. */
+  var last = walkLastObj();
+  REC.seeded = !!(last && last.points && last.points.length);
+  REC.points = REC.seeded ? last.points.slice() : [];
+  REC.houses = REC.seeded && last.houses ? last.houses.slice() : [];
+  REC.baseElapsed = REC.seeded ? (last.elapsedMs != null ? last.elapsedMs : Math.max(0, (last.endedAt || last.startedAt) - last.startedAt)) : 0;
+  REC.origStartedAt = REC.seeded ? last.startedAt : Date.now();
+  REC.startedAt = Date.now();
+  REC.on = true; REC.mode = mode; REC.confirming = false;
+  recDrawPts(REC.points);
+  ensureWatch();
+  recPersist();
+  recSample();
+  if (REC.timer) clearInterval(REC.timer);
+  REC.timer = setInterval(recTick, 1000);
+  recTick();
+  recWakeReq();
+  if (mode === 'free') {
+    document.body.classList.add('is-recording');
+    $('recBar').hidden = false; recSetConfirm(false);
+    toast('Recording your walk. The trail draws itself as you go.', 'ok');
+  }
+}
+function recStart() {
+  if (REC.on) { toast('Already recording your walk.', 'warn'); return; }
+  recBegin('free');
+}
+function recBeginNav() { recBegin('nav'); }
+/* Called from onPos on every fix. Filter: accuracy <= 25 m and at least
+   6 m from the last recorded point, so porch standing does not scribble. */
+function recSample() {
+  if (!REC.on || !S.pos) return;
+  if ((S.pos.acc || 99) > 25) return;
+  var n = REC.points.length;
+  if (n > 0) {
+    var d = haversine({ lat: REC.points[n - 1][0], lng: REC.points[n - 1][1] }, { lat: S.pos.lat, lng: S.pos.lng });
+    if (d < 6) return;
+  }
+  REC.points.push([S.pos.lat, S.pos.lng, Date.now()]);
+  recPersist();
+  recDrawPts(REC.points);
+  var rd = $('recDist'); if (rd) rd.textContent = fmtWalkDist(trackDistOf(REC.points));
+}
+function recHouse() {
+  if (!REC.on) return;
+  bumpCount('houses', null);
+  var ts = (S.counts.histLog && S.counts.histLog.length) ? S.counts.histLog[S.counts.histLog.length - 1] : null;
+  var pos = null;
+  if (ts) { for (var i = 0; i < S.pins.length; i++) { if (S.pins[i].ts === ts) { pos = { lat: S.pins[i].lat, lng: S.pins[i].lng }; break; } } }
+  if (!pos && S.pos) pos = { lat: S.pos.lat, lng: S.pos.lng };
+  if (pos) { REC.houses.push({ lat: pos.lat, lng: pos.lng, t: Date.now() }); recPersist(); }
+}
+function recFinish(opts) {
+  if (!REC.on) return;
+  opts = opts || {};
+  REC.on = false; REC.mode = 'free';
+  if (REC.timer) { clearInterval(REC.timer); REC.timer = null; }
+  recWakeRel();
+  document.body.classList.remove('is-recording');
+  $('recBar').hidden = true;
+  var walk = { startedAt: REC.origStartedAt || REC.startedAt, endedAt: Date.now(), elapsedMs: REC.baseElapsed + (Date.now() - REC.startedAt), points: REC.points, houses: REC.houses };
+  lsRawDel('ct_track_active');
+  if (REC.points.length >= 2) {
+    lsRawSet('ct_walk_last', walk);
+    if (!opts.quiet) toast('Walk saved. It is on your haul card.', 'ok');
+  } else if (!REC.seeded && !opts.quiet) {
+    toast('Walk ended. Too few GPS points to draw a trail.', 'warn');
+  }
+  REC.seeded = false;
+  renderCounts();
+  if (!opts.quiet) {
+    switchTab('haul');
+    if (sheetSnap === 'peek') applySnap(lastSnap);
+  }
+}
+function recEndSession() { if (REC.on) recFinish({ quiet: true }); }
+$('btnStart').addEventListener('click', function () {
+  showDlg('Start your night', 'Plan a loop and let Candy Trail guide you, or go on your own and let the trail record itself.', [
+    { label: 'Plan my route', cls: 'btn-ghost' },
+    { label: 'Go on my own', cls: 'btn-org', fn: recStart }
+  ]);
+});
+$('btnEmptyRecord').addEventListener('click', recStart);
+$('btnRecHouse').addEventListener('click', recHouse);
+$('btnRecFinish').addEventListener('click', function () { recSetConfirm(true); });
+$('btnRecResume').addEventListener('click', function () { recSetConfirm(false); });
+$('btnRecFinishYes').addEventListener('click', recFinish);
+document.addEventListener('visibilitychange', function () {
+  if (REC.on && document.visibilityState === 'visible') recWakeReq();
+});
+/* Boot: resume an interrupted recording, or redraw the last walk. */
+(function recBoot() {
+  var a = walkActiveObj();
+  if (a && a.startedAt && a.points && a.points.length) {
+    REC.on = true; REC.points = a.points || []; REC.houses = a.houses || [];
+    REC.origStartedAt = a.origStartedAt || a.startedAt; REC.mode = 'free'; REC.seeded = !!walkLastObj();
+    var lastTs = REC.points.length ? (REC.points[REC.points.length - 1][2] || a.startedAt) : a.startedAt;
+    REC.baseElapsed = (a.baseElapsed || 0) + Math.max(0, lastTs - a.startedAt);
+    REC.startedAt = Date.now();
+    document.body.classList.add('is-recording');
+    $('recBar').hidden = false; recSetConfirm(false);
+    recDrawPts(REC.points);
+    REC.timer = setInterval(recTick, 1000); recTick();
+    recWakeReq();
+  } else {
+    var l = walkLastObj();
+    if (l && l.points && l.points.length >= 2) recDrawPts(l.points);
+  }
+})();
+
+/* Haul photo (kept downscaled under ct_haul_photo when it fits; memory
+   only when the device refuses the store). */
+var haulPhotoImg = null;
+function paintHaulPhoto() {
+  var add = $('haulPhotoAdd'); if (add) add.hidden = !!haulPhotoImg;
+  var bar = $('haulPhotoBar'); if (bar) bar.hidden = !haulPhotoImg;
+}
+function setHaulPhoto(dataUrl, persist) {
+  var img = new Image();
+  img.onload = function () { haulPhotoImg = img; paintHaulPhoto(); };
+  img.src = dataUrl;
+  if (persist && !lsRawSet('ct_haul_photo', dataUrl)) toast('Photo is on tonight’s card, but too big to save on this device.', 'warn');
+}
+$('haulPhoto').addEventListener('change', function () {
+  var f = $('haulPhoto').files && $('haulPhoto').files[0];
+  if (!f) return;
+  var rd = new FileReader();
+  rd.onload = function () {
+    var img = new Image();
+    img.onload = function () {
+      var sc = Math.min(1, 1200 / Math.max(img.width, img.height));
+      var cv = document.createElement('canvas');
+      cv.width = Math.round(img.width * sc); cv.height = Math.round(img.height * sc);
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+      setHaulPhoto(cv.toDataURL('image/jpeg', 0.8), true);
+    };
+    img.src = rd.result;
+  };
+  rd.readAsDataURL(f);
+});
+$('btnPhotoRemove').addEventListener('click', function () {
+  haulPhotoImg = null; lsRawDel('ct_haul_photo'); paintHaulPhoto();
+});
+(function haulPhotoBoot() {
+  var u = lsRaw('ct_haul_photo');
+  if (u) setHaulPhoto(u, false);
+  paintHaulPhoto();
+})();
+
+/* Share Card v2 geometry: best trail wins (recorded track, then planned
+   route), dots are tonight's logged house positions, home is the start. */
+function splitSegObjs(objs) {
+  var segs = [], cur = [];
+  objs.forEach(function (p) {
+    if (cur.length) {
+      var q = cur[cur.length - 1];
+      if (haversine(q, p) > 200 || (q.t && p.t && (p.t - q.t) > 300000)) { segs.push(cur); cur = []; }
+    }
+    cur.push(p);
+  });
+  if (cur.length) segs.push(cur);
+  return segs;
+}
+function haulTrailData() {
+  var pts = [], rawPts = [], src = 'none', wk = null;
+  var co = currentWalkObj();
+  if (co && co.points && co.points.length >= 2) wk = co;
+  if (wk) { rawPts = wk.points.map(function (p) { return { lat: p[0], lng: p[1], t: p[2] }; }); pts = rawPts.map(function (p) { return { lat: p.lat, lng: p.lng }; }); src = 'walk'; }
+  else if (S.route && S.route.coords && S.route.coords.length >= 2) { pts = S.route.coords.slice(); rawPts = pts; src = 'route'; }
+  var dots = [], seen = {};
+  function addDot(lat, lng) {
+    if (lat == null || lng == null) return;
+    var k = lat.toFixed(5) + ',' + lng.toFixed(5);
+    if (seen[k]) return; seen[k] = 1; dots.push({ lat: lat, lng: lng });
+  }
+  S.pins.forEach(function (p) { addDot(p.lat, p.lng); });
+  if (wk && wk.houses) wk.houses.forEach(function (h) { addDot(h.lat, h.lng); });
+  if (S.nav && S.nav.stops) {
+    for (var i = 0; i < Math.min(S.nav.stopIdx || 0, S.nav.stops.length); i++) {
+      var st = S.nav.stops[i]; if (st) addDot(st.lat, st.lng);
+    }
+  }
+  var home = S.start || (pts.length ? pts[0] : null);
+  return { pts: pts, segs: splitSegObjs(rawPts), dots: dots, home: home, src: src };
+}
+function makeProjector(items, rect) {
+  var minLat = Infinity, maxLat = -Infinity, minLng = Infinity, maxLng = -Infinity;
+  items.forEach(function (p) {
+    if (p.lat < minLat) minLat = p.lat; if (p.lat > maxLat) maxLat = p.lat;
+    if (p.lng < minLng) minLng = p.lng; if (p.lng > maxLng) maxLng = p.lng;
+  });
+  var midLat = (minLat + maxLat) / 2;
+  var cosL = Math.cos(midLat * Math.PI / 180); if (!(cosL > 0.2)) cosL = 0.2;
+  var mPerDegLat = 111320, mPerDegLng = 111320 * cosL, MINM = 120;
+  if ((maxLat - minLat) * mPerDegLat < MINM) { var c = (minLat + maxLat) / 2, hf = (MINM / mPerDegLat) / 2; minLat = c - hf; maxLat = c + hf; }
+  if ((maxLng - minLng) * mPerDegLng < MINM) { var c2 = (minLng + maxLng) / 2, hf2 = (MINM / mPerDegLng) / 2; minLng = c2 - hf2; maxLng = c2 + hf2; }
+  var x0 = minLng * cosL, x1 = maxLng * cosL;
+  var padX = (x1 - x0) * 0.18, padY = (maxLat - minLat) * 0.18;
+  x0 -= padX; x1 += padX;
+  var y0 = minLat - padY, y1 = maxLat + padY;
+  var sc = Math.min(rect.w / (x1 - x0), rect.h / (y1 - y0));
+  var ox = rect.x + (rect.w - (x1 - x0) * sc) / 2, oy = rect.y + (rect.h - (y1 - y0) * sc) / 2;
+  return function (lat, lng) { return [ox + (lng * cosL - x0) * sc, oy + (y1 - lat) * sc]; };
+}
+function rrPath(g, x, y, w, h, r) {
+  g.beginPath();
+  g.moveTo(x + r, y);
+  g.arcTo(x + w, y, x + w, y + h, r);
+  g.arcTo(x + w, y + h, x, y + h, r);
+  g.arcTo(x, y + h, x, y, r);
+  g.arcTo(x, y, x + w, y, r);
+  g.closePath();
+}
+function drawTrailScene(g, rect, data) {
+  var items = data.pts.concat(data.dots);
+  if (data.home) items.push(data.home);
+  var proj = makeProjector(items, rect);
+  var s = rect.w / 968;
+  g.save();
+  g.strokeStyle = 'rgba(255,245,235,0.06)'; g.lineWidth = 1; g.setLineDash([4, 5]);
+  var cx = rect.x + rect.w / 2, cy = rect.y + rect.h / 2, maxR = Math.max(rect.w, rect.h) / 2;
+  for (var r = maxR / 3; r < maxR * 1.1; r += maxR / 3) { g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.stroke(); }
+  g.beginPath(); g.moveTo(rect.x, cy); g.lineTo(rect.x + rect.w, cy); g.moveTo(cx, rect.y); g.lineTo(cx, rect.y + rect.h); g.stroke();
+  g.setLineDash([]);
+  if (data.segs && data.segs.length) {
+    g.lineCap = 'round'; g.lineJoin = 'round';
+    data.segs.forEach(function (seg) {
+      if (seg.length < 2) return;
+      function pass(wd, style) {
+        g.beginPath();
+        seg.forEach(function (p, i) { var q = proj(p.lat, p.lng); if (i === 0) g.moveTo(q[0], q[1]); else g.lineTo(q[0], q[1]); });
+        g.lineWidth = wd; g.strokeStyle = style; g.stroke();
+      }
+      pass(Math.max(3, 12 * s), 'rgba(232,93,38,0.24)');
+      pass(Math.max(2, 4.5 * s), '#E85D26');
+    });
+  }
+  g.fillStyle = '#F5EFE6'; g.strokeStyle = '#0E0A16'; g.lineWidth = Math.max(1.2, 2.5 * s);
+  data.dots.forEach(function (p) {
+    var q = proj(p.lat, p.lng);
+    g.beginPath(); g.arc(q[0], q[1], Math.max(3, 7 * s), 0, Math.PI * 2); g.fill(); g.stroke();
+  });
+  if (data.home) {
+    var hp = proj(data.home.lat, data.home.lng);
+    var k = (64 * Math.max(s, 0.3)) / 48;
     g.save();
-    g.translate(390, 70); g.scale(6.25, 6.25);
+    g.translate(hp[0] - 24 * k, hp[1] - 43.2 * k); g.scale(k, k);
     g.lineCap = 'round'; g.lineJoin = 'round';
     g.strokeStyle = '#E85D26'; g.lineWidth = 3.2;
-    g.stroke(new Path2D(RIBBON_P1));
-    g.stroke(new Path2D(RIBBON_P2));
-    g.strokeStyle = '#8B7BB8'; g.lineWidth = 1.6;
-    g.stroke(new Path2D(RIBBON_TICKS));
+    g.stroke(new Path2D(RIBBON_P1)); g.stroke(new Path2D(RIBBON_P2));
+    g.strokeStyle = '#8B7BB8'; g.lineWidth = 1.6; g.stroke(new Path2D(RIBBON_TICKS));
     g.beginPath(); g.arc(24, 18.8, 3.2, 0, Math.PI * 2); g.fillStyle = '#F5EFE6'; g.fill();
     g.restore();
+  }
+  g.restore();
+}
+function drawHaulCard(cb) {
+  function go() {
+    var cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1350;
+    var g = cv.getContext('2d');
+    var grad = g.createLinearGradient(0, 0, 0, 1350);
+    grad.addColorStop(0, '#2A2140'); grad.addColorStop(1, '#0E0A16');
+    g.fillStyle = grad; g.fillRect(0, 0, 1080, 1350);
+    var data = haulTrailData();
+    var nw = nightWalk();
+    var hasTrail = data.pts.length >= 2 || data.dots.length > 0;
+    var heroBottom;
+    if (haulPhotoImg) {
+      var fx = 56, fy = 56, fw = 968, fh = 764;
+      g.save(); rrPath(g, fx, fy, fw, fh, 16); g.clip();
+      var iw = haulPhotoImg.width || 1, ih = haulPhotoImg.height || 1;
+      var sc = Math.max(fw / iw, fh / ih);
+      g.drawImage(haulPhotoImg, fx + (fw - iw * sc) / 2, fy + (fh - ih * sc) / 2, iw * sc, ih * sc);
+      var fg = g.createLinearGradient(0, fy, 0, fy + fh);
+      fg.addColorStop(0.6, 'rgba(14,10,22,0)'); fg.addColorStop(1, 'rgba(14,10,22,0.92)');
+      g.fillStyle = fg; g.fillRect(fx, fy, fw, fh);
+      g.restore();
+      g.strokeStyle = 'rgba(245,239,230,0.25)'; g.lineWidth = 1.5; rrPath(g, fx, fy, fw, fh, 16); g.stroke();
+      if (hasTrail) {
+        var bx = 716, by = 540, bw = 280, bh = 280;
+        g.save(); rrPath(g, bx, by, bw, bh, 20); g.clip();
+        g.fillStyle = 'rgba(14,10,22,0.88)'; g.fillRect(bx, by, bw, bh);
+        drawTrailScene(g, { x: bx + 14, y: by + 14, w: bw - 28, h: bh - 28 }, data);
+        g.restore();
+        g.strokeStyle = 'rgba(232,93,38,0.55)'; g.lineWidth = 1.5; rrPath(g, bx, by, bw, bh, 20); g.stroke();
+      }
+      heroBottom = fy + fh;
+    } else if (hasTrail) {
+      drawTrailScene(g, { x: 56, y: 56, w: 968, h: 740 }, data);
+      heroBottom = 56 + 740;
+    } else {
+      g.save();
+      g.translate(390, 120); g.scale(6.25, 6.25);
+      g.lineCap = 'round'; g.lineJoin = 'round';
+      g.strokeStyle = '#E85D26'; g.lineWidth = 3.2;
+      g.stroke(new Path2D(RIBBON_P1)); g.stroke(new Path2D(RIBBON_P2));
+      g.strokeStyle = '#8B7BB8'; g.lineWidth = 1.6; g.stroke(new Path2D(RIBBON_TICKS));
+      g.beginPath(); g.arc(24, 18.8, 3.2, 0, Math.PI * 2); g.fillStyle = '#F5EFE6'; g.fill();
+      g.restore();
+      g.textAlign = 'center';
+      g.fillStyle = '#F5EFE6'; g.font = '600 92px Fraunces, Georgia, serif';
+      g.fillText('Candy', 540, 560);
+      g.fillStyle = '#FF7844'; g.font = 'italic 600 92px Fraunces, Georgia, serif';
+      g.fillText('Trail', 540, 662);
+      heroBottom = 720;
+    }
+    /* stats: HOUSES drops out entirely for a zero-house recorded walk */
+    var stats = [];
+    if (!(S.counts.houses === 0 && data.src === 'walk')) stats.push({ v: String(S.counts.houses), l: 'HOUSES' });
+    stats.push({ v: String(S.counts.candy), l: 'CANDIES' });
+    stats.push({ v: fmtWalkDist(nw.trackDist), l: 'WALKED' });
+    stats.push({ v: fmtWalkTime(nw.elapsedMs), l: 'TIME' });
+    var sy = heroBottom + 168, colW = 968 / stats.length;
     g.textAlign = 'center';
-    g.fillStyle = '#F5EFE6'; g.font = '600 92px Fraunces, Georgia, serif';
-    g.fillText('Candy', 540, 520);
-    g.fillStyle = '#FF7844'; g.font = 'italic 600 92px Fraunces, Georgia, serif';
-    g.fillText('Trail', 540, 622);
-    g.fillStyle = '#A79CC4'; g.font = '700 27px Inter, system-ui, sans-serif';
-    g.fillText('H A L L O W E E N   2 0 2 6', 540, 678);
-    g.fillStyle = '#F4F0FA'; g.font = '600 118px Fraunces, Georgia, serif';
-    g.fillText(String(S.counts.houses), 290, 830);
-    g.fillText(String(S.counts.candy), 790, 830);
-    g.fillStyle = '#A79CC4'; g.font = '700 30px Inter, system-ui, sans-serif';
-    g.fillText('HOUSES VISITED', 290, 878);
-    g.fillText('CANDIES', 790, 878);
-    g.fillStyle = '#E8E2F2'; g.font = '600 38px Inter, system-ui, sans-serif';
-    g.fillText($('sumDist').textContent + ' walked · ' + $('sumTime').textContent + ' out', 540, 955);
-    g.fillStyle = '#A79CC4'; g.font = '500 30px Inter, system-ui, sans-serif';
-    g.fillText(S.pins.length + (S.pins.length === 1 ? ' spot' : ' spots') + ' logged on the crowd map', 540, 1005);
-    g.fillStyle = '#8D81AD'; g.font = '500 25px Inter, system-ui, sans-serif';
-    g.fillText('dreadgazebo.github.io/jc-heights-candy-path', 540, 1050);
+    stats.forEach(function (st, i) {
+      var cxp = 56 + colW * (i + 0.5);
+      var px = stats.length >= 4 ? 62 : 72;
+      g.font = '600 ' + px + 'px Fraunces, Georgia, serif';
+      var wdt = g.measureText(st.v).width;
+      if (wdt > colW - 14 && wdt > 0) { px = Math.max(28, Math.floor(px * (colW - 14) / wdt)); g.font = '600 ' + px + 'px Fraunces, Georgia, serif'; }
+      g.fillStyle = '#F5EFE6';
+      g.fillText(st.v, cxp, sy);
+      g.fillStyle = '#A79CC4'; g.font = '700 25px Inter, system-ui, sans-serif';
+      g.fillText(st.l, cxp, sy + 44);
+    });
+    /* brand footer: Ribbon mark + wordmark left, date/mode stamp right */
+    var fy2 = 1268;
+    g.save();
+    g.translate(64, fy2 - 40); g.scale(0.92, 0.92);
+    g.lineCap = 'round'; g.lineJoin = 'round';
+    g.strokeStyle = '#E85D26'; g.lineWidth = 3.2;
+    g.stroke(new Path2D(RIBBON_P1)); g.stroke(new Path2D(RIBBON_P2));
+    g.beginPath(); g.arc(24, 18.8, 3.2, 0, Math.PI * 2); g.fillStyle = '#F5EFE6'; g.fill();
+    g.restore();
+    g.textAlign = 'left';
+    g.fillStyle = '#F5EFE6'; g.font = '600 34px Fraunces, Georgia, serif';
+    g.fillText('Candy Trail', 122, fy2);
+    var months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    var now = new Date();
+    var stamp = months[now.getMonth()] + ' ' + now.getDate() + ' · ' + (data.src === 'walk' ? 'RECORDED WALK' : 'CANDY TRAIL');
+    g.textAlign = 'right';
+    g.fillStyle = '#A79CC4'; g.font = '700 24px Inter, system-ui, sans-serif';
+    g.fillText(stamp, 1016, fy2);
     if (cv.toBlob) cv.toBlob(cb, 'image/png'); else cb(null);
   }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(go); else go();
