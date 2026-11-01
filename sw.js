@@ -1,8 +1,7 @@
-/* Candy Trail service worker (v6.0).
-   Shell: network-first for pages (updates keep flowing), cache fallback offline.
-   Tiles: cache-first with a bounded runtime cache, plus a precache of the
-   Heights core at zoom 15-16 so the home neighborhood works offline. */
-var SHELL = 'ct-shell-v6';
+/* Candy Trail service worker (v6.4.1: shell cache bumped so the activate
+   step purges the v6 shell cache; navigations bypass the HTTP cache so a
+   fresh deploy is never masked by a stale cached page). */
+var SHELL = 'ct-shell-v7';
 var FONTS = 'ct-fonts-v6';
 var TILES = 'cp-tiles-v1';
 
@@ -74,7 +73,10 @@ self.addEventListener('fetch', function (event) {
     event.respondWith((async function () {
       var cache = await caches.open(SHELL);
       try {
-        var res = await fetch(req);
+        /* Navigations go to the network bypassing the HTTP cache: the app
+           is one self-contained page, and a stale cached copy (the host
+           serves a 10-minute max-age) must never mask a fresh deploy. */
+        var res = req.mode === 'navigate' ? await fetch(req.url, { cache: 'no-store', credentials: 'same-origin' }) : await fetch(req);
         if (res && res.ok) cache.put(req, res.clone());
         return res;
       } catch (e) {
