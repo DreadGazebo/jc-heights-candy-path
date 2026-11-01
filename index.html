@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0A16">
-<meta name="version" content="6.7">
+<meta name="version" content="6.8">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1037,7 +1037,7 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
       </div>
       <div class="sheetfoot">
         <div class="wm">Candy Trail</div>
-        <div class="ver" id="appVer">Candy Trail v6.7</div>
+        <div class="ver" id="appVer">Candy Trail v6.8</div>
       </div>
     </div>
 
@@ -4858,6 +4858,111 @@ function partyInitials(name) {
   var ini = (parts[0] ? parts[0].charAt(0) : '?') + (parts.length > 1 ? parts[1].charAt(0) : '');
   return ini.toUpperCase();
 }
+/* ---------- Street-matched trails (v6.8, Fix 13) ----------
+   Party trails and the walker's own recorded trail used to be drawn as
+   straight polylines between raw GPS fixes, cutting block corners.
+   Fixes now go through Valhalla map matching (trace_route, pedestrian,
+   walk_or_snap: the mode that accepts breadcrumb input) and the matched
+   shape is drawn instead, with the raw fixes kept as faint crumbs under
+   it. Matching is strictly an enhancement: any failure (network, HTTP,
+   no trip, timeout) leaves the raw polyline exactly as before, and the
+   puck always rides the newest RAW fix, never the match. */
+var TMATCH = {
+  MIN_MS: 25000,    /* re-match at most every ~25 s per trail */
+  MIN_NEW_M: 25,    /* and only after >= ~25 m of new path since the last match */
+  MAX_FIXES: 40,    /* send at most the last ~40 fixes */
+  state: {}         /* key -> {line, uptoT, lastAttemptAt, inflight, seq} */
+};
+function tmNewPathM(fixes, uptoT) {
+  /* Path length (m) of the fixes newer than the newest fix the last
+     successful match covered. */
+  var i, startIdx = -1;
+  for (i = fixes.length - 1; i >= 0; i--) {
+    if (fixes[i].t != null && uptoT && fixes[i].t <= uptoT) { startIdx = i; break; }
+  }
+  var d = 0, j;
+  if (startIdx < 0) {
+    for (j = 1; j < fixes.length; j++) d += haversine(fixes[j - 1], fixes[j]);
+    return d;
+  }
+  for (j = startIdx + 1; j < fixes.length; j++) d += haversine(fixes[j - 1], fixes[j]);
+  return d;
+}
+function tmFire(key, st, fixes, onDone) {
+  st.inflight = true;
+  st.lastAttemptAt = Date.now();
+  var seq = ++st.seq;
+  var shape = fixes.map(function (f, i) {
+    return { lat: f.lat, lon: f.lng, type: (i === 0 || i === fixes.length - 1) ? 'break' : 'via' };
+  });
+  var newestT = fixes.length ? fixes[fixes.length - 1].t : null;
+  fetchT('https://valhalla1.openstreetmap.de/trace_route', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ shape: shape, costing: 'pedestrian', shape_match: 'walk_or_snap' })
+  }, 12000).then(function (r) { return r.json(); }).then(function (j) {
+    if (TMATCH.state[key] !== st || seq !== st.seq) return; /* superseded or reset: discard */
+    st.inflight = false;
+    if (!j || !j.trip || !j.trip.legs || !j.trip.legs.length) return; /* no trip: keep raw */
+    var pts = [];
+    j.trip.legs.forEach(function (leg) {
+      if (!leg.shape) return;
+      decodePolyline(leg.shape, 6).forEach(function (p, i) {
+        if (i === 0 && pts.length) return; /* drop the duplicated leg joint */
+        pts.push([p.lat, p.lng]);
+      });
+    });
+    if (pts.length < 2) return;
+    st.line = pts;
+    st.uptoT = newestT || 0;
+    if (onDone) { try { onDone(); } catch (e) {} }
+  }).catch(function () {
+    if (TMATCH.state[key] === st && seq === st.seq) st.inflight = false;
+  });
+}
+function tmConsider(key, fixes, onDone) {
+  /* fixes: chronological [{lat, lng, t}]. Kicks a match request when one
+     is due and returns the latest matched line ([[lat,lng],...]) or null.
+     Fewer than 3 fixes: no attempt, no line (the raw line rules). */
+  if (!fixes || fixes.length < 3) return null;
+  var st = TMATCH.state[key] || (TMATCH.state[key] = { line: null, uptoT: 0, lastAttemptAt: 0, inflight: false, seq: 0 });
+  if (!st.inflight && Date.now() - st.lastAttemptAt >= TMATCH.MIN_MS) {
+    if (!st.line || tmNewPathM(fixes, st.uptoT) >= TMATCH.MIN_NEW_M) {
+      tmFire(key, st, fixes.slice(-TMATCH.MAX_FIXES), onDone);
+    }
+  }
+  return st.line;
+}
+function tmResetParty() {
+  Object.keys(TMATCH.state).forEach(function (k) {
+    if (k.indexOf('p:') === 0) delete TMATCH.state[k];
+  });
+}
+function drawPartyTrail(name, rowsDesc) {
+  /* rowsDesc: this member's pos rows, newest first (poll order). Draws the
+     street-matched line + raw crumbs when a match is on file; otherwise
+     the raw polyline, exactly as before v6.8. */
+  var color = partyMetaFor(name).color;
+  var fixes = rowsDesc.slice(0, TMATCH.MAX_FIXES).slice().reverse().map(function (r) {
+    return { lat: r.lat, lng: r.lng, t: new Date(r.created_at).getTime() };
+  });
+  var line = tmConsider('p:' + name, fixes, function () {
+    if (PARTY.lastRows && partyOn()) partyApply(PARTY.lastRows);
+  });
+  if (line && line.length >= 2) {
+    L.polyline(line, { color: '#0B0A0E', weight: 6, opacity: 0.55, lineCap: 'round' }).addTo(partyLayer);
+    L.polyline(line, { color: color, weight: 3, opacity: 0.6, lineCap: 'round' }).addTo(partyLayer);
+    fixes.forEach(function (f) {
+      L.circleMarker([f.lat, f.lng], { radius: 2.5, color: color, weight: 1, opacity: 0.5, fillColor: color, fillOpacity: 0.5 }).addTo(partyLayer);
+    });
+    return;
+  }
+  var pts = rowsDesc.slice(0, 14).reverse().map(function (r) { return [r.lat, r.lng]; });
+  if (pts.length >= 2) {
+    L.polyline(pts, { color: '#0B0A0E', weight: 6, opacity: 0.55, lineCap: 'round' }).addTo(partyLayer);
+    L.polyline(pts, { color: color, weight: 3, opacity: 0.6, lineCap: 'round' }).addTo(partyLayer);
+  }
+}
+
 function partyApply(rows) {
   var now = Date.now(), pos = {}, counts = {}, pinMap = {}, kicks = {}, trails = {};
   rows.forEach(function (r) {
@@ -4916,13 +5021,7 @@ function partyApply(rows) {
   if (partyOn() && S.pos && !pos[PARTY.name]) pos[PARTY.name] = { lat: S.pos.lat, lng: S.pos.lng, created_at: new Date().toISOString() };
   PARTY.posRows = pos;
   partyLayer.clearLayers();
-  Object.keys(trails).forEach(function (name) {
-    var pts = trails[name].slice(0, 14).reverse().map(function (r) { return [r.lat, r.lng]; });
-    if (pts.length >= 2) {
-      L.polyline(pts, { color: '#0B0A0E', weight: 6, opacity: 0.55, lineCap: 'round' }).addTo(partyLayer);
-      L.polyline(pts, { color: partyMetaFor(name).color, weight: 3, opacity: 0.6, lineCap: 'round' }).addTo(partyLayer);
-    }
-  });
+  Object.keys(trails).forEach(function (name) { drawPartyTrail(name, trails[name]); });
   /* Co-location dock: 2-6 members within 18 screen px fan out sideways
      (26px centers) instead of stacking, own name sorted first. Beyond 6,
      the first 5 pucks show plus a bone +N overflow pill in the 6th slot;
@@ -5151,6 +5250,7 @@ function renderPartyBox() {
   });
 }
 function partyJoin(code, name) {
+  tmResetParty();
   PARTY.code = code; PARTY.name = cleanName(name); PARTY.lastCountJson = '';
   PARTY.joinTs = Date.now();
   PARTY.avatar = (PARTY.avatarExplicit && PARTY.avatarDraft) ? PARTY.avatarDraft : partyDefaultAvatar(code + PARTY.name, {});
@@ -5173,6 +5273,7 @@ function partyJoin(code, name) {
   toast('You are in party ' + code + '. Your group can join with this code.', 'ok');
 }
 function partyLeave() {
+  tmResetParty();
   PARTY.code = ''; PARTY.lastCountJson = '';
   try { store.set('party', { code: '', name: PARTY.name }); } catch (e) {}
   if (PARTY.timer) { clearInterval(PARTY.timer); PARTY.timer = null; }
@@ -5405,16 +5506,7 @@ function haulTrailPts() {
 function showHaulTrail() {
   var pts = haulTrailPts();
   if (!pts) return;
-  haulTrailLayer.clearLayers();
-  splitSegments(pts).forEach(function (seg) {
-    var lls = seg.map(function (p) { return [p[0], p[1]]; });
-    if (lls.length >= 2) {
-      L.polyline(lls, { color: '#0E0A16', weight: 10, opacity: 0.9 }).addTo(haulTrailLayer);
-      L.polyline(lls, { color: '#E85D26', weight: 5, opacity: 0.95 }).addTo(haulTrailLayer);
-    } else if (lls.length === 1) {
-      L.circleMarker(lls[0], { radius: 4, color: '#0E0A16', weight: 2, fillColor: '#E85D26', fillOpacity: 1 }).addTo(haulTrailLayer);
-    }
-  });
+  drawOwnTrail(haulTrailLayer, pts);
   try { haulViewSave = { c: map.getCenter(), z: map.getZoom() }; } catch (e) { haulViewSave = null; }
   var all = pts.map(function (p) { return [p[0], p[1]]; });
   S.pins.forEach(function (p) { all.push([p.lat, p.lng]); });
@@ -5427,18 +5519,49 @@ function hideHaulTrail() {
   haulTrailShown = false; haulViewSave = null;
 }
 function recPersist() { lsRawSet('ct_track_active', { startedAt: REC.startedAt, origStartedAt: REC.origStartedAt, baseElapsed: REC.baseElapsed, points: REC.points, houses: REC.houses }); }
-function recDrawPts(pts) {
-  REC.layer.clearLayers();
-  splitSegments(pts).forEach(function (seg) {
-    var lls = seg.map(function (p) { return [p[0], p[1]]; });
+/* The walker's own trail (v6.8, Fix 13): the newest segment's tail
+   (last ~40 fixes) draws street-matched when a match is on file, with
+   the raw fixes as faint crumbs under it; everything older, and every
+   gap-separated segment, draws raw exactly as before. pts are
+   [lat, lng, ts] triples. A match completing re-runs the draw for the
+   same layer and points. */
+function drawOwnTrail(layer, pts) {
+  layer.clearLayers();
+  if (!pts || !pts.length) return;
+  var segs = splitSegments(pts);
+  var lastSeg = segs.length ? segs[segs.length - 1] : [];
+  var segStart = pts.length - lastSeg.length;
+  var matched = null, mFrom = -1;
+  if (lastSeg.length >= 3) {
+    var wFrom = Math.max(segStart, pts.length - TMATCH.MAX_FIXES);
+    var fixes = [];
+    for (var fi = wFrom; fi < pts.length; fi++) fixes.push({ lat: pts[fi][0], lng: pts[fi][1], t: pts[fi][2] });
+    var line = tmConsider('self', fixes, function () { drawOwnTrail(layer, pts); });
+    if (line && line.length >= 2) { matched = line; mFrom = wFrom; }
+  }
+  function rawSeg(lls) {
     if (lls.length >= 2) {
-      L.polyline(lls, { color: '#0E0A16', weight: 10, opacity: 0.9 }).addTo(REC.layer);
-      L.polyline(lls, { color: '#E85D26', weight: 5, opacity: 0.95 }).addTo(REC.layer);
+      L.polyline(lls, { color: '#0E0A16', weight: 10, opacity: 0.9 }).addTo(layer);
+      L.polyline(lls, { color: '#E85D26', weight: 5, opacity: 0.95 }).addTo(layer);
     } else if (lls.length === 1) {
-      L.circleMarker(lls[0], { radius: 4, color: '#0E0A16', weight: 2, fillColor: '#E85D26', fillOpacity: 1 }).addTo(REC.layer);
+      L.circleMarker(lls[0], { radius: 4, color: '#0E0A16', weight: 2, fillColor: '#E85D26', fillOpacity: 1 }).addTo(layer);
+    }
+  }
+  segs.forEach(function (seg, si) {
+    var lls = seg.map(function (p) { return [p[0], p[1]]; });
+    if (si < segs.length - 1 || !matched) { rawSeg(lls); return; }
+    /* Last segment with a street match: raw prefix older than the match
+       window, then the matched line, then the window's raw crumbs. */
+    var wLocal = mFrom - segStart;
+    if (wLocal > 0) rawSeg(lls.slice(0, wLocal + 1));
+    L.polyline(matched, { color: '#0E0A16', weight: 10, opacity: 0.9 }).addTo(layer);
+    L.polyline(matched, { color: '#E85D26', weight: 5, opacity: 0.95 }).addTo(layer);
+    for (var ci = mFrom; ci < pts.length; ci++) {
+      L.circleMarker([pts[ci][0], pts[ci][1]], { radius: 2.5, color: '#E85D26', weight: 1, opacity: 0.55, fillColor: '#E85D26', fillOpacity: 0.55 }).addTo(layer);
     }
   });
 }
+function recDrawPts(pts) { drawOwnTrail(REC.layer, pts); }
 function recClock(ms) {
   var sec = Math.max(0, Math.round(ms / 1000));
   var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), ss = sec % 60;
@@ -5855,6 +5978,7 @@ function partyKick(name) {
   toast(name + ' removed from the party.', 'ok');
 }
 function partyEject() {
+  tmResetParty();
   var code = PARTY.code;
   PARTY.code = ''; PARTY.lastCountJson = '';
   try { store.set('party', { code: '', name: PARTY.name }); } catch (e) {}
@@ -7458,7 +7582,7 @@ paintChromeState();
 /* v6.4.1 boot self-check marker: the shell's checker script verifies this
    was set. If boot died anywhere above, the repair overlay appears instead
    of a silently half-dead app. */
-window.__ctBootOK = '6.7';
+window.__ctBootOK = '6.8';
 
 </script>
 <script>
