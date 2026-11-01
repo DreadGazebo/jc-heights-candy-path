@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0A16">
-<meta name="version" content="7.3">
+<meta name="version" content="7.4">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -209,6 +209,8 @@ body.kid #fabSpot{display:none}
 #peekStart.solid{background:var(--org);border-color:var(--org);color:var(--ink)}
 #peekStart.solid svg{fill:var(--ink)}
 #peekStart[hidden]{display:none}
+#peekWalk{flex:none;align-self:center;height:48px;border-radius:999px;border:1px solid var(--pur);background:rgba(139,123,184,.16);color:var(--pur2);font-weight:600;font-size:13.5px;padding:0 14px;cursor:pointer;white-space:nowrap;font-family:inherit}
+#peekWalk[hidden]{display:none}
 #sheet.snap-peek #sheetBody{display:none}
 #sheetBody{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;flex:1;min-height:0;margin:0 -4px;padding:0 4px 2px}
 .search{display:flex;gap:8px;margin-top:10px}
@@ -221,17 +223,25 @@ body.kid #fabSpot{display:none}
 .chip svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .chip[aria-pressed="true"]{background:rgba(232,93,38,.15);border-color:var(--org);color:var(--org2)}
 .chip[aria-pressed="true"] small{color:var(--org2)}
+#styleChips{grid-template-columns:1fr 1fr;gap:8px}
+#styleChips .chip{height:48px;min-height:48px;border-radius:8px;border:1px solid #2E2444;background:var(--bg2);color:#A89EC4;font-size:14px;font-weight:500;flex-direction:row;justify-content:flex-start;gap:8px;padding:0 13px;line-height:1.2}
+#styleChips .chip svg{width:16px;height:16px}
+#styleChips .chip[aria-pressed="true"]{background:var(--card2);border:1.5px solid var(--org);box-shadow:inset 0 0 0 100px rgba(232,93,38,.12);color:#fff;font-weight:600}
+#styleChips .chip[aria-pressed="true"] svg{stroke:var(--org2)}
 #viewBanner{margin:2px 0 10px;padding:10px 12px;border-radius:12px;background:rgba(139,123,184,.15);border:1px solid rgba(139,123,184,.5);font-size:14.5px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:2px 0 6px}
-.stat{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:16px;padding:5px 2px;text-align:center}
-.stat b{display:block;font-size:16px;line-height:1.1;font-variant-numeric:tabular-nums}
-.stat span{display:block;font-size:10px;color:var(--mut);margin-top:0}
-.stat.hl b{color:var(--org2)}
-#fitNote{font-size:12.5px;line-height:1.35;margin:0 2px 4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.statcard{background:var(--bg2);border:1px solid #2E2444;border-radius:12px;margin-top:10px;overflow:hidden}
+.statgrid{display:grid;grid-template-columns:repeat(4,1fr)}
+.pstat{padding:13px 4px 11px;text-align:center}
+.pstat + .pstat{border-left:1px solid #2E2444}
+.pstat b{display:block;font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:22px;line-height:1.1;color:#F5F2FA;font-variant-numeric:tabular-nums}
+.pstat span{display:block;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--mut);margin-top:3px}
+.fitrow{background:var(--card2);border-top:1px solid #2E2444;display:flex;align-items:flex-start;gap:7px;padding:8px 12px}
+.fitrow #fitCheck{width:14px;height:14px;color:var(--grn);flex:none;margin-top:2px}
+.fitrow #fitCheck[hidden]{display:none}
+#fitNote{font-size:12.5px;line-height:1.35;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fitrow #fitNote{flex:1;min-width:0}
 #fitNote.open{-webkit-line-clamp:99}
-#btnFitMore{display:block;margin:0 0 6px auto;padding:2px 10px;min-height:24px;font-size:12px}
-#routeBlock .row3{margin-top:8px}
-#planToggle{width:100%;margin-top:8px;justify-content:space-between;font-weight:600;font-size:14.5px}
+.fitrow #btnFitMore{flex:none;margin:0;padding:2px 8px;min-height:24px;font-size:12px}
 #planInputs.folded{display:none}
 .foot{margin:14px 0 2px;text-align:center;font-size:12.5px;color:var(--dim)}
 .sheetfoot{margin:12px 0 2px;text-align:center}
@@ -756,34 +766,44 @@ body.light dialog::backdrop{background:rgba(36,27,51,.45)}
 body.light #busy{background:rgba(246,241,232,.8)}
 body.light .dark-tiles .leaflet-tile-pane{filter:none}
 
-/* ---------- v6.2: plan head / start row / budget / party / draw dock ---------- */
-.plan-head{padding:14px 2px 0;text-align:left}
-.plan-title{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:20px;margin:0;color:var(--txt)}
-.plan-sub{color:var(--mut);font-size:13px;margin:4px 0 0;line-height:1.45}
+/* ---------- v7.4 Fix 19: planner header, parameter panel, 4-tier buttons ---------- */
+#planHead{padding:14px 2px 0;text-align:left}
+.p-headrow{display:flex;align-items:center;gap:10px;min-height:48px}
+#planTitle{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:20px;letter-spacing:-.015em;margin:0;color:var(--txt);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zonepill{position:relative;display:flex;align-items:center;gap:6px;max-width:165px;height:36px;padding:0 12px;border-radius:999px;background:var(--card2);border:1px solid #4A3B6E;color:var(--txt);font-size:14px;font-weight:500;font-family:inherit;cursor:pointer}
+.zonepill::after{content:"";position:absolute;left:0;right:0;top:-6px;bottom:-6px}
+.zonepill svg{width:16px;height:16px;color:var(--pur);flex:none}
+.zonepill svg.chev{width:13px;height:13px}
+.zonepill span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.editpill{position:relative;display:flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:999px;background:var(--card2);border:1px solid #4A3B6E;color:var(--txt);font-size:13.5px;font-weight:500;font-family:inherit;cursor:pointer;white-space:nowrap}
+.editpill::after{content:"";position:absolute;left:0;right:0;top:-6px;bottom:-6px}
+.editpill svg{width:15px;height:15px;color:var(--pur);flex:none}
+#btnPlace[hidden],#btnEditPlan[hidden]{display:none}
+#planPanel{background:var(--bg2);border:1px solid #2E2444;border-radius:12px;margin-top:6px}
+.p-block{padding:13px 14px 14px}
+.p-block + .p-block{border-top:1px solid #2E2444}
+.p-micro{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--mut);margin-bottom:9px}
+.p-wthead{display:flex;align-items:center;justify-content:space-between;min-height:48px}
+.p-wtlabel{font-size:14px;color:#A89EC4}
+.p-stepper{display:flex;align-items:center;gap:12px}
+.p-stepbtn{position:relative;width:28px;height:28px;border-radius:99px;background:var(--card2);border:1px solid #3D315B;display:flex;align-items:center;justify-content:center;color:var(--txt);cursor:pointer;padding:0}
+.p-stepbtn::after{content:"";position:absolute;inset:-10px}
+.p-stepbtn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;flex:none}
+.p-wtval{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:20px;color:#F5F2FA;min-width:74px;text-align:center}
+.p-cta{width:100%;height:52px;border:0;border-radius:12px;background:var(--org);color:var(--ink);font-size:16px;font-weight:700;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer}
+.p-cta svg{width:19px;height:19px}
+.p-quiet{display:flex;align-items:center;justify-content:center;width:100%;height:48px;border:0;background:transparent;color:var(--pur);font-size:14px;font-weight:500;font-family:inherit;cursor:pointer}
+#planFoot{position:sticky;bottom:0;z-index:6;background:var(--card);border-top:1px solid #2E2444;margin:12px 0 0;padding:12px 2px 6px}
+.ugrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
 #homeRow{display:flex;align-items:center;gap:10px;min-height:48px;margin-top:10px;padding:0 4px 0 12px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;font-size:13px;color:var(--mut)}
 #homeRow span{flex:1}
 #homeRowBtn{flex:none;min-height:44px;padding:0 12px;background:none;border:0;color:var(--org2);font-weight:700;font-size:13px;cursor:pointer}
-.plancard{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;min-height:56px;padding:10px 16px;margin-top:10px;border-radius:14px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);cursor:pointer;text-align:left}
-.plancard-t{font-size:15px;font-weight:700}
-.plancard-s{font-size:12px;color:var(--mut)}
-.plancard-primary{background:var(--org);border-color:var(--org);color:#0E0A16}
-.plancard-primary .plancard-s{color:rgba(14,10,22,.72)}
 .homeicon.draglift .tdh{transform:rotate(-45deg) scale(1.1);box-shadow:0 10px 22px rgba(0,0,0,.6)}
 .party-actions{margin-top:24px;display:flex;flex-direction:column;gap:12px}
 .party-actions .btn{width:100%;min-height:48px}
-.budgetHead{display:flex;justify-content:space-between;align-items:baseline;margin:2px 2px 8px}
-.budgetLbl{font-size:13px;font-weight:600;color:var(--mut)}
-.budgetVal{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:22px;color:var(--org2)}
-.budgetTrack{min-height:48px;display:flex;align-items:center}
-#budgetSlider{-webkit-appearance:none;appearance:none;width:100%;height:48px;background:transparent;--fill:43%;margin:0}
-#budgetSlider::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--org) var(--fill),var(--line) var(--fill))}
-#budgetSlider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:28px;height:28px;border-radius:50%;background:var(--bone);border:3px solid var(--org);margin-top:-11px;box-shadow:0 2px 8px rgba(0,0,0,.45)}
-#budgetSlider::-moz-range-track{height:6px;border-radius:3px;background:var(--line)}
-#budgetSlider::-moz-range-progress{height:6px;border-radius:3px;background:var(--org)}
-#budgetSlider::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--bone);border:3px solid var(--org)}
-.budgetRail{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:4px}
-.budgetRail button{min-height:48px;border-radius:999px;border:1px solid var(--line);background:var(--bg2);color:var(--mut);font-weight:700;font-size:13px}
-.budgetRail button[aria-pressed="true"]{border-color:var(--org);color:var(--org2)}
+.budgetRail{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.budgetRail button{height:48px;border-radius:8px;background:var(--bg2);border:1px solid #2E2444;color:#A89EC4;font-weight:500;font-size:14px;font-family:inherit;cursor:pointer}
+.budgetRail button[aria-pressed="true"]{background:var(--card2);border:1.5px solid var(--org);box-shadow:inset 0 0 0 100px rgba(232,93,38,.12);color:#fff;font-weight:600}
 #drawPill{position:fixed;z-index:1150;top:calc(var(--topH) + 8px);left:50%;transform:translateX(-50%);max-width:calc(100vw - 32px);min-height:40px;display:flex;align-items:center;padding:8px 16px;border-radius:999px;background:rgba(20,18,16,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid var(--line2);color:var(--bone);font-size:13.5px;font-weight:600;box-shadow:0 10px 26px rgba(0,0,0,.5);white-space:nowrap}
 #drawPill[hidden]{display:none}
 #drawBar{top:auto;bottom:calc(var(--sab) + 10px);flex-direction:row;align-items:stretch;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 44px rgba(0,0,0,.55)}
@@ -812,7 +832,7 @@ body.mode-nav.rot-manual #btnResume{display:block!important}
 body:not(.has-route) .route-only{display:none!important}
 body.mode-view .plan-edit{display:none!important}
 body:not(.mode-view) .view-only{display:none!important}
-body.has-route #routeEmpty{display:none}
+body.has-route #tagline{display:none}
 #navThen{font-size:14px;color:var(--mut);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #navFlag{font-size:13px;font-weight:700;margin-top:6px;color:var(--cau2)}
 #btnResume{position:fixed;z-index:1400;right:calc(var(--sar) + 12px);bottom:300px;padding:10px 14px;font-weight:700;font-size:14.5px;border-radius:999px;align-items:center;gap:8px}
@@ -950,33 +970,26 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
 .sumnav{display:flex;gap:12px;margin-top:14px}
 .sumnav .btn{flex:1;height:40px;min-height:40px;font-size:14px;border-radius:12px;position:relative;padding:0 10px}
 .sumnav .btn::after{content:"";position:absolute;left:0;right:0;top:-4px;bottom:-4px}
-/* ---------- v6.6 Phase 4A fix 11: Unified Loop Bar ---------- */
-#loopBar{margin:2px 0 10px}
-.loop-meta{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:.09em;color:var(--mut)}
-#loopHint{color:#f59e0b;letter-spacing:.02em;font-weight:700}
+/* ---------- v7.4 Fix 19: planner start field + utility buttons ---------- */
+#loopHint{color:var(--cau2);letter-spacing:.02em;text-transform:none;font-weight:600;font-size:12px}
 #loopHint[hidden]{display:none}
-.loop-main{display:block;margin-top:4px;min-height:48px}
-#loopReadout{width:100%;min-width:0;display:flex;align-items:center;gap:8px;padding:0 12px;border:1px solid var(--line2);border-radius:14px;background:var(--bg2);color:var(--txt);font-size:14.5px;font-weight:600;font-family:inherit;cursor:pointer;text-align:left}
-#loopReadout[hidden]{display:none}
-#loopReadout svg{flex:none;color:var(--org2)}
-#loopValue{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.loop-form{width:100%;min-width:0;position:relative;display:flex;align-items:center}
-.loop-form[hidden]{display:none}
-.loop-form input{flex:1;min-width:0;min-height:48px;border-radius:14px;border:1px solid var(--org);background:var(--bg2);color:var(--txt);padding:0 44px 0 12px;font-size:16px}
-#loopClear{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;border-radius:50%;background:transparent;color:var(--mut);font-size:20px;font-family:inherit;cursor:pointer}
+.p-field{position:relative;display:flex;align-items:center;gap:10px;height:52px;background:var(--ink);border:1px solid #3D315B;border-radius:8px;padding:0 6px 0 14px;margin:0}
+.p-field:focus-within{border-color:#8B7BB8}
+.p-field > svg.pin{width:18px;height:18px;color:var(--pur);flex:none}
+.p-field input{flex:1;min-width:0;height:100%;border:0;background:transparent;color:#F5F2FA;padding:0 44px 0 0;font-size:16px;font-family:inherit;outline:none}
+.p-field input::placeholder{color:#7E7296}
+#loopClear{position:absolute;right:2px;top:50%;transform:translateY(-50%);width:48px;height:48px;border:0;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+#loopClear[hidden]{display:none}
+#loopClear .xdisc{width:26px;height:26px;border-radius:99px;background:var(--card2);color:var(--mut);display:flex;align-items:center;justify-content:center}
+#loopClear .xdisc svg{width:13px;height:13px}
 #loopSugg{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:30;background:var(--card);border:1px solid var(--line2);border-radius:14px;overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.5)}
 #loopSugg[hidden]{display:none}
 #loopSugg button{display:block;width:100%;padding:11px 12px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--txt);font-size:13.5px;font-family:inherit;text-align:left;cursor:pointer}
 #loopSugg button:last-child{border-bottom:0}
-.loop-subrow{display:flex;align-items:center;gap:8px;margin-top:8px}
-.loop-sub-label{flex:1;min-width:0;font-size:10.5px;font-weight:800;letter-spacing:.09em;color:var(--mut);text-transform:uppercase}
-.loop-actions{display:flex;gap:8px;flex:none}
-#loopBar .loop-pill{min-height:36px;padding:0 12px;white-space:nowrap;font-size:13px;background:transparent;border:1px solid var(--line2);color:var(--txt)}
-#loopBar .loop-pill.btn-org{background:var(--org);border-color:var(--org);color:var(--ink)}
-.start-row{display:flex;justify-content:flex-end;margin:0 0 12px}
-#btnStart{padding:12px 20px;min-height:48px}
-.loop-pill[hidden]{display:none}
-#btnDrop.loop-outline{border:1.5px solid var(--org);color:var(--org2)}
+.p-utilrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.p-util{display:flex;align-items:center;justify-content:center;gap:7px;height:48px;border-radius:10px;background:var(--card2);border:1px solid #3D315B;color:#E2DCF0;font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;text-decoration:none}
+.p-util svg{width:16px;height:16px;color:var(--pur);flex:none}
+.p-util.on{border-color:var(--pur)}
 /* ---------- v6.7 Phase 4B: share sheet ---------- */
 .seg3{grid-template-columns:1fr 1fr 1fr}
 #shareSheet .ocard{max-width:520px}
@@ -991,21 +1004,16 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
 /* Pioneer bar: the first walker in an unseeded zone gets the truth
    (nothing mapped yet) plus two working next actions, never a dead
    end. Ember left edge, quiet surface, Route pane only. */
-#pioneerBar{margin-top:12px;background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--org);border-radius:14px;padding:12px}
+#pioneerBar{margin-top:6px;background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--org);border-radius:12px;padding:12px 13px}
 #pioneerBar[hidden]{display:none}
 #pioneerBar b{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:16.5px;color:var(--txt)}
-#pioneerBar p{color:var(--mut);font-size:13px;line-height:1.45;margin:4px 0 10px}
-#pioneerBar .row2 .btn{flex:1;min-height:48px}
-/* Waypoint note: one plain line in the Route pane when the local stop
-   pool is under 3 and Auto-plan therefore runs on waypoints. */
-#wpNote{margin-top:12px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:10px 12px;color:var(--mut);font-size:13px;line-height:1.45}
+#pioneerBar p{color:var(--mut);font-size:13px;line-height:1.45;margin:3px 0 10px}
+#pioneerBar .row2 .p-util{flex:1}
+/* Waypoint note: one plain line above the planner's sticky footer
+   when the local stop pool is under 3 and the CTA therefore draws. */
+#wpNote{margin:12px 2px 0;color:var(--mut);font-size:13px;line-height:1.45;text-align:center}
 #wpNote[hidden]{display:none}
-#wpNote b{color:var(--txt)}
-/* The quiet neighborhood row under the Loop Bar: where you are, and
-   the always-available way to change it. */
-.place-row{display:flex;align-items:center;gap:8px;margin-top:8px}
-.place-row #placeNow{flex:1;min-width:0;color:var(--mut);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.place-row .btn{flex:none}
+#wpNote b{color:var(--cau2);font-weight:600}
 /* Place entry: the city/ZIP fallback surface. One input, one primary
    action, two honest exits (GPS, or the seeded launch map). */
 #placeSheet input[type="search"]{width:100%;min-height:52px;border-radius:14px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:0 14px;font-size:16px;font-family:inherit}
@@ -1150,84 +1158,97 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
   </div>
   <div id="peek">
     <button id="peekMain" type="button"><span id="peekTitle">Tonight's Route</span><span id="peekSub">Free Walk &middot; Ready</span></button>
+    <button id="peekWalk" type="button" hidden>Just walk &middot; No route</button>
     <button id="peekStart" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5Z"/></svg>Start</button>
   </div>
   <div id="sheetBody">
     <div id="tabRoute" role="tabpanel">
-      <div id="viewBanner" class="view-only"><b>Shared route.</b> Someone sent you this candy loop. Tap <b>Start trick-or-treating</b> below to walk it.</div>
-      <div id="routeEmpty" class="plan-head">
-        <h3 class="plan-title">Plan your loop</h3>
-        <p class="plan-sub">Set a home base and how long you want to walk.</p>
+      <div id="planHead">
+        <div class="p-headrow">
+          <h3 id="planTitle">Plan your loop</h3>
+          <button id="btnPlace" class="zonepill" type="button" aria-label="Change neighborhood"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-pin"/></svg><span id="zonePillName">The Heights</span><svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chev-d"/></svg></button>
+          <button id="btnEditPlan" class="editpill plan-edit" type="button" aria-expanded="false" hidden><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sliders"/></svg><span id="editPlanTxt">Edit plan &middot; 60m</span></button>
+        </div>
         <p id="tagline" hidden><span>Tell us where you start and how long you have. We build the loop that hits the most candy houses, then guide you turn by turn.</span><button id="btnIntroOk" type="button">Got it</button></p>
       </div>
+      <div id="viewBanner" class="view-only"><b>Shared route.</b> Someone sent you this candy loop. Tap <b>Start trick-or-treating</b> below to walk it.</div>
       <div id="pioneerBar" hidden>
         <b id="pioneerTitle">First on the block</b>
         <p id="pioneerText">No houses are mapped here yet. Mark spots as you walk and this street lights up for your party and neighbors.</p>
         <div class="row2">
-          <button id="btnPioneerSpot" class="btn btn-org btn-sm" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-plus"/></svg>Mark a spot</button>
-          <button id="btnPioneerClaim" class="btn btn-ghost btn-sm" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-pin"/></svg>Claim your porch</button>
+          <button id="btnPioneerSpot" class="p-util" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-plus"/></svg>Mark a spot</button>
+          <button id="btnPioneerClaim" class="p-util" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-pin"/></svg>Claim your porch</button>
         </div>
-      </div>
-      <div id="wpNote" hidden></div>
-      <div id="routeBlock" class="route-only">
-        <div id="stats" class="stats"></div>
-        <div id="fitNote" class="muted"></div>
-        <button id="btnFitMore" class="btn btn-ghost" type="button">More &#9662;</button>
-        <div id="approxNote" class="warn" hidden>Walking directions are unavailable right now, so the route is drawn as straight lines between stops. Navigation is approximate: follow the sidewalks.</div>
-        <button id="btnNewRoute" class="btn btn-pur" type="button" style="width:100%;margin-top:8px"><svg class="ic" viewBox="0 0 24 24"><use href="#i-shuffle"/></svg>New route &middot; different streets</button>
-        <button id="btnNav" class="btn btn-org btn-xl" type="button" style="margin-top:8px"><svg class="ic" viewBox="0 0 24 24"><use href="#i-flag"/></svg>Start trick-or-treating</button>
-        <div class="row3">
-          <button id="btnRebuild" class="btn plan-edit" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-undo"/></svg>Rebuild</button>
-          <button id="btnPlanOwn" class="btn view-only" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-draw"/></svg>Plan my own</button>
-          <a id="btnGmaps" class="btn" href="#" target="_blank" rel="noopener"><svg class="ic" viewBox="0 0 24 24"><use href="#i-route"/></svg>Google Maps</a>
-          <button id="btnShare" class="btn" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-share"/></svg>Share route</button>
-        </div>
-        <button id="btnRouteCard" class="btn btn-ghost" type="button" style="width:100%;margin-top:8px"><svg class="ic" viewBox="0 0 24 24"><use href="#i-share"/></svg>Share route card</button>
-        <button id="planToggle" class="btn btn-ghost route-only plan-edit" type="button" aria-expanded="false"><span id="planToggleText">Change start or time</span><span>&#9662;</span></button>
       </div>
       <div id="planInputs" class="plan-edit">
-        <div id="loopBar">
-          <div class="loop-meta"><span>Start point</span><span id="loopHint" hidden>Fuzzy GPS &middot; drag pin to fix</span></div>
-          <div class="loop-main">
-            <button id="loopReadout" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-pin"/></svg><span id="loopValue">Type an address or use GPS</span></button>
-            <form class="search loop-form" id="searchForm" hidden>
-              <input id="searchInput" type="search" placeholder="Type an address or place" autocomplete="off" enterkeyhint="search" aria-label="Start address">
-              <button id="loopClear" type="button" aria-label="Clear address">&times;</button>
+        <div id="planPanel">
+          <div class="p-block">
+            <div class="p-micro"><span>Start &amp; end &middot; Loop</span><span id="loopHint" hidden>Fuzzy GPS &middot; drag pin to fix</span></div>
+            <form class="p-field" id="searchForm">
+              <svg class="ic pin" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-pin"/></svg>
+              <input id="searchInput" type="search" placeholder="Type an address or use GPS" autocomplete="off" enterkeyhint="search" aria-label="Start address">
+              <button id="loopClear" type="button" aria-label="Clear address" hidden><span class="xdisc"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-x"/></svg></span></button>
               <div id="loopSugg" hidden></div>
             </form>
+            <div class="p-utilrow">
+              <button id="btnLocate" class="p-util" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-locate"/></svg>Use GPS</button>
+              <button id="btnDrop" class="p-util" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-pin"/></svg>Drop pin</button>
+            </div>
           </div>
-          <div class="loop-subrow"><span class="loop-sub-label">Start &amp; end &middot; Loop</span><span class="loop-actions">
-              <button id="btnLocate" class="btn btn-org loop-pill" type="button">Use GPS</button>
-              <button id="btnDrop" class="btn loop-pill" type="button">Drop pin</button>
-            </span></div>
-        </div>
-        <div class="start-row"><button id="btnStart" class="btn btn-org" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-flag"/></svg>Start</button></div>
-        <div class="place-row"><span id="placeNow">Neighborhood: The Heights</span><button id="btnPlace" class="btn btn-ghost btn-sm" type="button">Change place</button></div>
-        <div class="label">How long do we have?</div>
-        <div class="budgetCtl">
-          <div class="budgetHead"><span class="budgetLbl">Walk time</span><span id="budgetReadout" class="budgetVal">60 min</span></div>
-          <div class="budgetTrack"><input id="budgetSlider" type="range" min="15" max="120" step="5" value="60" aria-label="Walk time in minutes"></div>
-          <div class="budgetRail" id="budgetRail" role="group" aria-label="Quick times">
-            <button type="button" data-min="30" aria-pressed="false">30m</button>
-            <button type="button" data-min="45" aria-pressed="false">45m</button>
-            <button type="button" data-min="60" aria-pressed="true">60m</button>
-            <button type="button" data-min="90" aria-pressed="false">90m</button>
-            <button type="button" data-min="120" aria-pressed="false">120m</button>
+          <div class="p-block">
+            <div class="p-wthead">
+              <span class="p-wtlabel">Walk time</span>
+              <span class="p-stepper">
+                <button id="btnBudgetMinus" class="p-stepbtn" type="button" aria-label="Less walk time"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+                <span id="budgetReadout" class="p-wtval">60 min</span>
+                <button id="btnBudgetPlus" class="p-stepbtn" type="button" aria-label="More walk time"><svg class="ic" viewBox="0 0 24 24"><use href="#i-plus"/></svg></button>
+              </span>
+            </div>
+            <div class="budgetRail" id="budgetRail" role="group" aria-label="Quick times">
+              <button type="button" data-min="30" aria-pressed="false">30m</button>
+              <button type="button" data-min="45" aria-pressed="false">45m</button>
+              <button type="button" data-min="60" aria-pressed="true">60m</button>
+              <button type="button" data-min="90" aria-pressed="false">90m</button>
+              <button type="button" data-min="120" aria-pressed="false">2h</button>
+            </div>
+          </div>
+          <div class="p-block">
+            <div class="p-micro"><span>Route style</span></div>
+            <div class="chips" id="styleChips" role="group" aria-label="Route style">
+              <button class="chip" data-style="fresh" type="button" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-spark"/></svg>Fresh streets</button>
+              <button class="chip" data-style="best" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-star"/></svg>Best houses</button>
+              <button class="chip" data-style="shuffle" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-shuffle"/></svg>Shuffle it</button>
+              <button class="chip" data-style="lastyear" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-history"/></svg>Last year</button>
+            </div>
           </div>
         </div>
-        <div class="label">Route style</div>
-        <div class="chips" id="styleChips" role="group" aria-label="Route style" style="grid-template-columns:repeat(4,1fr)">
-          <button class="chip" data-style="best" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-star"/></svg><small>Best route</small></button>
-          <button class="chip" data-style="shuffle" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-shuffle"/></svg><small>Shuffle it</small></button>
-          <button class="chip" data-style="fresh" type="button" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-spark"/></svg><small>Fresh streets</small></button>
-          <button class="chip" data-style="lastyear" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-history"/></svg><small>Last year</small></button>
+        <div id="wpNote" hidden></div>
+        <div id="planFoot">
+          <button id="btnBuild" class="p-cta" type="button"><svg class="ic" id="btnBuildIc" viewBox="0 0 24 24" aria-hidden="true" hidden><use href="#i-draw"/></svg><span id="btnBuildTxt">Auto-plan 60m loop</span></button>
+          <button id="btnDraw" class="p-quiet" type="button">Or pick stops on map yourself &#8594;</button>
         </div>
-        <button id="btnBuild" class="plancard plancard-primary" type="button"><span class="plancard-t">Auto-plan a loop</span><span class="plancard-s">We pick and order stops for your time budget</span></button>
-        <button id="btnDraw" class="plancard" type="button"><span class="plancard-t">Pick stops on map</span><span class="plancard-s">Tap houses yourself &middot; we connect the path</span></button>
+      </div>
+      <div id="routeBlock" class="route-only">
+        <div id="approxNote" class="warn" hidden>Walking directions are unavailable right now, so the route is drawn as straight lines between stops. Navigation is approximate: follow the sidewalks.</div>
+        <div class="statcard">
+          <div id="stats" class="statgrid"></div>
+          <div class="fitrow">
+            <svg class="ic" id="fitCheck" viewBox="0 0 24 24" aria-hidden="true" hidden><use href="#i-check"/></svg>
+            <div id="fitNote"></div>
+            <button id="btnFitMore" class="btn btn-ghost" type="button">More &#9662;</button>
+          </div>
+        </div>
+        <div class="ugrid">
+          <button id="btnNewRoute" class="p-util" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-shuffle"/></svg>Different streets</button>
+          <button id="btnPlanOwn" class="p-util" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-draw"/></svg>Edit stops</button>
+          <button id="btnShare" class="p-util" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-share"/></svg>Share route</button>
+          <a id="btnGmaps" class="p-util" href="#" target="_blank" rel="noopener"><svg class="ic" viewBox="0 0 24 24"><use href="#i-route"/></svg>Google Maps</a>
+        </div>
+        <button id="btnNav" class="btn btn-org btn-xl" type="button" style="margin-top:10px"><svg class="ic" viewBox="0 0 24 24"><use href="#i-flag"/></svg>Start trick-or-treating</button>
       </div>
       <div class="sheetfoot">
         <div class="wm">Candy Trail</div>
-        <div class="ver" id="appVer">Candy Trail v7.3</div>
+        <div class="ver" id="appVer">Candy Trail v7.4</div>
       </div>
     </div>
 
@@ -1344,7 +1365,7 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
   <div class="prefs-foot">
     <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon-mono"/></svg>
     <div class="crest">Candy Trail</div>
-    <div class="ver">Version 7.3</div>
+    <div class="ver">Version 7.4</div>
   </div>
 </div>
 
@@ -2537,10 +2558,12 @@ $('fabLocate').addEventListener('click', function () {
 /* ---------------- start point ---------------- */
 var homeMarker = null;
 function startIsCustom() { return !!(S.start && S.start.label !== 'My location'); }
-/* Unified Loop Bar paint (v6.6 Phase 4A, fix 11): the readout shows
-   the current anchor; the trailing pills show only the modes that are
-   NOT active (Use GPS is ember primary only when nothing is anchored;
-   Drop pin wears an ember outline in the weak-GPS state). */
+/* Planner start-block paint (v7.4 Fix 19; states from v6.6 fix 11):
+   the persistent address input shows the current anchor (never
+   clobbering text the user is typing), the fuzzy hint rides the
+   block's label row, and Use GPS / Drop pin are always-visible equal
+   secondaries; Use GPS wears the violet active border while the
+   anchor IS the GPS fix. */
 function loopAnchorState() {
   if (!S.start) return 'none';
   if (S.start.label === 'My location') return (GPS_DEGRADED || S.locTier === 3) ? 'gpsfuzzy' : 'gps';
@@ -2548,23 +2571,18 @@ function loopAnchorState() {
   return 'addr';
 }
 function paintLoopBar() {
-  var val = $('loopValue'), hint = $('loopHint'), gps = $('btnLocate'), drop = $('btnDrop');
-  if (!val) return;
+  var inp = $('searchInput'), hint = $('loopHint'), gps = $('btnLocate'), drop = $('btnDrop'), clr = $('loopClear');
+  if (!inp) return;
   var st = loopAnchorState();
-  val.textContent = st === 'none' ? 'Type an address or use GPS'
-    : st === 'gps' ? 'My GPS location'
-    : st === 'gpsfuzzy' ? 'My GPS (approximate)'
+  var label = st === 'none' ? ''
+    : (st === 'gps' || st === 'gpsfuzzy') ? 'Current location'
     : st === 'pin' ? 'Custom map pin'
     : (S.start.label || 'Custom map pin');
+  if (document.activeElement !== inp) inp.value = label;
+  if (clr) clr.hidden = !inp.value;
   if (hint) hint.hidden = st !== 'gpsfuzzy';
-  if (gps) {
-    gps.hidden = st === 'gps' || st === 'gpsfuzzy';
-    gps.className = 'btn loop-pill' + (st === 'none' ? ' btn-org' : '');
-  }
-  if (drop) {
-    drop.hidden = st === 'pin' || st === 'addr';
-    drop.className = 'btn loop-pill' + (st === 'gpsfuzzy' ? ' loop-outline' : '');
-  }
+  if (gps) gps.className = 'p-util' + ((st === 'gps' || st === 'gpsfuzzy') ? ' on' : '');
+  if (drop) drop.className = 'p-util';
 }
 function renderStart() {
   if (homeMarker) { map.removeLayer(homeMarker); homeMarker = null; }
@@ -2685,35 +2703,29 @@ $('searchForm').addEventListener('submit', function (ev) {
   }).catch(function () { hideBusy(); toast('Search failed. Check your connection.', 'err'); });
 });
 
-/* Loop Bar edit mode (fix 11): tapping the readout turns it into the
-   address input; suggestions geocode live through the same Nominatim
-   endpoint the submit path uses, and picking one sets the anchor with
-   the same label rule. Enter still submits through the form handler. */
-function loopEditOpen() {
-  var ro = $('loopReadout'), f = $('searchForm');
-  if (ro) ro.hidden = true;
-  if (f) f.hidden = false;
-  var inp = $('searchInput');
-  if (inp) {
-    if (S.start && S.start.label && S.start.label !== 'My location' && S.start.label !== 'Dropped pin') inp.value = S.start.label;
-    try { inp.focus(); } catch (e) {}
-  }
-}
+/* Planner address field (v7.4 Fix 19): the input is persistent, so
+   there is no edit mode to open; suggestions geocode live through the
+   same Nominatim endpoint the submit path uses, and picking one sets
+   the anchor with the same label rule. Enter still submits through
+   the form handler. "Closing" now means: suggestions away, field
+   resynced to the anchor it just set. */
 function loopEditClose() {
-  var ro = $('loopReadout'), f = $('searchForm'), sg = $('loopSugg');
-  if (ro) ro.hidden = false;
-  if (f) f.hidden = true;
+  var sg = $('loopSugg');
   if (sg) sg.hidden = true;
+  var inp = $('searchInput');
+  if (inp) { try { inp.blur(); } catch (e) {} }
+  paintLoopBar();
 }
-$('loopReadout').addEventListener('click', loopEditOpen);
 $('loopClear').addEventListener('click', function () {
   var inp = $('searchInput');
   if (inp) { inp.value = ''; try { inp.focus(); } catch (e) {} }
+  var clr = $('loopClear'); if (clr) clr.hidden = true;
   var sg = $('loopSugg'); if (sg) sg.hidden = true;
 });
 var loopSuggTimer = null;
 $('searchInput').addEventListener('input', function () {
   var q = $('searchInput').value.trim();
+  var clr = $('loopClear'); if (clr) clr.hidden = !q;
   var sg = $('loopSugg');
   if (loopSuggTimer) clearTimeout(loopSuggTimer);
   if (q.length < 3) { if (sg) sg.hidden = true; return; }
@@ -2735,19 +2747,42 @@ $('searchInput').addEventListener('input', function () {
   }, 300);
 });
 
-/* ---------------- budget slider ---------------- */
+/* ---------------- budget: preset rail + stepper (v7.4 Fix 19) ----
+   One value (S.budget, persisted as before), two writers: the rail
+   for the common cases and the -/+ stepper (15m grain, 15..180) for
+   everything else. The slider is gone. An off-preset value simply
+   leaves every rail chip unpressed. paintBudget also repaints the
+   dynamic CTA label and the planned-state header, which both quote
+   the budget live. */
+var PLAN_SPARSE = false;
+function paintPlanCta() {
+  var t = $('btnBuildTxt'); if (!t) return;
+  var ic = $('btnBuildIc');
+  if (PLAN_SPARSE) { t.textContent = 'Draw your route'; if (ic) ic.hidden = false; }
+  else { t.textContent = 'Auto-plan ' + S.budget + 'm loop'; if (ic) ic.hidden = true; }
+}
+function paintPlanHead() {
+  var title = $('planTitle'), zp = $('btnPlace'), ep = $('btnEditPlan'), et = $('editPlanTxt');
+  if (!title) return;
+  var has = document.body.classList.contains('has-route');
+  title.textContent = has ? ('Your ' + S.budget + 'm loop') : 'Plan your loop';
+  if (zp) zp.hidden = has;
+  if (ep) ep.hidden = !has;
+  if (et) et.textContent = 'Edit plan \u00B7 ' + S.budget + 'm';
+}
 function paintBudget() {
   var v = S.budget;
-  var sl = $('budgetSlider');
-  if (sl) { sl.value = v; sl.style.setProperty('--fill', ((v - 15) / 105 * 100) + '%'); }
   var ro = $('budgetReadout'); if (ro) ro.textContent = v + ' min';
   $$('#budgetRail button').forEach(function (b) { b.setAttribute('aria-pressed', String(parseInt(b.getAttribute('data-min'), 10) === v)); });
+  paintPlanCta();
+  paintPlanHead();
 }
 function setBudget(v) { S.budget = v; store.set('budget', v); paintBudget(); }
 (function initBudget() {
-  var sl = $('budgetSlider');
-  if (sl) sl.addEventListener('input', function () { setBudget(parseInt(sl.value, 10)); });
   $$('#budgetRail button').forEach(function (b) { b.addEventListener('click', function () { setBudget(parseInt(b.getAttribute('data-min'), 10)); }); });
+  var minus = $('btnBudgetMinus'), plus = $('btnBudgetPlus');
+  if (minus) minus.addEventListener('click', function () { setBudget(Math.max(15, S.budget - 15)); });
+  if (plus) plus.addEventListener('click', function () { setBudget(Math.min(180, S.budget + 15)); });
   paintBudget();
 })();
 
@@ -3602,13 +3637,13 @@ function showStats(route) {
   S._routePeek = (route.distance / M_PER_MI).toFixed(1) + ' mi \u00B7 ' + mins + ' min \u00B7 ' + (noData ? 'starter loop' : route.houses + ' houses');
   if (typeof updatePeek === 'function') updatePeek();
   $('stats').innerHTML =
-    '<div class="stat"><b>' + (route.distance / M_PER_MI).toFixed(1) + '</b><span>miles</span></div>' +
-    '<div class="stat"><b>' + mins + '</b><span>est. minutes</span></div>' +
-    '<div class="stat"><b>' + (noData ? '–' : route.houses) + '</b><span>est. houses</span></div>' +
-    '<div class="stat hl"><b>' + (noData ? '–' : score) + '</b><span>houses/hr</span></div>';
+    '<div class="pstat"><b>' + route.stops.length + '</b><span>Stops</span></div>' +
+    '<div class="pstat"><b>' + (noData ? '–' : route.houses) + '</b><span>Houses</span></div>' +
+    '<div class="pstat"><b>' + mins + '</b><span>Minutes</span></div>' +
+    '<div class="pstat"><b>' + (route.distance / M_PER_MI).toFixed(1) + '</b><span>Miles</span></div>';
   var spare = S.budget - mins;
   $('fitNote').textContent = route.degraded ?
-    'The street-data service is swamped right now (it is Halloween, after all), so this is a starter loop. Tap Rebuild in a little while for the fully optimized candy route.' :
+    'The street-data service is swamped right now (it is Halloween, after all), so this is a starter loop. Tap Different streets in a little while for the fully optimized candy route.' :
     route.fallback ?
     'Not many mapped houses nearby, so this is a simple loop. Your pins and the community stops still show on the map.' :
     (spare >= 0 ?
@@ -3625,6 +3660,7 @@ function showStats(route) {
   if (S.allergy) $('fitNote').textContent += ' Allergy-safe stops were prioritized.';
   if (S.stroller) $('fitNote').textContent += ' Stroller mode: step-free streets preferred where possible.';
   if (route.fromHere) $('fitNote').textContent = 'Re-planned from where you stood, ending back home. ' + $('fitNote').textContent;
+  var fc = $('fitCheck'); if (fc) fc.hidden = !(!route.degraded && !route.fallback && spare >= 0);
   $('fitNote').classList.remove('open');
   var bfm = $('btnFitMore'); if (bfm) bfm.innerHTML = 'More &#9662;';
   var anEl = $('approxNote'); if (anEl) anEl.hidden = !route.approx;
@@ -3635,12 +3671,15 @@ function showStats(route) {
   document.body.classList.add('has-route');
   setSheetCollapsed(false);
   $('planInputs').classList.add('folded');
-  $('planToggleText').textContent = 'Change start or time';
-  $('planToggle').setAttribute('aria-expanded', 'false');
+  var ep = $('btnEditPlan'); if (ep) ep.setAttribute('aria-expanded', 'false');
+  paintPlanHead();
 }
-$('planToggle').addEventListener('click', function () {
+/* v7.4 Fix 19: "Change start or time" is promoted to the header as
+   the Edit pill; it expands the parameter panel in place above the
+   planned route it edits. */
+$('btnEditPlan').addEventListener('click', function () {
   var folded = $('planInputs').classList.toggle('folded');
-  $('planToggle').setAttribute('aria-expanded', folded ? 'false' : 'true');
+  $('btnEditPlan').setAttribute('aria-expanded', folded ? 'false' : 'true');
 });
 
 function buildRoute() {
@@ -4068,7 +4107,7 @@ function catsVisible(cats) {
 function paintToggles() { $('tglAllergy').setAttribute('aria-pressed', String(!!S.allergy)); $('tglStroller').setAttribute('aria-pressed', String(!!S.stroller)); var tc = $('tglCrowd'); if (tc) tc.setAttribute('aria-pressed', String(!!CROWD_PREF)); paintTray(); paintPrefs(); }
 function paintPrefs() {
   var el = $('prefsState'); if (!el) return;
-  var styleName = { best: 'Best route', shuffle: 'Shuffle', fresh: 'Fresh streets', lastyear: 'Last year' }[S.variety] || 'Fresh streets';
+  var styleName = { best: 'Best houses', shuffle: 'Shuffle', fresh: 'Fresh streets', lastyear: 'Last year' }[S.variety] || 'Fresh streets';
   var parts = [styleName];
   if (S.allergy) parts.push('Allergy-safe');
   if (S.stroller) parts.push('Stroller');
@@ -4346,7 +4385,8 @@ function rerouteFromHere() {
   }).catch(function () { hideBusy(); toast('Could not build a new route right now. Your current route is unchanged.', 'err'); });
 }
 $('btnReroute').addEventListener('click', rerouteFromHere);
-$('btnRebuild').addEventListener('click', function () { S.forceVariety = true; buildRoute(); });
+/* v7.4 Fix 19: Rebuild is cut. Its handler was byte-identical to
+   Different streets (forceVariety + buildRoute), so nothing is lost. */
 $('btnNewRoute').addEventListener('click', function () { S.forceVariety = true; buildRoute(); });
 
 /* route from explicit stops (shared links) */
@@ -4370,29 +4410,35 @@ function encodeRoute() {
   return btoa(unescape(encodeURIComponent(JSON.stringify(payload)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 function round6(n) { return Math.round(n * 1e6) / 1e6; }
-$('btnShare').addEventListener('click', function () {
-  var code = encodeRoute();
-  if (!code) { toast('Build a route first, then share it.', 'warn'); return; }
-  var vq = currentViewQuery();
-  var url = APP_LINK + (vq ? '?' + vq : '') + '#r=' + code;
-  if (navigator.share) {
-    navigator.share({ title: 'Our trick-or-treat route', text: 'Follow our Candy Trail loop:', url: url }).catch(function () {});
-  } else if (navigator.clipboard) {
-    navigator.clipboard.writeText(url).then(function () { toast('Route link copied. Send it to the other parents!', 'ok'); },
-      function () { toast('Copy failed. The link is in the address bar.', 'warn'); });
-    try { history.replaceState(null, '', '#r=' + code); } catch (e) {}
-  } else {
-    try { history.replaceState(null, '', '#r=' + code); } catch (e) {}
-    toast('Link is in the address bar, copy it from there.', 'ok');
+/* v7.4 Fix 19: one Share route action. It opens the v7.3 share
+   sheet for the route (card preview + the link line), merging the
+   old Share route and Share route card buttons into a single door. */
+$('btnShare').addEventListener('click', function () { openShareSheet('route'); });
+/* v7.4 Fix 19: Edit stops. The old Plan my own button existed only
+   in shared-route view mode and only exited it; Edit stops is a
+   planned-state action in both modes: it opens the draw editor
+   preloaded with the route's stops (drag to move, tap a stop to
+   remove, tap the map to add), and finishing rebuilds through the
+   same routeFromStops path the draw editor always used. In view
+   mode it first makes the route the walker's own (the old button's
+   exit-view-mode behavior). */
+function enterDrawEdit() {
+  if (!S.route || !S.start) { toast('Build a route first, then edit its stops.', 'warn'); return; }
+  if (S.viewMode) {
+    S.viewMode = false;
+    document.body.classList.remove('mode-view');
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
   }
-});
-$('btnPlanOwn').addEventListener('click', function () {
-  S.viewMode = false;
-  document.body.classList.remove('mode-view');
-  try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
-  $('planInputs').classList.remove('folded');
-  toast('Plan your own: set a start and build.', 'ok');
-});
+  var stops = (S.route.stops || []).map(function (s) {
+    return { lat: s.lat, lng: s.lng, stop: s.stop || null, name: s.name || (s.stop ? (s.stop.name || s.stop.addr || null) : null) };
+  });
+  enterDraw();
+  if (S.draw) {
+    stops.forEach(function (p) { drawAdd(p); });
+    toast('Edit stops: drag to move, tap a stop to take it out, tap the map to add. Build loop when you are done.', 'ok');
+  }
+}
+$('btnPlanOwn').addEventListener('click', enterDrawEdit);
 
 /* ---------------- navigation ---------------- */
 var wakeLock = null;
@@ -4743,6 +4789,7 @@ function freshStart(collapseSheet) {
   document.body.classList.remove('has-route');
   ghostHeights(false);
   $('planInputs').classList.remove('folded');
+  paintPlanHead();
   S._routePeek = 'Tap to plan your route'; if (typeof updatePeek === 'function') updatePeek();
   setSheetCollapsed(!!collapseSheet);
 }
@@ -6409,11 +6456,16 @@ function recFinish(opts) {
   maybeSpotSharePrompt();
 }
 function recEndSession() { if (REC.on) recFinish({ quiet: true }); }
-$('btnStart').addEventListener('click', function () {
-  showDlg('Start your night', 'Plan a loop and let Candy Trail guide you, or go on your own and let the trail record itself.', [
-    { label: 'Plan my route', cls: 'btn-ghost' },
-    { label: 'Go on my own', cls: 'btn-org', fn: recStart }
-  ]);
+/* v7.4 Fix 19: the planner's Start row is deleted (Argon: a Start
+   inside an unconfigured planner launches empty walks). Its
+   free-walk branch ("Go on my own") moves to the collapsed peek bar
+   as the violet Just walk pill; planning is what the planner itself
+   is for, so the pill starts the free walk directly. */
+$('peekWalk').addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+$('peekWalk').addEventListener('click', function (e) {
+  e.stopPropagation();
+  recStart();
+  updatePeek();
 });
 $('btnEmptyRecord').addEventListener('click', recStart);
 $('btnRecHouse').addEventListener('click', recHouse);
@@ -7964,6 +8016,9 @@ function peekSetStart(mode) {
 function updatePeek() {
   var tEl = $('peekTitle'), sEl = $('peekSub');
   if (!tEl || !sEl) return;
+  /* v7.4 Fix 19: the Just walk pill shows in exactly one state,
+     Route tab with no route planned and nothing recording. */
+  var walkEl = $('peekWalk'); if (walkEl) walkEl.hidden = true;
   var tab = S.sheetTab || 'route';
   if (S.nav) {
     tEl.textContent = 'On your route';
@@ -7999,7 +8054,8 @@ function updatePeek() {
       peekSetStart('start-route');
     } else {
       sEl.textContent = 'Free Walk · Ready';
-      peekSetStart('start-free');
+      peekSetStart(null);
+      if (walkEl) walkEl.hidden = false;
     }
   }
 }
@@ -8194,6 +8250,20 @@ function mapShareUrl(extraQuery) {
 function shareLinkFor(kind) {
   /* v6.9: a spot card links to the place itself, not the live viewport. */
   if (kind === 'spot') return (typeof SHARE !== 'undefined' && SHARE.spotReg) ? regLink(SHARE.spotReg) : APP_LINK;
+  /* v7.4 correction (Fix 19): a route share with a planned route must
+     carry the #r= encoded-route link, minted with the same encodeRoute()
+     the pre-v7.4 Share route button used, so the recipient gets the
+     actual loop (and the boot #r= shared-route flow) instead of only a
+     map viewport. No planned route: the viewport link below, as before. */
+  if (kind === 'route') {
+    var code = '';
+    try { code = encodeRoute(); } catch (e) {}
+    if (code) {
+      var vq = '';
+      try { vq = currentViewQuery(); } catch (e) {}
+      return APP_LINK + (vq ? '?' + vq : '') + '#r=' + code;
+    }
+  }
   var extra = '';
   if (kind === 'party' && typeof PARTY !== 'undefined' && PARTY.code) extra = 'party=' + encodeURIComponent(PARTY.code);
   var url = mapShareUrl(extra);
@@ -8677,7 +8747,8 @@ $('shareSave').addEventListener('click', function () {
   if (SHARE.blob) { if (downloadCardBlob(SHARE.blob, shareFileName(SHARE.kind))) toast('Card image saved.', 'ok'); }
   else toast('Could not make the card on this browser.', 'err');
 });
-$('btnRouteCard').addEventListener('click', function () { openShareSheet('route'); });
+/* v7.4 Fix 19: #btnRouteCard is gone; the planned state's single
+   Share route action opens this same sheet (see the route actions). */
 $('btnHaulShare').addEventListener('click', function () { openShareSheet('haul'); });
 
 /* --- third marked spot: a one-time, gentle card offer ---
@@ -9604,8 +9675,8 @@ function enterWaypointMode(anchor) {
 /* ---------- zone chrome: place row, pioneer bar, waypoint note ---------- */
 function paintZoneChrome() {
   var def = (typeof ZONE !== 'undefined' && ZONE) ? ZONE.zoneDef : null;
-  var pn = $('placeNow');
-  if (pn) pn.textContent = 'Neighborhood: ' + (def ? def.place : 'The Heights');
+  var pn = $('zonePillName');
+  if (pn) pn.textContent = def ? def.place : 'The Heights';
   paintStyleVisibility(def);
   paintPioneer(def);
   paintWpNote(def);
@@ -9616,7 +9687,7 @@ function paintStyleVisibility(def) {
   if (!wrap || !chip) return;
   var seeded = !def || !!def.seeded;
   chip.style.display = seeded ? '' : 'none';
-  wrap.style.gridTemplateColumns = seeded ? 'repeat(4,1fr)' : 'repeat(3,1fr)';
+  wrap.style.gridTemplateColumns = ''; /* v7.4: the 2x2 grid is pure CSS now */
   /* "Last year's hits" is meaningless where there is no last year. */
   if (!seeded && S.variety === 'lastyear') {
     S.variety = 'fresh'; store.set('variety', 'fresh');
@@ -9637,13 +9708,11 @@ function paintPioneer(def) {
 function paintWpNote(def) {
   var el = $('wpNote');
   if (!el) return;
-  var bbT = $('btnBuild') ? $('btnBuild').querySelector('.plancard-t') : null;
-  if (!S.start) { el.hidden = true; if (bbT) bbT.textContent = 'Auto-plan a loop'; return; }
+  if (!S.start) { el.hidden = true; PLAN_SPARSE = false; paintPlanCta(); return; }
   var n = routePoolCount(S.start);
-  if (n >= 3) { el.hidden = true; if (bbT) bbT.textContent = 'Auto-plan a loop'; return; }
-  if (bbT) bbT.textContent = 'Draw your route';
-  el.innerHTML = '<b>Waypoint mode.</b> Only ' + n + ' stop' + (n === 1 ? '' : 's') +
-    ' mapped near your start, so Auto-plan drops waypoints instead of guessing. Tap the map, or mark spots as you go, and we connect the loop.';
+  if (n >= 3) { el.hidden = true; PLAN_SPARSE = false; paintPlanCta(); return; }
+  PLAN_SPARSE = true; paintPlanCta();
+  el.innerHTML = '<b>Fewer than 3 stops mapped nearby.</b> Draw your path instead and mark houses as you go.';
   el.hidden = false;
 }
 
@@ -9824,7 +9893,7 @@ paintChromeState();
 /* v6.4.1 boot self-check marker: the shell's checker script verifies this
    was set. If boot died anywhere above, the repair overlay appears instead
    of a silently half-dead app. */
-window.__ctBootOK = '7.3';
+window.__ctBootOK = '7.4';
 
 </script>
 <script>
