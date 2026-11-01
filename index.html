@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0A16">
-<meta name="version" content="6.9">
+<meta name="version" content="7.0">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -904,6 +904,32 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
 #shareSheet .btns .btn{min-height:52px}
 .ss-link{font-size:12.5px;word-break:break-all;margin:12px 0 0;line-height:1.45;color:var(--mut)}
 .ss-link b{color:var(--txt);font-weight:600}
+/* ---------- v7.0 Phase 4D: national onboarding ---------- */
+/* Pioneer bar: the first walker in an unseeded zone gets the truth
+   (nothing mapped yet) plus two working next actions, never a dead
+   end. Ember left edge, quiet surface, Route pane only. */
+#pioneerBar{margin-top:12px;background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--org);border-radius:14px;padding:12px}
+#pioneerBar[hidden]{display:none}
+#pioneerBar b{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:16.5px;color:var(--txt)}
+#pioneerBar p{color:var(--mut);font-size:13px;line-height:1.45;margin:4px 0 10px}
+#pioneerBar .row2 .btn{flex:1;min-height:48px}
+/* Waypoint note: one plain line in the Route pane when the local stop
+   pool is under 3 and Auto-plan therefore runs on waypoints. */
+#wpNote{margin-top:12px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:10px 12px;color:var(--mut);font-size:13px;line-height:1.45}
+#wpNote[hidden]{display:none}
+#wpNote b{color:var(--txt)}
+/* The quiet neighborhood row under the Loop Bar: where you are, and
+   the always-available way to change it. */
+.place-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+.place-row #placeNow{flex:1;min-width:0;color:var(--mut);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.place-row .btn{flex:none}
+/* Place entry: the city/ZIP fallback surface. One input, one primary
+   action, two honest exits (GPS, or the seeded launch map). */
+#placeSheet input[type="search"]{width:100%;min-height:52px;border-radius:14px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:0 14px;font-size:16px;font-family:inherit}
+#placeErr{margin:10px 0 0;font-size:13.5px}
+/* Out-of-zone tag on Loop Bar suggestions: the match is labeled, never
+   silently applied. */
+#loopSugg .ooz{color:var(--cau2);font-weight:600}
 </style>
 </head>
 <body class="mode-plan">
@@ -1035,6 +1061,15 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
         <p class="plan-sub">Set a home base and how long you want to walk.</p>
         <p id="tagline" hidden><span>Tell us where you start and how long you have. We build the loop that hits the most candy houses, then guide you turn by turn.</span><button id="btnIntroOk" type="button">Got it</button></p>
       </div>
+      <div id="pioneerBar" hidden>
+        <b id="pioneerTitle">First on the block</b>
+        <p id="pioneerText">No houses are mapped here yet. Mark spots as you walk and this street lights up for your party and neighbors.</p>
+        <div class="row2">
+          <button id="btnPioneerSpot" class="btn btn-org btn-sm" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-plus"/></svg>Mark a spot</button>
+          <button id="btnPioneerClaim" class="btn btn-ghost btn-sm" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-pin"/></svg>Claim your porch</button>
+        </div>
+      </div>
+      <div id="wpNote" hidden></div>
       <div id="routeBlock" class="route-only">
         <div id="stats" class="stats"></div>
         <div id="fitNote" class="muted"></div>
@@ -1068,6 +1103,7 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
             </span>
           </div>
         </div>
+        <div class="place-row"><span id="placeNow">Neighborhood: The Heights</span><button id="btnPlace" class="btn btn-ghost btn-sm" type="button">Change place</button></div>
         <div class="label">How long do we have?</div>
         <div class="budgetCtl">
           <div class="budgetHead"><span class="budgetLbl">Walk time</span><span id="budgetReadout" class="budgetVal">60 min</span></div>
@@ -1092,7 +1128,7 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
       </div>
       <div class="sheetfoot">
         <div class="wm">Candy Trail</div>
-        <div class="ver" id="appVer">Candy Trail v6.9</div>
+        <div class="ver" id="appVer">Candy Trail v7.0</div>
       </div>
     </div>
 
@@ -1343,7 +1379,7 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
 
 <div id="zonePop" class="overlay center" hidden>
   <div class="ocard card" role="dialog" aria-modal="true" aria-labelledby="zonePopTitle">
-    <h2 id="zonePopTitle">Your Heights Live walker</h2>
+    <h2 id="zonePopTitle">Your Local walker</h2>
     <div id="zpPreview" class="walker-preview"></div>
     <input id="zpName" type="text" autocomplete="off" maxlength="24" placeholder="Walker name" aria-label="Walker name">
     <div id="zpColors" class="party-colors" role="group" aria-label="Your color"></div>
@@ -1435,6 +1471,24 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
     <div class="btns" style="margin-top:12px">
       <button id="signPrint" class="btn btn-ember" type="button">Print</button>
       <button id="signPng" class="btn btn-ghost" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-download"/></svg>Save as image</button>
+    </div>
+  </div>
+</div>
+
+<div id="placeSheet" class="overlay" hidden>
+  <div class="ocard card" role="dialog" aria-modal="true" aria-labelledby="placeTitle">
+    <div class="ss-head"><h2 id="placeTitle">Where are you trick-or-treating?</h2><button id="placeClose" class="btn-close" type="button" aria-label="Close place finder"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button></div>
+    <p>Candy Trail works anywhere in the US. Name your town or ZIP and we will set up your neighborhood: its own Local feed, search, and routes. No account needed.</p>
+    <form id="placeForm">
+      <input id="placeInput" type="search" placeholder="Town or ZIP, e.g. Brooklyn Park or 55443" autocomplete="off" enterkeyhint="search" aria-label="Your town or ZIP code">
+      <div class="btns" style="margin-top:12px">
+        <button id="placeGo" class="btn btn-ember" type="submit">Find my neighborhood</button>
+      </div>
+    </form>
+    <p id="placeErr" class="warn" hidden></p>
+    <div class="btns" style="margin-top:10px">
+      <button id="placeGps" class="btn btn-ghost" type="button">Use my location instead</button>
+      <button id="placeSkip" class="btn btn-ghost" type="button">Not now</button>
     </div>
   </div>
 </div>
@@ -2394,6 +2448,10 @@ function setStart(lat, lng, label, fly) {
   store.set('start', S.start);
   renderStart();
   if (fly) map.flyTo([lat, lng], Math.max(map.getZoom(), 16), { duration: 0.6 });
+  /* v7.0 Phase 4D: a start set well outside the active zone offers a
+     zone switch (never a silent feed mix). Declared in the resolver
+     section at the end of this file; hoisting makes it safe to call. */
+  if (typeof zoneOnStartSet === 'function') zoneOnStartSet(lat, lng, label);
 }
 $('btnLocate').addEventListener('click', function () {
   ensureWatch();
@@ -2452,22 +2510,23 @@ map.on('contextmenu', function (e) {
   L.popup().setLatLng(ll).setContent(div).openOn(map);
 });
 
-/* address search (Nominatim) */
+/* address search (Nominatim), zone-scoped since v7.0 Phase 4D: the
+   query is bound to the active zone (viewbox = zone bbox, bare street
+   names get the zone's city appended), in-zone matches rank first,
+   and an out-of-zone best match is labeled instead of silently
+   moving the start (the setStart zone-switch offer also fires). */
 $('searchForm').addEventListener('submit', function (ev) {
   ev.preventDefault();
   var q = $('searchInput').value.trim();
   if (!q) return;
   showBusy('Searching…', q);
-  var near = S.pos || S.start;
-  var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q) +
-    (near ? '&viewbox=' + (near.lng - 0.3) + ',' + (near.lat + 0.3) + ',' + (near.lng + 0.3) + ',' + (near.lat - 0.3) : '');
-  fetchT(url, { headers: { 'Accept': 'application/json' } }, 12000).then(function (r) { return r.json(); }).then(function (arr) {
+  zoneGeocode(q, 5).then(function (res) {
     hideBusy();
-    if (!arr || !arr.length) { toast('No match for that address. Try adding the city.', 'warn'); return; }
-    var a = arr[0];
-    setStart(parseFloat(a.lat), parseFloat(a.lon), (a.display_name || '').split(',').slice(0, 2).join(','), true);
+    if (!res.length) { toast('No match for that address. Try adding the city.', 'warn'); return; }
+    var a = res[0];
+    setStart(a.lat, a.lng, a.name, true);
     loopEditClose();
-    toast('Start set from search.', 'ok');
+    toast(a.inZone ? 'Start set from search.' : 'Start set from search. That address is outside ' + zonePlace() + '.', 'ok');
   }).catch(function () { hideBusy(); toast('Search failed. Check your connection.', 'err'); });
 });
 
@@ -2504,20 +2563,17 @@ $('searchInput').addEventListener('input', function () {
   if (loopSuggTimer) clearTimeout(loopSuggTimer);
   if (q.length < 3) { if (sg) sg.hidden = true; return; }
   loopSuggTimer = setTimeout(function () {
-    var near = S.pos || S.start;
-    var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=5&q=' + encodeURIComponent(q) +
-      (near ? '&viewbox=' + (near.lng - 0.3) + ',' + (near.lat + 0.3) + ',' + (near.lng + 0.3) + ',' + (near.lat - 0.3) : '');
-    fetchT(url, { headers: { 'Accept': 'application/json' } }, 12000).then(function (r) { return r.json(); }).then(function (arr) {
-      if (!sg || !arr || !arr.length) { if (sg) sg.hidden = true; return; }
-      sg.innerHTML = arr.map(function (a, i) { return '<button type="button" data-i="' + i + '">' + esc((a.display_name || '').split(',').slice(0, 3).join(',')) + '</button>'; }).join('');
+    zoneGeocode(q, 5).then(function (res) {
+      if (!sg || !res.length) { if (sg) sg.hidden = true; return; }
+      sg.innerHTML = res.map(function (a, i) { return '<button type="button" data-i="' + i + '">' + esc(a.label) + (a.inZone ? '' : ' <span class="ooz">&middot; outside ' + esc(zonePlace()) + '</span>') + '</button>'; }).join('');
       sg.hidden = false;
       sg.querySelectorAll('button').forEach(function (b) {
         b.addEventListener('click', function () {
-          var a = arr[parseInt(b.getAttribute('data-i'), 10)];
+          var a = res[parseInt(b.getAttribute('data-i'), 10)];
           if (!a) return;
-          setStart(parseFloat(a.lat), parseFloat(a.lon), (a.display_name || '').split(',').slice(0, 2).join(','), true);
+          setStart(a.lat, a.lng, a.name, true);
           loopEditClose();
-          toast('Start set from search.', 'ok');
+          toast(a.inZone ? 'Start set from search.' : 'Start set from search. That address is outside ' + zonePlace() + '.', 'ok');
         });
       });
     }).catch(function () { if (sg) sg.hidden = true; });
@@ -2672,6 +2728,9 @@ function renderPins() {
      which calls it early) down with them. */
   try { if (typeof renderHeightsStops === 'function') renderHeightsStops(); } catch (e) { console.error('renderHeightsStops failed', e); }
   try { if (typeof renderPinsList === 'function') renderPinsList(); } catch (e) { console.error('renderPinsList failed', e); }
+  /* v7.0 Phase 4D: pins feed the local stop pool, so the pioneer bar
+     and the waypoint note repaint with them. */
+  try { if (typeof paintZoneChrome === 'function') paintZoneChrome(); } catch (e) {}
 }
 function addPin(lat, lng, type, via) {
   var pin = { lat: lat, lng: lng, type: type, ts: Date.now() };
@@ -2934,6 +2993,11 @@ function heightsPassHtml(s) {
 function renderHeightsStops() {
   heightsLayer.clearLayers(); heightsMarkers = [];
   if (!S.stopsOn || typeof HEIGHTS_STOPS === 'undefined') return;
+  /* v7.0 Phase 4D: the seeded layer exists only inside its home zone.
+     Elsewhere the map bootstraps from crowd reports, logged houses,
+     and registrations; seeded data is an accelerator, never a
+     requirement (and never drawn in the wrong town). */
+  if (typeof zoneSeededActive === 'function' && !zoneSeededActive()) return;
   /* fan out co-located stops (same address/block) so they don't stack */
   var groups = {};
   (typeof SEED_STOPS !== 'undefined' ? HEIGHTS_STOPS.concat(SEED_STOPS) : HEIGHTS_STOPS).forEach(function (s) {
@@ -2991,7 +3055,7 @@ function ghostHeights(on) {
     b.setAttribute('aria-pressed', S.stopsOn ? 'true' : 'false');
     renderHeightsStops();
     if (typeof applyCrowdVis === 'function') applyCrowdVis();
-    toast(S.stopsOn ? 'Community treat stops shown (' + ((typeof HEIGHTS_STOPS !== 'undefined' && HEIGHTS_STOPS) ? HEIGHTS_STOPS.length : 0) + ' community stops).' : 'Treat stops hidden.', S.stopsOn ? 'ok' : '');
+    toast(S.stopsOn ? 'Community treat stops shown' + ((typeof zoneSeededActive !== 'function' || zoneSeededActive()) && typeof HEIGHTS_STOPS !== 'undefined' && HEIGHTS_STOPS ? ' (' + HEIGHTS_STOPS.length + ' community stops).' : '.') : 'Treat stops hidden.', S.stopsOn ? 'ok' : '');
   });
   var chipsRow = $('layerChips');
   if (chipsRow) chipsRow.insertBefore(b, chipsRow.firstChild);
@@ -3440,6 +3504,13 @@ function buildRoute() {
     }
   }
   if (!S.start) { toast('Set your start first: use your location, drop a pin, or search.', 'warn'); return; }
+  /* v7.0 Phase 4D waypoint mode: when fewer than 3 stops are mapped
+     near the start (seeded + crowd + logged + registered), there is
+     nothing honest to auto-plan yet. Rather than inventing a loop,
+     switch to waypoint mode: the draw editor, preloaded with whatever
+     IS mapped, and the walker taps the rest. The normal planner
+     unlocks by itself once 3+ stops exist near the start. */
+  if (typeof routePoolCount === 'function' && routePoolCount(S.start) < 3) { enterWaypointMode(S.start); return; }
   var seq = ++BUILD_SEQ;
   showBusy('Building your candy route…', 'Scoring the densest streets near you.');
   var start = S.start, budgetSec = S.budget * 60;
@@ -3499,7 +3570,7 @@ function buildRoute() {
        loop physically routes TO parties, stores and confirmed stops instead of
        passing a street away from them. */
     var cands = [];
-    if (typeof HEIGHTS_STOPS !== 'undefined') {
+    if (typeof HEIGHTS_STOPS !== 'undefined' && (typeof zoneSeededActive !== 'function' || zoneSeededActive())) {
       var stopCands = [];
       (typeof SEED_STOPS !== 'undefined' ? HEIGHTS_STOPS.concat(SEED_STOPS) : HEIGHTS_STOPS).forEach(function (s) {
         var p = { lat: s.lat, lng: s.lon };
@@ -4557,29 +4628,59 @@ map.on('popupopen', function (e) {
 function openSearch() {
   $('searchPanel').hidden = false;
   var i = $('findInput'); i.value = '';
+  /* The placeholder names real launch-zone streets only where the
+     seeded layer exists; elsewhere it speaks generically. */
+  i.placeholder = (typeof zoneSeededActive !== 'function' || zoneSeededActive()) ? 'Try Sherman, Ogden, a street or a store name' : 'Try a street or a place name nearby';
   renderSearch('');
   setTimeout(function () { try { i.focus(); } catch (e) {} }, 60);
 }
 function closeSearch() { $('searchPanel').hidden = true; }
+/* Find (v7.0 Phase 4D): searches the ACTIVE ZONE's world, not just the
+   seeded layer: seeded stops (only where the zone is seeded), live
+   crowd reports inside the zone, the walker's own logged houses, and
+   registered places in the zone. In an unseeded zone the seeded list
+   simply does not exist, and the other three sources carry the pane. */
 function renderSearch(q) {
   q = String(q || '').trim().toLowerCase();
   var ref = S.pos || S.start;
   var out = [];
-  if (typeof HEIGHTS_STOPS !== 'undefined') HEIGHTS_STOPS.forEach(function (st) {
-    if (!q || (String(st.name || '') + ' ' + String(st.addr || '')).toLowerCase().indexOf(q) >= 0)
+  var def = (typeof ZONE !== 'undefined' && ZONE.zoneDef) || null;
+  function match(hay) { return !q || String(hay || '').toLowerCase().indexOf(q) >= 0; }
+  if ((!def || def.seeded) && typeof HEIGHTS_STOPS !== 'undefined') HEIGHTS_STOPS.forEach(function (st) {
+    if (match(String(st.name || '') + ' ' + String(st.addr || '')))
       out.push({ lat: st.lat, lng: st.lon, icon: heightsPassHtml(st), title: st.name || 'Treat stop', sub: st.addr || '' });
   });
+  if (typeof CROWD !== 'undefined' && CROWD.reports && def) {
+    var seenC = [];
+    CROWD.reports.forEach(function (r) {
+      if (!r || !isFinite(r.lat) || !isFinite(r.lng)) return;
+      if (!zoneDefContains(def, r.lat, r.lng)) return;
+      for (var i = 0; i < seenC.length; i++) { if (haversine(r, seenC[i]) <= 25) return; }
+      seenC.push(r);
+      var t = r.status === 'nonfood' ? 'Non-food treats' : r.status === 'decor' ? 'Great decor' : r.status === 'out' ? 'Ran out' : 'Giving candy';
+      if (match(t + ' ' + String(r.note || '')))
+        out.push({ lat: r.lat, lng: r.lng, icon: pinIconHtml(r.status, 'house'), title: t, sub: 'Live crowd report' });
+    });
+  }
   S.pins.forEach(function (pn) {
     var lbl = pn.type === 'candy' ? 'My candy pin' : pn.type === 'decor' ? 'My decor pin' : 'My pin';
-    if (!q || (lbl + ' ' + String(pn.note || '')).toLowerCase().indexOf(q) >= 0)
+    if (match(lbl + ' ' + String(pn.note || '')))
       out.push({ lat: pn.lat, lng: pn.lng, icon: pinIconHtml(pn.type, pn.kind), title: pn.note ? lbl + ': ' + pn.note : lbl, sub: 'Your saved pin' });
+  });
+  if (typeof REG !== 'undefined' && REG.ok && def) REG.all.forEach(function (reg) {
+    if (reg.zone && reg.zone !== def.id && !zoneDefContains(def, reg.lat, reg.lng)) return;
+    var nm = regName(reg);
+    if (match(nm + ' ' + String(reg.note || '')))
+      out.push({ lat: reg.lat, lng: reg.lng, icon: regIconHtml(reg), title: nm, sub: 'Registered on Candy Trail' });
   });
   out.forEach(function (o) { o.d = ref ? haversine(ref, o) : null; });
   out.sort(function (a, b) { return (a.d || 0) - (b.d || 0); });
   out = out.slice(0, 9);
+  var emptyMsg = q ? 'No stops match. Try a street name.'
+    : (def && def.dynamic ? 'Nothing mapped in ' + def.place + ' yet. Mark a spot and it shows up here.' : 'No stops match. Try a street name.');
   $('searchResults').innerHTML = out.length ? out.map(function (o, i) {
     return '<button class="sr-row" data-i="' + i + '"><span class="sr-e">' + o.icon + '</span><span><b>' + esc(o.title) + '</b><br><span class="muted">' + esc(o.sub) + (o.d != null ? ' · ' + (o.d < 1000 ? Math.round(o.d) + ' m away' : (o.d / 1609.34).toFixed(1) + ' mi away') : '') + '</span></span></button>';
-  }).join('') : '<div class="muted" style="padding:8px 2px">No stops match. Try a street name.</div>';
+  }).join('') : '<div class="muted" style="padding:8px 2px">' + esc(emptyMsg) + '</div>';
   Array.prototype.forEach.call($('searchResults').querySelectorAll('.sr-row'), function (row) {
     row.addEventListener('click', function () {
       var o = out[parseInt(row.getAttribute('data-i'), 10)];
@@ -4632,7 +4733,7 @@ function crowdFetch() {
   if (!crowdOn()) return;
   fetch(CROWD.url + '/rest/v1/treat_reports?select=id,lat,lng,status,note,photo,created_at&order=created_at.desc&limit=500', { headers: crowdHeaders() })
     .then(function (r) { return r.ok ? r.json() : null; })
-    .then(function (rows) { if (Array.isArray(rows)) { CROWD.reports = rows; renderCrowd(); } })
+    .then(function (rows) { if (Array.isArray(rows)) { CROWD.reports = rows; renderCrowd(); if (typeof paintZoneChrome === 'function') paintZoneChrome(); } })
     .catch(function () {});
 }
 function crowdOutNear(lat, lng) {
@@ -6408,6 +6509,10 @@ var ZONE_ID = 'heights';
    this same object. */
 var ZONE_INFO = { name: 'Heights', place: 'The Heights', placeLower: 'the Heights', area: 'Jersey City Heights' };
 function zonePlace() { return ZONE_INFO.place; }
+/* The whole-zone corridor fallback ("in the Heights" at launch): every
+   corridor fallback in this section reads through here so a resolved
+   zone renames them all at once (v7.0 Phase 4D). */
+function zoneWholeTag() { return 'in ' + ZONE_INFO.placeLower; }
 var ZONE_TTL_MS = 4 * 3600 * 1000;
 var ZONE_STICKY_MS = 2 * 3600 * 1000;
 var ZONE_PRES_MS = 30 * 60000;        /* neighbor-count window */
@@ -6504,14 +6609,27 @@ function zoneSeed() {
   if (!ZONE.persona) ZONE.persona = zonePersonaFor(ZONE.dev);
 }
 /* ---------- zone geometry ---------- */
-function zoneInPoly(lat, lng) {
-  var inside = false, poly = ZONE_POLY;
+/* v7.0 Phase 4D: the point-in-polygon and distance math is parameterized
+   by polygon so the zone resolver can ask the same questions of any
+   zone definition (the Heights polygon, or a dynamic zone's bbox
+   rectangle). The active-zone wrappers below keep their signatures. */
+function zonePolyContains(poly, lat, lng) {
+  var inside = false;
   for (var i = 0, j = poly.length - 1; i < poly.length; j = i++) {
     var xi = poly[i][1], yi = poly[i][0], xj = poly[j][1], yj = poly[j][0];
     if ((yi > lat) !== (yj > lat) && lng < (xj - xi) * (lat - yi) / (yj - yi) + xi) inside = !inside;
   }
   return inside;
 }
+function zonePolyDist(poly, lat, lng) {
+  var best = Infinity;
+  for (var i = 0; i < poly.length; i++) {
+    var d = zoneSegDistM(lat, lng, poly[i], poly[(i + 1) % poly.length]);
+    if (d < best) best = d;
+  }
+  return best;
+}
+function zoneInPoly(lat, lng) { return zonePolyContains(ZONE_POLY, lat, lng); }
 function zoneSegDistM(lat, lng, a, b) {
   var kLat = 111320, kLng = 111320 * Math.cos(lat * Math.PI / 180);
   var px = lng * kLng, py = lat * kLat, ax = a[1] * kLng, ay = a[0] * kLat, bx = b[1] * kLng, by = b[0] * kLat;
@@ -6520,14 +6638,7 @@ function zoneSegDistM(lat, lng, a, b) {
   var ex = ax + t * dx - px, ey = ay + t * dy - py;
   return Math.sqrt(ex * ex + ey * ey);
 }
-function zoneDistToPoly(lat, lng) {
-  var best = Infinity;
-  for (var i = 0; i < ZONE_POLY.length; i++) {
-    var d = zoneSegDistM(lat, lng, ZONE_POLY[i], ZONE_POLY[(i + 1) % ZONE_POLY.length]);
-    if (d < best) best = d;
-  }
-  return best;
-}
+function zoneDistToPoly(lat, lng) { return zonePolyDist(ZONE_POLY, lat, lng); }
 function zoneInside(lat, lng) { return zoneInPoly(lat, lng) || zoneDistToPoly(lat, lng) <= ZONE_BUFFER_M; }
 /* Session state (v6.6 Phase 4A fix 8, an owner-reported defect: the
    Stage B gate required a trusted fix, so the channel stayed locked at
@@ -6580,7 +6691,7 @@ function zoneBand(lat, lng) {
     var d = haversine({ lat: lat, lng: lng }, ZONE_BANDS[i]);
     if (d < bd) { bd = d; best = ZONE_BANDS[i]; }
   }
-  return best ? best.t : 'in the Heights';
+  return best ? best.t : zoneWholeTag();
 }
 function zoneVisible() { return S.sheetTab === 'chat' && (!partyOn() || CHAT.channel === 'zone'); }
 /* ---------- composer modes ---------- */
@@ -6709,7 +6820,7 @@ function zonePresence(force) {
   var fix = S.pos;
   fetch(CROWD.url + '/rest/v1/zone_posts', {
     method: 'POST', headers: crowdHeaders(),
-    body: JSON.stringify({ zone: ZONE_ID, persona: ZONE.persona.name, color: ZONE.persona.color, avatar: ZONE.persona.avatar, devhash: ZONE.dev, kind: 'presence', corridor: fix ? zoneBand(fix.lat, fix.lng) : 'in the Heights', msg: null })
+    body: JSON.stringify({ zone: ZONE_ID, persona: ZONE.persona.name, color: ZONE.persona.color, avatar: ZONE.persona.avatar, devhash: ZONE.dev, kind: 'presence', corridor: fix ? zoneBand(fix.lat, fix.lng) : zoneWholeTag(), msg: null })
   }).catch(function () {});
 }
 /* Same word filter as party chat (BAD_WORDS), held to the zone
@@ -6726,7 +6837,7 @@ function zoneSend() {
   var text = String(inp.value || '').trim();
   if (!text) return;
   var now = Date.now();
-  if (now - ZONE.lastSend < ZONE_SEND_MS) { toast('One message every 10 seconds in Heights Live.', 'warn'); return; }
+  if (now - ZONE.lastSend < ZONE_SEND_MS) { toast('One message every 10 seconds in Local.', 'warn'); return; }
   var clean = zoneClean(text);
   if (!clean) return;
   inp.value = '';
@@ -6735,7 +6846,7 @@ function zoneSend() {
   var fix = S.pos;
   fetch(CROWD.url + '/rest/v1/zone_posts', {
     method: 'POST', headers: crowdHeaders(),
-    body: JSON.stringify({ zone: ZONE_ID, persona: ZONE.persona.name, color: ZONE.persona.color, avatar: ZONE.persona.avatar, devhash: ZONE.dev, kind: 'chat', corridor: fix ? zoneBand(fix.lat, fix.lng) : 'in the Heights', msg: clean })
+    body: JSON.stringify({ zone: ZONE_ID, persona: ZONE.persona.name, color: ZONE.persona.color, avatar: ZONE.persona.avatar, devhash: ZONE.dev, kind: 'chat', corridor: fix ? zoneBand(fix.lat, fix.lng) : zoneWholeTag(), msg: clean })
   }).then(function (r) {
     if (!r.ok) { ZONE.down = true; ZONE.downAt = Date.now(); ZONE.downVis = zoneVisible(); if (zoneVisible()) zoneRender(); }
   }).catch(function () {
@@ -6759,7 +6870,13 @@ function zoneShown() {
 }
 function zoneBubblesHtml() {
   var rows = zoneShown();
-  if (!rows.length) return '<div class="chat-empty"><b>Local is quiet right now.</b><br>No posts in the last 4 hours.</div>';
+  if (!rows.length) {
+    /* v7.0 Phase 4D pioneer state: in a zone nobody has posted in yet,
+       say so and hand the first walker the opener. The composer below
+       (or the start-pin path when read-only) is the working action. */
+    if (ZONE.zoneDef && ZONE.zoneDef.dynamic) return '<div class="chat-empty"><b>' + esc(ZONE.zoneDef.place) + ' is quiet.</b><br>No posts in the last 4 hours. The first walker here sets the tone: say where the candy is.</div>';
+    return '<div class="chat-empty"><b>Local is quiet right now.</b><br>No posts in the last 4 hours.</div>';
+  }
   var out = '', i = 0, prevTs = 0;
   while (i < rows.length) {
     var first = rows[i], fts = new Date(first.created_at).getTime();
@@ -6787,7 +6904,7 @@ function zoneBubblesHtml() {
     });
     var lastR = grp[grp.length - 1];
     var sub = '<div class="cb-sub">' +
-      '<span>' + esc(lastR.corridor || 'in the Heights') + '</span><span>&middot;</span><span>' + esc(zoneRelTime(new Date(lastR.created_at).getTime())) + '</span>' +
+      '<span>' + esc(lastR.corridor || zoneWholeTag()) + '</span><span>&middot;</span><span>' + esc(zoneRelTime(new Date(lastR.created_at).getTime())) + '</span>' +
       (!mine && lastR.id ? '<button type="button" class="cb-mod" data-mod="' + esc(String(lastR.id)) + '" aria-label="Post options">&middot;&middot;&middot;</button>' : '') +
       '</div>';
     out += '<div class="cb-row zone ' + (mine ? 'me' : 'other') + '"' + (mine ? '' : ' style="--zc:' + col + '"') + '><div class="cb-col">' + colHtml + sub + '</div></div>';
@@ -6906,7 +7023,7 @@ function zoneModOpen(id) {
   var r = null;
   ZONE.posts.forEach(function (p) { if (p.id && String(p.id) === ZONE.modId) r = p; });
   var t = $('zmTitle');
-  if (t) t.textContent = r ? ('Post by ' + (r.persona || 'a neighbor') + ' · ' + (r.corridor || 'in the Heights')) : 'Post options';
+  if (t) t.textContent = r ? ('Post by ' + (r.persona || 'a neighbor') + ' · ' + (r.corridor || zoneWholeTag())) : 'Post options';
   var pop = $('zoneModPop');
   if (pop) pop.hidden = false;
 }
@@ -7074,7 +7191,7 @@ function updatePeek() {
     else { tEl.textContent = 'Party mode'; sEl.textContent = 'Start or join a party'; }
   } else if (tab === 'chat') {
     peekSetStart(null);
-    tEl.textContent = partyOn() ? 'Party chat' : 'Heights Live';
+    tEl.textContent = partyOn() ? 'Party chat' : zonePlace();
     sEl.textContent = 'Tap to open';
   } else if (tab === 'haul') {
     peekSetStart(null);
@@ -7868,6 +7985,7 @@ function regFetch() {
       REG.ok = true; REG.loaded = true;
       regApplyRows(rows);
       renderRegs(); paintRegMine();
+      if (typeof paintZoneChrome === 'function') paintZoneChrome();
     })
     .catch(function () {
       if (seq !== REG.fetchSeq) return;
@@ -8302,6 +8420,462 @@ function regParseScan() {
   document.addEventListener('visibilitychange', function () { if (!document.hidden) regFetch(); });
 })();
 
+/* ---------------- v7.0 Phase 4D: zone resolver + national onboarding ----------------
+   The zone is no longer a constant. A resolver maps any US coordinate
+   to a zone definition {id, name, place, placeLower, area, searchCity,
+   seeded, dynamic, center, poly, bbox, bands}, and ACTIVATING a def
+   re-points the globals the rest of the app already reads at call
+   time (ZONE_ID, ZONE_INFO, ZONE_POLY, ZONE_BANDS), so the Local
+   feed, presence, crowd, registrations, corridor tags, search, and
+   Find all follow the active zone with no other changes.
+
+   The Heights resolves to its authored definition: the real polygon,
+   the named corridor bands, and the byte-compatible id 'heights', so
+   every existing backend row keeps working. Anywhere else, a dynamic
+   zone is derived from Nominatim's reverse geocode: the neighborhood
+   (falling back to city/town) names it, the id is a deterministic
+   slug of place + state (two devices in the same town resolve the
+   same id and share a feed), the boundary is a ~4.2 km square
+   centered on the anchor (the walkable 20k-80k population band), and
+   the corridor bands are a 3x3 compass grid generated from that bbox.
+   If reverse geocoding has not answered yet (or fails), a provisional
+   grid zone ("Your neighborhood") keeps the app fully working; the
+   named def replaces it when the answer lands. No backend change:
+   every zone-scoped write already carries the ZONE_ID global.
+
+   Boot (see the kickoff at the end of this section): a saved start
+   anchors the zone silently. A resumed party or walk is never
+   interrupted. A truly fresh visitor gets GPS first (anchoring start
+   + zone at the fix), the place-entry sheet when GPS declines, and
+   the Heights as the seeded fallback behind the scenes either way.
+   Setting a start well outside the active zone OFFERS a switch; it
+   never silently mixes feeds. */
+
+/* Pristine copies of the authored Heights geometry, captured before
+   any activation can swap the globals. */
+var ZONE_HEIGHTS_POLY = ZONE_POLY;
+var ZONE_HEIGHTS_BANDS = ZONE_BANDS;
+/* Half-extent of a dynamic zone: a 4.2 km square, centered on the
+   anchor. Big enough to hold a walkable neighborhood's Halloween,
+   small enough that two ends of a large city are different zones. */
+var ZONE_HALF_M = 2100;
+var ZRES = { ready: false, onboarding: false, revSeq: 0, revCache: {}, offeredKey: '' };
+
+function zoneSlug(s) {
+  var out = String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  return out || 'us';
+}
+function zoneBboxOf(lat, lng, halfM) {
+  var dLat = halfM / 111320;
+  var dLng = halfM / (111320 * Math.max(0.2, Math.cos(lat * Math.PI / 180)));
+  return { w: lng - dLng, e: lng + dLng, s: lat - dLat, n: lat + dLat };
+}
+function zonePolyOfBbox(b) { return [[b.n, b.w], [b.n, b.e], [b.s, b.e], [b.s, b.w]]; }
+function zoneBandsOf(bbox, place) {
+  var rows = [{ f: 0.82, t: 'north' }, { f: 0.5, t: '' }, { f: 0.18, t: 'south' }];
+  var cols = [{ f: 0.18, t: 'west' }, { f: 0.5, t: '' }, { f: 0.82, t: 'east' }];
+  var out = [];
+  rows.forEach(function (r) {
+    cols.forEach(function (c) {
+      var word = (r.t + c.t) || 'central';
+      out.push({ t: word + ' ' + place, lat: bbox.s + (bbox.n - bbox.s) * r.f, lng: bbox.w + (bbox.e - bbox.w) * c.f });
+    });
+  });
+  return out;
+}
+function zoneDefaultDef() {
+  var b = { w: Infinity, e: -Infinity, s: Infinity, n: -Infinity };
+  ZONE_HEIGHTS_POLY.forEach(function (p) {
+    if (p[0] < b.s) b.s = p[0]; if (p[0] > b.n) b.n = p[0];
+    if (p[1] < b.w) b.w = p[1]; if (p[1] > b.e) b.e = p[1];
+  });
+  return { id: 'heights', name: 'Heights', place: 'The Heights', placeLower: 'the Heights', area: 'Jersey City Heights',
+    searchCity: 'Jersey City, NJ', seeded: true, dynamic: false, provisional: false,
+    center: { lat: 40.7484, lng: -74.0452 }, poly: ZONE_HEIGHTS_POLY, bbox: b, bands: ZONE_HEIGHTS_BANDS };
+}
+function zoneProvisionalDef(lat, lng) {
+  var cell = 0.05;
+  var bbox = zoneBboxOf(lat, lng, ZONE_HALF_M);
+  return { id: 'z-grid-' + Math.floor((lat + 90) / cell) + '-' + Math.floor((lng + 180) / cell),
+    name: 'Your neighborhood', place: 'Your neighborhood', placeLower: 'your neighborhood',
+    area: 'Your neighborhood', searchCity: '', seeded: false, dynamic: true, provisional: true,
+    center: { lat: lat, lng: lng }, poly: zonePolyOfBbox(bbox), bbox: bbox, bands: zoneBandsOf(bbox, 'Your neighborhood') };
+}
+function zoneDynamicDef(lat, lng, addr) {
+  addr = addr || {};
+  var state = String(addr.state || '').trim();
+  var iso = String(addr['ISO3166-2-lvl4'] || '');
+  var stCode = iso.indexOf('US-') === 0 ? iso.slice(3) : '';
+  var name = String(addr.neighbourhood || addr.suburb || addr.quarter || addr.city_district ||
+    addr.city || addr.town || addr.village || addr.municipality || addr.county || '').replace(/\s+/g, ' ').trim();
+  if (!name) return zoneProvisionalDef(lat, lng);
+  var city = String(addr.city || addr.town || addr.village || name);
+  var bbox = zoneBboxOf(lat, lng, ZONE_HALF_M);
+  var areaParts = [name];
+  if (city && city !== name) areaParts.push(city);
+  if (state) areaParts.push(state);
+  return { id: 'z-' + zoneSlug(name) + '-' + zoneSlug(stCode || state), name: name, place: name,
+    placeLower: /^The /.test(name) ? 'the ' + name.slice(4) : name,
+    area: areaParts.join(', '), searchCity: city + (state ? ', ' + state : ''),
+    seeded: false, dynamic: true, provisional: false,
+    center: { lat: lat, lng: lng }, poly: zonePolyOfBbox(bbox), bbox: bbox, bands: zoneBandsOf(bbox, name) };
+}
+function zoneDefOk(d) {
+  return !!d && typeof d === 'object' && typeof d.id === 'string' && !!d.id &&
+    typeof d.place === 'string' && !!d.place &&
+    !!d.center && isFinite(d.center.lat) && isFinite(d.center.lng) &&
+    !!d.bbox && isFinite(d.bbox.w) && isFinite(d.bbox.e) && isFinite(d.bbox.s) && isFinite(d.bbox.n) &&
+    Array.isArray(d.poly) && d.poly.length >= 3 && Array.isArray(d.bands);
+}
+function zoneDefContains(def, lat, lng) {
+  if (!def || !isFinite(lat) || !isFinite(lng)) return false;
+  if (zonePolyContains(def.poly, lat, lng)) return true;
+  return zonePolyDist(def.poly, lat, lng) <= ZONE_BUFFER_M;
+}
+function zoneSeededActive() {
+  var def = (typeof ZONE !== 'undefined' && ZONE) ? ZONE.zoneDef : null;
+  return !def || !!def.seeded;
+}
+function seededStops() {
+  if (!zoneSeededActive()) return [];
+  var out = [];
+  if (typeof HEIGHTS_STOPS !== 'undefined' && HEIGHTS_STOPS) out = out.concat(HEIGHTS_STOPS);
+  if (typeof SEED_STOPS !== 'undefined' && SEED_STOPS) out = out.concat(SEED_STOPS);
+  return out;
+}
+
+/* Activation: re-point the zone globals, persist the def on-device
+   (so the next boot lands in the same zone without a network call),
+   reset the feed state when the zone actually changes, and repaint
+   every zone-touched surface. */
+function zoneActivate(def) {
+  if (!def) return null;
+  var changed = !ZONE.zoneDef || ZONE.zoneDef.id !== def.id;
+  ZONE.zoneDef = def;
+  ZONE_ID = def.id;
+  ZONE_INFO = { name: def.name, place: def.place, placeLower: def.placeLower, area: def.area };
+  ZONE_POLY = def.poly;
+  ZONE_BANDS = def.bands;
+  try { store.set('zoneDef', def); } catch (e) {}
+  if (changed) {
+    ZONE.posts = []; ZONE.cursor = ''; ZONE.init = false; ZONE.down = false;
+    ZONE.presDevs = []; ZONE.neighbors = null; ZONE.repCounts = {}; ZONE.repMine = {};
+    try { renderHeightsStops(); } catch (e) {}
+  }
+  try { paintZoneChrome(); } catch (e) {}
+  if (typeof zoneVisible === 'function' && zoneVisible()) {
+    try { zoneRender(); } catch (e) {}
+    try { zoneEnsure(); } catch (e) {}
+  }
+  return def;
+}
+
+/* The resolver. Synchronous part: Heights, the persisted def, or the
+   session reverse cache answer immediately; otherwise a provisional
+   zone activates now and the reverse geocode upgrades it in place. */
+function zoneResolveAt(lat, lng) {
+  if (!isFinite(lat) || !isFinite(lng)) return ZONE.zoneDef || zoneActivate(zoneDefaultDef());
+  var hd = zoneDefaultDef();
+  if (zoneDefContains(hd, lat, lng)) return zoneActivate(hd);
+  var stored = null;
+  try { stored = store.get('zoneDef', null); } catch (e) {}
+  /* A persisted PROVISIONAL def never satisfies this shortcut: it was
+     a placeholder while reverse geocoding was pending, and letting it
+     stick would leave the zone unnamed forever. Skipping it re-runs
+     the reverse lookup, which is exactly the retry an offline boot
+     needs. */
+  if (zoneDefOk(stored) && stored.id !== 'heights' && !stored.provisional && zoneDefContains(stored, lat, lng)) return zoneActivate(stored);
+  var key = lat.toFixed(2) + ',' + lng.toFixed(2);
+  if (ZRES.revCache[key]) return zoneActivate(ZRES.revCache[key]);
+  var prov = zoneProvisionalDef(lat, lng);
+  zoneActivate(prov);
+  zoneReverseInto(lat, lng, prov, key);
+  return prov;
+}
+function zoneReverseInto(lat, lng, prov, key) {
+  ++ZRES.revSeq;
+  var url = 'https://nominatim.openstreetmap.org/reverse?format=json&addressdetails=1&zoom=14&lat=' +
+    encodeURIComponent(lat) + '&lon=' + encodeURIComponent(lng);
+  fetchT(url, { headers: { 'Accept': 'application/json' } }, 12000).then(function (r) { return r.json(); }).then(function (j) {
+    if (!j || !j.address) return;
+    var def = zoneDynamicDef(lat, lng, j.address);
+    if (!def || def.provisional) return;
+    ZRES.revCache[key] = def;
+    /* Upgrade in place only when the walker is still in the zone this
+       lookup was for: the provisional it created, or the same named
+       place recentered on a newer anchor. A stale answer for a zone
+       the walker already left just warms the cache. */
+    if (ZONE.zoneDef && (ZONE.zoneDef.id === prov.id || ZONE.zoneDef.id === def.id)) zoneActivate(def);
+  }).catch(function () { /* the provisional zone stands; the app keeps working */ });
+}
+
+/* Called from setStart (hoisted). A start set well outside the active
+   zone offers a switch instead of silently mixing feeds. Boundary
+   grazes (inside the zone, or within 3 km of its center across an
+   edge) never nag. One offer per start point per session. */
+function zoneOnStartSet(lat, lng) {
+  try { paintZoneChrome(); } catch (e) {}
+  if (!ZRES.ready || ZRES.onboarding) return;
+  var def = ZONE.zoneDef;
+  if (!def) return;
+  if (zoneDefContains(def, lat, lng)) return;
+  if (haversine({ lat: lat, lng: lng }, def.center) < 3000) return;
+  var key = lat.toFixed(3) + ',' + lng.toFixed(3);
+  if (ZRES.offeredKey === key) return;
+  ZRES.offeredKey = key;
+  showDlg('A different neighborhood?',
+    'This start is outside ' + def.place + '. Switch your neighborhood to the streets around your start? Your Local feed, search, and routes will follow.',
+    [
+      { label: 'Switch neighborhoods', cls: 'btn-org', fn: function () {
+          zoneResolveAt(lat, lng);
+          toast('Neighborhood switched to the streets around your start.', 'ok');
+        } },
+      { label: 'Keep ' + def.place, cls: 'btn-ghost' }
+    ]);
+}
+
+/* ---------- zone-scoped search ---------- */
+function zoneScopedQuery(q) {
+  q = String(q || '').trim();
+  var def = ZONE.zoneDef || zoneDefaultDef();
+  if (!def.searchCity) return q;
+  /* A bare street name is ambiguous nationwide; a number or a comma
+     means the walker already scoped it themselves. */
+  if (/\d/.test(q) || q.indexOf(',') >= 0) return q;
+  return q + ', ' + def.searchCity;
+}
+function zoneViewbox() {
+  var def = ZONE.zoneDef || zoneDefaultDef();
+  return def.bbox.w + ',' + def.bbox.n + ',' + def.bbox.e + ',' + def.bbox.s;
+}
+function zoneRankResults(arr) {
+  var def = ZONE.zoneDef || zoneDefaultDef();
+  var out = [];
+  (arr || []).forEach(function (a) {
+    var lat = parseFloat(a.lat), lng = parseFloat(a.lon);
+    if (!isFinite(lat) || !isFinite(lng)) return;
+    var parts = String(a.display_name || '').split(',');
+    out.push({ lat: lat, lng: lng, name: parts.slice(0, 2).join(','), label: parts.slice(0, 3).join(','),
+      inZone: lat <= def.bbox.n && lat >= def.bbox.s && lng >= def.bbox.w && lng <= def.bbox.e });
+  });
+  /* Stable partition: in-zone matches first, Nominatim's own order
+     kept inside each group. */
+  return out.filter(function (a) { return a.inZone; }).concat(out.filter(function (a) { return !a.inZone; }));
+}
+function zoneGeocode(q, limit) {
+  var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=' + (limit || 5) +
+    '&viewbox=' + zoneViewbox() + '&q=' + encodeURIComponent(zoneScopedQuery(q));
+  return fetchT(url, { headers: { 'Accept': 'application/json' } }, 12000)
+    .then(function (r) { return r.json(); })
+    .then(function (arr) { return zoneRankResults(arr); });
+}
+
+/* ---------- the local stop pool + waypoint mode ---------- */
+/* The planner's raw material, anywhere: seeded stops (home zone
+   only), the walker's own logged houses, fresh crowd reports, and
+   registered places, deduped to one entry per house. Density
+   segments are street filler inside the planner, never stops, and
+   are deliberately not counted here. */
+function poolPointsAround(anchor, radiusM) {
+  if (!anchor) return [];
+  var raw = [];
+  seededStops().forEach(function (st) { raw.push({ lat: st.lat, lng: (st.lon != null ? st.lon : st.lng) }); });
+  S.pins.forEach(function (p) {
+    if (p.type === 'candy' || p.type === 'decor' || p.type === 'nonfood') raw.push({ lat: p.lat, lng: p.lng });
+  });
+  if (typeof CROWD !== 'undefined' && CROWD && CROWD.reports && typeof crowdFreshStops === 'function') {
+    crowdFreshStops().forEach(function (r) { raw.push({ lat: r.lat, lng: r.lng }); });
+  }
+  if (typeof REG !== 'undefined' && REG && REG.ok && REG.all) {
+    REG.all.forEach(function (reg) {
+      if (typeof crowdOutNear === 'function' && crowdOutNear(reg.lat, reg.lng)) return;
+      raw.push({ lat: reg.lat, lng: reg.lng });
+    });
+  }
+  var out = [];
+  raw.forEach(function (p) {
+    if (!isFinite(p.lat) || !isFinite(p.lng)) return;
+    if (haversine(anchor, p) > radiusM) return;
+    for (var i = 0; i < out.length; i++) { if (haversine(p, out[i]) <= 25) return; }
+    out.push(p);
+  });
+  return out;
+}
+function routePoolCount(anchor) { return poolPointsAround(anchor, 1500).length; }
+/* Waypoint mode: the existing draw editor, preloaded with whatever IS
+   mapped near the start. Finishing runs routeFromStops: the same
+   routing engines and time model as the planner. */
+function enterWaypointMode(anchor) {
+  try { paintZoneChrome(); } catch (e) {}
+  enterDraw();
+  if (S.draw) {
+    poolPointsAround(anchor, 1500).forEach(function (p) { drawAdd(p); });
+  }
+  toast('Few stops are mapped here yet, so this route runs on waypoints. Tap the map to add them, then Build my loop.', 'warn');
+}
+
+/* ---------- zone chrome: place row, pioneer bar, waypoint note ---------- */
+function paintZoneChrome() {
+  var def = (typeof ZONE !== 'undefined' && ZONE) ? ZONE.zoneDef : null;
+  var pn = $('placeNow');
+  if (pn) pn.textContent = 'Neighborhood: ' + (def ? def.place : 'The Heights');
+  paintStyleVisibility(def);
+  paintPioneer(def);
+  paintWpNote(def);
+}
+function paintStyleVisibility(def) {
+  var wrap = $('styleChips');
+  var chip = wrap ? wrap.querySelector('[data-style="lastyear"]') : null;
+  if (!wrap || !chip) return;
+  var seeded = !def || !!def.seeded;
+  chip.style.display = seeded ? '' : 'none';
+  wrap.style.gridTemplateColumns = seeded ? 'repeat(4,1fr)' : 'repeat(3,1fr)';
+  /* "Last year's hits" is meaningless where there is no last year. */
+  if (!seeded && S.variety === 'lastyear') {
+    S.variety = 'fresh'; store.set('variety', 'fresh');
+    if (typeof paintStyleChips === 'function') paintStyleChips();
+  }
+}
+function paintPioneer(def) {
+  var bar = $('pioneerBar');
+  if (!bar) return;
+  if (!def || !def.dynamic || routePoolCount(S.start || def.center) > 0) { bar.hidden = true; return; }
+  var t = $('pioneerTitle'), x = $('pioneerText');
+  if (t) t.textContent = 'First on the block in ' + def.place;
+  if (x) x.textContent = 'No houses are mapped in ' + def.place + ' yet. Mark spots as you walk and this street lights up for your party and neighbors.';
+  var claim = $('btnPioneerClaim');
+  if (claim) claim.hidden = !(typeof REG !== 'undefined' && REG && REG.ok);
+  bar.hidden = false;
+}
+function paintWpNote(def) {
+  var el = $('wpNote');
+  if (!el) return;
+  if (!S.start) { el.hidden = true; return; }
+  var n = routePoolCount(S.start);
+  if (n >= 3) { el.hidden = true; return; }
+  el.innerHTML = '<b>Waypoint mode.</b> Only ' + n + ' stop' + (n === 1 ? '' : 's') +
+    ' mapped near your start, so Auto-plan drops waypoints instead of guessing. Tap the map, or mark spots as you go, and we connect the loop.';
+  el.hidden = false;
+}
+
+/* ---------- place entry (city / ZIP fallback) ---------- */
+function placeShow() {
+  var sh = $('placeSheet');
+  if (!sh) return;
+  sh.hidden = false;
+  var i = $('placeInput');
+  if (i) setTimeout(function () { try { i.focus(); } catch (e) {} }, 60);
+}
+function placeHide() { var sh = $('placeSheet'); if (sh) sh.hidden = true; }
+function placeSubmit(q) {
+  q = String(q || '').trim();
+  var err = $('placeErr');
+  function fail(msg) { if (err) { err.textContent = msg; err.hidden = false; } }
+  if (!q) { fail('Type a town name or a ZIP code.'); return; }
+  if (err) err.hidden = true;
+  var url = 'https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&countrycodes=us&limit=5&q=' + encodeURIComponent(q);
+  fetchT(url, { headers: { 'Accept': 'application/json' } }, 12000).then(function (r) { return r.json(); }).then(function (arr) {
+    if (!arr || !arr.length) { fail('No US place matched that. Try the town name, or town plus state.'); return; }
+    var a = arr[0];
+    var lat = parseFloat(a.lat), lng = parseFloat(a.lon);
+    if (!isFinite(lat) || !isFinite(lng)) { fail('That result has no location. Try another spelling.'); return; }
+    var label = String(a.display_name || q).split(',').slice(0, 2).join(',');
+    /* Resolve BEFORE setStart, with onboarding raised, so the answer
+       to "where am I" never triggers the zone-switch offer: this IS
+       the switch. A forward geocode already carries address parts,
+       so a named zone activates directly when they are present. */
+    ZRES.onboarding = true;
+    var hd = zoneDefaultDef();
+    if (zoneDefContains(hd, lat, lng)) zoneActivate(hd);
+    else if (a.address) {
+      var nd = zoneDynamicDef(lat, lng, a.address);
+      if (nd && !nd.provisional) zoneActivate(nd); else zoneResolveAt(lat, lng);
+    } else zoneResolveAt(lat, lng);
+    setStart(lat, lng, label, false);
+    ZRES.onboarding = false;
+    if (typeof map !== 'undefined' && map && map.setView) map.setView([lat, lng], 15);
+    placeHide();
+    toast('Neighborhood set: ' + (ZONE.zoneDef ? ZONE.zoneDef.place : label) + '.', 'ok');
+  }).catch(function () { fail('Place search failed. Check your connection and try again.'); });
+}
+(function wirePlaceEntry() {
+  var form = $('placeForm');
+  if (form) form.addEventListener('submit', function (ev) { ev.preventDefault(); placeSubmit($('placeInput').value); });
+  var bp = $('btnPlace');
+  if (bp) bp.addEventListener('click', placeShow);
+  var pc = $('placeClose');
+  if (pc) pc.addEventListener('click', placeHide);
+  var pg = $('placeGps');
+  if (pg) pg.addEventListener('click', function () { placeHide(); var b = $('btnLocate'); if (b) b.click(); });
+  var ps = $('placeSkip');
+  if (ps) ps.addEventListener('click', function () {
+    placeHide();
+    var def = null;
+    try { def = store.get('zoneDef', null); } catch (e) {}
+    var target = zoneDefOk(def) ? zoneActivate(def) : zoneActivate(zoneDefaultDef());
+    if (target && typeof map !== 'undefined' && map && map.setView) map.setView([target.center.lat, target.center.lng], 14);
+  });
+  var spot = $('btnPioneerSpot');
+  if (spot) spot.addEventListener('click', function () { var f = $('fabSpot'); if (f) f.click(); });
+  var claim = $('btnPioneerClaim');
+  if (claim) claim.addEventListener('click', function () { if (typeof switchTab === 'function') switchTab('haul'); });
+})();
+
+/* ---------- GPS-first onboarding + boot kickoff ---------- */
+function onboardGps() {
+  ZRES.onboarding = true;
+  var done = false;
+  var timer = setTimeout(function () {
+    if (done) return; done = true;
+    ZRES.onboarding = false;
+    placeShow();
+  }, 9000);
+  getPosOnce().then(function (pos) {
+    if (done) return; done = true; clearTimeout(timer);
+    if (S.start || !pos || !isFinite(pos.lat) || !isFinite(pos.lng)) { ZRES.onboarding = false; return; }
+    setStart(pos.lat, pos.lng, 'My location', false);
+    if (typeof map !== 'undefined' && map && map.setView) map.setView([pos.lat, pos.lng], 16);
+    zoneResolveAt(pos.lat, pos.lng);
+    ZRES.onboarding = false;
+    toast('Anchored to your location. Happy haunting!', 'ok');
+  }).catch(function (e) {
+    if (done) return; done = true; clearTimeout(timer);
+    ZRES.onboarding = false;
+    /* Code 0 means no geolocation API at all (embedded webviews, the
+       jsdom test harness): stay silent and keep the seeded fallback,
+       place entry one tap away. Codes 1 (denied) and 3 (timeout) are
+       real answers from a real device: offer the place entry. */
+    if (e && (e.code === 1 || e.code === 3)) placeShow();
+  });
+}
+(function onboardBoot() {
+  try { ensureWatch(); } catch (e) {}
+  if (S.start) { zoneResolveAt(S.start.lat, S.start.lng); ZRES.ready = true; return; }
+  var hashShared = false;
+  try { hashShared = /#r=/.test(location.hash || ''); } catch (e) {}
+  var resumed = hashShared ||
+    (typeof PARTY !== 'undefined' && PARTY && PARTY.code) ||
+    (typeof walkPresent === 'function' && walkPresent());
+  if (resumed) {
+    /* A shared route, a live party, or a saved walk anchors the
+       session; onboarding never interrupts it. Restore the persisted
+       zone (or the seeded default) and stop. */
+    var pd = null;
+    try { pd = store.get('zoneDef', null); } catch (e) {}
+    if (zoneDefOk(pd)) zoneActivate(pd); else zoneActivate(zoneDefaultDef());
+    ZRES.ready = true;
+    return;
+  }
+  /* Fresh visitor: the Heights activates as the seeded fallback (the
+     app is fully usable as the launch map), GPS gets first say at
+     anchoring, and the place entry is the fallback when GPS declines.
+     The Change place row keeps the entry visibly available either
+     way. */
+  zoneActivate(zoneDefaultDef());
+  ZRES.ready = true;
+  onboardGps();
+})();
+
 /* ---------- version self-check (v6.6 Phase 4A, fix 4) ----------
    A stale tab / zombie service worker left the owner's phone on a
    pre-v6.5 build while production had moved on, and the fixes looked
@@ -8361,7 +8935,7 @@ paintChromeState();
 /* v6.4.1 boot self-check marker: the shell's checker script verifies this
    was set. If boot died anywhere above, the repair overlay appears instead
    of a silently half-dead app. */
-window.__ctBootOK = '6.9';
+window.__ctBootOK = '7.0';
 
 </script>
 <script>
