@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0A16">
-<meta name="version" content="6.8">
+<meta name="version" content="6.9">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -564,6 +564,61 @@ body.mode-nav.in-party #spotSheet{top:calc(var(--sat) + 200px)}
 #spotVis{flex:1;min-height:48px;border-radius:999px;border:1px solid var(--line2);background:transparent;color:var(--mut);font-weight:600;font-size:13.5px;padding:6px 10px;cursor:pointer}
 #spotSave{flex:1.25;min-height:48px}
 .mk-spot .td{background:var(--pur)}
+/* ---------- v6.9 Phase 4C: registered places ---------- */
+/* The Registered treatment is deliberately quiet: the ordinary spot
+   marker inside a thin dashed bone ring. A trust signal, not an ad. */
+.mk-regwrap{position:relative;width:34px;height:34px}
+.mk-regring{position:absolute;left:50%;top:-2px;width:33px;height:33px;margin-left:-16.5px;border:1.5px dashed rgba(245,239,230,.55);border-radius:50%;pointer-events:none}
+body.light .mk-regring{border-color:rgba(14,10,22,.45)}
+#spotRegInfo{margin-top:10px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+#spotRegInfo .reg-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--org2)}
+#spotRegInfo .reg-name{font-weight:800;font-size:16px;margin-top:2px}
+#spotRegInfo .reg-note{font-size:14px;color:var(--mut);margin-top:3px;line-height:1.4}
+.reg-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.reg-chip{font-size:12.5px;font-weight:700;border:1px solid var(--line2);border-radius:999px;padding:3px 9px;color:var(--txt);background:var(--card2)}
+.reg-chip.teal{border-color:#2AB3A6;color:#7FE3D8}
+#spotRegInfo .reg-actions{display:flex;gap:8px;margin-top:10px}
+#spotRegInfo .reg-actions .btn{flex:1}
+#spotClaim{width:100%;margin-top:10px}
+.pop .reg-line{font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--org2)}
+#regBox{margin-top:14px}
+#regBox[hidden]{display:none}
+.reg-card{background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:12px;margin-top:8px}
+.reg-card .reg-name{font-weight:800;font-size:16.5px}
+.reg-card .reg-sub{font-size:13px;color:var(--mut);margin-top:1px}
+.reg-card .reg-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.reg-card .reg-actions .btn{min-height:48px}
+.reg-grp{margin-top:12px}
+.reg-grp .label{margin-bottom:6px}
+.reg-flags{display:flex;flex-wrap:wrap;gap:6px}
+.reg-flag{min-height:44px;border-radius:999px;border:1px solid var(--line2);background:var(--bg2);font-weight:700;font-size:14px;color:var(--txt);padding:6px 12px;cursor:pointer}
+.reg-flag[aria-pressed="true"]{background:rgba(232,93,38,.15);border-color:var(--org);color:var(--org2)}
+.reg-hours{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.reg-hours label{font-size:13px;color:var(--mut);font-weight:700}
+.reg-hours input{width:100%;min-height:48px;border-radius:12px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:0 10px;font-size:16px;margin-top:4px}
+#regSheet input[type=text],#promoSheet textarea{width:100%;border-radius:14px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:11px 12px;font-size:16px}
+#regGate{font-size:13.5px;line-height:1.45;margin-top:12px;color:var(--mut)}
+#regGate.ok{color:var(--grn)}
+#promoSheet .promo-link{font-size:12.5px;word-break:break-all;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:9px 11px;line-height:1.45}
+#promoSheet textarea{min-height:64px;font-size:13px;line-height:1.45;resize:vertical}
+#promoSheet .tpl{margin-top:8px}
+#promoBadgeImg{display:block;max-width:100%;border-radius:10px;margin-top:6px}
+#signSheet .ocard{max-width:520px;text-align:center}
+.sign-card{background:#F5EFE6;color:#0E0A16;border-radius:18px;padding:26px 20px 20px;text-align:center}
+.sign-card .sign-mark{width:92px;height:92px}
+.sign-card .sign-on{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:34px;margin-top:6px}
+.sign-card .sign-name{font-weight:800;font-size:19px;margin-top:4px}
+.sign-card .sign-flags{font-size:14px;color:#4A3F63;margin-top:4px;line-height:1.45}
+.sign-card .sign-qr{width:210px;height:210px;margin:14px auto 6px;display:block;background:#fff}
+.sign-card .sign-link{font-size:11.5px;word-break:break-all;color:#4A3F63}
+.sign-card .sign-sub{font-size:13px;font-weight:700;margin-top:6px}
+.sign-card.flyer .sign-on{font-size:30px}
+#printArea{display:none}
+@media print{
+  body>*{display:none !important}
+  body>#printArea{display:block !important}
+  #printArea .sign-card{border:2px solid #0E0A16}
+}
 #summary{text-align:center}
 #summary .mark{width:84px;height:84px;margin:2px auto 4px}
 #summary .mark svg{width:84px;height:84px}
@@ -1037,7 +1092,7 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
       </div>
       <div class="sheetfoot">
         <div class="wm">Candy Trail</div>
-        <div class="ver" id="appVer">Candy Trail v6.8</div>
+        <div class="ver" id="appVer">Candy Trail v6.9</div>
       </div>
     </div>
 
@@ -1105,6 +1160,12 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
           <button id="btnCopyLink" class="btn btn-ghost" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-link"/></svg>Copy link</button>
         </div>
         <button id="btnHaulExport" class="btn btn-ghost" type="button" style="width:100%;margin-top:8px"><svg class="ic" viewBox="0 0 24 24"><use href="#i-download"/></svg>Export my spots</button>
+      </div>
+      <div id="regBox" hidden>
+        <div class="label">Your porch &amp; storefront</div>
+        <p class="muted" style="font-size:13.5px;line-height:1.45;margin:0">Places you claim show on the map before the night, with your treats, hours and flags, so families can plan around you.</p>
+        <div id="regMine"></div>
+        <button id="btnClaim" class="btn btn-org" type="button" style="width:100%;margin-top:10px"><svg class="ic" viewBox="0 0 24 24"><use href="#i-pin"/></svg>Claim your porch or storefront</button>
       </div>
     </div>
   </div>
@@ -1181,6 +1242,8 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
     <button id="spotRemove" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-trash"/></svg>Remove</button>
     <button id="spotClose" class="btn-close" type="button" aria-label="Close"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button>
   </div>
+  <div id="spotRegInfo" hidden></div>
+  <button id="spotClaim" class="btn btn-ghost" type="button" hidden><svg class="ic" viewBox="0 0 24 24"><use href="#i-ribbon"/></svg>Claim this place on Candy Trail</button>
   <div class="spot-tags" role="group" aria-label="What is at this spot">
     <button class="spot-tag" data-tag="candy" type="button" aria-pressed="false">Candy</button>
     <button class="spot-tag" data-tag="full" type="button" aria-pressed="false">Full-Size</button>
@@ -1305,6 +1368,79 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
     <div id="dlgBtns" class="btns"></div>
   </div>
 </div>
+<div id="regSheet" class="overlay" hidden>
+  <div class="ocard card" role="dialog" aria-modal="true" aria-labelledby="regTitle">
+    <div class="ss-head"><h2 id="regTitle">Claim your porch</h2><button id="regClose" class="btn-close" type="button" aria-label="Close claim form"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button></div>
+    <p>Register your place on the map ahead of the night. It links to this device, no account needed. You prove it is yours by claiming from the porch or storefront itself.</p>
+    <div class="label">Place type</div>
+    <div class="seg" id="regType" role="group" aria-label="Place type">
+      <button type="button" data-ptype="house" aria-pressed="true">House</button>
+      <button type="button" data-ptype="shop" aria-pressed="false">Shop</button>
+    </div>
+    <div class="label" id="regNameLbl">Porch name (optional)</div>
+    <input id="regName" type="text" maxlength="48" placeholder="e.g. The Pumpkin Porch" autocomplete="off">
+    <div id="regFlagGroups"></div>
+    <div class="reg-grp">
+      <div class="label">Hours</div>
+      <div class="seg seg3" id="regHoursPreset" role="group" aria-label="Hours preset" style="grid-template-columns:1fr 1fr 1fr">
+        <button type="button" data-hpreset="early" aria-pressed="false">Early Start</button>
+        <button type="button" data-hpreset="late" aria-pressed="false">Open Late</button>
+        <button type="button" data-hpreset="supplies" aria-pressed="false">While Supplies Last</button>
+      </div>
+      <div class="reg-hours">
+        <label>Starts<input id="regStart" type="time" aria-label="Starts at"></label>
+        <label>Ends<input id="regEnd" type="time" aria-label="Ends at"></label>
+      </div>
+    </div>
+    <div class="reg-grp">
+      <div class="label">Note for visitors (optional)</div>
+      <input id="regNote" type="text" maxlength="120" placeholder="e.g. Ring the bell, candy on the steps" autocomplete="off">
+    </div>
+    <div id="regGate" role="status"></div>
+    <div class="btns" style="margin-top:12px">
+      <button id="regSave" class="btn btn-ember" type="button">Claim this place</button>
+      <button id="regRemoveBtn" class="btn btn-ghost" type="button" hidden>Remove this registration</button>
+    </div>
+  </div>
+</div>
+
+<div id="promoSheet" class="overlay" hidden>
+  <div class="ocard card" role="dialog" aria-modal="true" aria-labelledby="promoTitle">
+    <div class="ss-head"><h2 id="promoTitle">Your Porch</h2><button id="promoClose" class="btn-close" type="button" aria-label="Close promote kit"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button></div>
+    <p id="promoSub">Everything you need to bring the block to your door.</p>
+    <div class="label">Your spot's permanent link</div>
+    <div class="promo-link" id="promoLink"></div>
+    <div class="btns" style="margin-top:8px">
+      <button id="promoCopy" class="btn btn-ghost" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-link"/></svg>Copy link</button>
+      <button id="promoCard" class="btn btn-ghost" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-share"/></svg>Share spot card</button>
+      <button id="promoSign" class="btn btn-ghost" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-qr"/></svg>Printable sign</button>
+      <button id="promoFlyer" class="btn btn-ghost" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-users"/></svg>Block flyer for neighbors</button>
+    </div>
+    <div id="promoBadgeBox" hidden>
+      <div class="label" style="margin-top:14px">Website badge (for shops)</div>
+      <img id="promoBadgeImg" alt="On Candy Trail website badge" width="220" height="60">
+      <div class="label" style="margin-top:10px">Badge HTML snippet</div>
+      <textarea id="promoSnippet" readonly aria-label="Badge HTML snippet"></textarea>
+      <button id="promoSnippetCopy" class="btn btn-ghost" type="button" style="width:100%;margin-top:8px"><svg class="ic" viewBox="0 0 24 24"><use href="#i-copy"/></svg>Copy snippet</button>
+    </div>
+    <div class="label" style="margin-top:14px">Post about it</div>
+    <div id="promoTpls"></div>
+  </div>
+</div>
+
+<div id="signSheet" class="overlay" hidden>
+  <div class="ocard card" role="dialog" aria-modal="true" aria-labelledby="signTitle">
+    <div class="ss-head"><h2 id="signTitle">Porch sign</h2><button id="signClose" class="btn-close" type="button" aria-label="Close sign"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button></div>
+    <div id="signBody"></div>
+    <div class="btns" style="margin-top:12px">
+      <button id="signPrint" class="btn btn-ember" type="button">Print</button>
+      <button id="signPng" class="btn btn-ghost" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-download"/></svg>Save as image</button>
+    </div>
+  </div>
+</div>
+
+<div id="printArea" aria-hidden="true"></div>
+
 <div id="shareSheet" class="overlay" hidden>
   <div class="ocard card" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
     <div class="ss-head"><h2 id="shareTitle">Share</h2><button id="shareClose" class="btn-close" type="button" aria-label="Close share sheet"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button></div>
@@ -2640,6 +2776,9 @@ function paintSpotSheet() {
   var bar = $('spotPhotoBar');
   if (dr.photo) { bar.hidden = false; $('spotThumb').src = dr.photo; $('spotPhotoLbl').textContent = 'Photo added'; }
   else { bar.hidden = true; $('spotThumb').removeAttribute('src'); $('spotPhotoLbl').textContent = 'Add Photo'; }
+  /* v6.9 Phase 4C: a registered place at this spot shows its flags and
+     Registered treatment on the sheet; an unclaimed spot offers claim. */
+  try { if (typeof regPaintSpotInfo === 'function') regPaintSpotInfo(); } catch (e) {}
 }
 function showSpotSheet() {
   var sh = $('spotSheet');
@@ -3393,6 +3532,15 @@ function buildRoute() {
       var cv = rp.status === 'nonfood' ? (S.allergy ? 6 : 4) : 4;
       cands.push({ lat: rp.lat, lng: rp.lng, value: cv, housesEst: 2, kind: 'pin' });
     });
+    /* v6.9 Phase 4C: registered places are first-class route candidates;
+       their Non-Food / Allergy-Aware flags feed the same allergy boost
+       as seeded stops and crowd non-food reports. */
+    if (typeof REG !== 'undefined' && REG.ok) {
+      regCandidates(start, radius).forEach(function (rc) {
+        if (cands.some(function (c) { return haversine(c, rc) <= 25; })) return;
+        cands.push(rc);
+      });
+    }
     res.segs.slice(0, vMode !== 'best' ? 30 : 20).forEach(function (s) {
       cands.push({ lat: s.mid.lat, lng: s.mid.lng, value: Math.min(6, s.houses / 7), housesEst: s.houses, kind: 'seg' });
     });
@@ -4510,6 +4658,9 @@ function renderCrowd() {
   CROWD.reports.forEach(function (r) {
     var age = crowdAgeMin(r);
     if (age > 180) return;
+    /* v6.9: a registered place carries its own marker, so a same-place
+       crowd report (other than a live Ran Out) does not double-draw. */
+    if (typeof REG !== 'undefined' && REG.ok && r.status !== 'out' && regNearLatLng(r.lat, r.lng, 25)) return;
     for (var i = 0; i < placed.length; i++) if (haversine(placed[i], r) <= 25) return;
     placed.push(r);
     var meta = CROWD_META[r.status] || CROWD_META.candy;
@@ -7128,6 +7279,8 @@ function mapShareUrl(extraQuery) {
   return APP_LINK + (parts.length ? '?' + parts.join('&') : '');
 }
 function shareLinkFor(kind) {
+  /* v6.9: a spot card links to the place itself, not the live viewport. */
+  if (kind === 'spot') return (typeof SHARE !== 'undefined' && SHARE.spotReg) ? regLink(SHARE.spotReg) : APP_LINK;
   var extra = '';
   if (kind === 'party' && typeof PARTY !== 'undefined' && PARTY.code) extra = 'party=' + encodeURIComponent(PARTY.code);
   var url = mapShareUrl(extra);
@@ -7351,6 +7504,7 @@ function paintShareCard(kind, dims, data, imgs, cb) {
   g.fillText(data.title, m, titleY);
   var sub = '';
   if (kind === 'party') sub = data.people + (data.people === 1 ? ' walker' : ' walkers') + ' · pooled haul';
+  else if (kind === 'spot') sub = 'On Candy Trail · ' + (data.corridor || data.place || '');
   else if (data.place) sub = 'in ' + data.place;
   if (sub) {
     g.font = '500 ' + Math.round(27 * u) + 'px Inter, system-ui, sans-serif';
@@ -7361,7 +7515,35 @@ function paintShareCard(kind, dims, data, imgs, cb) {
   var statsY = H - Math.round(196 * u);
   var artH = Math.max(110, (statsY - Math.round(118 * u)) - artY);
   var artW = W - 2 * m;
-  if (kind === 'party') {
+  if (kind === 'spot') {
+    /* v6.9: the personal spot card. Ribbon Pin, the place's flags and
+       hours, its corridor, and the permanent deep link as text (the
+       printable medallion carries the scannable QR of the same link). */
+    var scx = W / 2;
+    var mkSize = Math.min(190 * u, artH * 0.34);
+    drawRibbonMark(g, scx - mkSize / 2, artY + Math.round(6 * u), mkSize, true);
+    var ly = artY + mkSize + Math.round(84 * u);
+    g.textAlign = 'center';
+    g.fillStyle = '#FF7844';
+    g.font = '700 ' + Math.round(27 * u) + 'px Inter, system-ui, sans-serif';
+    g.fillText('ON CANDY TRAIL', scx, ly); ly += Math.round(52 * u);
+    g.fillStyle = '#F5EFE6';
+    cardWrapLines(g, data.flagsLine || '', Math.round(34 * u), '500', 'Inter, system-ui, sans-serif', artW - Math.round(20 * u), 3).forEach(function (ln) {
+      g.fillText(ln, scx, ly); ly += Math.round(46 * u);
+    });
+    if (data.hoursLine) {
+      g.fillStyle = '#A79CC4';
+      g.font = '600 ' + Math.round(30 * u) + 'px Inter, system-ui, sans-serif';
+      g.fillText(data.hoursLine, scx, ly + Math.round(10 * u)); ly += Math.round(56 * u);
+    }
+    g.fillStyle = '#A79CC4';
+    g.font = '500 ' + Math.round(25 * u) + 'px Inter, system-ui, sans-serif';
+    g.fillText('Scan the porch sign QR, or open the link on the card', scx, statsY - Math.round(120 * u));
+    drawCardStats(g, [
+      { v: data.hoursShort || 'Halloween', l: 'HOURS' },
+      { v: data.typeLabel || 'House', l: 'REGISTERED' }
+    ], m, statsY, artW, u);
+  } else if (kind === 'party') {
     paintPartyArt(g, data, imgs, { x: m, y: artY, w: artW, h: artH }, u);
     drawCardStats(g, [
       { v: String(data.houses), l: 'HOUSES POOLED' },
@@ -7387,10 +7569,20 @@ function paintShareCard(kind, dims, data, imgs, cb) {
   drawCardFooter(g, W, H, u, m, cardStamp(kind, data.src));
   if (cv.toBlob) cv.toBlob(cb, 'image/png'); else cb(null);
 }
+function cardWrapLines(g, text, px, weight, family, maxW, maxLines) {
+  g.font = weight + ' ' + px + 'px ' + family;
+  var words = String(text || '').split(/\s+/).filter(Boolean), lines = [], cur = '';
+  words.forEach(function (wd) {
+    var t = cur ? cur + ' ' + wd : wd;
+    if (cur && g.measureText(t).width > maxW) { lines.push(cur); cur = wd; } else cur = t;
+  });
+  if (cur) lines.push(cur);
+  return lines.slice(0, maxLines || 3);
+}
 function drawShareCard(kind, crop, cb) {
   var dims = CARD_CROPS[crop] || CARD_CROPS.portrait;
   function go() {
-    var data = kind === 'party' ? partyCardData() : kind === 'route' ? routeCardData() : haulCardData();
+    var data = cardDataFor(kind);
     if (!data) { cb(null); return; }
     if (kind !== 'party' || !data.members.length) { paintShareCard(kind, dims, data, {}, cb); return; }
     var imgs = {}, left = data.members.length;
@@ -7406,16 +7598,28 @@ function drawShareCard(kind, crop, cb) {
 }
 
 /* --- share sheet --- */
-var SHARE = { kind: 'haul', crop: 'portrait', blob: null };
-function shareTitleFor(kind) { return kind === 'party' ? 'Share the party' : kind === 'route' ? 'Share the route' : 'Share your haul'; }
+var SHARE = { kind: 'haul', crop: 'portrait', blob: null, spotReg: null };
+function shareTitleFor(kind) { return kind === 'party' ? 'Share the party' : kind === 'route' ? 'Share the route' : kind === 'spot' ? 'Share your spot' : 'Share your haul'; }
 function shareTextFor(kind, data) {
   if (!data) return 'Candy Trail: the live trick-or-treat map.';
   if (kind === 'party') return 'Party ' + data.code + ' pooled ' + data.houses + (data.houses === 1 ? ' house' : ' houses') + ' on Candy Trail.';
   if (kind === 'route') return 'Our trick-or-treat route on Candy Trail: ' + data.houses + (data.houses === 1 ? ' house' : ' houses') + ', ' + fmtDist(data.distance) + '.';
+  if (kind === 'spot') return data.title + ' is on Candy Trail this Halloween! ' + (data.flagsLine ? data.flagsLine + '. ' : '') + 'Find us on the map: ' + data.link;
   return 'My Halloween haul on Candy Trail: ' + data.houses + (data.houses === 1 ? ' house' : ' houses') + ', ' + fmtWalkDist(data.trackDist) + ' walked.';
 }
 function shareFileName(kind) { return 'candy-trail-' + kind + '-2026.png'; }
-function cardDataFor(kind) { return kind === 'party' ? partyCardData() : kind === 'route' ? routeCardData() : haulCardData(); }
+function spotCardData() {
+  var reg = SHARE.spotReg;
+  if (!reg) return null;
+  return {
+    kind: 'spot', title: regName(reg), reg: reg, link: regLink(reg),
+    corridor: zoneBand(reg.lat, reg.lng), place: '',
+    flagsLine: regFlagLabels(reg).join(' · '),
+    hoursLine: regHoursText(reg), hoursShort: regHoursShort(reg),
+    typeLabel: reg.place_type === 'shop' ? 'Shop' : 'House'
+  };
+}
+function cardDataFor(kind) { return kind === 'party' ? partyCardData() : kind === 'route' ? routeCardData() : kind === 'spot' ? spotCardData() : haulCardData(); }
 function openShareSheet(kind) {
   var data = cardDataFor(kind);
   if (!data) {
@@ -7523,6 +7727,581 @@ function maybeSpotSharePrompt() {
 }
 setTimeout(function () { try { maybeSpotSharePrompt(); } catch (e) {} }, 2500);
 
+/* ---------------- Phase 4C: place registration ("Claim your porch") ----------------
+   A homeowner or shopkeeper registers their place ahead of the night and
+   links it to this device. No accounts: identity is the same device hash
+   the zone channel uses (cr_zoneDev, never the raw token). Claim proof is
+   a GPS fix within ~50 m of the place, or arrival through that place's
+   porch-sign QR deep link (?place= + ?view=). One device holds at most
+   3 claims, each proximity-proved. The claimed place is editable and
+   removable by the claiming device only.
+   Backend: the `registrations` table (registrations-setup.sql, public
+   read + insert like the other tables). Writes are append-only; the read
+   side takes the latest row per place_id, and a removed=true row retires
+   a place. If the table does not exist yet, every registration surface
+   hides and the rest of the app is untouched. */
+var REG_FLAG_GROUPS = [
+  { id: 'treats', label: 'Treats', flags: [['candy', 'Candy'], ['full', 'Full-Size / King'], ['nonfood', 'Non-Food (Teal)'], ['allergy', 'Allergy-Aware']] },
+  { id: 'exp', label: 'Experience', flags: [['decor', 'Decor Display'], ['scary', 'Scary'], ['lights', 'Lights'], ['photo', 'Photo Spot'], ['music', 'Music / Animatronics']] },
+  { id: 'log', label: 'Logistics', flags: [['stepfree', 'Steps-Free Access'], ['dog', 'Dog on Porch']] }
+];
+var REG_FLAG_LABELS = {};
+REG_FLAG_GROUPS.forEach(function (gr) { gr.flags.forEach(function (fl) { REG_FLAG_LABELS[fl[0]] = fl[1]; }); });
+var REG_HOUR_PRESETS = { early: 'Early Start', late: 'Open Late', supplies: 'While Supplies Last' };
+var REG_MAX_PER_DEVICE = 3;
+var REG = { ok: false, loaded: false, rows: [], all: [], scan: null, draft: null, layer: null, fetchSeq: 0 };
+function regNormFlags(f) {
+  var out = { treats: [], exp: [], log: [], hours: { preset: '', start: '', end: '' } };
+  try { if (typeof f === 'string') f = JSON.parse(f); } catch (e) { f = null; }
+  if (!f || typeof f !== 'object') return out;
+  ['treats', 'exp', 'log'].forEach(function (k) { if (Array.isArray(f[k])) out[k] = f[k].filter(function (v) { return REG_FLAG_LABELS[v]; }); });
+  if (f.hours && typeof f.hours === 'object') {
+    out.hours.preset = REG_HOUR_PRESETS[f.hours.preset] ? f.hours.preset : '';
+    out.hours.start = String(f.hours.start || '');
+    out.hours.end = String(f.hours.end || '');
+  }
+  return out;
+}
+function regDevHash() {
+  try { zoneLoadIdentity(); } catch (e) {}
+  if (typeof ZONE !== 'undefined' && ZONE.dev) return ZONE.dev;
+  try { return zoneMintDev(); } catch (e) { return ''; }
+}
+function regPlaceId(lat, lng, dev) {
+  return 'p' + zoneHash53(dev + '|' + Number(lat).toFixed(5) + '|' + Number(lng).toFixed(5), 11).slice(0, 16);
+}
+function regById(pid) {
+  for (var i = 0; i < REG.all.length; i++) if (REG.all[i].place_id === pid) return REG.all[i];
+  return null;
+}
+function regMine(reg) {
+  var d = regDevHash();
+  return !!d && !!reg && reg.devhash === d;
+}
+function regName(reg) {
+  return (reg && reg.display_name) || (reg && reg.place_type === 'shop' ? 'A shop on Candy Trail' : 'A porch on Candy Trail');
+}
+function regFlagLabels(reg) {
+  var f = regNormFlags(reg && reg.flags), out = [];
+  ['treats', 'exp', 'log'].forEach(function (k) { f[k].forEach(function (v) { out.push(REG_FLAG_LABELS[v]); }); });
+  return out;
+}
+function regFmtTime(t) {
+  var p = String(t || '').split(':'), h = parseInt(p[0], 10), m = p[1] || '00';
+  if (isNaN(h)) return '';
+  var ap = h >= 12 ? 'PM' : 'AM'; h = h % 12; if (!h) h = 12;
+  return h + ':' + m + ' ' + ap;
+}
+function regHoursText(reg) {
+  var h = regNormFlags(reg && reg.flags).hours;
+  if (h.preset) return REG_HOUR_PRESETS[h.preset];
+  if (h.start && h.end) return 'Open ' + regFmtTime(h.start) + ' to ' + regFmtTime(h.end);
+  if (h.start) return 'Opens ' + regFmtTime(h.start);
+  if (h.end) return 'Open until ' + regFmtTime(h.end);
+  return '';
+}
+function regHoursShort(reg) {
+  var h = regNormFlags(reg && reg.flags).hours;
+  if (h.preset) return REG_HOUR_PRESETS[h.preset];
+  if (h.start && h.end) return regFmtTime(h.start) + ' - ' + regFmtTime(h.end);
+  return 'Halloween';
+}
+function regAllergySafe(reg) {
+  var f = regNormFlags(reg && reg.flags);
+  return f.treats.indexOf('nonfood') >= 0 || f.treats.indexOf('allergy') >= 0;
+}
+function regRouteValue(reg) {
+  var v = 5;
+  if (regNormFlags(reg.flags).treats.indexOf('full') >= 0) v += 1;
+  if (S.allergy && regAllergySafe(reg)) v += 4;
+  return v;
+}
+function regCandidates(start, radius) {
+  var out = [];
+  REG.all.forEach(function (reg) {
+    if (haversine(reg, start) > radius * 1.2) return;
+    if (crowdOutNear(reg.lat, reg.lng)) return;
+    out.push({ lat: reg.lat, lng: reg.lng, value: regRouteValue(reg), housesEst: 3, kind: 'reg', reg: reg });
+  });
+  return out;
+}
+function regLink(reg) {
+  return APP_LINK + '?view=' + viewCoord(reg.lat) + ',' + viewCoord(reg.lng) + ',17&label=' + encodeURIComponent(regName(reg)) + '&place=' + encodeURIComponent(reg.place_id);
+}
+function regQrUrl(data, size) {
+  return 'https://api.qrserver.com/v1/create-qr-code/?size=' + size + 'x' + size + '&margin=0&data=' + encodeURIComponent(data);
+}
+function regNearLatLng(lat, lng, m) {
+  for (var i = 0; i < REG.all.length; i++) if (haversine({ lat: lat, lng: lng }, REG.all[i]) <= m) return true;
+  return false;
+}
+function regAt(lat, lng, m) {
+  for (var i = 0; i < REG.all.length; i++) if (haversine({ lat: lat, lng: lng }, REG.all[i]) <= m) return REG.all[i];
+  return null;
+}
+function regApplyRows(rows) {
+  var sorted = (rows || []).slice().sort(function (a, b) {
+    var x = String(a.created_at || ''), y = String(b.created_at || '');
+    return x < y ? 1 : x > y ? -1 : 0;
+  });
+  REG.rows = sorted;
+  var seen = {}, all = [];
+  sorted.forEach(function (r) {
+    if (!r.place_id || seen[r.place_id]) return;
+    seen[r.place_id] = 1;
+    if (!r.removed) all.push(r);
+  });
+  REG.all = all;
+}
+function regFetch() {
+  if (!crowdOn() || typeof fetch !== 'function') return;
+  var seq = ++REG.fetchSeq;
+  fetch(CROWD.url + '/rest/v1/registrations?select=*&order=created_at.desc&limit=1000', { headers: crowdHeaders() })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (rows) {
+      if (seq !== REG.fetchSeq) return;
+      if (!Array.isArray(rows)) {
+        /* Table missing (or a failed read): registration surfaces hide,
+           everything else keeps working. */
+        REG.ok = false; REG.loaded = true; regHideBox(); return;
+      }
+      REG.ok = true; REG.loaded = true;
+      regApplyRows(rows);
+      renderRegs(); paintRegMine();
+    })
+    .catch(function () {
+      if (seq !== REG.fetchSeq) return;
+      REG.ok = false; REG.loaded = true; regHideBox();
+    });
+}
+function regPostRow(row) {
+  if (!crowdOn() || typeof fetch !== 'function') return Promise.resolve(false);
+  return fetch(CROWD.url + '/rest/v1/registrations', { method: 'POST', headers: crowdHeaders(), body: JSON.stringify(row) })
+    .then(function (r) { return !!r.ok; })
+    .catch(function () { return false; });
+}
+function regFix() {
+  if (S.pos && isFinite(S.pos.lat) && isFinite(S.pos.lng)) return { lat: S.pos.lat, lng: S.pos.lng, acc: S.pos.acc };
+  var c = (S.lastPos && S.lastPos.coords) ? S.lastPos.coords : null;
+  if (c && isFinite(c.latitude) && isFinite(c.longitude)) return { lat: c.latitude, lng: c.longitude, acc: c.accuracy };
+  return null;
+}
+function regGate(lat, lng) {
+  var t = { lat: lat, lng: lng };
+  if (REG.scan && isFinite(REG.scan.lat) && isFinite(REG.scan.lng)) {
+    var ds = haversine(t, REG.scan);
+    if (ds <= 25) return { ok: true, via: 'scan', dist: ds };
+  }
+  var f = regFix();
+  if (!f) return { ok: false, via: '', dist: null };
+  var d = haversine(t, f);
+  return { ok: d <= 50, via: d <= 50 ? 'gps' : '', dist: d };
+}
+function regHideBox() { var b = $('regBox'); if (b) b.hidden = true; }
+
+/* ---------- rendering: markers, popups, Spot Sheet info ---------- */
+function regChipsHtml(reg) {
+  return regFlagLabels(reg).map(function (f) {
+    return '<span class="reg-chip' + (f.indexOf('Teal') >= 0 || f.indexOf('Allergy') >= 0 ? ' teal' : '') + '">' + esc(f) + '</span>';
+  }).join('');
+}
+function regIconHtml(reg) {
+  var f = regNormFlags(reg.flags), type = 'candy';
+  if (f.treats.indexOf('nonfood') >= 0 && f.treats.indexOf('candy') < 0) type = 'nonfood';
+  else if (f.exp.indexOf('decor') >= 0 && f.treats.indexOf('candy') < 0 && f.treats.indexOf('nonfood') < 0) type = 'decor';
+  return '<div class="mk-regwrap">' + pinIconHtml(type, reg.place_type === 'shop' ? 'shop' : 'house') + '<span class="mk-regring"></span></div>';
+}
+function regPopupHtml(reg) {
+  var out = crowdOutNear(reg.lat, reg.lng);
+  var flags = regFlagLabels(reg);
+  var html = '<div class="pop"><b>' + esc(regName(reg)) + '</b><br><span class="reg-line">Registered on Candy Trail</span>' +
+    '<br><span class="muted" style="font-size:12px">' + esc(zoneBand(reg.lat, reg.lng)) + '</span>' +
+    (flags.length ? '<br>' + regChipsHtml(reg) : '') +
+    (regHoursText(reg) ? '<br><span style="font-size:13.5px">' + esc(regHoursText(reg)) + '</span>' : '') +
+    (reg.note ? '<br><span class="popnote">' + esc(reg.note) + '</span>' : '') +
+    (out ? '<br><span style="font-size:13.5px;color:var(--red2)">Ran out (crowd report)</span>' : '');
+  html += '<br><button class="btn-org goHere" data-lat="' + reg.lat + '" data-lng="' + reg.lng + '" data-name="' + esc(regName(reg)) + '" style="margin-top:8px;min-height:38px;padding:6px 14px;font-size:14px">Go here</button> ' +
+    '<button class="btn-ghost crowdOut" data-lat="' + reg.lat + '" data-lng="' + reg.lng + '" style="margin-top:8px;min-height:38px;padding:6px 12px;font-size:14px">Ran out</button> ' +
+    '<button class="btn-ghost crowdStill" data-lat="' + reg.lat + '" data-lng="' + reg.lng + '" data-status="' + (regAllergySafe(reg) ? 'nonfood' : 'candy') + '" style="margin-top:8px;min-height:38px;padding:6px 12px;font-size:14px">Still giving</button>';
+  if (regMine(reg)) {
+    html += '<br><button class="btn-ghost" data-reg-act="promo" data-pid="' + esc(reg.place_id) + '" style="margin-top:8px;min-height:38px;padding:6px 12px;font-size:14px">Your porch: Promote kit</button> ' +
+      '<button class="btn-ghost" data-reg-act="edit" data-pid="' + esc(reg.place_id) + '" style="margin-top:8px;min-height:38px;padding:6px 12px;font-size:14px">Edit</button>';
+  }
+  return html + '</div>';
+}
+function renderRegs() {
+  if (!REG.layer) { try { REG.layer = L.layerGroup().addTo(map); } catch (e) { return; } }
+  REG.layer.clearLayers();
+  if (!REG.ok) return;
+  REG.all.forEach(function (reg) {
+    var html = crowdOutNear(reg.lat, reg.lng)
+      ? '<div class="mk-regwrap">' + pinIconHtml('out', 'house') + '<span class="mk-regring"></span></div>'
+      : regIconHtml(reg);
+    var m = L.marker([reg.lat, reg.lng], { icon: L.divIcon({ className: 'regicon', iconSize: [34, 34], iconAnchor: [17, 30], html: html }) });
+    m.bindPopup(regPopupHtml(reg));
+    m.addTo(REG.layer);
+  });
+}
+function regPaintSpotInfo() {
+  var info = $('spotRegInfo'), claim = $('spotClaim');
+  if (!info) return;
+  var dr = spotDraft;
+  if (!dr) { info.hidden = true; if (claim) claim.hidden = true; return; }
+  var reg = regAt(dr.lat, dr.lng, 25);
+  if (reg) {
+    var flags = regFlagLabels(reg);
+    info.hidden = false;
+    if (claim) claim.hidden = true;
+    info.innerHTML = '<span class="reg-badge">Registered on Candy Trail</span><div class="reg-name">' + esc(regName(reg)) + '</div>' +
+      '<div class="reg-note">' + esc(zoneBand(reg.lat, reg.lng)) + (regHoursText(reg) ? ' · ' + esc(regHoursText(reg)) : '') + '</div>' +
+      (flags.length ? '<div class="reg-chips">' + regChipsHtml(reg) + '</div>' : '') +
+      (reg.note ? '<div class="reg-note">' + esc(reg.note) + '</div>' : '') +
+      (regMine(reg) ? '<div class="reg-actions"><button class="btn btn-ghost" type="button" data-reg-act="promo" data-pid="' + esc(reg.place_id) + '">Promote kit</button><button class="btn btn-ghost" type="button" data-reg-act="edit" data-pid="' + esc(reg.place_id) + '">Edit</button></div>' : '');
+  } else {
+    info.hidden = true;
+    if (claim) claim.hidden = !REG.ok;
+  }
+}
+
+/* ---------- claim form ---------- */
+function regPaintFlagGroups(sel) {
+  var f = regNormFlags(sel), html = '';
+  REG_FLAG_GROUPS.forEach(function (gr) {
+    html += '<div class="reg-grp"><div class="label">' + gr.label + '</div><div class="reg-flags">';
+    gr.flags.forEach(function (fl) {
+      var on = (f[gr.id] || []).indexOf(fl[0]) >= 0;
+      html += '<button type="button" class="reg-flag" data-group="' + gr.id + '" data-flag="' + fl[0] + '" aria-pressed="' + on + '">' + esc(fl[1]) + '</button>';
+    });
+    html += '</div></div>';
+  });
+  $('regFlagGroups').innerHTML = html;
+}
+function regPaintGate() {
+  var d = REG.draft, el = $('regGate');
+  if (!d || !el) return;
+  if (d.pid) {
+    el.className = 'ok';
+    el.textContent = 'Editing your registration. The place stays linked to this device.';
+    return;
+  }
+  var g = regGate(d.lat, d.lng);
+  if (g.ok) {
+    el.className = 'ok';
+    el.textContent = g.via === 'scan'
+      ? 'Proof ready: you arrived here from this place\u2019s porch sign.'
+      : 'Proof ready: you are within ' + Math.round(g.dist) + ' m of this place.';
+  } else if (g.dist == null) {
+    el.className = '';
+    el.textContent = 'We need your location to prove this place is yours. Stand at the porch or storefront and try again.';
+  } else {
+    el.className = '';
+    el.textContent = 'You are about ' + Math.round(g.dist) + ' m away. Claim from within 50 m of the place, or scan its porch sign QR.';
+  }
+}
+function regFillForm(reg) {
+  var isShop = (reg && reg.place_type === 'shop') || (REG.draft && REG.draft.ptype === 'shop');
+  REG.draft.ptype = isShop ? 'shop' : 'house';
+  $$('#regType button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-ptype') === REG.draft.ptype)); });
+  $('regTitle').textContent = REG.draft.pid ? 'Edit your registration' : (isShop ? 'Claim your storefront' : 'Claim your porch');
+  $('regNameLbl').textContent = isShop ? 'Business name (optional)' : 'Porch name (optional)';
+  $('regName').value = (reg && reg.display_name) || '';
+  regPaintFlagGroups(reg ? reg.flags : null);
+  var h = regNormFlags(reg ? reg.flags : null).hours;
+  REG.draft.preset = h.preset || '';
+  $$('#regHoursPreset button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-hpreset') === REG.draft.preset)); });
+  $('regStart').value = h.start || '';
+  $('regEnd').value = h.end || '';
+  $('regNote').value = (reg && reg.note) || '';
+  $('regRemoveBtn').hidden = !REG.draft.pid;
+  $('regSave').textContent = REG.draft.pid ? 'Save changes' : 'Claim this place';
+  regPaintGate();
+  $('regSheet').hidden = false;
+}
+function regOpenNew(lat, lng, kind) {
+  REG.draft = { pid: null, lat: lat, lng: lng, ptype: kind === 'shop' ? 'shop' : 'house', preset: '' };
+  regFillForm(null);
+}
+function regOpenEdit(reg) {
+  if (!reg || !regMine(reg)) return;
+  REG.draft = { pid: reg.place_id, lat: reg.lat, lng: reg.lng, ptype: reg.place_type, preset: '' };
+  regFillForm(reg);
+}
+function hideRegSheet() { $('regSheet').hidden = true; REG.draft = null; }
+function regFormFlags() {
+  var out = { treats: [], exp: [], log: [] };
+  $$('#regFlagGroups .reg-flag').forEach(function (b) {
+    if (b.getAttribute('aria-pressed') === 'true') out[b.getAttribute('data-group')].push(b.getAttribute('data-flag'));
+  });
+  return out;
+}
+function regSave() {
+  var d = REG.draft; if (!d) return;
+  var dev = regDevHash();
+  if (!dev) { toast('Could not link this device. Try again.', 'err'); return; }
+  var pid = d.pid || regPlaceId(d.lat, d.lng, dev);
+  if (!d.pid) {
+    if (REG.all.filter(regMine).length >= REG_MAX_PER_DEVICE) {
+      toast('This device already claims ' + REG_MAX_PER_DEVICE + ' places, the most one device can hold.', 'warn');
+      return;
+    }
+    var g = regGate(d.lat, d.lng);
+    if (!g.ok) { regPaintGate(); toast('Claim from the place itself: within 50 m, or by scanning its porch sign.', 'warn'); return; }
+  } else {
+    var ex = regById(pid);
+    if (!ex || !regMine(ex)) { toast('Only the device that claimed this place can edit it.', 'warn'); return; }
+  }
+  var flags = regFormFlags();
+  flags.hours = { preset: d.preset || '', start: $('regStart').value || '', end: $('regEnd').value || '' };
+  var row = {
+    place_id: pid, devhash: dev, zone: ZONE_ID, lat: d.lat, lng: d.lng,
+    place_type: d.ptype, display_name: cleanText($('regName').value || '').slice(0, 48) || null,
+    flags: flags, note: cleanText($('regNote').value || '') || null, removed: false
+  };
+  regPostRow(row).then(function (ok) {
+    if (!ok) { toast('Could not save the registration. Check your connection and try again.', 'err'); return; }
+    row.created_at = new Date().toISOString();
+    regApplyRows(REG.rows.concat([row]));
+    renderRegs(); paintRegMine(); hideRegSheet();
+    toast(d.pid ? 'Registration updated.' : 'Your place is on the map.', 'ok');
+  });
+}
+function regRemoveReg(pid) {
+  var ex = regById(pid);
+  if (!ex || !regMine(ex)) return false;
+  var row = {
+    place_id: pid, devhash: regDevHash(), zone: ZONE_ID, lat: ex.lat, lng: ex.lng,
+    place_type: ex.place_type, display_name: ex.display_name, flags: ex.flags, note: ex.note, removed: true
+  };
+  regPostRow(row).then(function (ok) {
+    if (!ok) { toast('Could not remove the registration. Check your connection and try again.', 'err'); return; }
+    row.created_at = new Date().toISOString();
+    regApplyRows(REG.rows.concat([row]));
+    renderRegs(); paintRegMine(); hideRegSheet();
+    toast('Registration removed.', 'ok');
+  });
+  return true;
+}
+
+/* ---------- Your Porch / Your Storefront (the Haul pane section) ---------- */
+function regMineCardHtml(reg) {
+  return '<div class="reg-card"><div class="reg-name">' + esc(regName(reg)) + '</div>' +
+    '<div class="reg-sub">' + esc(zoneBand(reg.lat, reg.lng)) + (regHoursText(reg) ? ' · ' + esc(regHoursText(reg)) : '') + '</div>' +
+    '<div class="reg-chips">' + regChipsHtml(reg) + '</div>' +
+    '<div class="reg-actions"><button class="btn btn-ghost" type="button" data-reg-act="promo" data-pid="' + esc(reg.place_id) + '">Promote kit</button>' +
+    '<button class="btn btn-ghost" type="button" data-reg-act="edit" data-pid="' + esc(reg.place_id) + '">Edit</button></div></div>';
+}
+function paintRegMine() {
+  var box = $('regBox'); if (!box) return;
+  if (!REG.ok) { box.hidden = true; return; }
+  box.hidden = false;
+  var mine = REG.all.filter(regMine);
+  $('regMine').innerHTML = mine.length
+    ? mine.map(regMineCardHtml).join('')
+    : '<p class="muted" style="font-size:13.5px;margin-top:8px">No claimed places yet on this device. Claim up to 3.</p>';
+}
+
+/* ---------- Promote Kit, medallion, flyer, badge ---------- */
+var PROMO = { reg: null, signKind: 'sign' };
+function regSocialTemplates(reg) {
+  var link = regLink(reg), name = regName(reg), flags = regFlagLabels(reg).join(', ');
+  var fline = flags ? ' ' + flags + '.' : '';
+  var hline = regHoursText(reg) ? ' Hours: ' + regHoursText(reg) + '.' : '';
+  return [
+    name + ' is on Candy Trail this Halloween!' + fline + hline + ' Find us on the live map: ' + link,
+    'Trick-or-treaters, come find ' + name + ' on Candy Trail.' + fline + ' Here is our spot: ' + link,
+    'Our block is on Candy Trail, and ' + name + ' is in.' + fline + hline + ' See you on the trail: ' + link
+  ];
+}
+function regBadgeSnippet(reg) {
+  return '<a href="' + regLink(reg) + '"><img src="candy-trail-badge.png" alt="On Candy Trail" width="220" height="60"></a>';
+}
+function regDrawBadge(cb) {
+  try {
+    var cv = document.createElement('canvas'); cv.width = 440; cv.height = 120;
+    var g = cv.getContext('2d');
+    if (!g) { cb(null); return; }
+    g.fillStyle = '#0E0A16'; rrPath(g, 0, 0, 440, 120, 20); g.fill();
+    drawRibbonMark(g, 18, 18, 84, false);
+    g.fillStyle = '#F5EFE6'; g.font = '600 40px Fraunces, Georgia, serif'; g.fillText('On Candy Trail', 116, 62);
+    g.fillStyle = '#FF7844'; g.font = '600 24px Inter, system-ui, sans-serif'; g.fillText('Find us on the map', 118, 96);
+    if (cv.toBlob) cv.toBlob(cb, 'image/png'); else cb(null);
+  } catch (e) { cb(null); }
+}
+function regSignHtml(reg) {
+  var link = regLink(reg), flags = regFlagLabels(reg).join(' · ');
+  return '<div class="sign-card"><svg class="sign-mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon"/></svg>' +
+    '<div class="sign-on">On Candy Trail</div><div class="sign-name">' + esc(regName(reg)) + '</div>' +
+    (flags ? '<div class="sign-flags">' + esc(flags) + '</div>' : '') +
+    (regHoursText(reg) ? '<div class="sign-flags">' + esc(regHoursText(reg)) + '</div>' : '') +
+    '<img class="sign-qr" src="' + regQrUrl(link, 320) + '" alt="QR code to this spot">' +
+    '<div class="sign-link">' + esc(link) + '</div><div class="sign-sub">Scan to see this spot on the live map</div></div>';
+}
+function regFlyerHtml() {
+  return '<div class="sign-card flyer"><svg class="sign-mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon"/></svg>' +
+    '<div class="sign-on">Our block is on Candy Trail</div><div class="sign-name">Claim your porch</div>' +
+    '<div class="sign-flags">Register your porch or storefront in the app, and families can plan around you before the night.</div>' +
+    '<img class="sign-qr" src="' + regQrUrl(APP_LINK, 320) + '" alt="QR code for the Candy Trail app">' +
+    '<div class="sign-link">' + esc(APP_LINK) + '</div><div class="sign-sub">Open Candy Trail, then tap Claim your porch or storefront</div></div>';
+}
+function openSign(reg, kind) {
+  PROMO.signKind = kind;
+  $('signTitle').textContent = kind === 'flyer' ? 'Block flyer' : 'Porch sign';
+  var html = kind === 'flyer' ? regFlyerHtml() : regSignHtml(reg);
+  $('signBody').innerHTML = html;
+  $('printArea').innerHTML = html;
+  $('signSheet').hidden = false;
+}
+function regSignPng(reg, cb) {
+  try {
+    var cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1350;
+    var g = cv.getContext('2d');
+    if (!g) { cb(null); return; }
+    var grad = g.createLinearGradient(0, 0, 1080, 1350);
+    grad.addColorStop(0, '#2A2140'); grad.addColorStop(1, '#0E0A16');
+    g.fillStyle = grad; g.fillRect(0, 0, 1080, 1350);
+    drawRibbonMark(g, 540 - 110, 90, 220, true);
+    g.textAlign = 'center';
+    g.fillStyle = '#F5EFE6';
+    fitFont(g, 'On Candy Trail', 72, '600', 'Fraunces, Georgia, serif', 960);
+    g.fillText('On Candy Trail', 540, 430);
+    fitFont(g, regName(reg), 64, '600', 'Fraunces, Georgia, serif', 960);
+    g.fillText(regName(reg), 540, 520);
+    var ly = 610;
+    g.fillStyle = '#A79CC4';
+    cardWrapLines(g, regFlagLabels(reg).join(' · '), 34, '500', 'Inter, system-ui, sans-serif', 940, 3).forEach(function (ln) {
+      g.fillText(ln, 540, ly); ly += 48;
+    });
+    if (regHoursText(reg)) {
+      g.font = '600 30px Inter, system-ui, sans-serif';
+      g.fillText(regHoursText(reg), 540, ly + 14); ly += 60;
+    }
+    var link = regLink(reg);
+    var finish = function (qrImg) {
+      if (qrImg) { try { g.drawImage(qrImg, 540 - 160, ly + 20, 320, 320); } catch (e) {} }
+      g.fillStyle = '#8B7BB8'; g.font = '500 24px Inter, system-ui, sans-serif';
+      g.fillText(link, 540, 1350 - 110);
+      if (cv.toBlob) cv.toBlob(cb, 'image/png'); else cb(null);
+    };
+    var img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function () { finish(img); };
+    img.onerror = function () { finish(null); };
+    img.src = regQrUrl(link, 320);
+  } catch (e) { cb(null); }
+}
+function openPromo(reg) {
+  if (!reg) return;
+  PROMO.reg = reg;
+  $('promoTitle').textContent = reg.place_type === 'shop' ? 'Your Storefront' : 'Your Porch';
+  $('promoSub').textContent = regName(reg) + ' · ' + zoneBand(reg.lat, reg.lng) + (regHoursText(reg) ? ' · ' + regHoursText(reg) : '');
+  $('promoLink').textContent = regLink(reg);
+  var shop = reg.place_type === 'shop';
+  $('promoBadgeBox').hidden = !shop;
+  if (shop) {
+    $('promoSnippet').value = regBadgeSnippet(reg);
+    regDrawBadge(function (blob) {
+      var img = $('promoBadgeImg');
+      if (blob && window.URL && typeof URL.createObjectURL === 'function') {
+        try { img.src = URL.createObjectURL(blob); } catch (e) {}
+      }
+    });
+  }
+  $('promoTpls').innerHTML = regSocialTemplates(reg).map(function (tpl) {
+    return '<div class="tpl"><textarea readonly>' + esc(tpl) + '</textarea>' +
+      '<button class="btn btn-ghost" type="button" data-reg-act="copy-tpl" data-tpl="' + esc(tpl) + '" style="width:100%;margin-top:4px">Copy post</button></div>';
+  }).join('');
+  $('promoSheet').hidden = false;
+}
+function copyTextReg(text, okMsg) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function () { toast(okMsg || 'Copied.', 'ok'); }, function () { toast('Copy failed. Select the text to copy it.', 'warn'); });
+  } else toast('Select the text to copy it.', 'warn');
+}
+
+/* ---------- delegated clicks for registration surfaces ---------- */
+document.addEventListener('click', function (e) {
+  var t = e.target && e.target.closest ? e.target.closest('[data-reg-act]') : null;
+  if (t) {
+    var act = t.getAttribute('data-reg-act'), pid = t.getAttribute('data-pid');
+    if (act === 'promo') { var r = regById(pid); if (r) openPromo(r); }
+    else if (act === 'edit') { var r2 = regById(pid); if (r2) regOpenEdit(r2); }
+    else if (act === 'copy-tpl') { copyTextReg(t.getAttribute('data-tpl') || '', 'Post copied.'); }
+    return;
+  }
+  var f = e.target && e.target.closest ? e.target.closest('.reg-flag') : null;
+  if (f) f.setAttribute('aria-pressed', String(f.getAttribute('aria-pressed') !== 'true'));
+});
+$$('#regType button').forEach(function (b) {
+  b.addEventListener('click', function () {
+    if (!REG.draft) return;
+    REG.draft.ptype = b.getAttribute('data-ptype') || 'house';
+    $$('#regType button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    $('regTitle').textContent = REG.draft.pid ? 'Edit your registration' : (REG.draft.ptype === 'shop' ? 'Claim your storefront' : 'Claim your porch');
+    $('regNameLbl').textContent = REG.draft.ptype === 'shop' ? 'Business name (optional)' : 'Porch name (optional)';
+  });
+});
+$$('#regHoursPreset button').forEach(function (b) {
+  b.addEventListener('click', function () {
+    if (!REG.draft) return;
+    var p = b.getAttribute('data-hpreset') || '';
+    REG.draft.preset = REG.draft.preset === p ? '' : p;
+    $$('#regHoursPreset button').forEach(function (x) { x.setAttribute('aria-pressed', String(REG.draft.preset === x.getAttribute('data-hpreset'))); });
+  });
+});
+$('regClose').addEventListener('click', hideRegSheet);
+$('regSheet').addEventListener('click', function (e) { if (e.target === this) hideRegSheet(); });
+$('regSave').addEventListener('click', regSave);
+$('regRemoveBtn').addEventListener('click', function () { if (REG.draft && REG.draft.pid) regRemoveReg(REG.draft.pid); });
+$('promoClose').addEventListener('click', function () { $('promoSheet').hidden = true; });
+$('promoSheet').addEventListener('click', function (e) { if (e.target === this) $('promoSheet').hidden = true; });
+$('promoCopy').addEventListener('click', function () { if (PROMO.reg) copyTextReg(regLink(PROMO.reg), 'Link copied.'); });
+$('promoCard').addEventListener('click', function () {
+  if (!PROMO.reg) return;
+  SHARE.spotReg = PROMO.reg;
+  $('promoSheet').hidden = true;
+  openShareSheet('spot');
+});
+$('promoSign').addEventListener('click', function () { if (PROMO.reg) openSign(PROMO.reg, 'sign'); });
+$('promoFlyer').addEventListener('click', function () { if (PROMO.reg) openSign(PROMO.reg, 'flyer'); });
+$('promoSnippetCopy').addEventListener('click', function () { copyTextReg($('promoSnippet').value || '', 'Snippet copied.'); });
+$('signClose').addEventListener('click', function () { $('signSheet').hidden = true; });
+$('signSheet').addEventListener('click', function (e) { if (e.target === this) $('signSheet').hidden = true; });
+$('signPrint').addEventListener('click', function () { try { if (window.print) window.print(); } catch (e) {} });
+$('signPng').addEventListener('click', function () {
+  if (!PROMO.reg) return;
+  regSignPng(PROMO.reg, function (blob) {
+    if (blob && downloadCardBlob(blob, 'candy-trail-porch-sign-2026.png')) toast('Sign image saved.', 'ok');
+    else toast('Could not make the sign image on this browser.', 'err');
+  });
+});
+$('btnClaim').addEventListener('click', function () {
+  var f = regFix();
+  var at = f || S.start;
+  if (!at) { toast('Let GPS find you first, or set a start point, then claim from your porch.', 'warn'); return; }
+  regOpenNew(at.lat, at.lng, 'house');
+});
+$('spotClaim').addEventListener('click', function () {
+  if (!spotDraft) return;
+  regOpenNew(spotDraft.lat, spotDraft.lng, spotDraft.kind === 'shop' ? 'shop' : 'house');
+});
+
+/* ---------- boot: scan arrival, first fetch, refresh ---------- */
+function regParseScan() {
+  try {
+    var q = new URLSearchParams(location.search);
+    var pid = q.get('place');
+    if (!pid) return;
+    var v = parseViewParam(location.search);
+    if (v) REG.scan = { pid: pid, lat: v.lat, lng: v.lng };
+  } catch (e) {}
+}
+(function regBoot() {
+  regParseScan();
+  regFetch();
+  if (typeof setInterval === 'function') setInterval(regFetch, 60000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) regFetch(); });
+})();
+
 /* ---------- version self-check (v6.6 Phase 4A, fix 4) ----------
    A stale tab / zombie service worker left the owner's phone on a
    pre-v6.5 build while production had moved on, and the fixes looked
@@ -7582,7 +8361,7 @@ paintChromeState();
 /* v6.4.1 boot self-check marker: the shell's checker script verifies this
    was set. If boot died anywhere above, the repair overlay appears instead
    of a silently half-dead app. */
-window.__ctBootOK = '6.8';
+window.__ctBootOK = '6.9';
 
 </script>
 <script>
