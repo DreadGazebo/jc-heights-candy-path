@@ -117,7 +117,7 @@ body.mode-nav #fabLog{bottom:calc(var(--sab) + 268px);transform:none;opacity:1;p
 body.kid #fabLog{display:none}
 
 /* ---------- bottom sheet (Lantern tabs + snaps) ---------- */
-#sheet{position:fixed;z-index:1100;left:calc(var(--sal) + 8px);right:calc(var(--sar) + 8px);bottom:calc(var(--sab) + 8px);
+#sheet{position:fixed;z-index:1100;left:calc(var(--sal) + 8px);right:calc(var(--sar) + 8px);bottom:calc(var(--sab) + 8px + var(--kbH, 0px));
   display:flex;flex-direction:column;padding:0 14px 10px;overflow:hidden;background:linear-gradient(180deg,var(--card2),var(--card));border-radius:26px 26px 0 0;transition:height .22s ease}
 #sheet.dragging{transition:none}
 #sheet.snap-peek{height:122px}
@@ -132,7 +132,7 @@ body.kid #fabLog{display:none}
 #btnSheetLog{margin-left:auto;display:none;min-height:40px;padding:6px 14px;font-size:14px}
 #sheet.logpill #btnSheetLog{display:inline-flex}
 #sheetTabs{display:flex;gap:4px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:4px;margin:0 0 6px;flex:none}
-#sheetTabs button{flex:1;min-height:38px;border:0;border-radius:9px;background:transparent;color:var(--mut);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 4px}
+#sheetTabs button{flex:1;min-height:48px;border:0;border-radius:9px;background:transparent;color:var(--mut);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 4px}
 #sheetTabs button svg{width:15px;height:15px}
 #sheetTabs button[aria-selected="true"]{background:var(--pur);color:var(--ink)}
 #sheetTabs .cnt{background:var(--org);color:var(--ink);border-radius:99px;font-size:10px;font-weight:800;padding:1px 6px;letter-spacing:0}
@@ -282,12 +282,73 @@ dialog .row .btn{flex:1;min-width:130px}
 #gpsFuzzy{position:fixed;z-index:1115;left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);top:calc(var(--topH) + 8px);display:flex;flex-direction:column;gap:1px;padding:9px 14px;border:1px solid #f59e0b;border-radius:12px;font-size:13px}
 #gpsFuzzy[hidden]{display:none}
 #gpsFuzzy span{color:var(--mut);font-size:12px}
-#partyBar{position:fixed;z-index:1120;left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);top:calc(var(--topH) + 8px);
-  display:flex;align-items:center;gap:8px;padding:8px 12px;border-color:var(--pur2)}
-#partyBarText{flex:1;font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#partyPill{position:fixed;z-index:1120;top:calc(var(--topH) + 8px);left:50%;transform:translateX(-50%);max-width:88vw;height:36px;
+  display:flex;align-items:center;gap:8px;padding:0 14px 0 10px;border-radius:999px;background:rgba(20,14,28,.90);
+  border:1px solid var(--line2);color:var(--txt);font-size:13px;font-weight:700;box-shadow:0 8px 22px rgba(0,0,0,.45);cursor:pointer}
+#partyPill[hidden]{display:none}
+#partyPillDots{display:flex;align-items:center;flex:none}
+#partyPillDots i{width:14px;height:14px;border-radius:50%;border:2px solid #16101E;margin-left:-5px;display:block}
+#partyPillDots i:first-child{margin-left:0}
+#partyPillText{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #gpsBanner{position:fixed;z-index:1120;left:calc(50% + var(--sal) / 2 - var(--sar) / 2);transform:translateX(-50%);top:calc(var(--topH) + 8px);
   padding:8px 14px;border-radius:999px;background:var(--card);border:1px solid var(--cau);color:var(--cau2);font-size:13px;font-weight:700;box-shadow:0 8px 22px rgba(0,0,0,.45)}
-body.in-party #partyBar ~ #gpsBanner{top:calc(var(--topH) + 62px)}
+
+/* ---------- party pane + chat surface (v6.5 Phase 2) ---------- */
+.joinrow{display:flex;gap:8px;margin-top:12px;align-items:stretch}
+.joinrow input{flex:1;min-width:0}
+.joinrow .btn{flex:none;min-width:84px}
+.party-hd{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:8px 8px 8px 14px;min-height:56px}
+.party-hd .pcode{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:20px;letter-spacing:.02em;white-space:nowrap}
+.party-hd .ppool{flex:1;min-width:0;color:var(--mut);font-size:12.5px;line-height:1.3}
+.party-hd .btn{min-height:48px}
+.party-leave-confirm{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700}
+.party-leave-confirm .btn{min-height:48px}
+.roster-row{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;padding:4px 6px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--txt);text-align:left;cursor:pointer}
+.roster-row:last-child{border-bottom:0}
+.roster-puck{flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:#16101E;--av-stage:#16101E;border:2.5px solid var(--pc,#888);color:var(--pc,#888)}
+.roster-puck .avatar-glyph{width:22px;height:22px}
+.roster-puck .puck-ini{font-size:12px;font-weight:800;color:var(--pc,#888)}
+.roster-main{flex:1;min-width:0}
+.roster-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.roster-name .youtag{color:var(--org2);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-left:6px}
+.roster-sub{color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.roster-right{flex:none;text-align:right;font-size:12.5px}
+.roster-right .muted{display:block;font-size:11.5px}
+#partyOpenChat{width:100%;margin-top:10px;min-height:48px}
+#tabChat{display:flex;flex-direction:column;height:100%;min-height:0}
+#chatHead{flex:none;padding:2px 0 8px}
+.chat-seg{display:flex;gap:4px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:4px}
+.chat-seg button{flex:1;min-height:48px;border:0;border-radius:9px;background:transparent;color:var(--mut);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 4px}
+.chat-seg button[aria-pressed="true"]{background:var(--pur);color:var(--ink)}
+.chat-seg .cnt{background:var(--org);color:var(--ink);border-radius:99px;font-size:10px;font-weight:800;padding:1px 6px}
+.chat-solo{display:flex;align-items:center;gap:8px;min-height:48px}
+.chat-solo .cs-title{flex:1;min-width:0;font-weight:800;font-size:14px}
+.chat-solo .cs-title span{display:block;color:var(--mut);font-weight:600;font-size:12px}
+#zoneBar{flex:none;background:#1D1526;color:var(--mut);font-size:12px;border-radius:10px;padding:8px 12px;margin-bottom:8px;text-align:center}
+#chatScroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:2px 2px 6px}
+.chat-empty{color:var(--mut);font-size:13.5px;text-align:center;padding:26px 18px;line-height:1.5}
+.cb-div{text-align:center;color:#8A7F96;font-size:11px;margin:12px 0 8px}
+.cb-row{display:flex;align-items:flex-end;gap:6px;margin-top:8px}
+.cb-row.me{justify-content:flex-end}
+.cb-col{display:flex;flex-direction:column;gap:4px;max-width:80%;min-width:0}
+.cb-row.me .cb-col{align-items:flex-end}
+.cb-av{flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#16101E;--av-stage:#16101E;border:2px solid var(--pc,#888);color:var(--pc,#888)}
+.cb-av .avatar-glyph{width:17px;height:17px}
+.cb-av .avatar-detail{display:none}
+.cb-b{border:1.5px solid;border-radius:14px;padding:7px 10px;font-size:15px;line-height:1.4;color:#F4EFEA;word-break:break-word;max-width:100%}
+.cb-row.other .cb-b{background:#1F172B;border-bottom-left-radius:14px}
+.cb-row.other .cb-b.last{border-bottom-left-radius:4px}
+.cb-row.me .cb-b{background:#26192E;border-bottom-right-radius:14px}
+.cb-row.me .cb-b.last{border-bottom-right-radius:4px}
+.cb-h{font-size:12px;font-weight:600;margin-bottom:2px}
+.cb-ts{display:block;text-align:right;color:#8A7F96;font-size:11px;margin-top:3px}
+.cb-jumbo{font-size:32px;line-height:1.25}
+.cb-img{display:block;max-width:210px;max-height:230px;width:100%;border-radius:10px;object-fit:cover;cursor:pointer;background:#16101E}
+#chatComposer{flex:none;display:flex;gap:8px;align-items:stretch;padding-top:8px}
+#chatComposer input[type=text]{flex:1;min-width:0;min-height:50px;border-radius:14px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:0 12px;font-size:16px}
+#chatPhotoBtn{display:grid;place-items:center;width:50px;min-height:50px;border-radius:14px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);cursor:pointer;flex:none}
+#chatPhotoBtn svg{width:21px;height:21px}
+#chatSend{flex:none;min-width:76px}
 
 /* ---------- nav mode ---------- */
 #navTop{position:fixed;z-index:1100;top:calc(var(--sat) + 10px);left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);padding:14px 16px;display:none}
@@ -440,7 +501,6 @@ body.mode-nav.in-party #logCard,body.mode-nav.in-party #pinSheet{top:calc(var(--
 .roster .rdot{width:14px;height:14px;border-radius:50%;flex:none;border:2px solid rgba(255,255,255,.35)}
 .roster .cnt{margin-left:auto;color:var(--mut);font-size:13.5px;font-variant-numeric:tabular-nums}
 .kickbtn{min-height:36px;padding:2px 10px;border-radius:999px;border:1px solid var(--red);background:transparent;color:var(--red2);font-size:12.5px;font-weight:700}
-#partyChatLog{display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto;margin:6px 0}
 .chatmsg{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:7px 10px;font-size:14px;line-height:1.4}
 .chatmsg b{font-size:12.5px}
 .chatempty{color:var(--mut);font-size:13.5px;text-align:center;padding:8px}
@@ -560,7 +620,7 @@ body.light .dark-tiles .leaflet-tile-pane{filter:none}
   #logCard,#pinSheet,#summary,#searchPanel{left:auto;width:430px}
   #fabLog{right:calc(var(--sar) + 472px)}
   #toasts{left:auto;width:430px}
-  #pickBanner,#drawBar,#exploreCard,#moveBar,#partyBar{left:auto;width:430px}
+  #pickBanner,#drawBar,#exploreCard,#moveBar{left:auto;width:430px}
 }
 
 /* ---------- v6 corrections: v5.9 structures + mode visibility ---------- */
@@ -756,10 +816,9 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
   <button id="btnExploreClose" class="btn-close" type="button" aria-label="Dismiss"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button>
 </div>
 
-<div id="partyBar" class="card" hidden>
-  <div style="flex:1;min-width:0"><b id="partyBarText">Party</b><div id="partyBarSub" class="muted" style="font-size:12px"></div></div>
-  <button id="partyLeave" class="btn btn-ghost btn-sm" type="button">Leave</button>
-</div>
+<button id="partyPill" type="button" hidden aria-label="Open party">
+  <span id="partyPillDots" aria-hidden="true"></span><span id="partyPillText"></span>
+</button>
 
 <div id="recBar" hidden role="status">
   <span class="recdot" aria-hidden="true"></span>
@@ -784,6 +843,7 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
   <div id="sheetTabs" role="tablist">
     <button type="button" role="tab" data-tab="route" aria-selected="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-route"/></svg>Route</button>
     <button type="button" role="tab" data-tab="party" aria-selected="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-users"/></svg>Party<span class="cnt" id="partyTabCount" hidden>0</span></button>
+    <button type="button" role="tab" data-tab="chat" aria-selected="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-chat"/></svg>Chat<span class="cnt" id="chatTabCount" hidden>0</span></button>
     <button type="button" role="tab" data-tab="haul" aria-selected="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-bag"/></svg>Haul</button>
   </div>
   <button id="peek" type="button">Tap to plan your route</button>
@@ -852,6 +912,18 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
 
     <div id="tabParty" role="tabpanel" hidden>
       <div id="partyBox"></div>
+    </div>
+
+    <div id="tabChat" role="tabpanel" hidden>
+      <div id="chatHead"></div>
+      <div id="zoneBar" hidden>In Jersey City Heights &middot; Visible to nearby walkers &middot; Clears in 4h</div>
+      <div id="chatScroll"><div id="chatLog"></div></div>
+      <div id="chatComposer">
+        <label id="chatPhotoBtn" for="chatPhoto" aria-label="Send a photo"><svg class="ic" viewBox="0 0 24 24"><use href="#i-camera"/></svg></label>
+        <input id="chatPhoto" type="file" accept="image/*" hidden>
+        <input id="chatInput" type="text" autocomplete="off" placeholder="Message your party" maxlength="140">
+        <button id="chatSend" class="btn btn-org" type="button">Send</button>
+      </div>
     </div>
 
     <div id="tabHaul" role="tabpanel" hidden>
@@ -4022,7 +4094,7 @@ document.querySelectorAll('.lc-kind').forEach(function (b) {
    ~20 s while moving), pins (mirrored from crowdSyncPin), and haul counts.
    Backed by the Supabase party_posts table (public read/insert, rows simply
    age out client-side: positions 45 min, pins 6 h). */
-var PARTY = { code: '', name: '', timer: null, lastPosPost: 0, lastPosLL: null, lastCountJson: '', members: {}, counts: {}, joinTs: 0, kicked: {}, kickedLocal: {}, lastRows: [], chat: [], trails: {}, avatar: '', color: '', avatarDraft: '', avatarExplicit: false, colorDraft: '', meta: {}, markers: {}, iconSigs: {}, posRows: {}, trailRows: {}, states: {}, dock: {}, dockHidden: {}, dockOverflow: null, dockPill: null, labelUntil: {}, pinSeen: {}, pinSeenInit: false, compact: false, _avatarYielded: false };
+var PARTY = { code: '', name: '', timer: null, lastPosPost: 0, lastPosLL: null, lastCountJson: '', members: {}, counts: {}, joinTs: 0, kicked: {}, kickedLocal: {}, lastRows: [], chat: [], chatInit: false, chatCursor: '', unread: 0, lastImgTs: 0, leaveConfirm: false, trails: {}, avatar: '', color: '', avatarDraft: '', avatarExplicit: false, colorDraft: '', meta: {}, markers: {}, iconSigs: {}, posRows: {}, trailRows: {}, states: {}, dock: {}, dockHidden: {}, dockOverflow: null, dockPill: null, labelUntil: {}, pinSeen: {}, pinSeenInit: false, compact: false, _avatarYielded: false };
 var partyLayer = L.layerGroup().addTo(map);
 var partyMarkLayer = L.layerGroup().addTo(map);
 try { var savedParty = store.get('party', null); if (savedParty && savedParty.code) { PARTY.code = String(savedParty.code); PARTY.name = String(savedParty.name || ''); PARTY.joinTs = savedParty.joinTs || Date.now(); PARTY.avatar = String(savedParty.avatar || ''); PARTY.color = String(savedParty.color || ''); } } catch (e) {}
@@ -4050,8 +4122,66 @@ function partyPoll() {
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (rows) { if (Array.isArray(rows)) { PARTY.lastRows = rows; partyApply(rows); } })
     .catch(function () {});
+  chatPoll();
   var cj = JSON.stringify({ h: S.counts.houses, c: S.counts.candy });
   if (cj !== PARTY.lastCountJson) { PARTY.lastCountJson = cj; partyPost({ kind: 'count', houses: S.counts.houses, candy: S.counts.candy }); }
+}
+/* Party chat transport (v6.5 Phase 2): incremental cursor polling. The
+   first load takes the last 40 chat rows; later polls only ask for rows
+   newer than the cursor (the newest created_at ingested), so a photo
+   payload crosses the wire once, not on every 20 s tick. Chat rows are
+   owned here, not by partyApply's bulk window. The av1 avatar meta that
+   rides pos/count posts is filtered out defensively: it must never
+   render as chat text. */
+function chatPoll() {
+  if (!partyOn()) return;
+  var base = CROWD.url + '/rest/v1/party_posts?room=eq.' + encodeURIComponent(PARTY.code) + '&kind=eq.chat&select=*';
+  var url = PARTY.chatInit
+    ? base + '&created_at=gt.' + encodeURIComponent(PARTY.chatCursor) + '&order=created_at.asc&limit=100'
+    : base + '&order=created_at.desc&limit=40';
+  fetch(url, { headers: crowdHeaders() })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (rows) { if (Array.isArray(rows)) chatIngest(rows, !PARTY.chatInit); })
+    .catch(function () {});
+}
+function chatKey(r) { return String(r.created_at || '') + '|' + String(r.name || '') + '|' + String(r.msg || '').slice(0, 48); }
+function chatIngest(rows, initial) {
+  if (!rows || !rows.length) {
+    if (initial) { PARTY.chatInit = true; if (!PARTY.chatCursor) PARTY.chatCursor = new Date(0).toISOString(); }
+    return;
+  }
+  var seen = {};
+  PARTY.chat.forEach(function (r) { seen[chatKey(r)] = 1; });
+  var fresh = [];
+  rows.forEach(function (r) {
+    if (!r || r.kind !== 'chat') return;
+    if (r.msg && String(r.msg).indexOf('av1|') === 0) return;
+    var k = chatKey(r);
+    if (seen[k]) return;
+    seen[k] = 1; fresh.push(r);
+  });
+  if (fresh.length) {
+    PARTY.chat = PARTY.chat.concat(fresh).sort(function (a, b) { return String(a.created_at) < String(b.created_at) ? -1 : 1; }).slice(-80);
+    var newest = PARTY.chat[PARTY.chat.length - 1];
+    if (newest && String(newest.created_at) > String(PARTY.chatCursor || '')) PARTY.chatCursor = String(newest.created_at);
+    if (!initial) {
+      var add = 0;
+      fresh.forEach(function (r) { if (r.name !== PARTY.name) add++; });
+      if (add && !(S.sheetTab === 'chat' && CHAT.channel === 'party')) { PARTY.unread += add; paintChatBadge(); }
+    }
+  }
+  if (initial) PARTY.chatInit = true;
+  if (S.sheetTab === 'chat' && CHAT.channel === 'party') { renderChat(); scrollChatBottom(); }
+}
+function paintChatBadge() {
+  var b = $('chatTabCount'); if (!b) return;
+  b.textContent = PARTY.unread;
+  b.hidden = !(PARTY.unread > 0);
+}
+function partyChatReset() {
+  PARTY.chat = []; PARTY.chatInit = false; PARTY.chatCursor = ''; PARTY.unread = 0; PARTY.leaveConfirm = false;
+  paintChatBadge();
+  renderChatHead(); renderChat();
 }
 /* ---------- Party avatars (v6.4 phase 2; v6.5 Phase 1 recolor) ----------
    Eight walkers on the 24 grid. v6.5: filled silhouettes in the member
@@ -4184,7 +4314,7 @@ function partyInitials(name) {
   return ini.toUpperCase();
 }
 function partyApply(rows) {
-  var now = Date.now(), pos = {}, counts = {}, pinMap = {}, kicks = {}, trails = {}, chats = [];
+  var now = Date.now(), pos = {}, counts = {}, pinMap = {}, kicks = {}, trails = {};
   rows.forEach(function (r) {
     if (r.kind === 'kick') { var kt = new Date(r.created_at).getTime(); if (!kicks[r.name] || kt > kicks[r.name]) kicks[r.name] = kt; }
   });
@@ -4198,7 +4328,6 @@ function partyApply(rows) {
     if (!live(r.name, rts)) return;
     if (r.kind === 'pos' && age < 45 * 60000) { if (!pos[r.name]) pos[r.name] = r; (trails[r.name] = trails[r.name] || []).push(r); }
     else if (r.kind === 'count') { if (!counts[r.name]) counts[r.name] = r; }
-    else if (r.kind === 'chat' && age < 6 * 3600000) { chats.push(r); }
     else if (r.kind === 'pin' && age < 6 * 3600000 && r.name !== PARTY.name) {
       var k = Math.round(r.lat * 2000) + ',' + Math.round(r.lng * 2000) + ',' + r.status;
       if (!pinMap[k]) pinMap[k] = r;
@@ -4239,7 +4368,6 @@ function partyApply(rows) {
   PARTY.members = pos; PARTY.counts = counts;
   PARTY.trails = trails;
   PARTY.trailRows = trails;
-  PARTY.chat = chats.slice().reverse().slice(-30);
   if (partyOn() && S.pos && !pos[PARTY.name]) pos[PARTY.name] = { lat: S.pos.lat, lng: S.pos.lng, created_at: new Date().toISOString() };
   PARTY.posRows = pos;
   partyLayer.clearLayers();
@@ -4294,11 +4422,32 @@ function partyTotals() {
   if (PARTY.name) names[PARTY.name] = 1;
   return { houses: h, candy: c, people: Object.keys(names).length };
 }
+function partyRosterNames() {
+  var roster = {};
+  Object.keys(PARTY.counts).forEach(function (n) { roster[n] = 1; });
+  Object.keys(PARTY.members).forEach(function (n) { roster[n] = 1; });
+  if (PARTY.name) roster[PARTY.name] = 1;
+  return Object.keys(roster);
+}
+/* Floating map status pill (v6.5 Phase 2): one line, member dots +
+   walking count + pooled pieces. It replaces the tall party bar, and
+   it is never on screen while the Party tab itself is open, so party
+   stats are never shown twice (R3-3, R3-5). Tapping it opens Party. */
+function paintPartyPill() {
+  var pill = $('partyPill'); if (!pill) return;
+  var show = partyOn() && S.sheetTab !== 'party';
+  pill.hidden = !show;
+  if (!show) return;
+  var t = partyTotals();
+  $('partyPillDots').innerHTML = partyRosterNames().slice(0, 6).map(function (n) {
+    return '<i style="background:' + partyMetaFor(n).color + '"></i>';
+  }).join('');
+  $('partyPillText').textContent = t.people + ' walking · ' + t.candy + ' pcs';
+}
 function renderPartyInfo() {
   if (!partyOn()) return;
   var t = partyTotals();
-  $('partyBarText').textContent = 'Party ' + PARTY.code + ' · ' + t.people + (t.people === 1 ? ' person' : ' people');
-  $('partyBarSub').textContent = 'Party haul: ' + t.houses + ' houses · ' + t.candy + ' candies';
+  paintPartyPill();
   var tc2 = $('partyChipCount'); if (tc2) { tc2.textContent = t.people; tc2.hidden = t.people < 2; }
   var tt2 = $('partyTabCount'); if (tt2) { tt2.textContent = t.people; tt2.hidden = t.people < 2; }
   var cp3 = $('chipParty'); if (cp3) cp3.setAttribute('aria-pressed', 'true');
@@ -4306,19 +4455,26 @@ function renderPartyInfo() {
   renderPartyBox();
 }
 function rosterHtml() {
-  var roster = {};
-  Object.keys(PARTY.counts).forEach(function (n) { roster[n] = 1; });
-  Object.keys(PARTY.members).forEach(function (n) { roster[n] = 1; });
-  if (PARTY.name) roster[PARTY.name] = 1;
   var isAdmin = (typeof partyIsAdmin === 'function') && partyIsAdmin();
-  return Object.keys(roster).map(function (n) {
+  return partyRosterNames().map(function (n) {
     var c = PARTY.counts[n];
-    var right = c ? ((c.houses || 0) + ' houses · ' + (c.candy || 0) + ' candies') : 'on the map';
-    var kick = (isAdmin && n !== PARTY.name) ? ' <button class="btn btn-ghost btn-sm partyKick" data-name="' + esc(n) + '">Kick</button>' : '';
+    var haul = c ? ((c.houses || 0) + ' houses · ' + (c.candy || 0) + ' candies') : 'on the map';
     var meta = partyMetaFor(n);
-    var av = meta.avatar ? '<span class="roster-av" style="border-color:' + meta.color + ';color:' + meta.color + '">' + avatarSvg(meta.avatar) + '</span>' : '';
-    var idBtn = (n === PARTY.name) ? ' <button class="btn btn-ghost btn-sm partyIdentityBtn" type="button">Walker</button>' : '';
-    return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:2px 0"><span>' + av + esc(n) + (n === PARTY.name && isAdmin ? ' (host)' : '') + '</span><span class="muted">' + right + kick + idBtn + '</span></div>';
+    var pos = PARTY.posRows[n];
+    var fresh = '';
+    if (n !== PARTY.name && pos && pos.created_at) {
+      var ts = new Date(pos.created_at).getTime();
+      if (isFinite(ts)) {
+        if (S.pos && pos.lat != null) { var dd = haversine(S.pos, { lat: pos.lat, lng: pos.lng }); if (isFinite(dd)) fresh = fmtDist(dd) + ' away · '; }
+        fresh += partyAge(ts);
+      }
+    }
+    var av = '<span class="roster-puck" style="--pc:' + meta.color + '">' + (meta.avatar ? avatarSvg(meta.avatar) : '<span class="puck-ini">' + esc(partyInitials(n)) + '</span>') + '</span>';
+    var kick = (isAdmin && n !== PARTY.name) ? ' <span class="btn btn-ghost btn-sm partyKick" role="button" data-name="' + esc(n) + '">Kick</span>' : '';
+    return '<div class="roster-row" data-name="' + esc(n) + '" role="button" aria-label="' + (n === PARTY.name ? 'Change your walker' : 'Find ' + esc(n) + ' on the map') + '">' + av +
+      '<span class="roster-main"><span class="roster-name">' + esc(n) + (n === PARTY.name ? '<span class="youtag">You</span>' : '') + (n === PARTY.name && isAdmin ? ' <span class="muted" style="font-size:11px">(host)</span>' : '') + '</span>' +
+      '<span class="roster-sub">' + (n === PARTY.name ? 'Tap to change your walker' : (fresh || 'Party member')) + '</span></span>' +
+      '<span class="roster-right">' + haul + kick + '</span></div>';
   }).join('');
 }
 /* Walker picker (join sheet) + identity popover (mid-party changes). */
@@ -4376,9 +4532,6 @@ function openIdentity() { if (!partyOn()) return; $('identityPop').hidden = fals
 function closeIdentity() { var p = $('identityPop'); if (p) p.hidden = true; }
 function renderPartyBox() {
   var box = $('partyBox'); if (!box) return;
-  var keepChat = null, keepFocus = false;
-  var ci0 = $('partyChatInput');
-  if (ci0) { keepChat = ci0.value; keepFocus = document.activeElement === ci0; }
   if (!partyOn()) {
     box.innerHTML = '<div id="partyInvite" class="warn" hidden style="margin-bottom:8px"></div>' +
       '<div class="label">Party mode</div>' +
@@ -4389,7 +4542,7 @@ function renderPartyBox() {
       '<div class="label" style="margin-top:12px">Pick your walker</div>' +
       '<div class="walker-grid" id="walkerGrid"></div>' +
       '<div class="party-actions"><button id="partyStart" class="btn btn-pur">Start a party</button><button id="partyJoinBtn" class="btn btn-ghost">Join with a code</button></div>' +
-      '<div id="partyJoinRow" hidden style="margin-top:12px"><input id="partyCode" type="text" autocomplete="off" placeholder="Party code, e.g. TREAT123" style="text-transform:uppercase"><button id="partyJoinGo" class="btn btn-org" style="width:100%">Join party</button></div>';
+      '<div id="partyJoinRow" class="joinrow" hidden><input id="partyCode" type="text" autocomplete="off" placeholder="Party code, e.g. TREAT123" style="text-transform:uppercase" aria-label="Party code"><button id="partyJoinGo" class="btn btn-org" type="button">Join</button></div>';
     $('partyStart').addEventListener('click', function () {
       var name = $('partyName').value.trim(); if (!name) { toast('Add your name first, so your party can see who is who.', 'warn'); return; }
       var newCode = partyGenCode();
@@ -4415,36 +4568,40 @@ function renderPartyBox() {
   }
   var t = partyTotals();
   var list = rosterHtml();
-  box.innerHTML = '<div class="label">Party ' + esc(PARTY.code) + '</div>' +
-    '<p class="muted" style="margin:2px 0 6px;font-size:13px">Share this code so your group can join. Party haul so far: <b>' + t.houses + ' houses · ' + t.candy + ' candies</b>.</p>' +
-    '<div id="partyRoster">' + (list || '<p class="muted" style="font-size:13px">Counts appear as everyone logs.</p>') + '</div>' +
-    '<button id="partyShareLink" class="btn btn-pur" style="width:100%;margin-top:8px">Share invite link</button>' +
-    '<div class="row2" style="margin-top:8px"><button id="partyCopy" class="btn btn-ghost">Copy code</button><button id="partyLeave2" class="btn btn-ghost">Leave party</button></div>' +
+  var leaveZone = PARTY.leaveConfirm
+    ? '<span class="party-leave-confirm">Leave party?<button id="partyLeaveYes" class="btn btn-org" type="button">Leave</button><button id="partyLeaveNo" class="btn btn-ghost" type="button">Cancel</button></span>'
+    : '<button id="partyInviteBtn" class="btn btn-pur" type="button">Invite</button><button id="partyLeaveBtn" class="btn btn-ghost" type="button">Leave</button>';
+  box.innerHTML = '<div class="party-hd"><span class="pcode">' + esc(PARTY.code) + '</span><span class="ppool">Pooled: ' + t.houses + ' houses · ' + t.candy + ' candies</span>' + leaveZone + '</div>' +
+    '<div id="partyRoster">' + (list || '<p class="muted" style="font-size:13px;margin-top:8px">Counts appear as everyone logs.</p>') + '</div>' +
     ((typeof INVITE_CODE !== 'undefined' && INVITE_CODE && INVITE_CODE !== PARTY.code) ? '<button id="partySwitch" class="btn btn-ghost" style="width:100%;margin-top:8px">Switch to invited party ' + esc(INVITE_CODE) + '</button>' : '') +
-    '<div class="label" style="margin-top:12px">Party chat</div><div id="partyChatLog">' + chatHtml() + '</div><div class="row2" style="margin-top:6px"><input id="partyChatInput" type="text" autocomplete="off" placeholder="Message your party" maxlength="140"><button id="partyChatSend" class="btn btn-org">Send</button></div>';
-  var psl = $('partyShareLink');
-  if (psl) psl.addEventListener('click', function () {
+    '<button id="partyOpenChat" class="btn btn-ghost" type="button">Open Party Chat &rarr;</button>';
+  var piv = $('partyInviteBtn');
+  if (piv) piv.addEventListener('click', function () {
     var link = APP_LINK + '?party=' + encodeURIComponent(PARTY.code);
     if (navigator.share) navigator.share({ title: 'Join my trick-or-treat party', text: 'Join my party ' + PARTY.code + ' in Candy Trail and trick-or-treat with us live on the map.', url: link }).catch(function () {});
     else if (navigator.clipboard) navigator.clipboard.writeText(link).then(function () { toast('Invite link copied.', 'ok'); });
   });
+  var plb = $('partyLeaveBtn');
+  if (plb) plb.addEventListener('click', function () { PARTY.leaveConfirm = true; renderPartyBox(); });
+  var ply = $('partyLeaveYes');
+  if (ply) ply.addEventListener('click', partyLeave);
+  var pln = $('partyLeaveNo');
+  if (pln) pln.addEventListener('click', function () { PARTY.leaveConfirm = false; renderPartyBox(); });
   var psw = $('partySwitch');
   if (psw) psw.addEventListener('click', function () { var c = INVITE_CODE; INVITE_CODE = ''; partyJoin(c, PARTY.name); });
-  $('partyCopy').addEventListener('click', function () {
-    if (navigator.clipboard) navigator.clipboard.writeText(PARTY.code).then(function () { toast('Party code copied: ' + PARTY.code, 'ok'); }, function () { toast('Party code: ' + PARTY.code, 'ok'); });
-    else toast('Party code: ' + PARTY.code, 'ok');
-  });
-  $('partyLeave2').addEventListener('click', partyLeave);
+  var poc = $('partyOpenChat');
+  if (poc) poc.addEventListener('click', function () { setChatChannel('party'); switchTab('chat'); });
   box.querySelectorAll('.partyKick').forEach(function (b) {
-    b.addEventListener('click', function () { partyKick(b.getAttribute('data-name')); });
+    b.addEventListener('click', function (e) { e.stopPropagation(); partyKick(b.getAttribute('data-name')); });
   });
-  var pib = box.querySelector('.partyIdentityBtn');
-  if (pib) pib.addEventListener('click', openIdentity);
-  var pcs = $('partyChatSend');
-  if (pcs) pcs.addEventListener('click', partyChatSend);
-  var pci = $('partyChatInput');
-  if (pci) pci.addEventListener('keydown', function (e) { if (e.key === 'Enter') partyChatSend(); });
-  if (pci && keepChat) { pci.value = keepChat; if (keepFocus) pci.focus(); }
+  box.querySelectorAll('.roster-row').forEach(function (row) {
+    row.addEventListener('click', function () {
+      var n = row.getAttribute('data-name');
+      if (n === PARTY.name) { openIdentity(); return; }
+      var pos = PARTY.posRows[n];
+      if (pos && pos.lat != null) { try { map.flyTo([pos.lat, pos.lng], Math.max(map.getZoom ? map.getZoom() : 16, 16), { duration: 0.5 }); } catch (e) {} applySnap('peek'); }
+    });
+  });
 }
 function partyJoin(code, name) {
   PARTY.code = code; PARTY.name = cleanName(name); PARTY.lastCountJson = '';
@@ -4453,7 +4610,10 @@ function partyJoin(code, name) {
   PARTY.color = PARTY.colorDraft || partyColor(PARTY.name);
   try { store.set('party', { code: code, name: PARTY.name, avatar: PARTY.avatar, color: PARTY.color, joinTs: PARTY.joinTs }); } catch (e) {}
   document.body.classList.add('in-party');
-  $('partyBar').hidden = false;
+  PARTY.leaveConfirm = false;
+  partyChatReset();
+  if (typeof CHAT !== 'undefined') CHAT.channel = 'party';
+  paintPartyPill();
   ensureWatch();
   if (S.pos) { PARTY.lastPosPost = Date.now(); PARTY.lastPosLL = { lat: S.pos.lat, lng: S.pos.lng }; partyPost({ kind: 'pos', lat: S.pos.lat, lng: S.pos.lng }); }
   partyPost({ kind: 'count', houses: S.counts.houses, candy: S.counts.candy });
@@ -4470,7 +4630,8 @@ function partyLeave() {
   if (PARTY.timer) { clearInterval(PARTY.timer); PARTY.timer = null; }
   partyLayer.clearLayers(); partyMarkClear();
   document.body.classList.remove('in-party');
-  $('partyBar').hidden = true;
+  partyChatReset();
+  paintPartyPill();
   var cpl = $('chipParty'); if (cpl) cpl.setAttribute('aria-pressed', 'false');
   if (typeof updatePeek === 'function') updatePeek();
   renderPartyBox();
@@ -4487,7 +4648,7 @@ function partyTick() {
   }
   partyPoll();
 }
-$('partyLeave').addEventListener('click', partyLeave);
+$('partyPill').addEventListener('click', function () { switchTab('party'); });
 map.on('zoomend', function () { var c = map.getZoom() < 15; if (c !== PARTY.compact) { PARTY.compact = c; if (partyOn()) partyRefreshMarkers(true); } });
 $('identityDone').addEventListener('click', closeIdentity);
 $('identityPop').addEventListener('click', function (e) { if (e.target === this) closeIdentity(); });
@@ -4496,7 +4657,7 @@ try { INVITE_CODE = (new URLSearchParams(location.search).get('party') || '').to
 renderPartyBox();
 if (partyOn()) {
   document.body.classList.add('in-party');
-  $('partyBar').hidden = false;
+  paintPartyPill();
   if (PARTY.timer) clearInterval(PARTY.timer);
   PARTY.timer = setInterval(partyTick, 20000);
   partyPoll();
@@ -5094,7 +5255,8 @@ function partyEject() {
   if (PARTY.timer) { clearInterval(PARTY.timer); PARTY.timer = null; }
   partyLayer.clearLayers(); partyMarkClear();
   document.body.classList.remove('in-party');
-  $('partyBar').hidden = true;
+  partyChatReset();
+  paintPartyPill();
   var cpe = $('chipParty'); if (cpe) cpe.setAttribute('aria-pressed', 'false');
   if (typeof updatePeek === 'function') updatePeek();
   renderPartyBox();
@@ -5174,23 +5336,185 @@ $('btnKid').addEventListener('click', function () { kidSet(true); });
 $('kidCandy').addEventListener('click', function () { $('fabLog').click(); setTimeout(kidRender, 800); });
 setInterval(function () { if (KID.on) kidRender(); }, 3000);
 
-/* ---------- Party trails + chat (v5.9) ---------- */
-function chatHtml() {
-  if (!PARTY.chat || !PARTY.chat.length) return '<p class="muted" style="font-size:13px">No messages yet. Say hi to your party.</p>';
-  return PARTY.chat.slice(-8).map(function (r) {
-    var when = new Date(r.created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-    var cm = partyMetaFor(r.name);
-    var av = cm.avatar ? '<span class="chat-av" style="border-color:' + cm.color + ';color:' + cm.color + '">' + avatarSvg(cm.avatar) + '</span>' : '';
-    return '<div style="font-size:13px;padding:2px 0">' + av + '<b>' + esc(r.name) + '</b> <span class="muted">' + when + '</span><br>' + esc(r.msg || '') + '</div>';
-  }).join('');
+/* ---------- Chat surface (v6.5 Phase 2) ----------
+   Chat lives in its own sheet tab now. Two channels: Party (real,
+   private to the room, bubbles below) and Heights Live, the zone feed.
+   The zone UI ships in this phase; the feed itself lands in Phase 3,
+   so the zone channel renders an honest empty state, never fake posts.
+   Photos are Party-channel only (owner-approved): a canvas re-encode
+   strips EXIF/GPS and caps the payload, and the image rides the post's
+   msg field with an img1|<w>x<h>| prefix, so no new backend columns
+   are needed. The zone channel has no composer in this phase. */
+var CHAT = { channel: 'party' };
+var CHAT_IMG_CAP = 120 * 1024; /* data-URL chars, roughly 90 KB of image */
+function fmtChatTime(ts, full) {
+  var d = new Date(ts);
+  if (full) return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  var h = d.getHours(), m = d.getMinutes();
+  var ap = h >= 12 ? 'p' : 'a'; h = h % 12; if (h === 0) h = 12;
+  return h + ':' + (m < 10 ? '0' : '') + m + ap;
 }
-function partyChatSend() {
-  var inp = $('partyChatInput'); if (!inp) return;
+function emojiOnly(t) {
+  var s = String(t == null ? '' : t).replace(/\s+/g, '');
+  if (!s) return false;
+  var m = s.match(/\p{Extended_Pictographic}/gu);
+  if (!m || m.length < 1 || m.length > 3) return false;
+  return /^[\p{Extended_Pictographic}\p{Emoji_Modifier}\p{Emoji_Component}\uFE0F\u200D]+$/u.test(s);
+}
+function chatImgParse(msg) {
+  if (!msg || String(msg).indexOf('img1|') !== 0) return null;
+  var parts = String(msg).split('|');
+  if (parts.length < 3) return null;
+  var wh = (parts[1] || '').split('x');
+  return { src: parts.slice(2).join('|'), w: parseInt(wh[0], 10) || 4, h: parseInt(wh[1], 10) || 3 };
+}
+function chatBubblesHtml() {
+  var rows = PARTY.chat || [];
+  if (!rows.length) return '<div class="chat-empty">No messages yet.<br>Say hi to your party.</div>';
+  var out = '', i = 0, prevTs = 0;
+  while (i < rows.length) {
+    var first = rows[i], fts = new Date(first.created_at).getTime();
+    if (prevTs && isFinite(fts) && fts - prevTs > 10 * 60000) out += '<div class="cb-div">' + esc(fmtChatTime(fts, true)) + '</div>';
+    var grp = [first], j = i + 1;
+    while (j < rows.length) {
+      var nx = rows[j];
+      var nts = new Date(nx.created_at).getTime(), pv = new Date(rows[j - 1].created_at).getTime();
+      if (nx.name !== first.name || nts - pv > 3 * 60000) break;
+      grp.push(nx); j++;
+    }
+    var mine = first.name === PARTY.name;
+    var meta = partyMetaFor(first.name), col = meta.color, colHtml = '';
+    grp.forEach(function (r, gi) {
+      var last = gi === grp.length - 1;
+      var img = chatImgParse(r.msg), body;
+      if (img) body = '<img class="cb-img" src="' + img.src + '" style="aspect-ratio:' + img.w + '/' + img.h + '" alt="Photo shared in party chat">';
+      else if (emojiOnly(r.msg)) body = '<span class="cb-jumbo">' + esc(r.msg) + '</span>';
+      else body = esc(r.msg || '');
+      var head = (!mine && gi === 0) ? '<div class="cb-h" style="color:' + col + '">' + esc(r.name) + '</div>' : '';
+      var ts = last ? '<span class="cb-ts">' + esc(fmtChatTime(new Date(r.created_at).getTime(), false)) + '</span>' : '';
+      colHtml += '<div class="cb-b' + (last ? ' last' : '') + '" style="border-color:' + col + '">' + head + body + ts + '</div>';
+    });
+    var av = mine ? '' : '<span class="cb-av" style="--pc:' + col + '">' + (meta.avatar ? avatarSvg(meta.avatar) : '<span class="puck-ini">' + esc(partyInitials(first.name)) + '</span>') + '</span>';
+    out += '<div class="cb-row ' + (mine ? 'me' : 'other') + '">' + av + '<div class="cb-col">' + colHtml + '</div></div>';
+    prevTs = new Date(grp[grp.length - 1].created_at).getTime();
+    i = j;
+  }
+  return out;
+}
+function renderChatHead() {
+  var head = $('chatHead'); if (!head) return;
+  if (partyOn()) {
+    head.innerHTML = '<div class="chat-seg" role="group" aria-label="Chat channel">' +
+      '<button type="button" data-chan="party" aria-pressed="' + String(CHAT.channel === 'party') + '">Party' + ((PARTY.unread > 0 && CHAT.channel !== 'party') ? '<span class="cnt">' + PARTY.unread + '</span>' : '') + '</button>' +
+      '<button type="button" data-chan="zone" aria-pressed="' + String(CHAT.channel === 'zone') + '">Heights Live</button></div>';
+    head.querySelectorAll('[data-chan]').forEach(function (b) {
+      b.addEventListener('click', function () { setChatChannel(b.getAttribute('data-chan')); });
+    });
+  } else {
+    head.innerHTML = '<div class="chat-solo"><div class="cs-title">Heights Live<span>Neighborhood feed</span></div><button id="chatGoParty" class="btn btn-ghost btn-sm" type="button">+ Party Chat</button></div>';
+    var gp = $('chatGoParty');
+    if (gp) gp.addEventListener('click', function () { switchTab('party'); });
+  }
+}
+function setChatChannel(ch) {
+  CHAT.channel = ch;
+  if (ch === 'party') { PARTY.unread = 0; paintChatBadge(); }
+  renderChatHead(); renderChat(); scrollChatBottom();
+}
+function renderChat() {
+  var log = $('chatLog'); if (!log) return;
+  var zone = !partyOn() || CHAT.channel === 'zone';
+  $('zoneBar').hidden = !zone;
+  var comp = $('chatComposer');
+  if (zone) {
+    log.innerHTML = '<div class="chat-empty"><b>Heights Live opens soon.</b><br>The neighborhood feed arrives with the next update (Phase 3). ' + (partyOn() ? 'Party chat is live now, one tap over.' : 'Party chat works today once you start or join a party.') + '</div>';
+    if (comp) comp.style.display = 'none';
+    return;
+  }
+  if (comp) comp.style.display = '';
+  log.innerHTML = chatBubblesHtml();
+  log.querySelectorAll('.cb-img').forEach(function (im) {
+    im.addEventListener('click', function () { openPhotoView(im.getAttribute('src')); });
+  });
+}
+function scrollChatBottom() { var sc = $('chatScroll'); if (sc) sc.scrollTop = sc.scrollHeight; }
+function chatSend() {
+  var inp = $('chatInput'); if (!inp || !partyOn()) return;
   var text = inp.value.trim(); if (!text) return;
   inp.value = '';
   partyPost({ kind: 'chat', msg: cleanText(text) });
-  setTimeout(partyPoll, 700);
+  setTimeout(chatPoll, 500);
 }
+function chatEncodePhoto(img, cb) {
+  var steps = [0.72, 0.58, 0.44, 0.3];
+  var scale = Math.min(1, 800 / Math.max(img.width, img.height));
+  var cv = document.createElement('canvas');
+  function draw(w, h) { cv.width = w; cv.height = h; cv.getContext('2d').drawImage(img, 0, 0, w, h); }
+  draw(Math.max(1, Math.round(img.width * scale)), Math.max(1, Math.round(img.height * scale)));
+  for (var round = 0; round < 2; round++) {
+    for (var i = 0; i < steps.length; i++) {
+      var url = cv.toDataURL('image/webp', steps[i]);
+      if (url.indexOf('data:image/webp') !== 0) url = cv.toDataURL('image/jpeg', Math.min(0.75, steps[i] + 0.03));
+      if (url.length <= CHAT_IMG_CAP) { cb(url, cv.width, cv.height); return; }
+    }
+    if (round === 0) draw(Math.round(cv.width * 0.7), Math.round(cv.height * 0.7));
+  }
+  cb(null, cv.width, cv.height);
+}
+function chatSendPhoto(dataUrl, w, h) {
+  if (!partyOn() || !dataUrl) return false;
+  var now = Date.now();
+  if (now - (PARTY.lastImgTs || 0) < 30000) { toast('One photo every 30 seconds in party chat.', 'warn'); return false; }
+  PARTY.lastImgTs = now;
+  partyPost({ kind: 'chat', msg: 'img1|' + w + 'x' + h + '|' + dataUrl });
+  setTimeout(chatPoll, 500);
+  return true;
+}
+$('chatSend').addEventListener('click', chatSend);
+$('chatInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') chatSend(); });
+$('chatPhoto').addEventListener('change', function () {
+  var f = $('chatPhoto').files && $('chatPhoto').files[0];
+  $('chatPhoto').value = '';
+  if (!f || !partyOn()) return;
+  if (Date.now() - (PARTY.lastImgTs || 0) < 30000) { toast('One photo every 30 seconds in party chat.', 'warn'); return; }
+  var rd = new FileReader();
+  rd.onload = function () {
+    var img = new Image();
+    img.onload = function () {
+      chatEncodePhoto(img, function (url, w, h) {
+        if (!url) { toast('That photo is too large to send, even compressed.', 'warn'); return; }
+        chatSendPhoto(url, w, h);
+      });
+    };
+    img.src = rd.result;
+  };
+  rd.readAsDataURL(f);
+});
+renderChatHead();
+renderChat();
+/* Keep the sheet (and with it the chat composer) above the soft
+   keyboard: while a sheet field is focused, the sheet's bottom offset
+   tracks the visualViewport keyboard inset (--kbH). */
+(function () {
+  if (!window.visualViewport) return;
+  var vv = window.visualViewport, focused = false;
+  function kbApply() {
+    var kb = focused ? Math.max(0, Math.round(window.innerHeight - vv.height - (vv.offsetTop || 0))) : 0;
+    document.documentElement.style.setProperty('--kbH', kb + 'px');
+  }
+  vv.addEventListener('resize', kbApply);
+  vv.addEventListener('scroll', kbApply);
+  document.addEventListener('focusin', function (e) {
+    var sh = $('sheet');
+    if (sh && e.target && sh.contains(e.target)) { focused = true; kbApply(); }
+  });
+  document.addEventListener('focusout', function () {
+    setTimeout(function () {
+      var sh = $('sheet');
+      if (!sh || !sh.contains(document.activeElement)) { focused = false; kbApply(); }
+    }, 60);
+  });
+})();
 document.addEventListener('visibilitychange', function () {
   if (!document.hidden && typeof partyOn === 'function' && partyOn()) partyPoll();
 });
@@ -5203,6 +5527,8 @@ function updatePeek() {
   if (tab === 'party') {
     if (partyOn()) { var t = partyTotals(); pk.textContent = 'Party ' + PARTY.code + ' · ' + t.people + ' people · ' + t.houses + ' houses · ' + t.candy + ' candies — tap to open'; }
     else pk.textContent = 'Party mode — tap to start or join';
+  } else if (tab === 'chat') {
+    pk.textContent = partyOn() ? 'Party chat — tap to open' : 'Heights Live — tap to open';
   } else if (tab === 'haul') {
     pk.textContent = 'Tonight: ' + S.counts.houses + ' houses · ' + S.counts.candy + ' candies — tap to open';
   } else {
@@ -5214,6 +5540,7 @@ function updatePeek() {
    existing behavior while a nav is running (the nav UI owns the sheet). */
 function tabEntrySnap(name) {
   if (name === 'route' && S.nav) return;
+  if (name === 'chat') { applySnap('full'); return; }
   applySnap('half');
 }
 function switchTab(name) {
@@ -5221,14 +5548,25 @@ function switchTab(name) {
   $$('#sheetTabs button').forEach(function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-tab') === name)); });
   $('tabRoute').hidden = name !== 'route';
   $('tabParty').hidden = name !== 'party';
+  $('tabChat').hidden = name !== 'chat';
   $('tabHaul').hidden = name !== 'haul';
   /* v6.4.1 seatbelt: a tab render may fail loudly in the console, never
      silently kill the tab switch itself. */
   try {
     if (name === 'party') renderPartyBox();
+    if (name === 'chat') {
+      if (CHAT.channel === 'party' && PARTY.unread) { PARTY.unread = 0; paintChatBadge(); }
+      renderChatHead(); renderChat(); chatPoll();
+    }
     if (name === 'haul') { renderCounts(); if (typeof renderPinsList === 'function') renderPinsList(); showHaulTrail(); }
     else hideHaulTrail();
   } catch (e) { console.error('tab render failed', e); }
+  /* v6.5 Phase 2: a tab switch lands at the top of the new pane (the
+     Phase 1 residual: panes kept the previous tab's scroll offset);
+     chat instead lands on the newest message. */
+  var sb = $('sheetBody'); if (sb) sb.scrollTop = 0;
+  if (name === 'chat') scrollChatBottom();
+  paintPartyPill();
   updatePeek();
   tabEntrySnap(name);
 }
