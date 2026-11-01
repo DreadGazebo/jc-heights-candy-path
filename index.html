@@ -110,17 +110,17 @@ body.light .leaflet-container a.leaflet-popup-close-button:active::after{backgro
 .lchip .cnt{background:var(--org);color:var(--ink);border-radius:99px;font-size:10px;font-weight:800;padding:1px 6px;letter-spacing:0}
 
 /* ---------- Log FAB ---------- */
-#fabLog{position:fixed;z-index:1200;right:calc(var(--sar) + 16px);bottom:calc(var(--sab) + 142px);width:64px;height:64px;border-radius:50%;background:var(--org);border:2px solid rgba(245,239,230,.28);color:var(--ink);display:grid;place-items:center;box-shadow:0 12px 28px rgba(0,0,0,.55);padding:0;transition:transform .18s ease,opacity .18s ease,bottom .2s}
-#fabLog svg{width:30px;height:30px;stroke-width:1.9}
-body.fab-hide #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
-body.mode-nav #fabLog{bottom:calc(var(--sab) + 268px);transform:none;opacity:1;pointer-events:auto}
-body.kid #fabLog{display:none}
+#fabSpot{position:fixed;z-index:1200;right:calc(var(--sar) + 16px);bottom:calc(var(--sab) + 178px);height:48px;border-radius:999px;background:var(--org);border:2px solid rgba(245,239,230,.28);color:var(--ink);display:inline-flex;align-items:center;gap:7px;padding:0 18px 0 14px;font-size:15px;font-weight:600;box-shadow:0 12px 28px rgba(0,0,0,.55);transition:transform .18s ease,opacity .18s ease,bottom .2s;cursor:pointer}
+#fabSpot svg{width:20px;height:20px;stroke-width:2;flex:none}
+body.fab-hide #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
+body.mode-nav #fabSpot{bottom:calc(var(--sab) + 268px);transform:none;opacity:1;pointer-events:auto}
+body.kid #fabSpot{display:none}
 
 /* ---------- bottom sheet (Lantern tabs + snaps) ---------- */
 #sheet{position:fixed;z-index:1100;left:calc(var(--sal) + 8px);right:calc(var(--sar) + 8px);bottom:calc(var(--sab) + 8px + var(--kbH, 0px));
   display:flex;flex-direction:column;padding:0 14px 10px;overflow:hidden;background:linear-gradient(180deg,var(--card2),var(--card));border-radius:26px 26px 0 0;transition:height .22s ease}
 #sheet.dragging{transition:none}
-#sheet.snap-peek{height:122px}
+#sheet.snap-peek{height:162px}
 #sheet.snap-half{height:48dvh}
 #sheet.snap-full{height:88dvh}
 #sheetHandle{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;min-height:22px;border:0;background:transparent;padding:5px 0 1px;touch-action:none;flex:none}
@@ -136,8 +136,16 @@ body.kid #fabLog{display:none}
 #sheetTabs button svg{width:15px;height:15px}
 #sheetTabs button[aria-selected="true"]{background:var(--pur);color:var(--ink)}
 #sheetTabs .cnt{background:var(--org);color:var(--ink);border-radius:99px;font-size:10px;font-weight:800;padding:1px 6px;letter-spacing:0}
-#peek{display:none;width:100%;min-height:34px;border:0;background:transparent;text-align:left;font-weight:600;font-size:14.5px;padding:2px;color:var(--txt);touch-action:none;align-items:center;gap:8px}
+#peek{display:none;width:100%;min-height:68px;align-items:stretch;gap:10px;padding:2px 0}
 #sheet.snap-peek #peek{display:flex}
+#peekMain{flex:1;min-width:0;border:0;background:transparent;text-align:left;padding:4px 2px;color:var(--txt);display:flex;flex-direction:column;justify-content:center;gap:1px;touch-action:none;cursor:pointer}
+#peekTitle{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:17px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#peekSub{font-size:12.5px;font-weight:600;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#peekStart{flex:none;align-self:center;height:48px;min-width:104px;border-radius:999px;border:1px solid var(--line2);background:transparent;color:var(--txt);font-weight:700;font-size:15px;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:0 18px;cursor:pointer}
+#peekStart svg{width:14px;height:14px;fill:var(--org2)}
+#peekStart.solid{background:var(--org);border-color:var(--org);color:var(--ink)}
+#peekStart.solid svg{fill:var(--ink)}
+#peekStart[hidden]{display:none}
 #sheet.snap-peek #sheetBody{display:none}
 #sheetBody{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;flex:1;min-height:0;margin:0 -4px;padding:0 4px 2px}
 .search{display:flex;gap:8px;margin-top:10px}
@@ -168,12 +176,11 @@ body.kid #fabLog{display:none}
 .sheetfoot .ver{font-size:11.5px;color:var(--dim);margin-top:2px}
 
 /* ---------- haul counter ---------- */
-.haul{display:grid;grid-template-columns:1.25fr 1fr 52px;gap:6px;margin-top:8px}
+.haul{display:grid;grid-template-columns:1fr 52px;gap:6px;margin-top:8px}
 .haul .btn{min-height:48px;flex-direction:column;gap:0;line-height:1.1;padding:6px}
 .haul .btn b{font-size:19px;font-family:"Fraunces",Georgia,serif;font-weight:600;font-variant-numeric:tabular-nums}
 .haul .btn span{font-size:12.5px;font-weight:700;display:inline-flex;align-items:center;gap:5px}
 .haul .btn span svg{width:14px;height:14px}
-.haul .js-candy{background:var(--org);border-color:var(--org);color:var(--ink)}
 .haul .js-house{background:var(--pur);border-color:var(--pur);color:var(--ink)}
 .haul .js-undo{font-size:20px;padding:0}
 .bump{animation:bump .25s}
@@ -276,9 +283,6 @@ dialog .row .btn{flex:1;min-width:130px}
 /* ---------- context menu / banners ---------- */
 #ctxMenu{position:fixed;z-index:1600;display:flex;flex-direction:column;gap:8px;padding:10px;min-width:210px}
 #ctxMenu .btn{justify-content:flex-start}
-#moveBar{position:fixed;z-index:1180;left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);top:calc(var(--topH) + 8px);
-  display:flex;align-items:center;gap:10px;padding:10px 10px 10px 14px;border-color:var(--org)}
-#moveBar span{flex:1;font-weight:700}
 #gpsFuzzy{position:fixed;z-index:1115;left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);top:calc(var(--topH) + 8px);display:flex;flex-direction:column;gap:1px;padding:9px 14px;border:1px solid #f59e0b;border-radius:12px;font-size:13px}
 #gpsFuzzy[hidden]{display:none}
 #gpsFuzzy span{color:var(--mut);font-size:12px}
@@ -370,12 +374,13 @@ body.mode-nav #navBottom{display:block}
 #navTools .btn{flex:1;min-height:46px;font-size:14px;padding:6px}
 
 /* ---------- log card / pin sheet / summary ---------- */
-#logCard,#pinSheet,#summary{position:fixed;z-index:1250;left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);top:calc(var(--topH) + 8px);padding:14px;max-height:calc(100dvh - var(--topH) - 24px);overflow-y:auto}
-body.in-party #logCard,body.in-party #pinSheet,body.in-party #summary{top:calc(var(--topH) + 64px)}
-body.mode-nav #logCard,body.mode-nav #pinSheet{top:calc(var(--sat) + 140px)}
-body.mode-nav.in-party #logCard,body.mode-nav.in-party #pinSheet{top:calc(var(--sat) + 200px)}
+#spotSheet{position:fixed;z-index:1250;left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);top:calc(var(--topH) + 8px);padding:14px;transition:opacity .22s ease,transform .22s ease}
+#spotSheet.away{opacity:0;transform:translateY(-6px)}
+body.in-party #spotSheet{top:calc(var(--topH) + 64px)}
+body.mode-nav #spotSheet{top:calc(var(--sat) + 140px)}
+body.mode-nav.in-party #spotSheet{top:calc(var(--sat) + 200px)}
 .lc-head{display:flex;align-items:flex-start;gap:8px}
-#lcTitle,#pinTitle{flex:1;font-weight:800;font-size:17px;display:flex;align-items:center;gap:7px}
+#spotTitle{flex:1;font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:19px;display:flex;align-items:center;gap:7px}
 .xbtn{width:44px;height:44px;flex:none;border-radius:50%;border:1px solid var(--line2);background:var(--card2);display:grid;place-items:center;padding:0}
 .xbtn svg{width:19px;height:19px}
 /* ---------- close button component (v6.4 phase 2, Argon r2 spec) ----------
@@ -397,9 +402,12 @@ body.mode-nav.in-party #logCard,body.mode-nav.in-party #pinSheet{top:calc(var(--
 .btn-close:focus-visible .disc{outline:2px solid var(--org);outline-offset:2px}
 .lc-head .btn-close,.prefs-h .btn-close{margin:-8px -8px -8px 0}
 #searchPanel .lc-head b{flex:1;min-width:0;padding-right:12px}
-#pinSheet .ocard{position:relative}
-#pinSheet #pinTitle{padding-right:48px}
-#pinSheetClose{position:absolute;top:8px;right:8px}
+.spot-head{display:flex;align-items:flex-start;gap:8px}
+.spot-head .btn-close{margin:-8px -8px -8px 0}
+#spotSub{font-size:12.5px;color:var(--mut);margin-top:1px}
+#spotRemove{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:48px;padding:0 12px;border-radius:999px;border:1px solid var(--red);background:transparent;color:var(--red2);font-weight:700;font-size:14px;cursor:pointer}
+#spotRemove svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#spotRemove[hidden]{display:none}
 #exploreCard .btn-close{margin:-4px -4px -4px 0}
 /* ---------- photo viewer (v6.4 phase 2) ---------- */
 #photoView{position:fixed;inset:0;z-index:1700;background:rgba(5,3,10,.93);display:flex;align-items:center;justify-content:center;padding:20px}
@@ -460,30 +468,26 @@ body.mode-nav.in-party #logCard,body.mode-nav.in-party #pinSheet{top:calc(var(--
 .roster-av{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#141218;--av-stage:#141218;border:1.5px solid;vertical-align:-5px;margin-right:5px;color:#F4EFE6}
 .roster-av .avatar-glyph{width:13px;height:13px}
 
-.lc-sec{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:12px 0 6px}
-.lc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.lc-flag{min-height:56px;border-radius:16px;border:1px solid var(--line2);background:var(--bg2);font-weight:700;font-size:15px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 4px;color:var(--txt)}
-.lc-flag svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.lc-flag[aria-pressed="true"]{background:rgba(232,93,38,.15);border-color:var(--org);color:var(--org2)}
-.lc-kindwrap{display:flex;gap:8px}
-.lc-kind{flex:1;min-height:48px;border-radius:999px;border:1px solid var(--line2);background:var(--bg2);font-weight:700;font-size:14.5px;display:inline-flex;align-items:center;justify-content:center;gap:7px;color:var(--txt)}
-.lc-kind svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.lc-kind[aria-pressed="true"]{background:rgba(232,93,38,.15);border-color:var(--org);color:var(--org2)}
-.lc-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.lc-step{display:flex;align-items:center;gap:14px}
-.lc-step button{width:48px;height:48px;border-radius:50%;border:1px solid var(--line2);background:var(--card2);font-size:22px;font-weight:800}
-#lcCount{font-size:20px;font-weight:800;min-width:24px;text-align:center}
-#lcNote{width:100%;min-height:48px;border-radius:14px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:0 12px;font-size:16px}
-.lc-photo{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:8px 14px;border-radius:999px;border:1px dashed var(--line2);background:var(--bg2);font-weight:600}
-.lc-photo svg{width:18px;height:18px}
-#lcThumb{display:none;width:64px;height:64px;object-fit:cover;border-radius:12px;border:1px solid var(--line2)}
-#logCard.mini #lcFull{display:none}
-#logCard.mini .lc-head{margin-bottom:8px}
-#lcMini .chip{min-height:44px;padding:6px 12px;font-size:13.5px;flex-direction:row}
-.pingrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:4px 0}
-.pingrid button{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 2px;border-radius:16px;border:1px solid var(--line2);background:var(--bg2);font-size:12px;font-weight:700;color:var(--txt)}
-.pingrid button svg{width:30px;height:30px}
-.pingrid .pmk{width:30px;height:30px;display:grid;place-items:center}
+.spot-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.spot-tag{flex:1 1 30%;min-height:48px;border-radius:999px;border:1px solid var(--line2);background:var(--bg2);font-weight:700;font-size:14.5px;display:inline-flex;align-items:center;justify-content:center;gap:6px;color:var(--txt);padding:6px 8px;cursor:pointer}
+.spot-tag[aria-pressed="true"]{background:rgba(232,93,38,.15);border-color:var(--org);color:var(--org2)}
+.spot-kind{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;background:var(--bg2);padding:4px;border-radius:16px;border:1px solid var(--line);margin-top:8px}
+.spot-kind button{min-height:48px;border-radius:12px;border:0;background:transparent;font-weight:700;color:var(--mut);font-size:15px;cursor:pointer}
+.spot-kind button[aria-pressed="true"]{background:var(--card2);color:var(--txt);box-shadow:inset 0 0 0 1px var(--pur)}
+#spotVisited{width:100%;min-height:48px;margin-top:8px;border-radius:999px;border:1px solid var(--line2);background:var(--bg2);color:var(--mut);font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;padding:6px 10px}
+#spotVisited[aria-pressed="true"]{background:var(--org);border-color:var(--org);color:var(--ink)}
+.spot-photorow{display:flex;gap:8px;margin-top:8px;align-items:stretch}
+#spotPhotoBtn{flex:none;display:inline-flex;align-items:center;gap:7px;min-height:48px;padding:0 14px;border-radius:14px;border:1px dashed var(--line2);background:var(--bg2);font-weight:600;color:var(--txt);cursor:pointer;font-size:14.5px}
+#spotPhotoBtn svg{width:18px;height:18px}
+#spotNote{flex:1;min-width:0;min-height:48px;border-radius:14px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:0 12px;font-size:16px}
+#spotPhotoBar{display:flex;align-items:center;gap:8px;margin-top:8px}
+#spotPhotoBar[hidden]{display:none}
+#spotThumb{width:52px;height:52px;object-fit:cover;border-radius:12px;border:1px solid var(--line2);cursor:pointer;flex:none}
+#spotPhotoBar .btn{flex:1}
+.spot-bar{display:flex;gap:8px;margin-top:12px;align-items:stretch}
+#spotVis{flex:1;min-height:48px;border-radius:999px;border:1px solid var(--line2);background:transparent;color:var(--mut);font-weight:600;font-size:13.5px;padding:6px 10px;cursor:pointer}
+#spotSave{flex:1.25;min-height:48px}
+.mk-spot .td{background:var(--pur)}
 #summary{text-align:center}
 #summary .mark{width:84px;height:84px;margin:2px auto 4px}
 #summary .mark svg{width:84px;height:84px}
@@ -566,7 +570,7 @@ body.light{
   --org2:#B83D0E; --pur2:#5B498A; --grn:#2D6A3E; --red2:#B3271E; --cau2:#8A5A00;
 }
 body.light .wordmark{color:#241B33}
-body.light .btn-org,body.light .haul .js-candy,body.light #kidCandy{background:#C8430E;border-color:#C8430E;color:#FFFDF8}
+body.light .btn-org,body.light #kidCandy{background:#C8430E;border-color:#C8430E;color:#FFFDF8}
 body.light .btn-pur,body.light .haul .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFDF8}
 body.light #sheetTabs button[aria-selected="true"]{background:#6D5CA3;color:#FFFDF8}
 body.light .btn-ghost{background:rgba(36,27,51,.05)}
@@ -617,10 +621,10 @@ body.light .dark-tiles .leaflet-tile-pane{filter:none}
   #topChrome{width:452px;right:auto}
   #sheet{left:auto;width:452px;max-height:88dvh}
   #navTop,#navBottom{left:auto;width:452px}
-  #logCard,#pinSheet,#summary,#searchPanel{left:auto;width:430px}
-  #fabLog{right:calc(var(--sar) + 472px)}
+  #spotSheet,#searchPanel{left:auto;width:430px}
+  #fabSpot{right:calc(var(--sar) + 472px)}
   #toasts{left:auto;width:430px}
-  #pickBanner,#drawBar,#exploreCard,#moveBar{left:auto;width:430px}
+  #pickBanner,#drawBar,#exploreCard{left:auto;width:430px}
 }
 
 /* ---------- v6 corrections: v5.9 structures + mode visibility ---------- */
@@ -633,7 +637,6 @@ body:not(.has-route) .route-only{display:none!important}
 body.mode-view .plan-edit{display:none!important}
 body:not(.mode-view) .view-only{display:none!important}
 body.has-route #routeEmpty{display:none}
-#pinSheet{top:0;left:0;right:0;bottom:0;max-height:none}
 #navTop{align-items:stretch;gap:12px;padding:12px}
 #navArrowBox{flex:none;width:78px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(232,93,38,.12);border-radius:14px;border:1px solid rgba(232,93,38,.4)}
 #navArrow{font-size:44px;line-height:1;color:var(--org2);font-weight:900;font-family:-apple-system,"Segoe UI Symbol","Noto Sans Symbols 2","DejaVu Sans",sans-serif}
@@ -671,8 +674,6 @@ body.has-route #routeEmpty{display:none}
 .seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--bg2);padding:4px;border-radius:16px;border:1px solid var(--line);margin:10px 0 12px}
 .seg button{min-height:48px;border-radius:12px;border:0;background:transparent;font-weight:700;color:var(--mut);font-size:15px}
 .seg button[aria-pressed="true"]{background:var(--card2);color:var(--txt);box-shadow:inset 0 0 0 1px var(--pur)}
-.pingrid button .e{height:34px}
-#pinGpsNote,#pinPressNote{margin:-4px 2px 10px;font-size:13px}
 #busy{position:fixed;inset:0;z-index:1400;background:rgba(5,3,10,.55);display:flex;align-items:center;justify-content:center;padding:20px}
 #busy[hidden]{display:none}
 #busy .ocard{text-align:center;max-width:360px}
@@ -692,14 +693,6 @@ body.has-route #routeEmpty{display:none}
 #searchPanel{top:calc(var(--topH) + 8px)}
 #findInput{width:100%;min-height:50px;border-radius:12px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:8px 12px;font-size:16px;margin:8px 0 4px;outline:none}
 #searchResults{max-height:46vh;overflow-y:auto}
-.lc-flags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.lc-flags .chip{flex:1 1 40%;flex-direction:row;min-height:48px;font-size:14px;padding:8px 6px}
-#lcMini{display:none}
-#logCard.mini #lcMini{display:flex}
-#logCard.mini>div:not(.lc-head):not(#lcMini){display:none}
-#logCard.mini #lcThumb{display:none}
-#lcNote{flex:1;width:auto;min-width:0}
-.lc-row{margin-top:8px}
 #kidView{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:1700;background:var(--card);border-top:2px solid var(--pur);border-radius:22px 22px 0 0;padding:16px calc(var(--sar) + 16px) calc(var(--sab) + 16px) calc(var(--sal) + 16px);box-shadow:0 -12px 40px rgba(0,0,0,.45);text-align:center;display:block}
 #kidView[hidden]{display:none}
 #kidView .kid-label{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--org2)}
@@ -729,7 +722,7 @@ body.has-route #routeEmpty{display:none}
 .recdot{width:10px;height:10px;border-radius:50%;background:var(--org);flex:none;animation:recpulse 1.6s ease-in-out infinite}
 .recdot-sm{width:9px;height:9px;border-radius:50%;background:var(--org);display:inline-block;flex:none}
 @keyframes recpulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.78)}}
-body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
+body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
 #haulMode{color:var(--mut);font-size:13px;margin-top:2px}
 #haulPhotoRow{margin-top:12px}
 #haulPhotoAdd{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:48px}
@@ -794,7 +787,7 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
 
 <div id="gpsFuzzy" class="card" hidden role="status"><b>Weak GPS signal (usually indoors)</b><span>Showing your general area &middot; Step outside or drag your start pin.</span></div>
 
-<button id="fabLog" type="button" title="House visited: log a stop" aria-label="Log a stop: house visited"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6c-3.7 0-6.4 2.8-6.4 6.3 0 4.3 6.4 10.5 6.4 10.5s6.4-6.2 6.4-10.5c0-3.5-2.7-6.3-6.4-6.3Z"/><path d="M12 8v6.4M8.8 11.2h6.4"/></svg></button>
+<button id="fabSpot" type="button" aria-label="Mark a spot at your location"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6c-3.7 0-6.4 2.8-6.4 6.3 0 4.3 6.4 10.5 6.4 10.5s6.4-6.2 6.4-10.5c0-3.5-2.7-6.3-6.4-6.3Z"/><path d="M12 8.2v5M9.5 10.7h5"/></svg><span>Mark Spot</span></button>
 
 <div id="pickBanner" class="card" hidden role="status">
   <span id="pickText">Tap the map</span>
@@ -838,7 +831,7 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
   <div id="sheetBrand">
     <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon"/></svg>
     <span class="wordmark">Candy Trail</span>
-    <button id="btnSheetLog" class="btn btn-org" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-plus"/></svg>Log</button>
+    <button id="btnSheetLog" class="btn btn-org" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-plus"/></svg>Mark</button>
   </div>
   <div id="sheetTabs" role="tablist">
     <button type="button" role="tab" data-tab="route" aria-selected="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-route"/></svg>Route</button>
@@ -846,7 +839,10 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
     <button type="button" role="tab" data-tab="chat" aria-selected="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-chat"/></svg>Chat<span class="cnt" id="chatTabCount" hidden>0</span></button>
     <button type="button" role="tab" data-tab="haul" aria-selected="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-bag"/></svg>Haul</button>
   </div>
-  <button id="peek" type="button">Tap to plan your route</button>
+  <div id="peek">
+    <button id="peekMain" type="button"><span id="peekTitle">Tonight's Route</span><span id="peekSub">Free Walk &middot; Ready</span></button>
+    <button id="peekStart" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5Z"/></svg>Start</button>
+  </div>
   <div id="sheetBody">
     <div id="tabRoute" role="tabpanel">
       <div id="viewBanner" class="view-only"><b>Shared route.</b> Someone sent you this candy loop. Tap <b>Start trick-or-treating</b> below to walk it.</div>
@@ -931,24 +927,22 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
       <div id="haulMode" hidden></div>
       <div class="heroNums">
         <div class="heroNum" id="haulHousesCard"><b id="haulHouses">0</b><span>houses visited</span></div>
-        <div class="heroNum"><b id="haulCandy">0</b><span>candies</span></div>
         <div class="heroNum"><b id="haulDist">0.0 mi</b><span>tonight's walk</span></div>
         <div class="heroNum"><b id="haulTime">0 min</b><span>out tonight</span></div>
       </div>
       <div class="haul">
-        <button class="btn js-candy" type="button"><b class="js-candy-count">0</b><span><svg class="ic" viewBox="0 0 24 24"><use href="#i-plus"/></svg>Candy</span></button>
         <button class="btn js-house" type="button"><b class="js-house-count">0</b><span><svg class="ic" viewBox="0 0 24 24"><use href="#i-home"/></svg>House visited</span></button>
         <button class="btn js-undo" type="button" aria-label="Undo last count"><svg class="ic" viewBox="0 0 24 24"><use href="#i-undo"/></svg></button>
       </div>
       <div id="haulEmpty" class="empty">
         <span class="eic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-bag"/></svg></span>
         <b>Nothing logged yet</b>
-        <p>Tap the big + button on the map whenever a house gives out candy. Your haul builds here.</p>
-        <button id="btnEmptyLog" class="btn btn-ghost btn-sm" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-plus"/></svg>Log your first stop</button>
+        <p>Tap + Mark Spot on the map whenever a house gives out candy. Your haul builds here.</p>
+        <button id="btnEmptyLog" class="btn btn-ghost btn-sm" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-plus"/></svg>Mark your first spot</button>
         <button id="btnEmptyRecord" class="btn btn-ghost btn-sm" type="button"><span class="recdot-sm"></span>Start a walk</button>
       </div>
       <div id="pinsWrap">
-        <div class="label">My pins</div>
+        <div class="label">My spots</div>
         <div id="pinsList"></div>
       </div>
       <div id="haulPhotoRow">
@@ -1008,12 +1002,6 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
   </div>
 </div>
 
-<div id="moveBar" class="card" hidden>
-  <div style="flex:1;min-width:0"><b>Move the pin</b><div class="muted" style="font-size:12px">Drag it to the right house, then tap Done.</div></div>
-  <button id="mvCancel" class="btn btn-ghost btn-sm" type="button">Cancel</button>
-  <button id="mvDone" class="btn btn-org btn-sm" type="button">Done</button>
-</div>
-
 <div id="navTop" class="card nav-only">
   <div id="navArrowBox"><div id="navArrow">&#8593;</div><div id="navDist">--</div></div>
   <div id="navText">
@@ -1033,7 +1021,6 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
     <button id="btnEnd" class="btn btn-red" type="button">End</button>
   </div>
   <div class="haul">
-    <button class="btn js-candy" type="button"><b class="js-candy-count">0</b><span><svg class="ic" viewBox="0 0 24 24"><use href="#i-plus"/></svg>Candy</span></button>
     <button class="btn js-house" type="button"><b class="js-house-count">0</b><span><svg class="ic" viewBox="0 0 24 24"><use href="#i-home"/></svg>House visited</span></button>
     <button class="btn js-undo" type="button" aria-label="Undo last count"><svg class="ic" viewBox="0 0 24 24"><use href="#i-undo"/></svg></button>
   </div>
@@ -1045,64 +1032,38 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
   </div>
 </div>
 
-<div id="logCard" class="card" hidden>
-  <div class="lc-head">
-    <div style="flex:1;min-width:0"><b id="lcTitle">Candy here, logged</b><div id="lcSub" class="muted" style="font-size:12px"></div></div>
-    <button id="lcClose" class="btn-close" type="button" aria-label="Dismiss"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button>
+<div id="spotSheet" class="card" hidden>
+  <div class="spot-head">
+    <div style="flex:1;min-width:0"><b id="spotTitle">Mark Spot</b><div id="spotSub">At your location</div></div>
+    <button id="spotRemove" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-trash"/></svg>Remove</button>
+    <button id="spotClose" class="btn-close" type="button" aria-label="Close"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button>
   </div>
-  <div id="lcMini" class="lc-row">
-    <button id="lcDetails" class="btn btn-pur btn-sm" type="button" style="flex:1">Add details</button>
-    <button id="lcQuickUndo" class="btn btn-ghost btn-sm" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-undo"/></svg>Undo</button>
-    <span style="flex-basis:100%;height:0"></span>
-    <button id="lcTagOut" class="chip" type="button">Ran out</button>
-    <button id="lcTagNonfood" class="chip" type="button">Non-food</button>
+  <div class="spot-tags" role="group" aria-label="What is at this spot">
+    <button class="spot-tag" data-tag="candy" type="button" aria-pressed="false">Candy</button>
+    <button class="spot-tag" data-tag="full" type="button" aria-pressed="false">Full-Size</button>
+    <button class="spot-tag" data-tag="nonfood" type="button" aria-pressed="false">Non-Food</button>
+    <button class="spot-tag" data-tag="decor" type="button" aria-pressed="false">Decor</button>
+    <button class="spot-tag" data-tag="out" type="button" aria-pressed="false">Ran Out</button>
   </div>
-  <div class="lc-flags" role="group" aria-label="House, shop or trunk">
-    <button class="chip lc-kind" data-kind="house" type="button" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-home"/></svg>House</button>
-    <button class="chip lc-kind" data-kind="shop" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-bag"/></svg>Shop</button>
-    <button class="chip lc-kind" data-kind="trunk" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><path d="M6.8 11 8.5 6.2h7L17.2 11"/><path d="M4.5 11h15v5h-15Z"/><path d="M6.2 16v3.2M17.8 16v3.2"/></svg>Trunk</button>
+  <div class="spot-kind" role="group" aria-label="Place type">
+    <button data-kind="house" type="button" aria-pressed="true">House</button>
+    <button data-kind="trunk" type="button" aria-pressed="false">Trunk</button>
+    <button data-kind="shop" type="button" aria-pressed="false">Shop</button>
   </div>
-  <div class="lc-flags" role="group" aria-label="Treat status">
-    <button class="chip lc-flag" data-flag="candy" type="button" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-star"/></svg>Giving candy</button>
-    <button class="chip lc-flag" data-flag="out" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-x"/></svg>Ran out</button>
-    <button class="chip lc-flag" data-flag="nonfood" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-spark"/></svg>Non-food / allergy-safe</button>
-    <button class="chip lc-flag" data-flag="decor" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-spark"/></svg>Decor only</button>
+  <button id="spotVisited" type="button" aria-pressed="false">Not visited yet</button>
+  <div class="spot-photorow">
+    <label id="spotPhotoBtn" for="spotPhoto"><svg class="ic" viewBox="0 0 24 24"><use href="#i-camera"/></svg><span id="spotPhotoLbl">Add Photo</span></label>
+    <input id="spotPhoto" type="file" accept="image/*" hidden>
+    <input id="spotNote" type="text" placeholder="Add a note&hellip;" aria-label="Add a note" maxlength="120">
   </div>
-  <div class="lc-row"><button id="lcMove" class="btn btn-ghost btn-sm" type="button" style="width:100%"><svg class="ic" viewBox="0 0 24 24"><use href="#i-pin"/></svg>Pin in the wrong spot? Move it</button></div>
-  <div class="lc-row" style="align-items:center;justify-content:space-between">
-    <span style="font-weight:600">Candies from this stop</span>
-    <span style="display:flex;gap:8px;align-items:center">
-      <button id="lcCandyMinus" class="btn btn-ghost btn-sm" type="button" aria-label="One fewer candy">&minus;</button>
-      <b id="lcCandyN" style="min-width:22px;text-align:center">0</b>
-      <button id="lcCandyPlus" class="btn btn-ghost btn-sm" type="button" aria-label="One more candy">+</button>
-    </span>
+  <div id="spotPhotoBar" hidden>
+    <img id="spotThumb" alt="Photo of this spot">
+    <button id="spotPhotoReplace" class="btn btn-ghost btn-sm" type="button">Replace</button>
+    <button id="spotPhotoClear" class="btn btn-ghost btn-sm" type="button">Remove photo</button>
   </div>
-  <div class="lc-row">
-    <input id="lcNote" type="text" placeholder="Add a note (optional)" aria-label="Add a note">
-    <label class="btn btn-ghost btn-sm" style="white-space:nowrap"><svg class="ic" viewBox="0 0 24 24"><use href="#i-camera"/></svg>Photo<input id="lcPhoto" type="file" accept="image/*" capture="environment" hidden></label>
-  </div>
-  <img id="lcThumb" hidden alt="Photo of this stop" style="max-width:120px;border-radius:10px;margin-top:6px">
-  <div class="muted" style="font-size:11px;margin-top:4px">Shared live with other trick-or-treaters. Swipe the card away when you're done.</div>
-  <div class="lc-row"><button id="lcRemove" class="btn btn-ghost btn-sm" type="button" style="width:100%"><svg class="ic" viewBox="0 0 24 24"><use href="#i-trash"/></svg>Remove this log</button></div>
-</div>
-
-<div id="pinSheet" class="overlay" hidden>
-  <div class="ocard card" role="dialog" aria-modal="true" aria-labelledby="pinTitle">
-    <h2 id="pinTitle">Mark this spot</h2>
-    <button id="pinSheetClose" class="btn-close" type="button" aria-label="Close"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button>
-    <div class="seg" id="pinWhere">
-      <button data-where="gps" type="button" aria-pressed="true">My location</button>
-      <button data-where="tap" type="button" aria-pressed="false">Tap the map</button>
-    </div>
-    <div id="pinGpsNote" class="muted" hidden></div>
-    <div id="pinPressNote" class="muted" hidden>Marking the spot you pressed on the map. Pick what kind of spot it is.</div>
-    <div class="pingrid">
-      <button data-type="candy" type="button"><span class="e"><svg viewBox="0 0 24 24" style="width:30px;height:30px;fill:none;stroke:var(--org2);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><use href="#i-star"/></svg></span>Candy here</button>
-      <button data-type="decor" type="button"><span class="e"><svg viewBox="0 0 24 24" style="width:30px;height:30px;fill:none;stroke:var(--pur2);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><use href="#i-spark"/></svg></span>Great decorations</button>
-      <button data-type="nonfood" type="button"><span class="e"><span class="mk mk-teal" style="width:30px;height:30px"><span class="oct"><i></i><svg class="glyph" viewBox="0 0 24 24"><path d="M6 10.5h12V18.5A1.5 1.5 0 0 1 16.5 20h-9A1.5 1.5 0 0 1 6 18.5Z"/><path d="M12 10.5V20"/><path d="M12 10.5c-2.5 0-4-2-3.2-3.7C9.6 5.2 12 6.8 12 10.5c0-3.7 2.4-5.3 3.2-3.7.8 1.7-.7 3.7-3.2 3.7Z"/></svg></span></span></span>Non-food treats</button>
-      <button data-type="out" type="button"><span class="e"><span class="mk mk-out" style="width:30px;height:30px"><span class="td"></span><i class="mk-slash"></i></span></span>Out of candy</button>
-    </div>
-    <button id="pinCancel" class="btn btn-ghost" type="button" style="width:100%">Cancel</button>
+  <div class="spot-bar">
+    <button id="spotVis" type="button" aria-pressed="true">Shared (Party &amp; Crowd)</button>
+    <button id="spotSave" class="btn btn-org" type="button">Save Spot</button>
   </div>
 </div>
 
@@ -1113,7 +1074,6 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
     <div class="muted" id="sumSub">Here's your haul.</div>
     <div class="sgrid">
       <div class="sbox"><b id="sumHouses">0</b><span>houses visited</span></div>
-      <div class="sbox"><b id="sumCandy">0</b><span>candies</span></div>
       <div class="sbox"><b id="sumDist">0</b><span>walked</span></div>
       <div class="sbox"><b id="sumTime">0</b><span>time out</span></div>
     </div>
@@ -1305,6 +1265,7 @@ function toastKeyFor(msg) {
 function toastDurFor(key, kind) {
   if (kind === 'warn' || kind === 'err') return 6000;
   if (key === 'route-built') return 4000;
+  if (key === 'spot-removed') return 5000;
   return 2800;
 }
 function toastArm(st, ms) {
@@ -1648,7 +1609,7 @@ $('btnIntroOk').addEventListener('click', function () {
 });
 /* Lantern sheet: 3 snap points (peek / half / full). setSheetCollapsed keeps
    its v5 contract for existing callers: true -> peek, false -> last open snap. */
-var SHEET_SNAPS = { peek: 122, half: function () { return Math.round(window.innerHeight * 0.48); }, full: function () { return Math.round(window.innerHeight * 0.88); } };
+var SHEET_SNAPS = { peek: 162, half: function () { return Math.round(window.innerHeight * 0.48); }, full: function () { return Math.round(window.innerHeight * 0.88); } };
 var sheetSnap = 'peek', lastSnap = 'half';
 function snapH(name) { var v = SHEET_SNAPS[name]; return typeof v === 'function' ? v() : v; }
 function applySnap(name) {
@@ -1660,12 +1621,20 @@ function applySnap(name) {
   document.body.classList.toggle('sheet-collapsed', name === 'peek');
   document.body.classList.toggle('fab-hide', name !== 'peek');
   sh.classList.toggle('logpill', name !== 'peek');
-  document.documentElement.style.setProperty('--bottomH', name === 'peek' ? '132px' : (name === 'half' ? '52vh' : '92vh'));
+  document.documentElement.style.setProperty('--bottomH', name === 'peek' ? '172px' : (name === 'half' ? '52vh' : '92vh'));
   try { map.invalidateSize(); } catch (e) {}
 }
 function setSheetCollapsed(c) { applySnap(c ? 'peek' : lastSnap); }
 $('sheetHandle').addEventListener('click', function () { if ($('sheet').dataset.dragged) return; applySnap(sheetSnap === 'peek' ? lastSnap : 'peek'); });
-$('peek').addEventListener('click', function () { if ($('sheet').dataset.dragged) return; if (sheetSnap === 'peek') applySnap(lastSnap); });
+$('peekMain').addEventListener('click', function () { if ($('sheet').dataset.dragged) return; if (sheetSnap === 'peek') applySnap(lastSnap); });
+$('peekStart').addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+$('peekStart').addEventListener('click', function (e) {
+  e.stopPropagation();
+  if (S.nav) { $('btnEnd').click(); return; }
+  if (typeof REC !== 'undefined' && REC.on) { $('btnRecFinish').click(); return; }
+  if (S.route) startNav(); else recStart();
+  updatePeek();
+});
 /* Drag the sheet by its handle (or the peek line): free height while
    dragging, then snap to the nearest of the 3 points on release. A real
    drag swallows the click that follows so it does not toggle back. */
@@ -1815,9 +1784,6 @@ map.on('click', function (e) {
     setStart(e.latlng.lat, e.latlng.lng, 'Dropped pin', false);
     exitPick();
     toast('Start set. Now pick your time and build your route.', 'ok');
-  } else if (S.pickMode === 'pin' && S.pendingPinType) {
-    addPin(e.latlng.lat, e.latlng.lng, S.pendingPinType);
-    exitPick();
   }
 });
 map.on('contextmenu', function (e) {
@@ -1832,8 +1798,8 @@ map.on('contextmenu', function (e) {
   b1.onclick = function () { map.closePopup(); setStart(ll.lat, ll.lng, 'Dropped pin', false); toast('Start set here. Pick your time and build your route.', 'ok'); };
   var b2 = document.createElement('button');
   b2.className = 'btn btn-ghost btn-sm'; b2.style.cssText = 'width:100%;margin-top:6px;min-height:40px';
-  b2.textContent = 'Mark this spot';
-  b2.onclick = function () { map.closePopup(); openMarkSheet(ll); };
+  b2.textContent = 'Mark spot here';
+  b2.onclick = function () { map.closePopup(); openSpotNew(ll.lat, ll.lng, 'press'); };
   div.appendChild(b1); div.appendChild(b2);
   L.popup().setLatLng(ll).setContent(div).openOn(map);
 });
@@ -1874,10 +1840,8 @@ function setBudget(v) { S.budget = v; store.set('budget', v); paintBudget(); }
 
 /* ---------------- haul counters ---------------- */
 function renderCounts(bumpEl) {
-  $$('.js-candy-count').forEach(function (e) { e.textContent = S.counts.candy; });
   $$('.js-house-count').forEach(function (e) { e.textContent = S.counts.houses; });
   var hh = $('haulHouses'); if (hh) hh.textContent = S.counts.houses;
-  var hc = $('haulCandy'); if (hc) hc.textContent = S.counts.candy;
   var ln2 = nightWalk();
   var hd = $('haulDist'); if (hd) hd.textContent = ln2.trackDist >= 160 ? (ln2.trackDist / M_PER_MI).toFixed(1) + ' mi' : Math.round(ln2.trackDist * 3.28084) + ' ft';
   var ht = $('haulTime'); if (ht) { var mn2 = Math.round(ln2.elapsedMs / 60000); ht.textContent = mn2 >= 60 ? Math.floor(mn2 / 60) + ' hr ' + (mn2 % 60) + ' min' : mn2 + ' min'; }
@@ -1893,7 +1857,8 @@ function bumpCount(kind, btn) {
   while (S.counts.histLog.length < S.counts.hist.length - 1) S.counts.histLog.push(null);
   var logRes = kind === 'houses' ? logHouseLocation() : null;
   S.counts.histLog.push(logRes ? logRes.ts : null);
-  if (logRes) { showLogCard(logRes.pin, logRes.sub, logQuickNext); logQuickNext = false; crowdSyncPin(logRes.pin); }
+  if (logRes) { crowdSyncPin(logRes.pin); toast('House counted.', 'ok'); }
+  else if (kind === 'houses') toast(logFailToast(), 'warn');
   store.set('counts', S.counts); renderCounts(btn);
 }
 /* Tapping House visited also logs the spot as a treat location from the GPS
@@ -1920,7 +1885,9 @@ function logHouseLocation() {
   }
   var ts = addPin(ll.lat, ll.lng, 'candy', 'house');
   var newPin = S.pins[S.pins.length - 1];
-  if (best && best.t === 'biz') { newPin.kind = 'shop'; store.set('pins', S.pins); renderPins(); }
+  newPin.shared = true;
+  if (best && best.t === 'biz') newPin.kind = 'shop';
+  store.set('pins', S.pins); renderPins();
   return { ts: ts, pin: newPin, sub: sub };
 }
 function logFailToast() {
@@ -1929,100 +1896,6 @@ function logFailToast() {
   return 'House counted. No new pin could be placed here.';
 }
 
-/* Optional quick follow-up for a fresh house log: flag the treat status, add
-   a note or a photo to the stop's record. Never blocks: it auto-dismisses,
-   and a swipe or the X closes it instantly. */
-var logCardPin = null, logCardTimer = null;
-function paintLogFlags() {
-  if (!logCardPin) return;
-  document.querySelectorAll('.lc-flag').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-flag') === logCardPin.type)); });
-  $('lcTitle').textContent = { candy: 'Candy here, logged', out: 'Logged as ran out', nonfood: 'Non-food treats, logged', decor: 'Decor only, logged' }[logCardPin.type] || 'Logged';
-}
-var logQuickNext = false;
-var logStreak = { n: 0, last: 0 };
-function showLogCard(pin, sub, quick) {
-  logCardPin = pin;
-  $('lcSub').textContent = sub || '';
-  $('lcNote').value = pin.note || '';
-  lcCandy = 0; paintLcCandy();
-  var th = $('lcThumb');
-  if (pin.photo) { th.src = pin.photo; th.hidden = false; } else { th.hidden = true; th.removeAttribute('src'); }
-  paintLogFlags(); paintLogKind();
-  var card = $('logCard');
-  card.classList.remove('away'); card.hidden = false;
-  if (quick) {
-    card.classList.add('mini');
-    if (Date.now() - logStreak.last < 90000) logStreak.n++; else logStreak.n = 1;
-    logStreak.last = Date.now();
-    if (logStreak.n > 1) $('lcSub').textContent = (sub || '') + ' · streak ' + logStreak.n;
-    armLogCardTimer(4000);
-    return;
-  }
-  card.classList.remove('mini');
-  armLogCardTimer();
-}
-function armLogCardTimer(ms) {
-  if (logCardTimer) clearTimeout(logCardTimer);
-  logCardTimer = setTimeout(function () {
-    if (document.activeElement === $('lcNote')) { armLogCardTimer(); return; }
-    hideLogCard();
-  }, ms || 12000);
-}
-function hideLogCard() {
-  if (logCardPin && logCardPin._noteDirty) { logCardPin._noteDirty = false; crowdSyncPin(logCardPin); }
-  var card = $('logCard');
-  if (logCardTimer) { clearTimeout(logCardTimer); logCardTimer = null; }
-  card.classList.add('away');
-  setTimeout(function () { card.hidden = true; logCardPin = null; }, 240);
-}
-$('lcClose').addEventListener('click', hideLogCard);
-document.querySelectorAll('.lc-flag').forEach(function (b) {
-  b.addEventListener('click', function () {
-    if (!logCardPin) return;
-    logCardPin.type = b.getAttribute('data-flag');
-    store.set('pins', S.pins); renderPins(); paintLogFlags(); armLogCardTimer(); crowdSyncPin(logCardPin);
-  });
-});
-$('lcNote').addEventListener('input', function () {
-  if (!logCardPin) return;
-  logCardPin.note = cleanText($('lcNote').value);
-  logCardPin._noteDirty = true;
-  store.set('pins', S.pins); armLogCardTimer();
-});
-$('lcPhoto').addEventListener('change', function () {
-  var f = $('lcPhoto').files && $('lcPhoto').files[0];
-  if (!f || !logCardPin) return;
-  var pin = logCardPin;
-  var rd = new FileReader();
-  rd.onload = function () {
-    var img = new Image();
-    img.onload = function () {
-      var sc = Math.min(1, 480 / Math.max(img.width, img.height));
-      var cv = document.createElement('canvas');
-      cv.width = Math.round(img.width * sc); cv.height = Math.round(img.height * sc);
-      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
-      pin.photo = cv.toDataURL('image/jpeg', 0.72);
-      store.set('pins', S.pins);
-      var back = store.get('pins', []);
-      var kept = false;
-      for (var i = 0; i < back.length; i++) { if (back[i].ts === pin.ts && back[i].photo) kept = true; }
-      if (!kept) { delete pin.photo; store.set('pins', S.pins); toast('That photo was too big to keep on this device.', 'warn'); }
-      else { var th = $('lcThumb'); th.src = pin.photo; th.hidden = false; renderPins(); crowdSyncPin(pin); }
-      armLogCardTimer();
-    };
-    img.src = rd.result;
-  };
-  rd.readAsDataURL(f);
-});
-(function () {
-  var card = $('logCard'), sx = 0, sy = 0;
-  card.addEventListener('touchstart', function (e) { var t = e.changedTouches[0]; sx = t.clientX; sy = t.clientY; }, { passive: true });
-  card.addEventListener('touchend', function (e) {
-    var t = e.changedTouches[0];
-    if (Math.abs(t.clientY - sy) > 45 || Math.abs(t.clientX - sx) > 70) hideLogCard();
-  }, { passive: true });
-})();
-$$('.js-candy').forEach(function (b) { b.addEventListener('click', function () { bumpCount('candy', b); }); });
 $$('.js-house').forEach(function (b) { b.addEventListener('click', function () { bumpCount('houses', b); }); });
 $$('.js-undo').forEach(function (b) {
   b.addEventListener('click', function () {
@@ -2046,6 +1919,13 @@ var PIN_TYPES = {
   nonfood: { label: 'Non-food treats' },
   out: { label: 'Out of candy' }
 };
+function pinLabel(p) {
+  if (!p) return 'Marked spot';
+  if (p.kind === 'shop' && p.type === 'candy') return 'Shop with treats';
+  if (p.kind === 'trunk' && p.type === 'candy') return 'Trunk stop';
+  if (p.full && p.type === 'candy') return 'Full-size candy';
+  return PIN_TYPES[p.type] ? PIN_TYPES[p.type].label : 'Marked spot';
+}
 /* v6 markers: Ember & Ink shapes (shell CSS .mk). Candy status is carried
    by shape + color, never emoji. */
 var SVG_BAG = '<svg class="glyph" viewBox="0 0 24 24"><path d="M6.2 8.5h11.6l1 9.7a1.8 1.8 0 0 1-1.8 1.8H7a1.8 1.8 0 0 1-1.8-1.8l1-9.7Z"/><path d="M9.2 8.5V6.8a2.8 2.8 0 0 1 5.6 0v1.7"/></svg>';
@@ -2057,6 +1937,7 @@ var SVG_CHECK = '<svg class="glyph" viewBox="0 0 24 24"><path d="M6.5 12.5 10.2 
 var SVG_SPARK_BADGE = '<svg class="mk-badge" viewBox="0 0 24 24"><path d="M12 2 14 10 22 12 14 14 12 22 10 14 2 12 10 10Z" fill="#F5EFE6" stroke="#0E0A16" stroke-width="1.6"/></svg>';
 function markerHtml(cls, inner) { return '<div class="mk ' + cls + '"><div class="td">' + inner + '</div></div>'; }
 function pinIconHtml(type, kind) {
+  if (!type) return markerHtml('mk-spot', '<span class="dot"></span>');
   if (type === 'out') return '<div class="mk mk-out"><div class="td"></div><i class="mk-slash"></i></div>';
   if (type === 'nonfood') return '<div class="mk mk-teal"><div class="oct"><i></i>' + SVG_PRIZE + '</div></div>';
   if (kind === 'trunk') return markerHtml('mk-candy', SVG_TRUNK);
@@ -2082,21 +1963,7 @@ function renderPins() {
     var m = L.marker([p.lat, p.lng], {
       icon: L.divIcon({ className: 'pinicon', iconSize: [34, 34], iconAnchor: [17, 30], html: pinIconHtml(p.type, p.kind) })
     });
-    var pop = document.createElement('div');
-    pop.className = 'pop';
-    var popHead = (p.kind === 'shop' && p.type === 'candy') ? 'Shop with treats' : (p.kind === 'trunk' && p.type === 'candy') ? 'Trunk stop' : esc(PIN_TYPES[p.type] ? PIN_TYPES[p.type].label : 'Pin');
-    pop.innerHTML = '<b>' + popHead + '</b>' + (p.via === 'house' ? '<br><span class="muted" style="font-size:12px">Logged from your GPS when you tapped House visited</span>' : '') + (p.note ? '<br><i>' + esc(p.note) + '</i>' : '') + (p.photo ? '<br><img src="' + p.photo + '" style="max-width:150px;border-radius:10px;margin-top:4px" alt="Stop photo">' : '');
-    var del = document.createElement('button');
-    del.className = 'btn btn-ghost btn-sm'; del.textContent = 'Remove pin';
-    del.onclick = function () {
-      S.pins.splice(idx, 1); store.set('pins', S.pins); renderPins(); map.closePopup();
-    };
-    var mv = document.createElement('button');
-    mv.className = 'btn btn-ghost btn-sm'; mv.textContent = 'Move pin';
-    mv.onclick = function () { map.closePopup(); startMovePin(p); };
-    pop.appendChild(mv);
-    pop.appendChild(del);
-    m.bindPopup(pop);
+    m.on('click', function () { openSpotEdit(p); });
     m.addTo(pinLayer);
   });
   /* v6.4.1: the cross-renders below can never take renderPins (or boot,
@@ -2110,49 +1977,226 @@ function addPin(lat, lng, type, via) {
   S.pins.push(pin);
   store.set('pins', S.pins);
   renderPins();
-  toast((PIN_TYPES[type] ? PIN_TYPES[type].label : 'Pin') + ' pinned. Pins make future routes smarter.', 'ok');
+  toast((PIN_TYPES[type] ? PIN_TYPES[type].label : 'Spot') + ' marked.', 'ok');
   return pin.ts;
 }
 renderPins();
 
-/* pin sheet */
-var pinWhereMode = 'gps';
-$$('#pinWhere button').forEach(function (b) {
+/* ---------------- Spot sheet (v6.5 Phase 3A: Mark Spot) ----------------
+   One creation model: a Spot (Argon R4 design, owner-approved as-is).
+   The same sheet creates (the + Mark Spot pill at your GPS, or a
+   long-press anywhere on the map) and edits (tap your own marker).
+   Pin and Log are one object now. Counting follows the owner's stance:
+   a visited spot counts ONE house; there are no candy-piece counters
+   in this flow. A spot's record: {lat, lng, type|null, full, kind,
+   note, photo, shared, ts, via?}. type is the crowd status (candy /
+   nonfood / decor / out) or null for an untagged planning spot. */
+var SPOT_TREAT = { candy: 1, nonfood: 1 };
+var spotDraft = null;
+function spotCounted(p) {
+  return !!p && (S.counts.histLog || []).indexOf(p.ts) >= 0;
+}
+function spotSharedOf(p) {
+  if (p.shared != null) return !!p.shared;
+  return p.via === 'house';
+}
+function spotVisitedOf(p) {
+  return spotCounted(p) || p.via === 'house';
+}
+function spotNearGps(lat, lng) {
+  if (!S.pos) return false;
+  return haversine({ lat: lat, lng: lng }, S.pos) <= 30;
+}
+function spotAutoVisited() {
+  var dr = spotDraft; if (!dr || dr.visitedTouched) return;
+  dr.visited = !!(SPOT_TREAT[dr.type] && (dr.anchor === 'gps' || spotNearGps(dr.lat, dr.lng)));
+}
+function spotAutoShared() {
+  var dr = spotDraft; if (!dr || dr.visTouched) return;
+  dr.shared = !!dr.type;
+}
+function spotAgo(ts) {
+  var m = Math.max(0, Math.round((Date.now() - ts) / 60000));
+  if (m < 1) return 'just now';
+  if (m < 60) return m + 'm ago';
+  return Math.floor(m / 60) + 'h ' + (m % 60) + 'm ago';
+}
+function openSpotNew(lat, lng, anchor) {
+  for (var i = 0; i < S.pins.length; i++) {
+    if (haversine({ lat: lat, lng: lng }, S.pins[i]) <= 8) { openSpotEdit(S.pins[i]); return; }
+  }
+  var kind = 'house';
+  var stopsData = (typeof HEIGHTS_STOPS !== 'undefined') ? HEIGHTS_STOPS : [];
+  var best = null, bd = 25;
+  stopsData.forEach(function (sx) { var dd = haversine({ lat: lat, lng: lng }, { lat: sx.lat, lng: sx.lon }); if (dd < bd) { bd = dd; best = sx; } });
+  if (best) { lat = best.lat; lng = best.lon; if (best.t === 'biz') kind = 'shop'; }
+  spotDraft = {
+    pin: null, lat: lat, lng: lng, anchor: anchor,
+    type: anchor === 'gps' ? 'candy' : null, full: false, kind: kind,
+    visited: false, shared: false, photo: null, note: '',
+    visitedTouched: false, visTouched: false
+  };
+  spotAutoVisited(); spotAutoShared();
+  paintSpotSheet();
+  showSpotSheet();
+}
+function openSpotEdit(pin) {
+  if (!pin) return;
+  spotDraft = {
+    pin: pin, lat: pin.lat, lng: pin.lng, anchor: 'edit',
+    type: pin.type || null, full: !!pin.full, kind: pin.kind || 'house',
+    visited: spotVisitedOf(pin), shared: spotSharedOf(pin),
+    photo: pin.photo || null, note: pin.note || '',
+    visitedTouched: true, visTouched: true
+  };
+  paintSpotSheet();
+  showSpotSheet();
+}
+function paintSpotSheet() {
+  var dr = spotDraft; if (!dr) return;
+  var edit = !!dr.pin;
+  $('spotTitle').textContent = edit ? pinLabel(dr.pin) : 'Mark Spot';
+  $('spotSub').textContent = edit ? ('Marked ' + spotAgo(dr.pin.ts)) : (dr.anchor === 'gps' ? 'At your location' : 'Dropped on map');
+  $('spotRemove').hidden = !edit;
+  $$('.spot-tag').forEach(function (b) {
+    var t = b.getAttribute('data-tag');
+    b.setAttribute('aria-pressed', String(t === 'full' ? dr.full : dr.type === t));
+  });
+  $$('.spot-kind button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-kind') === dr.kind)); });
+  var vb = $('spotVisited');
+  vb.setAttribute('aria-pressed', String(dr.visited));
+  vb.textContent = dr.visited ? 'Visited (+1 house)' : 'Not visited yet';
+  var sv = $('spotVis');
+  sv.setAttribute('aria-pressed', String(dr.shared));
+  sv.textContent = dr.shared ? 'Shared (Party & Crowd)' : 'Just Me';
+  if (document.activeElement !== $('spotNote')) $('spotNote').value = dr.note || '';
+  var bar = $('spotPhotoBar');
+  if (dr.photo) { bar.hidden = false; $('spotThumb').src = dr.photo; $('spotPhotoLbl').textContent = 'Photo added'; }
+  else { bar.hidden = true; $('spotThumb').removeAttribute('src'); $('spotPhotoLbl').textContent = 'Add Photo'; }
+}
+function showSpotSheet() {
+  var sh = $('spotSheet');
+  sh.classList.remove('away'); sh.hidden = false;
+}
+function hideSpotSheet() {
+  var sh = $('spotSheet');
+  sh.classList.add('away');
+  setTimeout(function () { sh.hidden = true; if (spotDraft && !sh.hidden) spotDraft = null; spotDraft = null; }, 240);
+}
+function spotSetCounted(pin, on) {
+  if (!S.counts.histLog) S.counts.histLog = [];
+  var ix = S.counts.histLog.indexOf(pin.ts);
+  if (on && ix < 0) {
+    S.counts.houses++;
+    S.counts.hist.push('houses');
+    while (S.counts.histLog.length < S.counts.hist.length - 1) S.counts.histLog.push(null);
+    S.counts.histLog.push(pin.ts);
+  } else if (!on && ix >= 0) {
+    S.counts.histLog.splice(ix, 1);
+    if (S.counts.hist[ix] === 'houses') S.counts.hist.splice(ix, 1);
+    S.counts.houses = Math.max(0, S.counts.houses - 1);
+  }
+}
+function removeSpotWithUndo(pin) {
+  var ix = S.pins.indexOf(pin);
+  if (ix < 0) return;
+  var wasCounted = spotCounted(pin);
+  S.pins.splice(ix, 1);
+  if (wasCounted) spotSetCounted(pin, false);
+  store.set('pins', S.pins); store.set('counts', S.counts);
+  renderPins(); renderCounts();
+  toast('Spot removed', 'ok', 'Undo', function () {
+    S.pins.splice(Math.min(ix, S.pins.length), 0, pin);
+    if (wasCounted) spotSetCounted(pin, true);
+    store.set('pins', S.pins); store.set('counts', S.counts);
+    renderPins(); renderCounts();
+  }, 'spot-removed');
+}
+$$('.spot-tag').forEach(function (b) {
   b.addEventListener('click', function () {
-    pinWhereMode = b.getAttribute('data-where');
-    $$('#pinWhere button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
-    $('pinGpsNote').hidden = !(pinWhereMode === 'gps' && !S.pos);
+    var dr = spotDraft; if (!dr) return;
+    var t = b.getAttribute('data-tag');
+    if (t === 'full') {
+      dr.full = !dr.full;
+      if (dr.full) dr.type = 'candy';
+    } else if (t === 'out') {
+      dr.type = dr.type === 'out' ? null : 'out';
+      if (dr.type === 'out') dr.full = false;
+    } else {
+      dr.type = dr.type === t ? null : t;
+      if (dr.type !== 'candy') dr.full = false;
+    }
+    spotAutoVisited(); spotAutoShared();
+    paintSpotSheet();
   });
 });
-var pinPressLL = null;
-function openMarkSheet(ll) {
-  pinPressLL = { lat: ll.lat, lng: ll.lng };
-  pinWhereMode = 'press';
-  $('pinPressNote').hidden = false;
-  $('pinGpsNote').hidden = true;
-  $('pinSheet').hidden = false;
-}
-$('pinCancel').addEventListener('click', function () { $('pinSheet').hidden = true; });
-$$('.pingrid button').forEach(function (b) {
+$$('.spot-kind button').forEach(function (b) {
   b.addEventListener('click', function () {
-    var type = b.getAttribute('data-type');
-    $('pinSheet').hidden = true;
-    $('pinPressNote').hidden = true;
-    if (pinWhereMode === 'press' && pinPressLL) {
-      addPin(pinPressLL.lat, pinPressLL.lng, type);
-      pinPressLL = null;
-    } else if (pinWhereMode === 'gps') {
-      getPosOnce().then(function (p) { addPin(p.lat, p.lng, type); })
-        .catch(function () {
-          toast('No GPS fix. Switching to tap mode: tap the map to place it.', 'warn');
-          S.pendingPinType = type;
-          enterPick('pin', 'Tap the map to place your ' + PIN_TYPES[type].label + ' pin');
-        });
-    } else {
-      S.pendingPinType = type;
-      enterPick('pin', 'Tap the map to place your ' + PIN_TYPES[type].label + ' pin');
-    }
+    if (!spotDraft) return;
+    spotDraft.kind = b.getAttribute('data-kind');
+    paintSpotSheet();
   });
+});
+$('spotVisited').addEventListener('click', function () {
+  if (!spotDraft) return;
+  spotDraft.visited = !spotDraft.visited;
+  spotDraft.visitedTouched = true;
+  paintSpotSheet();
+});
+$('spotVis').addEventListener('click', function () {
+  if (!spotDraft) return;
+  spotDraft.shared = !spotDraft.shared;
+  spotDraft.visTouched = true;
+  paintSpotSheet();
+});
+$('spotNote').addEventListener('input', function () { if (spotDraft) spotDraft.note = $('spotNote').value; });
+$('spotPhoto').addEventListener('change', function () {
+  var f = $('spotPhoto').files && $('spotPhoto').files[0];
+  $('spotPhoto').value = '';
+  if (!f || !spotDraft) return;
+  var rd = new FileReader();
+  rd.onload = function () {
+    var img = new Image();
+    img.onload = function () {
+      chatEncodePhoto(img, function (url) {
+        if (!url) { toast('That photo is too large to keep, even compressed.', 'warn'); return; }
+        if (spotDraft) { spotDraft.photo = url; paintSpotSheet(); }
+      });
+    };
+    img.src = rd.result;
+  };
+  rd.readAsDataURL(f);
+});
+$('spotPhotoReplace').addEventListener('click', function () { $('spotPhoto').click(); });
+$('spotPhotoClear').addEventListener('click', function () { if (spotDraft) { spotDraft.photo = null; paintSpotSheet(); } });
+$('spotThumb').addEventListener('click', function () { if (spotDraft && spotDraft.photo) openPhotoView(spotDraft.photo); });
+$('spotClose').addEventListener('click', hideSpotSheet);
+$('spotRemove').addEventListener('click', function () {
+  if (!spotDraft || !spotDraft.pin) return;
+  var pin = spotDraft.pin;
+  hideSpotSheet();
+  removeSpotWithUndo(pin);
+});
+$('spotSave').addEventListener('click', function () {
+  var dr = spotDraft; if (!dr) return;
+  var pin = dr.pin;
+  if (!pin) {
+    pin = { lat: dr.lat, lng: dr.lng, type: dr.type, ts: Date.now() };
+    S.pins.push(pin);
+  }
+  pin.type = dr.type;
+  if (dr.full && dr.type === 'candy') pin.full = true; else delete pin.full;
+  pin.kind = dr.kind;
+  var note = cleanText(dr.note || '');
+  if (note) pin.note = note; else delete pin.note;
+  if (dr.photo) pin.photo = dr.photo; else delete pin.photo;
+  pin.shared = dr.shared;
+  spotSetCounted(pin, dr.visited);
+  store.set('pins', S.pins); store.set('counts', S.counts);
+  renderPins(); renderCounts();
+  if (dr.shared && dr.type) crowdSyncPin(pin);
+  hideSpotSheet();
+  toast('Spot saved.', 'ok');
 });
 
 /* ---------------- Heights community treat stops ---------------- */
@@ -2628,10 +2672,8 @@ function showStats(route) {
   var mins = Math.round(route.distance / KID_PACE_MPS / 60);
   var score = mins > 0 ? Math.round(route.houses / (mins / 60)) : 0;
   var noData = route.degraded && !route.houses;
-  var peekEl = $('peek');
-  var peekTxt = (route.distance / M_PER_MI).toFixed(1) + ' mi \u00B7 ' + mins + ' min \u00B7 ' + (noData ? 'starter loop' : route.houses + ' houses') + ' \u2014 tap to open';
-  S._routePeek = peekTxt;
-  if (peekEl && (!S.sheetTab || S.sheetTab === 'route')) peekEl.textContent = peekTxt;
+  S._routePeek = (route.distance / M_PER_MI).toFixed(1) + ' mi \u00B7 ' + mins + ' min \u00B7 ' + (noData ? 'starter loop' : route.houses + ' houses');
+  if (typeof updatePeek === 'function') updatePeek();
   $('stats').innerHTML =
     '<div class="stat"><b>' + (route.distance / M_PER_MI).toFixed(1) + '</b><span>miles</span></div>' +
     '<div class="stat"><b>' + mins + '</b><span>est. minutes</span></div>' +
@@ -3427,6 +3469,7 @@ function navTick() {
     $('nEta').textContent = minsLeft >= 60 ? Math.floor(minsLeft / 60) + 'h ' + (minsLeft % 60) + 'm' : minsLeft + ' min';
     $('nEtaSub').textContent = 'home at ' + fmtClock(new Date(Date.now() + (rem / KID_PACE_MPS) * 1000));
   }
+  if (typeof updatePeek === 'function') updatePeek();
 }
 function distToRouteLine(p) {
   var coords = S.route.coords, best = Infinity;
@@ -3659,15 +3702,12 @@ $('btnEnd').addEventListener('click', function () {
 function openSummary() {
   var ln = nightWalk();
   $('sumHouses').textContent = S.counts.houses;
-  $('sumCandy').textContent = S.counts.candy;
   $('sumDist').textContent = ln.trackDist >= 160 ? (ln.trackDist / M_PER_MI).toFixed(1) + ' mi' : Math.round(ln.trackDist * 3.28084) + ' ft';
   var mins = Math.round(ln.elapsedMs / 60000);
   $('sumTime').textContent = mins >= 60 ? Math.floor(mins / 60) + ' hr ' + (mins % 60) + ' min' : mins + ' min';
   var extra = '';
-  if (S.counts.houses > 0 && S.counts.candy > 0)
-    extra = 'That is about ' + (S.counts.candy / S.counts.houses).toFixed(1) + ' candies per house. Efficient haunting!';
-  else if (S.counts.candy > 0)
-    extra = 'Sweet haul. Tap House visited as you go next time for the full picture.';
+  if (S.counts.houses > 0)
+    extra = S.counts.houses + (S.counts.houses === 1 ? ' house' : ' houses') + ' visited in one night. Efficient haunting!';
   $('sumExtra').textContent = extra;
   $('summary').hidden = false;
 }
@@ -3681,7 +3721,7 @@ function freshStart(collapseSheet) {
   document.body.classList.remove('has-route');
   ghostHeights(false);
   $('planInputs').classList.remove('folded');
-  var pk = $('peek'); S._routePeek = 'Tap to plan your route'; if (pk && (!S.sheetTab || S.sheetTab === 'route')) pk.textContent = S._routePeek;
+  S._routePeek = 'Tap to plan your route'; if (typeof updatePeek === 'function') updatePeek();
   setSheetCollapsed(!!collapseSheet);
 }
 $('btnSumClose').addEventListener('click', function () { freshStart(true); });
@@ -3940,56 +3980,26 @@ $('btnResume').addEventListener('click', resumeCompass);
   mapEl.addEventListener('pointercancel', twistEnd);
 })();
 
-/* ---- Log a stop from anywhere (Steve, Oct 31): the Log fab works with no
-   route built and no panel open; the log card's stepper adds this stop's
-   candies straight into the haul counter. ---- */
-var lcCandy = 0;
-function paintLcCandy() { var el = $('lcCandyN'); if (el) el.textContent = lcCandy; }
-$('fabLog').addEventListener('click', function () {
+/* ---- Mark a spot from anywhere (v6.5 Phase 3A): the + Mark Spot
+   pill drops a spot at your GPS fix and opens the unified Spot sheet.
+   A spot of yours already within 25 m opens in edit mode instead of
+   duplicating. ---- */
+$('fabSpot').addEventListener('click', function () {
   ensureWatch();
-  function doLog() {
-    logQuickNext = true;
-    bumpCount('houses', null);
-    if (!logCardPin) toast(logFailToast(), 'warn');
+  function open(ll) {
+    for (var i = 0; i < S.pins.length; i++) {
+      if (haversine(ll, S.pins[i]) <= 25) { openSpotEdit(S.pins[i]); return; }
+    }
+    openSpotNew(ll.lat, ll.lng, 'gps');
   }
-  if (S.pos && Date.now() - S.pos.ts < 20000 && S.pos.acc <= 25) { doLog(); return; }
-  if (!navigator.geolocation) { toast('This browser cannot share location.', 'err'); return; }
-  toast('Getting a precise fix…', 'ok');
-  var best = null, done = false, wid = null;
-  function finish() {
-    if (done) return; done = true;
-    if (wid != null) { try { navigator.geolocation.clearWatch(wid); } catch (e) {} }
-    if (best) { onPos(best); doLog(); }
-    else if (S.pos) { doLog(); }
-    else toast('No GPS fix yet. Give it a few seconds outside and tap Log again.', 'err');
-  }
-  try {
-    wid = navigator.geolocation.watchPosition(function (pos) {
-      onPos(pos);
-      if (!best || pos.coords.accuracy < best.coords.accuracy) best = pos;
-      if (pos.coords.accuracy <= 25) finish();
-    }, function (err) {
-      if (err && err.code === 1 && !done) { done = true; toast('Location is blocked for this site. Tap the lock or tune icon in the address bar, allow Location, then tap Log again.', 'err'); }
-    }, { enableHighAccuracy: true, maximumAge: 0 });
-  } catch (e) {}
-  setTimeout(finish, 7000);
-});
-$('lcCandyPlus').addEventListener('click', function () {
-  lcCandy++;
-  S.counts.candy++; S.counts.hist.push('candy');
-  if (!S.counts.histLog) S.counts.histLog = [];
-  while (S.counts.histLog.length < S.counts.hist.length - 1) S.counts.histLog.push(null);
-  S.counts.histLog.push(null);
-  store.set('counts', S.counts); renderCounts(null); paintLcCandy(); armLogCardTimer();
-});
-$('lcCandyMinus').addEventListener('click', function () {
-  if (lcCandy <= 0) return;
-  lcCandy--;
-  S.counts.candy = Math.max(0, S.counts.candy - 1);
-  for (var i = S.counts.hist.length - 1; i >= 0; i--) {
-    if (S.counts.hist[i] === 'candy') { S.counts.hist.splice(i, 1); if (S.counts.histLog) S.counts.histLog.splice(i, 1); break; }
-  }
-  store.set('counts', S.counts); renderCounts(null); paintLcCandy(); armLogCardTimer();
+  if (S.pos && Date.now() - S.pos.ts < 20000 && (S.pos.acc || 99) <= 65) { open(S.pos); return; }
+  showBusy('Finding you…', 'GPS can take a few seconds outside.');
+  getPosOnce().then(function (p) { hideBusy(); open(p); })
+    .catch(function (e) {
+      hideBusy();
+      if (e && e.code === 1) gpsHelpDlg();
+      else toast('Could not get a GPS fix. Step outside, or long-press the map to mark a spot.', 'err');
+    });
 });
 
 /* ---------- Self-update check ----------
@@ -4013,81 +4023,6 @@ $('lcCandyMinus').addEventListener('click', function () {
     }).catch(function () {});
   } catch (e) {}
 })();
-
-/* ---------- Move a pin (Steve, Oct 31, 2026) ----------
-   GPS pins land where the fix says, not always where the house is. Move
-   mode swaps the pin layer for one draggable marker; Done writes the
-   corrected spot back, saves, and re-shares it to the crowd map. */
-var movePin = null, moveMarker = null;
-function startMovePin(pin) {
-  if (!pin) return;
-  if (logCardPin) hideLogCard();
-  movePin = pin;
-  if (map.hasLayer(pinLayer)) map.removeLayer(pinLayer);
-  moveMarker = L.marker([pin.lat, pin.lng], {
-    draggable: true, zIndexOffset: 900,
-    icon: L.divIcon({ className: 'pinicon', iconSize: [34, 34], iconAnchor: [17, 30], html: pinIconHtml(pin.type, pin.kind) })
-  }).addTo(map);
-  $('moveBar').hidden = false;
-  map.panTo([pin.lat, pin.lng]);
-}
-function endMovePin(saveIt) {
-  if (!movePin || !moveMarker) { $('moveBar').hidden = true; return; }
-  if (saveIt) {
-    var ll = moveMarker.getLatLng();
-    movePin.lat = ll.lat; movePin.lng = ll.lng;
-    store.set('pins', S.pins);
-    crowdSyncPin(movePin);
-    toast('Pin moved to the right spot.', 'ok');
-  }
-  map.removeLayer(moveMarker); moveMarker = null; movePin = null;
-  if (!map.hasLayer(pinLayer)) map.addLayer(pinLayer);
-  renderPins();
-  $('moveBar').hidden = true;
-}
-$('mvDone').addEventListener('click', function () { endMovePin(true); });
-$('mvCancel').addEventListener('click', function () { endMovePin(false); });
-$('lcMove').addEventListener('click', function () { if (logCardPin) startMovePin(logCardPin); });
-
-/* ---------- Remove this log (Steve, Oct 31, 2026) ----------
-   One tap in the log card undoes a mistaken log completely: the pin, the
-   house count, and any candies added from this card. */
-$('lcRemove').addEventListener('click', function () {
-  if (!logCardPin) return;
-  var pin = logCardPin;
-  pin._noteDirty = false;
-  var pi = S.pins.indexOf(pin); if (pi >= 0) S.pins.splice(pi, 1);
-  for (var j = S.counts.hist.length - 1; j >= 0; j--) {
-    if (S.counts.hist[j] === 'houses' && S.counts.histLog[j] === pin.ts) { S.counts.hist.splice(j, 1); S.counts.histLog.splice(j, 1); break; }
-  }
-  S.counts.houses = Math.max(0, S.counts.houses - 1);
-  if (lcCandy > 0) {
-    S.counts.candy = Math.max(0, S.counts.candy - lcCandy);
-    for (var k = 0; k < lcCandy; k++) { var ci = S.counts.hist.lastIndexOf('candy'); if (ci >= 0) { S.counts.hist.splice(ci, 1); S.counts.histLog.splice(ci, 1); } }
-    lcCandy = 0; $('lcCandyN').textContent = '0';
-  }
-  store.set('pins', S.pins); store.set('counts', S.counts);
-  renderPins(); renderCounts();
-  hideLogCard();
-  toast('Log removed: pin deleted and counters adjusted.', 'ok');
-});
-
-/* ---------- House vs shop (Steve, Oct 31, 2026) ----------
-   One toggle in the log card, House by default, auto-set to Shop when the
-   log snapped to a business stop. Zero extra taps for ordinary houses. */
-function paintLogKind() {
-  if (!logCardPin) return;
-  var k = logCardPin.kind || 'house';
-  document.querySelectorAll('.lc-kind').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-kind') === k ? 'true' : 'false'); });
-  $('lcTitle').textContent = (k === 'shop') ? 'Shop with treats, logged' : (k === 'trunk') ? 'Trunk stop, logged' : 'Candy here, logged';
-}
-document.querySelectorAll('.lc-kind').forEach(function (b) {
-  b.addEventListener('click', function () {
-    if (!logCardPin) return;
-    logCardPin.kind = b.getAttribute('data-kind');
-    store.set('pins', S.pins); renderPins(); paintLogKind(); armLogCardTimer();
-  });
-});
 
 /* ================= Party mode (Phase 3c, Steve Oct 31, 2026) =================
    Room code + display name. Members share: live position dots (posted every
@@ -4442,7 +4377,7 @@ function paintPartyPill() {
   $('partyPillDots').innerHTML = partyRosterNames().slice(0, 6).map(function (n) {
     return '<i style="background:' + partyMetaFor(n).color + '"></i>';
   }).join('');
-  $('partyPillText').textContent = t.people + ' walking · ' + t.candy + ' pcs';
+  $('partyPillText').textContent = t.people + ' walking · ' + t.houses + ' houses';
 }
 function renderPartyInfo() {
   if (!partyOn()) return;
@@ -4571,7 +4506,7 @@ function renderPartyBox() {
   var leaveZone = PARTY.leaveConfirm
     ? '<span class="party-leave-confirm">Leave party?<button id="partyLeaveYes" class="btn btn-org" type="button">Leave</button><button id="partyLeaveNo" class="btn btn-ghost" type="button">Cancel</button></span>'
     : '<button id="partyInviteBtn" class="btn btn-pur" type="button">Invite</button><button id="partyLeaveBtn" class="btn btn-ghost" type="button">Leave</button>';
-  box.innerHTML = '<div class="party-hd"><span class="pcode">' + esc(PARTY.code) + '</span><span class="ppool">Pooled: ' + t.houses + ' houses · ' + t.candy + ' candies</span>' + leaveZone + '</div>' +
+  box.innerHTML = '<div class="party-hd"><span class="pcode">' + esc(PARTY.code) + '</span><span class="ppool">Pooled: ' + t.houses + ' houses</span>' + leaveZone + '</div>' +
     '<div id="partyRoster">' + (list || '<p class="muted" style="font-size:13px;margin-top:8px">Counts appear as everyone logs.</p>') + '</div>' +
     ((typeof INVITE_CODE !== 'undefined' && INVITE_CODE && INVITE_CODE !== PARTY.code) ? '<button id="partySwitch" class="btn btn-ghost" style="width:100%;margin-top:8px">Switch to invited party ' + esc(INVITE_CODE) + '</button>' : '') +
     '<button id="partyOpenChat" class="btn btn-ghost" type="button">Open Party Chat &rarr;</button>';
@@ -4662,18 +4597,6 @@ if (partyOn()) {
   PARTY.timer = setInterval(partyTick, 20000);
   partyPoll();
 }
-
-/* ---------- Quick-log details + streak (v5.1) ---------- */
-$('lcDetails').addEventListener('click', function () {
-  $('logCard').classList.remove('mini');
-  logStreak.n = 0;
-  armLogCardTimer();
-});
-$('lcQuickUndo').addEventListener('click', function () {
-  hideLogCard();
-  var u = document.querySelector('.js-undo');
-  if (u) u.click();
-});
 
 /* ---------- Open where I am (v5.1) ----------
    Unless a shared-route link brought the user here, center once on their
@@ -5165,7 +5088,6 @@ function drawHaulCard(cb) {
     /* stats: HOUSES drops out entirely for a zero-house recorded walk */
     var stats = [];
     if (!(S.counts.houses === 0 && data.src === 'walk')) stats.push({ v: String(S.counts.houses), l: 'HOUSES' });
-    stats.push({ v: String(S.counts.candy), l: 'CANDIES' });
     stats.push({ v: fmtWalkDist(nw.trackDist), l: 'WALKED' });
     stats.push({ v: fmtWalkTime(nw.elapsedMs), l: 'TIME' });
     var sy = heroBottom + 168, colW = 968 / stats.length;
@@ -5281,7 +5203,7 @@ function cleanName(t) {
 
 /* ---------- Kid view (v5.8) ----------
    A big-button layer a parent can hand to a kid: next stop in huge type,
-   the running haul, and one giant candy button (the normal Log flow).
+   the running haul, and one giant candy button (a one-tap house count).
    The crowd layer hides while it is open to keep the map calm. */
 var KID = { on: false };
 function kidNearest() {
@@ -5296,7 +5218,7 @@ function kidNearest() {
 }
 function kidRender() {
   if (!KID.on) return;
-  $('kidCounts').innerHTML = '<b>' + S.counts.houses + '</b> houses &middot; <b>' + S.counts.candy + '</b> candies';
+  $('kidCounts').innerHTML = '<b>' + S.counts.houses + '</b> houses visited';
   var t = $('navTitle'), sub = $('navSub');
   if (document.body.classList.contains('navigating') && t && t.textContent) {
     $('kidNextName').textContent = t.textContent;
@@ -5333,7 +5255,7 @@ $('btnKid').addEventListener('click', function () { kidSet(true); });
   });
   ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) { btn.addEventListener(ev, reset); });
 })();
-$('kidCandy').addEventListener('click', function () { $('fabLog').click(); setTimeout(kidRender, 800); });
+$('kidCandy').addEventListener('click', function () { bumpCount('houses', null); setTimeout(kidRender, 300); });
 setInterval(function () { if (KID.on) kidRender(); }, 3000);
 
 /* ---------- Chat surface (v6.5 Phase 2) ----------
@@ -5521,20 +5443,63 @@ document.addEventListener('visibilitychange', function () {
 
 /* ================= Lantern chrome wiring (v6.0) ================= */
 S.sheetTab = 'route';
+function peekSetStart(mode) {
+  var b = $('peekStart'); if (!b) return;
+  if (!mode) { b.hidden = true; b.dataset.mode = ''; return; }
+  b.hidden = false;
+  if (b.dataset.mode === mode) return;
+  b.dataset.mode = mode;
+  b.classList.toggle('solid', mode === 'start-route');
+  b.innerHTML = mode === 'end' ? 'End' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5Z"/></svg>Start';
+}
+/* v6.5 Phase 3A (Argon R4 section 5): the peek is an actionable bar,
+   not a hint line. Left: Tonight's Route + status (stops and minutes,
+   or Free Walk). Right: a 48px Start pill that begins guidance (or a
+   free walk with 0 stops) without expanding the sheet. While walking,
+   the same slot becomes End, with the next-stop distance on the left. */
 function updatePeek() {
-  var pk = $('peek'); if (!pk) return;
+  var tEl = $('peekTitle'), sEl = $('peekSub');
+  if (!tEl || !sEl) return;
   var tab = S.sheetTab || 'route';
+  if (S.nav) {
+    tEl.textContent = 'On your route';
+    var nx = S.nav.stops && S.nav.stops[S.nav.stopIdx];
+    sEl.textContent = nx ? (S.pos ? 'Next stop · ' + fmtDist(haversine(S.pos, nx)) : 'Guiding you') : 'Heading home';
+    peekSetStart('end');
+    return;
+  }
+  if (typeof REC !== 'undefined' && REC.on) {
+    tEl.textContent = 'Recording walk';
+    sEl.textContent = fmtWalkDist(trackDistOf(REC.points)) + ' · ' + S.counts.houses + ' houses';
+    peekSetStart('end');
+    return;
+  }
   if (tab === 'party') {
-    if (partyOn()) { var t = partyTotals(); pk.textContent = 'Party ' + PARTY.code + ' · ' + t.people + ' people · ' + t.houses + ' houses · ' + t.candy + ' candies — tap to open'; }
-    else pk.textContent = 'Party mode — tap to start or join';
+    peekSetStart(null);
+    if (partyOn()) { var t = partyTotals(); tEl.textContent = 'Party ' + PARTY.code; sEl.textContent = t.people + ' people · ' + t.houses + ' houses'; }
+    else { tEl.textContent = 'Party mode'; sEl.textContent = 'Start or join a party'; }
   } else if (tab === 'chat') {
-    pk.textContent = partyOn() ? 'Party chat — tap to open' : 'Heights Live — tap to open';
+    peekSetStart(null);
+    tEl.textContent = partyOn() ? 'Party chat' : 'Heights Live';
+    sEl.textContent = 'Tap to open';
   } else if (tab === 'haul') {
-    pk.textContent = 'Tonight: ' + S.counts.houses + ' houses · ' + S.counts.candy + ' candies — tap to open';
+    peekSetStart(null);
+    tEl.textContent = "Tonight's Haul";
+    var hd = $('haulDist');
+    sEl.textContent = S.counts.houses + ' houses' + (hd && hd.textContent ? ' · ' + hd.textContent + ' walked' : '');
   } else {
-    pk.textContent = S._routePeek || 'Tap to plan your route';
+    tEl.textContent = "Tonight's Route";
+    if (S.route && S.route.stops) {
+      var mins = Math.round(S.route.distance / KID_PACE_MPS / 60);
+      sEl.textContent = S.route.stops.length + ' stops · ' + mins + ' min';
+      peekSetStart('start-route');
+    } else {
+      sEl.textContent = 'Free Walk · Ready';
+      peekSetStart('start-free');
+    }
   }
 }
+
 /* v6.5 Phase 1: deterministic sheet height per tab. A tab switch never
    inherits whatever snap the previous tab left behind. Route keeps its
    existing behavior while a nav is running (the nav UI owns the sheet). */
@@ -5622,7 +5587,7 @@ function revGeocodePin(p) {
 }
 function renderPinsList() {
   var el = $('pinsList'); if (!el) return;
-  if (!S.pins.length) { el.innerHTML = '<p class="muted" style="font-size:13.5px;margin:2px">No pins yet tonight.</p>'; return; }
+  if (!S.pins.length) { el.innerHTML = '<p class="muted" style="font-size:13.5px;margin:2px">No spots yet tonight.</p>'; return; }
   el.innerHTML = S.pins.slice().reverse().map(function (p, ri) {
     var i = S.pins.length - 1 - ri;
     var when = new Date(p.ts).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
@@ -5633,7 +5598,9 @@ function renderPinsList() {
     if (p.type === 'out') tags.push('Ran out');
     if (p.type === 'decor') tags.push('Decor');
     if (p.via === 'house') tags.push('GPS log');
-    var title = (p.kind === 'shop' && p.type === 'candy') ? 'Shop with treats' : (p.kind === 'trunk' && p.type === 'candy') ? 'Trunk stop' : (PIN_TYPES[p.type] ? PIN_TYPES[p.type].label : 'Pin');
+    if (p.full) tags.push('Full-size');
+    if (!spotSharedOf(p)) tags.push('Just me');
+    var title = pinLabel(p);
     return '<div class="pinrow" data-i="' + i + '">' +
       '<span class="pinrow-ic">' + pinIconHtml(p.type, p.kind) + '</span>' +
       '<span class="pinrow-main" data-act="go"><b>' + esc(title) + '</b>' +
@@ -5650,10 +5617,7 @@ function renderPinsList() {
     r.querySelector('[data-act="go"]').addEventListener('click', function () { map.flyTo([p.lat, p.lng], 17, { duration: 0.5 }); });
     var th = r.querySelector('[data-act="photo"]');
     if (th) th.addEventListener('click', function () { openPhotoView(p.photo); });
-    r.querySelector('[data-act="del"]').addEventListener('click', function () {
-      var ix = S.pins.indexOf(p);
-      if (ix >= 0) { S.pins.splice(ix, 1); store.set('pins', S.pins); renderPins(); }
-    });
+    r.querySelector('[data-act="del"]').addEventListener('click', function () { removeSpotWithUndo(p); });
     if (!pinAddrText(p)) revGeocodePin(p);
   });
 }
@@ -5665,8 +5629,6 @@ $('prefsClose').addEventListener('click', closePrefs);
 $('prefsScrim').addEventListener('click', closePrefs);
 $('photoViewClose').addEventListener('click', closePhotoView);
 $('photoView').addEventListener('click', function (e) { if (e.target === this) closePhotoView(); });
-$('lcThumb').addEventListener('click', function () { if (logCardPin && logCardPin.photo) openPhotoView(logCardPin.photo); });
-$('pinSheetClose').addEventListener('click', function () { $('pinSheet').hidden = true; });
 $('prefKid').addEventListener('click', function () { closePrefs(); kidSet(true); });
 $('prefShare').addEventListener('click', function () { var b = $('btnShareApp'); if (b) b.click(); });
 $('prefExport').addEventListener('click', function () { var b = $('btnSumExport'); if (b) b.click(); });
@@ -5674,17 +5636,9 @@ $('prefEndNight').addEventListener('click', function () { closePrefs(); openSumm
 $('btnHaulExport').addEventListener('click', function () { var b = $('btnSumExport'); if (b) b.click(); });
 $('chipCrowd').addEventListener('click', function () { var t = $('tglCrowd'); if (t) t.click(); });
 $('chipParty').addEventListener('click', function () { switchTab('party'); if (sheetSnap === 'peek') applySnap(lastSnap); });
-$('btnSheetLog').addEventListener('click', function () { $('fabLog').click(); });
-$('btnEmptyLog').addEventListener('click', function () { $('fabLog').click(); });
+$('btnSheetLog').addEventListener('click', function () { $('fabSpot').click(); });
+$('btnEmptyLog').addEventListener('click', function () { $('fabSpot').click(); });
 $('btnNavExit').addEventListener('click', function () { endNav(false); openSearch(); });
-/* Quick-tag pills on the mini log card: retag the just-created log */
-function lcQuickTag(type) {
-  if (!logCardPin) return;
-  logCardPin.type = type;
-  store.set('pins', S.pins); renderPins(); paintLogFlags(); crowdSyncPin(logCardPin); armLogCardTimer(4000);
-}
-$('lcTagOut').addEventListener('click', function () { lcQuickTag('out'); });
-$('lcTagNonfood').addEventListener('click', function () { lcQuickTag('nonfood'); });
 renderPinsList();
 updatePeek();
 
