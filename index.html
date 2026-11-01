@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0A16">
-<meta name="version" content="6.6">
+<meta name="version" content="6.7">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -13,6 +13,18 @@
 <meta name="apple-mobile-web-app-title" content="Candy Trail">
 <meta name="color-scheme" content="dark">
 <meta name="description" content="Candy Trail: tell us where you start and how long you have. We build the trick-or-treat loop that hits the most candy houses, then guide you turn by turn.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Candy Trail">
+<meta property="og:title" content="Candy Trail · Trick-or-Treat Route Planner">
+<meta property="og:description" content="Candy Trail: tell us where you start and how long you have. We build the trick-or-treat loop that hits the most candy houses, then guide you turn by turn.">
+<meta property="og:url" content="https://dreadgazebo.github.io/jc-heights-candy-path/">
+<meta property="og:image" content="https://dreadgazebo.github.io/jc-heights-candy-path/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Candy Trail · Trick-or-Treat Route Planner">
+<meta name="twitter:description" content="Candy Trail: tell us where you start and how long you have. We build the trick-or-treat loop that hits the most candy houses, then guide you turn by turn.">
+<meta name="twitter:image" content="https://dreadgazebo.github.io/jc-heights-candy-path/og-card.png">
 <title>Candy Trail · Trick-or-Treat Route Planner</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M8.1 14.5 C5.6 11.5 3.1 8.8 3.1 6.2 C3.1 3.4 5.3 1.4 8 1.4 C10.7 1.4 12.9 3.4 12.9 6.2 C12.9 7.8 12.4 9 11.8 9.8' stroke='%23E85D26' stroke-width='1.75' stroke-linecap='round'/%3E%3Cpath d='M9.6 11.4 C7.1 11.9 5.5 9.8 5.5 6.8' stroke='%23E85D26' stroke-width='1.75' stroke-linecap='round'/%3E%3Ccircle cx='8' cy='6.2' r='1.4' fill='%23F5EFE6'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
@@ -827,6 +839,16 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
 .loop-pill{min-height:48px;padding:0 14px;white-space:nowrap}
 .loop-pill[hidden]{display:none}
 #btnDrop.loop-outline{border:1.5px solid var(--org);color:var(--org2)}
+/* ---------- v6.7 Phase 4B: share sheet ---------- */
+.seg3{grid-template-columns:1fr 1fr 1fr}
+#shareSheet .ocard{max-width:520px}
+.ss-head{display:flex;align-items:flex-start;gap:12px}
+.ss-head h2{flex:1;min-width:0}
+#sharePreviewWrap{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:10px;margin:2px 0 4px}
+#sharePreview{display:block;width:100%;max-height:34dvh;object-fit:contain;border-radius:8px}
+#shareSheet .btns .btn{min-height:52px}
+.ss-link{font-size:12.5px;word-break:break-all;margin:12px 0 0;line-height:1.45;color:var(--mut)}
+.ss-link b{color:var(--txt);font-weight:600}
 </style>
 </head>
 <body class="mode-plan">
@@ -971,6 +993,7 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
           <a id="btnGmaps" class="btn" href="#" target="_blank" rel="noopener"><svg class="ic" viewBox="0 0 24 24"><use href="#i-route"/></svg>Google Maps</a>
           <button id="btnShare" class="btn" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-share"/></svg>Share route</button>
         </div>
+        <button id="btnRouteCard" class="btn btn-ghost" type="button" style="width:100%;margin-top:8px"><svg class="ic" viewBox="0 0 24 24"><use href="#i-share"/></svg>Share route card</button>
         <button id="planToggle" class="btn btn-ghost route-only plan-edit" type="button" aria-expanded="false"><span id="planToggleText">Change start or time</span><span>&#9662;</span></button>
       </div>
       <div id="planInputs" class="plan-edit">
@@ -1014,7 +1037,7 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
       </div>
       <div class="sheetfoot">
         <div class="wm">Candy Trail</div>
-        <div class="ver" id="appVer">Candy Trail v6.6</div>
+        <div class="ver" id="appVer">Candy Trail v6.7</div>
       </div>
     </div>
 
@@ -1073,6 +1096,7 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
         <button id="btnKid" class="btn btn-pur" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-smile"/></svg>Kid view</button>
         <button id="btnSummary" class="btn btn-org" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-moon"/></svg>End night &amp; see haul</button>
       </div>
+      <button id="btnHaulCard" class="btn btn-ghost" type="button" style="width:100%;margin-bottom:10px"><svg class="ic" viewBox="0 0 24 24"><use href="#i-share"/></svg>Share tonight's card</button>
       <div id="shareBox">
         <div class="label">Share Candy Trail</div>
         <img id="shareQr" alt="QR code for the Candy Trail app" width="168" height="168">
@@ -1199,6 +1223,7 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
     <p class="muted" id="sumExtra"></p>
     <div class="btns">
       <button id="btnSumShare" class="btn btn-pur btn-xl" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-share"/></svg>Share my haul</button>
+      <button id="btnSumParty" class="btn btn-ghost btn-xl" type="button" hidden><svg class="ic" viewBox="0 0 24 24"><use href="#i-users"/></svg>Share party recap</button>
       <button id="btnSumNew" class="btn btn-org btn-xl" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-shuffle"/></svg>New route</button>
       <button id="btnSumClose" class="btn btn-ghost btn-xl" type="button">Back to map</button>
     </div>
@@ -1278,6 +1303,23 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
     <h2 id="dlgTitle"></h2>
     <p id="dlgText"></p>
     <div id="dlgBtns" class="btns"></div>
+  </div>
+</div>
+<div id="shareSheet" class="overlay" hidden>
+  <div class="ocard card" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
+    <div class="ss-head"><h2 id="shareTitle">Share</h2><button id="shareClose" class="btn-close" type="button" aria-label="Close share sheet"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button></div>
+    <div id="sharePreviewWrap"><img id="sharePreview" alt="Share card preview"></div>
+    <div class="lbl">Card shape</div>
+    <div class="seg seg3" id="shareCrops" role="group" aria-label="Card shape">
+      <button type="button" data-crop="portrait" aria-pressed="true">Portrait</button>
+      <button type="button" data-crop="story" aria-pressed="false">Story</button>
+      <button type="button" data-crop="wide" aria-pressed="false">Wide</button>
+    </div>
+    <div class="btns">
+      <button id="shareGo" class="btn btn-ember" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-share"/></svg>Share</button>
+      <button id="shareSave" class="btn btn-ghost" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-download"/></svg>Save image</button>
+    </div>
+    <p class="ss-link"><b>Link:</b> <span id="shareLinkTxt"></span></p>
   </div>
 </div>
 
@@ -1405,6 +1447,7 @@ function toastDurFor(key, kind) {
   if (kind === 'warn' || kind === 'err') return 6000;
   if (key === 'route-built') return 4000;
   if (key === 'spot-removed') return 5000;
+  if (key === 'spot-share') return 6000;
   return 2800;
 }
 function toastArm(st, ms) {
@@ -1812,6 +1855,7 @@ function voiceCmdFull() {
     var pt = voiceNearestPoint(60) || { lat: S.pos.lat, lng: S.pos.lng };
     pin = { lat: pt.lat, lng: pt.lng, type: 'candy', full: true, kind: 'house', shared: true, ts: Date.now() };
     S.pins.push(pin);
+    noteSpotMarked();
   } else {
     pin.type = 'candy'; pin.full = true;
   }
@@ -2497,6 +2541,7 @@ function addPin(lat, lng, type, via) {
   var pin = { lat: lat, lng: lng, type: type, ts: Date.now() };
   if (via) pin.via = via;
   S.pins.push(pin);
+  noteSpotMarked();
   store.set('pins', S.pins);
   renderPins();
   toast((PIN_TYPES[type] ? PIN_TYPES[type].label : 'Spot') + ' marked.', 'ok');
@@ -2706,6 +2751,7 @@ $('spotSave').addEventListener('click', function () {
   if (!pin) {
     pin = { lat: dr.lat, lng: dr.lng, type: dr.type, ts: Date.now() };
     S.pins.push(pin);
+    noteSpotMarked();
   }
   pin.type = dr.type;
   if (dr.full && dr.type === 'candy') pin.full = true; else delete pin.full;
@@ -3914,7 +3960,8 @@ function round6(n) { return Math.round(n * 1e6) / 1e6; }
 $('btnShare').addEventListener('click', function () {
   var code = encodeRoute();
   if (!code) { toast('Build a route first, then share it.', 'warn'); return; }
-  var url = location.href.split('#')[0] + '#r=' + code;
+  var vq = currentViewQuery();
+  var url = APP_LINK + (vq ? '?' + vq : '') + '#r=' + code;
   if (navigator.share) {
     navigator.share({ title: 'Our trick-or-treat route', text: 'Follow our Candy Trail loop:', url: url }).catch(function () {});
   } else if (navigator.clipboard) {
@@ -4264,6 +4311,8 @@ function openSummary() {
   if (S.counts.houses > 0)
     extra = S.counts.houses + (S.counts.houses === 1 ? ' house' : ' houses') + ' visited in one night. Efficient haunting!';
   $('sumExtra').textContent = extra;
+  var bpSum = $('btnSumParty'); if (bpSum) bpSum.hidden = !partyOn();
+  maybeSpotSharePrompt();
   $('summary').hidden = false;
 }
 $('btnSummary').addEventListener('click', openSummary);
@@ -4286,6 +4335,7 @@ $('btnSumNew').addEventListener('click', function () {
 });
 
 /* ---------------- boot ---------------- */
+var DEEP_VIEW = null; /* v6.7 Phase 4B: parsed ?view= viewport, set in boot */
 (function boot() {
   ensureWatch();
   setSheetCollapsed(true); /* clean map first, Google Maps style: slim peek bar until tapped */
@@ -4295,6 +4345,11 @@ $('btnSumNew').addEventListener('click', function () {
   if (sp) {
     var parts = sp.split(',').map(Number);
     if (parts.length === 2 && !isNaN(parts[0])) setStart(parts[0], parts[1], 'Shared start', false);
+  }
+  DEEP_VIEW = parseViewParam(location.search);
+  if (DEEP_VIEW && !/#r=/.test(location.hash || '')) {
+    try { map.setView([DEEP_VIEW.lat, DEEP_VIEW.lng], DEEP_VIEW.zoom); } catch (e) {}
+    DEEP_VIEW.applied = true;
   }
   var m = /#r=([A-Za-z0-9\-_]+)/.exec(location.hash || '');
   if (m) {
@@ -5067,7 +5122,8 @@ function renderPartyBox() {
   box.innerHTML = '<div class="party-hd"><span class="pcode">' + esc(PARTY.code) + '</span><span class="ppool">Pooled: ' + t.houses + ' houses</span>' + leaveZone + '</div>' +
     '<div id="partyRoster">' + (list || '<p class="muted" style="font-size:13px;margin-top:8px">Counts appear as everyone logs.</p>') + '</div>' +
     ((typeof INVITE_CODE !== 'undefined' && INVITE_CODE && INVITE_CODE !== PARTY.code) ? '<button id="partySwitch" class="btn btn-ghost" style="width:100%;margin-top:8px">Switch to invited party ' + esc(INVITE_CODE) + '</button>' : '') +
-    '<button id="partyOpenChat" class="btn btn-ghost" type="button">Open Party Chat &rarr;</button>';
+    '<button id="partyOpenChat" class="btn btn-ghost" type="button">Open Party Chat &rarr;</button>' +
+    '<button id="partyCardShare" class="btn btn-ghost" type="button" style="width:100%;margin-top:8px">Share party card</button>';
   var piv = $('partyInviteBtn');
   if (piv) piv.addEventListener('click', partyInviteShare);
   var plb = $('partyLeaveBtn');
@@ -5080,6 +5136,8 @@ function renderPartyBox() {
   if (psw) psw.addEventListener('click', function () { var c = INVITE_CODE; INVITE_CODE = ''; partyJoin(c, PARTY.name); });
   var poc = $('partyOpenChat');
   if (poc) poc.addEventListener('click', function () { setChatChannel('party'); switchTab('chat'); });
+  var pcs = $('partyCardShare');
+  if (pcs) pcs.addEventListener('click', function () { openShareSheet('party'); });
   box.querySelectorAll('.partyKick').forEach(function (b) {
     b.addEventListener('click', function (e) { e.stopPropagation(); partyKick(b.getAttribute('data-name')); });
   });
@@ -5145,7 +5203,7 @@ function partyTick() {
    everyone walking. A 260 ms tap timer separates the two gestures. */
 var PC = { open: false, tapTimer: null };
 function partyInviteShare() {
-  var link = APP_LINK + '?party=' + encodeURIComponent(PARTY.code);
+  var link = mapShareUrl('party=' + encodeURIComponent(PARTY.code));
   if (navigator.share) navigator.share({ title: 'Join my trick-or-treat party', text: 'Join my party ' + PARTY.code + ' in Candy Trail and trick-or-treat with us live on the map.', url: link }).catch(function () {});
   else if (navigator.clipboard) navigator.clipboard.writeText(link).then(function () { toast('Invite link copied.', 'ok'); });
 }
@@ -5231,6 +5289,7 @@ if (partyOn()) {
    first fresh GPS fix instead of the Heights default. */
 (function () {
   if (location.hash) return;
+  if (typeof DEEP_VIEW !== 'undefined' && DEEP_VIEW && DEEP_VIEW.applied) return;
   var done = false;
   try { ensureWatch(); } catch (e) {}
   var iv = setInterval(function () {
@@ -5248,12 +5307,12 @@ var APP_LINK = 'https://dreadgazebo.github.io/jc-heights-candy-path/';
   if (qr) qr.src = 'https://api.qrserver.com/v1/create-qr-code/?size=208x208&margin=0&data=' + encodeURIComponent(APP_LINK);
   var bs = $('btnShareApp');
   if (bs) bs.addEventListener('click', function () {
-    if (navigator.share) navigator.share({ title: 'Candy Trail', text: 'Live trick-or-treat map: routes, crowd reports, and party mode.', url: APP_LINK }).catch(function () {});
-    else if (navigator.clipboard) navigator.clipboard.writeText(APP_LINK).then(function () { toast('Link copied.', 'ok'); });
+    if (navigator.share) navigator.share({ title: 'Candy Trail', text: 'Live trick-or-treat map: routes, crowd reports, and party mode.', url: mapShareUrl() }).catch(function () {});
+    else if (navigator.clipboard) navigator.clipboard.writeText(mapShareUrl()).then(function () { toast('Link copied.', 'ok'); });
   });
   var bc = $('btnCopyLink');
   if (bc) bc.addEventListener('click', function () {
-    if (navigator.clipboard) navigator.clipboard.writeText(APP_LINK).then(function () { toast('Link copied.', 'ok'); });
+    if (navigator.clipboard) navigator.clipboard.writeText(mapShareUrl()).then(function () { toast('Link copied.', 'ok'); });
   });
 })();
 
@@ -5487,6 +5546,7 @@ function recFinish(opts) {
     switchTab('haul');
     if (sheetSnap === 'peek') applySnap(lastSnap);
   }
+  maybeSpotSharePrompt();
 }
 function recEndSession() { if (REC.on) recFinish({ quiet: true }); }
 $('btnStart').addEventListener('click', function () {
@@ -5761,20 +5821,8 @@ function drawHaulCard(cb) {
   }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(go); else go();
 }
-$('btnSumShare').addEventListener('click', function () {
-  drawHaulCard(function (blob) {
-    if (!blob) { toast('Could not make the card on this browser.', 'err'); return; }
-    var file = null;
-    try { file = new File([blob], 'candy-trail-haul-2026.png', { type: 'image/png' }); } catch (e) {}
-    if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-      navigator.share({ files: [file], title: 'My Halloween haul' }).catch(function () {});
-    } else {
-      var a = document.createElement('a');
-      a.href = URL.createObjectURL(blob); a.download = 'candy-trail-haul-2026.png'; a.click();
-      setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
-    }
-  });
-});
+$('btnSumShare').addEventListener('click', function () { openShareSheet('haul'); });
+$('btnSumParty').addEventListener('click', function () { openShareSheet('party'); });
 $('btnSumExport').addEventListener('click', function () {
   var data = { exportedAt: new Date().toISOString(), app: 'Candy Trail', counts: { houses: S.counts.houses, candy: S.counts.candy }, pins: S.pins };
   var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -6913,6 +6961,444 @@ $('btnNavExit').addEventListener('click', function () { endNav(false); openSearc
 renderPinsList();
 updatePeek();
 
+
+/* ---------- Share cards + deep-linked viewports (v6.7 Phase 4B) ----------
+   The viral loop, client-side only. Every link the app shares carries a
+   deep-linked map viewport (?view=LAT,LNG,ZOOM, optional &label=) so a
+   recipient lands on the sharer's streets, and three recap cards
+   (route, party, haul) render on canvas in Ember & Ink at portrait,
+   story, and wide crops. No server: link previews use the static
+   og-card.png. Houses are the only count on any card. */
+
+/* --- deep-linked viewports --- */
+function parseViewParam(search) {
+  var q;
+  try { q = new URLSearchParams(search != null ? String(search) : location.search); } catch (e) { return null; }
+  var raw = q.get('view');
+  if (!raw) return null;
+  var parts = String(raw).split(',');
+  if (parts.length < 2 || parts.length > 3) return null;
+  var lat = parseFloat(parts[0]), lng = parseFloat(parts[1]);
+  var zoom = parts.length === 3 ? parseFloat(parts[2]) : 16;
+  if (!isFinite(lat) || !isFinite(lng) || !isFinite(zoom)) return null;
+  if (lat < -85 || lat > 85 || lng < -180 || lng > 180) return null;
+  zoom = Math.round(Math.min(19, Math.max(3, zoom)));
+  var label = '';
+  try { label = String(q.get('label') || '').slice(0, 80); } catch (e) {}
+  return { lat: lat, lng: lng, zoom: zoom, label: label, applied: false };
+}
+function viewCoord(n) { return String(Math.round(n * 1e5) / 1e5); }
+function currentViewQuery() {
+  var lat = null, lng = null, zoom = 16;
+  try { var c = map.getCenter(); if (c) { lat = c.lat; lng = c.lng; } } catch (e) {}
+  try { zoom = map.getZoom() || 16; } catch (e) {}
+  if (lat == null || lng == null) { var f = S.pos || S.start; if (f) { lat = f.lat; lng = f.lng; } }
+  if (lat == null || lng == null || !isFinite(lat) || !isFinite(lng)) return '';
+  return 'view=' + viewCoord(lat) + ',' + viewCoord(lng) + ',' + (Math.round(zoom) || 16);
+}
+function mapShareUrl(extraQuery) {
+  var parts = [];
+  var vq = currentViewQuery();
+  if (vq) parts.push(vq);
+  if (extraQuery) parts.push(extraQuery);
+  return APP_LINK + (parts.length ? '?' + parts.join('&') : '');
+}
+function shareLinkFor(kind) {
+  var extra = '';
+  if (kind === 'party' && typeof PARTY !== 'undefined' && PARTY.code) extra = 'party=' + encodeURIComponent(PARTY.code);
+  var url = mapShareUrl(extra);
+  var place = cardPlace();
+  if (place) url += (url.indexOf('?') >= 0 ? '&' : '?') + 'label=' + encodeURIComponent(place);
+  return url;
+}
+
+/* --- card data assembly (houses only; no candy figures, by design) --- */
+function cardPlace() { return (typeof ZONE_INFO !== 'undefined' && ZONE_INFO && ZONE_INFO.place) ? ZONE_INFO.place : ''; }
+function routeCardData() {
+  if (!S.route || !S.route.coords || S.route.coords.length < 2) return null;
+  var pts = S.route.coords.map(function (p) { return { lat: p.lat, lng: p.lng }; });
+  var dots = (S.route.stops || []).map(function (s) { return { lat: s.lat, lng: s.lng }; });
+  return {
+    kind: 'route', title: 'Our trick-or-treat route',
+    houses: dots.length, distance: S.route.distance || 0, budgetMin: S.budget || 60,
+    pts: pts, segs: [pts], dots: dots, home: S.start || pts[0], place: cardPlace()
+  };
+}
+function partyCardData() {
+  if (!partyOn()) return null;
+  var t = partyTotals();
+  var members = partyRosterNames().map(function (n) {
+    var meta = partyMetaFor(n), c = PARTY.counts[n] || {};
+    return { name: n, color: meta.color, avatar: meta.avatar || null, houses: c.houses || 0, you: n === PARTY.name };
+  });
+  members.sort(function (a, b) { return (b.houses - a.houses) || (a.name < b.name ? -1 : 1); });
+  return { kind: 'party', title: 'Party ' + PARTY.code, code: PARTY.code, houses: t.houses, people: t.people, members: members, place: cardPlace() };
+}
+function haulCardData() {
+  var td = haulTrailData(), nw = nightWalk();
+  return {
+    kind: 'haul', title: 'What a night!', houses: S.counts.houses,
+    trackDist: nw.trackDist, elapsedMs: nw.elapsedMs,
+    pts: td.pts, segs: td.segs, dots: td.dots, home: td.home, src: td.src,
+    hasTrail: td.pts.length >= 2 || td.dots.length > 0, photo: !!haulPhotoImg, place: cardPlace()
+  };
+}
+
+/* --- canvas card engine (extends the v6.3 haul-card pattern) --- */
+var CARD_CROPS = {
+  portrait: { w: 1080, h: 1350, label: 'Portrait' },
+  story: { w: 1080, h: 1920, label: 'Story' },
+  wide: { w: 1200, h: 630, label: 'Wide' }
+};
+function drawRibbonMark(g, x, y, size, ticks) {
+  var k = size / 48;
+  g.save();
+  g.translate(x, y); g.scale(k, k);
+  g.lineCap = 'round'; g.lineJoin = 'round';
+  g.strokeStyle = '#E85D26'; g.lineWidth = 3.2;
+  g.stroke(new Path2D(RIBBON_P1)); g.stroke(new Path2D(RIBBON_P2));
+  if (ticks) { g.strokeStyle = '#8B7BB8'; g.lineWidth = 1.6; g.stroke(new Path2D(RIBBON_TICKS)); }
+  g.beginPath(); g.arc(24, 18.8, 3.2, 0, Math.PI * 2); g.fillStyle = '#F5EFE6'; g.fill();
+  g.restore();
+}
+function fitFont(g, text, px, weight, family, maxW) {
+  g.font = weight + ' ' + px + 'px ' + family;
+  var wdt = g.measureText(text).width;
+  if (wdt > maxW && wdt > 0) { px = Math.max(18, Math.floor(px * maxW / wdt)); g.font = weight + ' ' + px + 'px ' + family; }
+  return px;
+}
+function cardStamp(kind, src) {
+  var months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+  var now = new Date();
+  var what = kind === 'route' ? 'ROUTE' : kind === 'party' ? 'PARTY' : (src === 'walk' ? 'RECORDED WALK' : 'HAUL');
+  return months[now.getMonth()] + ' ' + now.getDate() + ' · ' + what;
+}
+function drawCardFooter(g, W, H, u, m, stamp) {
+  var fy = H - 62 * u;
+  drawRibbonMark(g, m, fy - 40 * u, 44 * u, false);
+  g.textAlign = 'left'; g.fillStyle = '#F5EFE6';
+  g.font = '600 ' + Math.round(34 * u) + 'px Fraunces, Georgia, serif';
+  g.fillText('Candy Trail', m + 58 * u, fy);
+  g.textAlign = 'right'; g.fillStyle = '#8B7BB8';
+  g.font = '600 ' + Math.round(24 * u) + 'px Inter, system-ui, sans-serif';
+  g.fillText(stamp, W - m, fy);
+}
+function drawCardStats(g, stats, x, y, w, u) {
+  var colW = w / stats.length;
+  g.textAlign = 'center';
+  stats.forEach(function (st, i) {
+    var cxp = x + colW * (i + 0.5);
+    fitFont(g, st.v, Math.round(68 * u), '600', 'Fraunces, Georgia, serif', colW - 14);
+    g.fillStyle = '#F5EFE6';
+    g.fillText(st.v, cxp, y);
+    g.fillStyle = '#A79CC4';
+    g.font = '700 ' + Math.round(24 * u) + 'px Inter, system-ui, sans-serif';
+    g.fillText(st.l, cxp, y + 42 * u);
+  });
+}
+function drawPhotoFrame(g, rect) {
+  g.save(); rrPath(g, rect.x, rect.y, rect.w, rect.h, 16); g.clip();
+  var iw = haulPhotoImg.width || 1, ih = haulPhotoImg.height || 1;
+  var sc = Math.max(rect.w / iw, rect.h / ih);
+  g.drawImage(haulPhotoImg, rect.x + (rect.w - iw * sc) / 2, rect.y + (rect.h - ih * sc) / 2, iw * sc, ih * sc);
+  var fg = g.createLinearGradient(0, rect.y, 0, rect.y + rect.h);
+  fg.addColorStop(0.6, 'rgba(14,10,22,0)'); fg.addColorStop(1, 'rgba(14,10,22,0.92)');
+  g.fillStyle = fg; g.fillRect(rect.x, rect.y, rect.w, rect.h);
+  g.restore();
+  g.strokeStyle = 'rgba(245,239,230,0.25)'; g.lineWidth = 1.5; rrPath(g, rect.x, rect.y, rect.w, rect.h, 16); g.stroke();
+}
+function drawSceneFrame(g, data, rect) {
+  g.save(); rrPath(g, rect.x, rect.y, rect.w, rect.h, 20); g.clip();
+  g.fillStyle = 'rgba(14,10,22,0.55)'; g.fillRect(rect.x, rect.y, rect.w, rect.h);
+  drawTrailScene(g, { x: rect.x + 14, y: rect.y + 14, w: rect.w - 28, h: rect.h - 28 }, data);
+  g.restore();
+  g.strokeStyle = 'rgba(232,93,38,0.5)'; g.lineWidth = 1.5; rrPath(g, rect.x, rect.y, rect.w, rect.h, 20); g.stroke();
+}
+function paintTrailArt(g, data, rect, u, kind) {
+  var hasTrail = (data.pts && data.pts.length >= 2) || (data.dots && data.dots.length > 0);
+  if (kind === 'haul' && haulPhotoImg) {
+    if (rect.w > rect.h * 1.4) {
+      if (hasTrail) {
+        var pw = Math.round(rect.w * 0.52);
+        drawPhotoFrame(g, { x: rect.x, y: rect.y, w: pw, h: rect.h });
+        drawSceneFrame(g, data, { x: rect.x + pw + Math.round(18 * u), y: rect.y, w: rect.w - pw - Math.round(18 * u), h: rect.h });
+      } else {
+        drawPhotoFrame(g, rect);
+      }
+    } else {
+      drawPhotoFrame(g, rect);
+      if (hasTrail) {
+        var bw = Math.round(rect.w * 0.3);
+        drawSceneFrame(g, data, { x: rect.x + rect.w - bw - Math.round(16 * u), y: rect.y + rect.h - bw - Math.round(16 * u), w: bw, h: bw });
+      }
+    }
+    return;
+  }
+  if (hasTrail) { drawSceneFrame(g, data, rect); return; }
+  /* brand hero: the Night Badge lockup, centered in the frame */
+  var cx = rect.x + rect.w / 2;
+  var markSize = Math.min(300 * u, rect.h * 0.5);
+  var blockH = markSize + 214 * u;
+  var y0 = rect.y + Math.max(0, (rect.h - blockH) / 2);
+  drawRibbonMark(g, cx - markSize / 2, y0, markSize, true);
+  g.textAlign = 'center';
+  g.fillStyle = '#F5EFE6'; g.font = '600 ' + Math.round(84 * u) + 'px Fraunces, Georgia, serif';
+  g.fillText('Candy', cx, y0 + markSize + 92 * u);
+  g.fillStyle = '#FF7844'; g.font = 'italic 600 ' + Math.round(84 * u) + 'px Fraunces, Georgia, serif';
+  g.fillText('Trail', cx, y0 + markSize + 184 * u);
+}
+function avatarSvgArt(id, color) {
+  if (!id || !AVATAR_BODY[id]) return null;
+  var stage = '#16111A';
+  var s = String(AVATAR_BODY[id]);
+  s = s.replace(/class="avatar-detail av-line"/g, 'fill="none" stroke="' + stage + '" stroke-width="1.3"');
+  s = s.replace(/class="avatar-detail av-str"/g, 'fill="none" stroke="' + color + '" stroke-width="1.1"');
+  s = s.replace(/class="av-line"/g, 'fill="none" stroke="' + stage + '" stroke-width="1.3"');
+  s = s.replace(/class="av-str"/g, 'fill="none" stroke="' + color + '" stroke-width="1.1"');
+  s = s.replace(/class="av-cut"/g, 'fill="' + stage + '"');
+  s = s.replace(/class="av-bone"/g, 'fill="#F5EFE6"');
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="' + color + '">' + s + '</g></svg>';
+}
+function loadAvatarImg(id, color, cb) {
+  var svg = avatarSvgArt(id, color);
+  if (!svg) { cb(null); return; }
+  var img = new Image();
+  img.onload = function () { cb(img); };
+  img.onerror = function () { cb(null); };
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+function paintPartyArt(g, data, imgs, rect, u) {
+  var rowH = Math.round(88 * u), gap = Math.round(12 * u);
+  var maxRows = Math.max(1, Math.floor((rect.h + gap) / (rowH + gap)));
+  var rows = data.members.slice(0, Math.min(6, maxRows));
+  var more = data.members.length - rows.length;
+  if (more > 0 && rows.length >= maxRows && rows.length > 1) { rows = data.members.slice(0, maxRows - 1); more = data.members.length - rows.length; }
+  var y = rect.y;
+  rows.forEach(function (mem) {
+    g.save(); rrPath(g, rect.x, y, rect.w, rowH, 16); g.clip();
+    g.fillStyle = 'rgba(255,255,255,0.045)'; g.fillRect(rect.x, y, rect.w, rowH);
+    g.restore();
+    g.strokeStyle = 'rgba(245,239,230,0.10)'; g.lineWidth = 1; rrPath(g, rect.x, y, rect.w, rowH, 16); g.stroke();
+    var d = Math.round(rowH * 0.68), dx = rect.x + Math.round(16 * u), dy = y + Math.round((rowH - d) / 2);
+    g.beginPath(); g.arc(dx + d / 2, dy + d / 2, d / 2, 0, Math.PI * 2);
+    g.fillStyle = '#16111A'; g.fill();
+    g.lineWidth = Math.max(2, 3 * u); g.strokeStyle = mem.color; g.stroke();
+    var im = imgs[mem.name];
+    if (im) {
+      var gw = d * 0.72;
+      g.drawImage(im, dx + (d - gw) / 2, dy + (d - gw) / 2, gw, gw);
+    } else {
+      g.fillStyle = mem.color; g.textAlign = 'center';
+      g.font = '800 ' + Math.round(d * 0.36) + 'px Inter, system-ui, sans-serif';
+      g.fillText(partyInitials(mem.name), dx + d / 2, dy + d / 2 + d * 0.13);
+    }
+    var name = mem.name + (mem.you ? ' (you)' : '');
+    if (name.length > 26) name = name.slice(0, 25) + '…';
+    g.textAlign = 'left';
+    fitFont(g, name, Math.round(32 * u), '600', 'Inter, system-ui, sans-serif', rect.w - d - 200 * u);
+    g.fillStyle = '#F4F0FA';
+    g.fillText(name, dx + d + Math.round(16 * u), y + rowH / 2 + 11 * u);
+    g.textAlign = 'right';
+    g.font = '700 ' + Math.round(30 * u) + 'px Inter, system-ui, sans-serif';
+    g.fillStyle = '#F5EFE6';
+    g.fillText(mem.houses + (mem.houses === 1 ? ' house' : ' houses'), rect.x + rect.w - Math.round(18 * u), y + rowH / 2 + 11 * u);
+    y += rowH + gap;
+  });
+  if (more > 0) {
+    g.textAlign = 'left'; g.fillStyle = '#A79CC4';
+    g.font = '600 ' + Math.round(26 * u) + 'px Inter, system-ui, sans-serif';
+    g.fillText('+' + more + ' more ' + (more === 1 ? 'walker' : 'walkers'), rect.x + 4, y + Math.round(30 * u));
+  }
+}
+function paintShareCard(kind, dims, data, imgs, cb) {
+  var W = dims.w, H = dims.h;
+  var u = W >= 1199 ? 0.66 : 1;
+  var m = Math.round(W * 0.052);
+  var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  var g = cv.getContext('2d');
+  if (!g) { cb(null); return; }
+  var grad = g.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, '#2A2140'); grad.addColorStop(1, '#0E0A16');
+  g.fillStyle = grad; g.fillRect(0, 0, W, H);
+  var titleY = m + Math.round(74 * u);
+  g.textAlign = 'left';
+  fitFont(g, data.title, Math.round(64 * u), '600', 'Fraunces, Georgia, serif', W - 2 * m);
+  g.fillStyle = '#F5EFE6';
+  g.fillText(data.title, m, titleY);
+  var sub = '';
+  if (kind === 'party') sub = data.people + (data.people === 1 ? ' walker' : ' walkers') + ' · pooled haul';
+  else if (data.place) sub = 'in ' + data.place;
+  if (sub) {
+    g.font = '500 ' + Math.round(27 * u) + 'px Inter, system-ui, sans-serif';
+    g.fillStyle = '#A79CC4';
+    g.fillText(sub, m, titleY + Math.round(42 * u));
+  }
+  var artY = titleY + Math.round((sub ? 78 : 58) * u);
+  var statsY = H - Math.round(196 * u);
+  var artH = Math.max(110, (statsY - Math.round(118 * u)) - artY);
+  var artW = W - 2 * m;
+  if (kind === 'party') {
+    paintPartyArt(g, data, imgs, { x: m, y: artY, w: artW, h: artH }, u);
+    drawCardStats(g, [
+      { v: String(data.houses), l: 'HOUSES POOLED' },
+      { v: String(data.people), l: 'WALKERS' }
+    ], m, statsY, artW, u);
+  } else {
+    paintTrailArt(g, data, { x: m, y: artY, w: artW, h: artH }, u, kind);
+    var stats;
+    if (kind === 'route') {
+      stats = [
+        { v: String(data.houses), l: 'HOUSES' },
+        { v: fmtDist(data.distance), l: 'DISTANCE' },
+        { v: data.budgetMin + ' min', l: 'TIME BUDGET' }
+      ];
+    } else {
+      stats = [];
+      if (!(data.houses === 0 && data.src === 'walk')) stats.push({ v: String(data.houses), l: 'HOUSES' });
+      stats.push({ v: fmtWalkDist(data.trackDist), l: 'WALKED' });
+      stats.push({ v: fmtWalkTime(data.elapsedMs), l: 'TIME' });
+    }
+    drawCardStats(g, stats, m, statsY, artW, u);
+  }
+  drawCardFooter(g, W, H, u, m, cardStamp(kind, data.src));
+  if (cv.toBlob) cv.toBlob(cb, 'image/png'); else cb(null);
+}
+function drawShareCard(kind, crop, cb) {
+  var dims = CARD_CROPS[crop] || CARD_CROPS.portrait;
+  function go() {
+    var data = kind === 'party' ? partyCardData() : kind === 'route' ? routeCardData() : haulCardData();
+    if (!data) { cb(null); return; }
+    if (kind !== 'party' || !data.members.length) { paintShareCard(kind, dims, data, {}, cb); return; }
+    var imgs = {}, left = data.members.length;
+    data.members.forEach(function (mem) {
+      loadAvatarImg(mem.avatar, mem.color, function (im) {
+        if (im) imgs[mem.name] = im;
+        left--;
+        if (left === 0) paintShareCard(kind, dims, data, imgs, cb);
+      });
+    });
+  }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(go); else go();
+}
+
+/* --- share sheet --- */
+var SHARE = { kind: 'haul', crop: 'portrait', blob: null };
+function shareTitleFor(kind) { return kind === 'party' ? 'Share the party' : kind === 'route' ? 'Share the route' : 'Share your haul'; }
+function shareTextFor(kind, data) {
+  if (!data) return 'Candy Trail: the live trick-or-treat map.';
+  if (kind === 'party') return 'Party ' + data.code + ' pooled ' + data.houses + (data.houses === 1 ? ' house' : ' houses') + ' on Candy Trail.';
+  if (kind === 'route') return 'Our trick-or-treat route on Candy Trail: ' + data.houses + (data.houses === 1 ? ' house' : ' houses') + ', ' + fmtDist(data.distance) + '.';
+  return 'My Halloween haul on Candy Trail: ' + data.houses + (data.houses === 1 ? ' house' : ' houses') + ', ' + fmtWalkDist(data.trackDist) + ' walked.';
+}
+function shareFileName(kind) { return 'candy-trail-' + kind + '-2026.png'; }
+function cardDataFor(kind) { return kind === 'party' ? partyCardData() : kind === 'route' ? routeCardData() : haulCardData(); }
+function openShareSheet(kind) {
+  var data = cardDataFor(kind);
+  if (!data) {
+    toast(kind === 'route' ? 'Build a route first, then share its card.' : kind === 'party' ? 'Join a party first, then share its card.' : 'Nothing to share yet.', 'warn');
+    return false;
+  }
+  SHARE.kind = kind; SHARE.crop = 'portrait'; SHARE.blob = null;
+  $('shareTitle').textContent = shareTitleFor(kind);
+  $('shareLinkTxt').textContent = shareLinkFor(kind);
+  paintShareCrops();
+  $('shareSheet').hidden = false;
+  renderSharePreview();
+  return true;
+}
+function closeShareSheet() { $('shareSheet').hidden = true; }
+function paintShareCrops() {
+  $$('#shareCrops button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-crop') === SHARE.crop)); });
+}
+function renderSharePreview() {
+  drawShareCard(SHARE.kind, SHARE.crop, function (blob) {
+    SHARE.blob = blob;
+    var img = $('sharePreview'); if (!img) return;
+    var shown = false;
+    if (blob && window.URL && typeof URL.createObjectURL === 'function') {
+      try { img.src = URL.createObjectURL(blob); shown = true; } catch (e) {}
+    }
+    if (!shown) img.removeAttribute('src');
+    img.hidden = !shown;
+    var wrap = $('sharePreviewWrap'); if (wrap) wrap.hidden = !shown;
+  });
+}
+function downloadCardBlob(blob, name) {
+  if (!blob) { toast('Could not make the card on this browser.', 'err'); return false; }
+  if (!window.URL || typeof URL.createObjectURL !== 'function') { toast('Saving images is not supported in this browser.', 'warn'); return false; }
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click();
+  if (a.remove) a.remove();
+  setTimeout(function () { try { URL.revokeObjectURL(a.href); } catch (e) {} }, 4000);
+  return true;
+}
+function copyShareLink(link, okMsg) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(link).then(function () { toast(okMsg || 'Link copied.', 'ok'); }, function () { toast('Copy failed. The link is shown under the card.', 'warn'); });
+  } else {
+    toast('The link is shown under the card.', 'ok');
+  }
+}
+function shareSheetGo() {
+  var kind = SHARE.kind;
+  var link = shareLinkFor(kind);
+  var text = shareTextFor(kind, cardDataFor(kind));
+  var blob = SHARE.blob, fname = shareFileName(kind);
+  var file = null;
+  try { if (blob) file = new File([blob], fname, { type: 'image/png' }); } catch (e) {}
+  if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+    navigator.share({ files: [file], title: 'Candy Trail', text: text, url: link }).catch(function () {});
+  } else if (navigator.share) {
+    navigator.share({ title: 'Candy Trail', text: text, url: link }).catch(function () {});
+    if (blob) downloadCardBlob(blob, fname);
+  } else if (blob) {
+    if (downloadCardBlob(blob, fname)) copyShareLink(link, 'Image saved. Link copied, send it with the picture.');
+  } else {
+    copyShareLink(link);
+  }
+}
+$$('#shareCrops button').forEach(function (b) {
+  b.addEventListener('click', function () { SHARE.crop = b.getAttribute('data-crop') || 'portrait'; paintShareCrops(); renderSharePreview(); });
+});
+$('shareClose').addEventListener('click', closeShareSheet);
+$('shareSheet').addEventListener('click', function (e) { if (e.target === this) closeShareSheet(); });
+$('shareGo').addEventListener('click', shareSheetGo);
+$('shareSave').addEventListener('click', function () {
+  if (SHARE.blob) { if (downloadCardBlob(SHARE.blob, shareFileName(SHARE.kind))) toast('Card image saved.', 'ok'); }
+  else toast('Could not make the card on this browser.', 'err');
+});
+$('btnRouteCard').addEventListener('click', function () { openShareSheet('route'); });
+$('btnHaulCard').addEventListener('click', function () { openShareSheet('haul'); });
+
+/* --- third marked spot: a one-time, gentle card offer ---
+   The counter is lifetime and lives in the store. The third mark arms
+   the prompt; it surfaces only at calm moments (walk end, the night
+   summary, a later boot), never mid-walk, and once shown it is done,
+   whether the walker shares or dismisses it. */
+function noteSpotMarked() {
+  var n = 0;
+  try { n = store.get('spotsMarked', 0) || 0; } catch (e) {}
+  n += 1;
+  try { store.set('spotsMarked', n); } catch (e) {}
+  if (n >= 3) {
+    var st = '';
+    try { st = store.get('spotSharePrompt', ''); } catch (e) {}
+    if (!st) { try { store.set('spotSharePrompt', 'pending'); } catch (e) {} }
+  }
+}
+function maybeSpotSharePrompt() {
+  var st = '';
+  try { st = store.get('spotSharePrompt', ''); } catch (e) {}
+  if (st !== 'pending') return false;
+  if (walkActiveNow()) return false;
+  try { store.set('spotSharePrompt', 'done'); } catch (e) {}
+  var kind = routeCardData() ? 'route' : 'haul';
+  toast('Three spots marked. Want a card to share?', '', 'Share card', function () { openShareSheet(kind); }, 'spot-share');
+  return true;
+}
+setTimeout(function () { try { maybeSpotSharePrompt(); } catch (e) {} }, 2500);
+
 /* ---------- version self-check (v6.6 Phase 4A, fix 4) ----------
    A stale tab / zombie service worker left the owner's phone on a
    pre-v6.5 build while production had moved on, and the fixes looked
@@ -6972,7 +7458,7 @@ paintChromeState();
 /* v6.4.1 boot self-check marker: the shell's checker script verifies this
    was set. If boot died anywhere above, the repair overlay appears instead
    of a silently half-dead app. */
-window.__ctBootOK = '6.6';
+window.__ctBootOK = '6.7';
 
 </script>
 <script>
