@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0A16">
-<meta name="version" content="6.3">
+<meta name="version" content="6.4">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -52,8 +52,14 @@ body.light .rcore{fill:#241B33}
 .leaflet-control-attribution a{color:var(--pur2)!important}
 .leaflet-bottom{bottom:var(--bottomH);transition:bottom .2s}
 .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--card);color:var(--txt);box-shadow:0 8px 30px rgba(0,0,0,.6);border-radius:18px}
-.leaflet-popup-content{margin:14px 16px;font-size:15px}
-.leaflet-container a.leaflet-popup-close-button{color:var(--mut);width:36px;height:36px;font-size:24px;line-height:36px}
+.leaflet-popup-content{margin:14px 16px;font-size:15px;padding-right:26px}
+.leaflet-container a.leaflet-popup-close-button{top:4px;right:4px;width:48px;height:48px;font-size:0;color:transparent;z-index:10}
+.leaflet-container a.leaflet-popup-close-button::after{content:"";position:absolute;top:8px;right:8px;width:32px;height:32px;border-radius:50%;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F5EFE6' stroke-opacity='.72' stroke-width='1.75' stroke-linecap='round'%3E%3Cpath d='M6 6L18 18M18 6L6 18'/%3E%3C/svg%3E");background-position:center;background-size:24px;background-repeat:no-repeat;transition:background-color .12s ease,transform .16s ease}
+@media(hover:hover){.leaflet-container a.leaflet-popup-close-button:hover::after{background-color:rgba(245,239,230,.10)}}
+.leaflet-container a.leaflet-popup-close-button:active::after{background-color:rgba(245,239,230,.16);transform:scale(.92)}
+body.light .leaflet-container a.leaflet-popup-close-button::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230E0A16' stroke-opacity='.64' stroke-width='1.75' stroke-linecap='round'%3E%3Cpath d='M6 6L18 18M18 6L6 18'/%3E%3C/svg%3E")}
+@media(hover:hover){body.light .leaflet-container a.leaflet-popup-close-button:hover::after{background-color:rgba(14,10,22,.07)}}
+body.light .leaflet-container a.leaflet-popup-close-button:active::after{background-color:rgba(14,10,22,.13)}
 .leaflet-popup-content a{color:var(--org2)}
 .pop b{font-size:16px}
 .pop .btn{margin-top:10px;width:100%}
@@ -206,20 +212,19 @@ body.drawing .leaflet-marker-icon{pointer-events:none}
 .mk-slash{position:absolute;left:50%;top:12.5px;width:26px;height:3.5px;margin-left:-13px;background:var(--red);border-radius:2px;transform:rotate(-45deg);z-index:2}
 .mk-teal .oct{position:absolute;left:50%;top:1px;width:29px;height:29px;margin-left:-14.5px;background:#0E0A16;clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%)}
 .mk-teal .oct i{position:absolute;inset:2.5px;background:#2AB3A6;clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%)}
-.mk-teal .plus{position:absolute;left:50%;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px}
-.mk-teal .plus::before,.mk-teal .plus::after{content:"";position:absolute;background:#F5EFE6;border-radius:2px}
-.mk-teal .plus::before{left:0;top:4.5px;width:12px;height:3px}
-.mk-teal .plus::after{left:4.5px;top:0;width:3px;height:12px}
+.mk-teal .oct svg.glyph{position:absolute;left:50%;top:50%;width:15px;height:15px;margin:-7.5px 0 0 -7.5px}
 .mk-badge{position:absolute;top:-4px;right:-2px;width:13px;height:13px;z-index:3;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5))}
 .mk-visited{width:28px;height:28px}
 .mk-visited .td{width:22px;height:22px;margin-left:-11px;background:#1D1629;border:2px solid var(--grn)}
-.mk-visited svg.glyph{width:11px;height:11px;stroke:var(--grn)}
+.mk-visited svg.glyph{width:11px;height:11px;stroke:var(--grn);stroke-width:2.2}
 .mk-ghost{width:28px;height:28px}
 .mk-ghost .td{width:21px;height:21px;margin-left:-10.5px;background:var(--card2);border:1.5px solid var(--pur)}
 .mk-ghost .dot{width:5px;height:5px}
+.mk-ghost svg.glyph{width:10px;height:10px;stroke:var(--pur)}
 .mk-mini{width:22px;height:22px}
 .mk-mini .td{width:17px;height:17px;margin-left:-8.5px}
 .mk-mini .dot{width:6px;height:6px}
+.mk-mini svg.glyph{width:10px;height:10px}
 .stopicon .tdn{position:relative;width:30px;height:30px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);background:var(--org);border:2px solid #0E0A16;box-shadow:0 4px 10px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center}
 .stopicon .tdn span{transform:rotate(45deg);font-weight:800;font-size:14px;color:var(--bone);line-height:1}
 .stopicon.done .tdn{background:#1D1629;border-color:var(--grn)}
@@ -311,6 +316,84 @@ body.mode-nav.in-party #logCard,body.mode-nav.in-party #pinSheet{top:calc(var(--
 #lcTitle,#pinTitle{flex:1;font-weight:800;font-size:17px;display:flex;align-items:center;gap:7px}
 .xbtn{width:44px;height:44px;flex:none;border-radius:50%;border:1px solid var(--line2);background:var(--card2);display:grid;place-items:center;padding:0}
 .xbtn svg{width:19px;height:19px}
+/* ---------- close button component (v6.4 phase 2, Argon r2 spec) ----------
+   One component: 48px hit area, 32px disc, drawn SVG X (1.75 stroke).
+   Bare at rest on card/panel surfaces; persistent disc only over photos. */
+.btn-close{position:relative;width:48px;height:48px;flex:none;display:grid;place-items:center;background:none;border:0;padding:0;color:rgba(245,239,230,.72);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.btn-close .disc{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;transition:transform .16s ease,background .12s ease}
+.btn-close svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+@media(hover:hover){.btn-close:hover .disc{background:rgba(245,239,230,.10)}}
+.btn-close:active{color:#F5EFE6}
+.btn-close:active .disc{background:rgba(245,239,230,.16);transform:scale(.92)}
+.btn-close.light{color:rgba(14,10,22,.64)}
+@media(hover:hover){.btn-close.light:hover .disc{background:rgba(14,10,22,.07)}}
+.btn-close.light:active{color:#0E0A16}
+.btn-close.light:active .disc{background:rgba(14,10,22,.13)}
+.btn-close.overlay{color:#F5EFE6}
+.btn-close.overlay .disc{background:rgba(14,10,22,.68);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(245,239,230,.14)}
+.btn-close:focus-visible{outline:none}
+.btn-close:focus-visible .disc{outline:2px solid var(--org);outline-offset:2px}
+.lc-head .btn-close,.prefs-h .btn-close{margin:-8px -8px -8px 0}
+#searchPanel .lc-head b{flex:1;min-width:0;padding-right:12px}
+#pinSheet .ocard{position:relative}
+#pinSheet #pinTitle{padding-right:48px}
+#pinSheetClose{position:absolute;top:8px;right:8px}
+#exploreCard .btn-close{margin:-4px -4px -4px 0}
+/* ---------- photo viewer (v6.4 phase 2) ---------- */
+#photoView{position:fixed;inset:0;z-index:1700;background:rgba(5,3,10,.93);display:flex;align-items:center;justify-content:center;padding:20px}
+#photoView[hidden]{display:none}
+#photoViewImg{max-width:94vw;max-height:84dvh;border-radius:16px;box-shadow:0 18px 50px rgba(0,0,0,.6)}
+#photoViewClose{position:absolute;top:calc(var(--sat) + 8px);right:8px}
+/* ---------- My Pins rows (v6.4 phase 2) ---------- */
+.pinrow-main{flex:1;min-width:0;cursor:pointer}
+.pinrow-main b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pinrow-addr{display:block;font-size:12.5px;color:var(--bone);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pinrow-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px}
+.pinrow-tags .tag{font-size:10.5px;font-weight:700;letter-spacing:.02em;padding:2px 7px;border-radius:999px;border:1px solid var(--line2);color:var(--pur2)}
+.pinrow-thumb{flex:none;width:48px;height:48px;border-radius:12px;overflow:hidden;border:1px solid var(--line2);padding:0;background:var(--card2);cursor:pointer}
+.pinrow-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.pinrow-del{flex:none;width:40px;height:40px;border-radius:50%;border:0;background:transparent;color:var(--mut);display:grid;place-items:center;cursor:pointer;padding:0}
+.pinrow-del svg{width:18px;height:18px}
+/* ---------- party avatars (v6.4 phase 2, Argon spec) ---------- */
+.partyicon{transition:transform 1s linear}
+.puck{position:relative;width:32px;height:32px;border-radius:50%;background:rgba(20,18,24,.96);border:1.5px solid #0B0A0E;box-shadow:inset 0 0 0 2px var(--pc,#F5EFE6),0 2px 6px rgba(0,0,0,.55);color:#F4EFE6;display:grid;place-items:center}
+.avatar-glyph{fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;display:block}
+.puck .avatar-glyph{width:20px;height:20px}
+.puck-compact{width:24px;height:24px}
+.puck-compact .avatar-glyph{width:15px;height:15px;stroke-width:2.2}
+.puck-compact .avatar-detail{display:none}
+.puck-lg{width:48px;height:48px}
+.puck-lg .avatar-glyph{width:28px;height:28px;stroke-width:1.8}
+.puck-ini{font-weight:800;font-size:12px;letter-spacing:.02em}
+.puck-pipwrap{position:absolute;inset:0;pointer-events:none}
+.puck-pip{position:absolute;left:50%;top:-5px;transform:translateX(-50%);width:0;height:0;border-left:3px solid transparent;border-right:3px solid transparent;border-bottom:4px solid var(--pc,#F5EFE6);filter:drop-shadow(0 0 1px #0B0A0E)}
+.puck-overflow{width:32px;height:32px;border-radius:999px;background:#F5EFE6;color:#0E0A16;border:1.5px solid #0B0A0E;box-shadow:0 2px 6px rgba(0,0,0,.55);display:grid;place-items:center;font-size:12px;font-weight:700;pointer-events:none}
+.puck-label{position:absolute;top:calc(100% + 5px);left:50%;transform:translateX(-50%);font-size:11px;font-weight:500;letter-spacing:.02em;color:#F4EFE6;white-space:nowrap;text-shadow:0 0 2px #0B0A0E,0 0 2px #0B0A0E,0 1px 3px #0B0A0E;pointer-events:none}
+.puck-dwell::after{content:"";position:absolute;inset:0;border-radius:50%;border:1.5px solid var(--pc,#F5EFE6);opacity:0;animation:puckbreath 3.6s ease-out infinite;pointer-events:none}
+@keyframes puckbreath{0%{transform:scale(1);opacity:.32}70%{opacity:0}100%{transform:scale(1.44);opacity:0}}
+.puck-flash{animation:puckflash .35s ease}
+@keyframes puckflash{40%{background:var(--pc,#F5EFE6)}}
+.puck-glyph-spring{animation:puckspring .35s cubic-bezier(.22,1,.36,1)}
+@keyframes puckspring{40%{transform:scale(1.18)}}
+.walker-preview{display:flex;justify-content:center;padding:12px 0 2px}
+.party-colors{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.party-colors .cdot{width:26px;height:26px;border-radius:50%;border:2px solid transparent;padding:0;cursor:pointer}
+.party-colors .cdot[aria-pressed="true"]{border-color:#F5EFE6;box-shadow:0 0 0 2px #0E0A16}
+.walker-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
+.walker-tile{position:relative;height:56px;border-radius:12px;border:2px solid transparent;background:#18151E;color:#F4EFE6;display:grid;place-items:center;padding:0;cursor:pointer}
+.walker-tile .avatar-glyph{width:30px;height:30px}
+.walker-tile[aria-pressed="true"]{border-color:var(--selc,#E85D26);background:radial-gradient(circle at 50% 45%,rgba(232,93,38,.14),#18151E 78%)}
+.walker-tile.taken{background:#100E14;cursor:default}
+.walker-tile.taken .avatar-glyph{opacity:.32}
+.walker-claim{position:absolute;right:3px;bottom:3px;display:flex;align-items:center;gap:3px;font-size:9px;font-weight:700;background:rgba(11,10,14,.85);padding:2px 5px;border-radius:999px;color:#F4EFE6}
+.walker-claim i{width:6px;height:6px;border-radius:50%;display:block;flex:none}
+.party-collar{position:absolute;inset:-4px;border:2px solid;border-radius:14px;pointer-events:none}
+.chat-av{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:#141218;border:1.5px solid;vertical-align:-3px;margin-right:4px;color:#F4EFE6}
+.chat-av .avatar-glyph{width:10px;height:10px;stroke-width:2.6}
+.chat-av .avatar-detail,.roster-av .avatar-detail{display:none}
+.roster-av{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#141218;border:1.5px solid;vertical-align:-5px;margin-right:5px;color:#F4EFE6}
+.roster-av .avatar-glyph{width:13px;height:13px;stroke-width:2.4}
+
 .lc-sec{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:12px 0 6px}
 .lc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .lc-flag{min-height:56px;border-radius:16px;border:1px solid var(--line2);background:var(--bg2);font-weight:700;font-size:15px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 4px;color:var(--txt)}
@@ -658,7 +741,7 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
 <div id="exploreCard" class="card" hidden>
   <svg class="ic" viewBox="0 0 24 24" style="color:var(--org2)"><use href="#i-compass"/></svg>
   <div style="flex:1;min-width:0"><div id="exploreTitle" style="font-weight:800">Nearby</div><div id="exploreSub" class="muted" style="font-size:13px"></div></div>
-  <button id="btnExploreClose" class="xbtn" type="button" aria-label="Dismiss"><svg class="ic" viewBox="0 0 24 24"><use href="#i-x"/></svg></button>
+  <button id="btnExploreClose" class="btn-close" type="button" aria-label="Dismiss"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button>
 </div>
 
 <div id="partyBar" class="card" hidden>
@@ -752,7 +835,7 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
       </div>
       <div class="sheetfoot">
         <div class="wm">Candy Trail</div>
-        <div class="ver" id="appVer">Candy Trail v6.3</div>
+        <div class="ver" id="appVer">Candy Trail v6.4</div>
       </div>
     </div>
 
@@ -811,7 +894,7 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
 </div>
 
 <div id="searchPanel" class="card" hidden>
-  <div class="lc-head"><b style="display:flex;align-items:center;gap:8px"><svg class="ic" viewBox="0 0 24 24"><use href="#i-search"/></svg>Find a treat stop</b><button id="searchClose" class="xbtn" type="button" aria-label="Close search"><svg class="ic" viewBox="0 0 24 24"><use href="#i-x"/></svg></button></div>
+  <div class="lc-head"><b style="display:flex;align-items:center;gap:8px"><svg class="ic" viewBox="0 0 24 24"><use href="#i-search"/></svg>Find a treat stop</b><button id="searchClose" class="btn-close" type="button" aria-label="Close search"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button></div>
   <input id="findInput" type="search" placeholder="Try Sherman, Ogden, a street or a store name" autocomplete="off">
   <div id="searchResults"></div>
 </div>
@@ -820,10 +903,10 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
 <div id="prefsMenu" hidden role="dialog" aria-label="Preferences">
   <div class="prefs-h">
     <span class="t">Preferences</span>
-    <button id="prefsClose" class="xbtn" type="button" aria-label="Close preferences"><svg class="ic" viewBox="0 0 24 24"><use href="#i-x"/></svg></button>
+    <button id="prefsClose" class="btn-close" type="button" aria-label="Close preferences"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button>
   </div>
   <div class="grp">Route comfort</div>
-  <button id="tglAllergy" class="pref-row" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-star"/></svg><span class="pl">Allergy-safe<small>Drop stops without allergy-safe treats</small></span><span class="sw" aria-hidden="true"></span></button>
+  <button id="tglAllergy" class="pref-row" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-star"/></svg><span class="pl">Prioritize allergy-friendly stops<small>Boosts stops listing non-food or allergy-friendly treats. Always check the stop's notes and verify at the door.</small></span><span class="sw" aria-hidden="true"></span></button>
   <button id="tglStroller" class="pref-row" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-route"/></svg><span class="pl">Stroller<small>Prefer step-free streets</small></span><span class="sw" aria-hidden="true"></span></button>
   <div class="grp">Map</div>
   <button id="tglCrowd" class="pref-row" type="button" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-users"/></svg><span class="pl">Crowd reports<small>Live candy spots from other families</small></span><span class="sw" aria-hidden="true"></span></button>
@@ -838,7 +921,7 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
   <div class="prefs-foot">
     <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon-mono"/></svg>
     <div class="crest">Candy Trail</div>
-    <div class="ver">Version 6.3</div>
+    <div class="ver">Version 6.4</div>
   </div>
 </div>
 
@@ -882,7 +965,7 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
 <div id="logCard" class="card" hidden>
   <div class="lc-head">
     <div style="flex:1;min-width:0"><b id="lcTitle">Candy here, logged</b><div id="lcSub" class="muted" style="font-size:12px"></div></div>
-    <button id="lcClose" class="xbtn" type="button" aria-label="Dismiss"><svg class="ic" viewBox="0 0 24 24"><use href="#i-x"/></svg></button>
+    <button id="lcClose" class="btn-close" type="button" aria-label="Dismiss"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button>
   </div>
   <div id="lcMini" class="lc-row">
     <button id="lcDetails" class="btn btn-pur btn-sm" type="button" style="flex:1">Add details</button>
@@ -891,9 +974,10 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
     <button id="lcTagOut" class="chip" type="button">Ran out</button>
     <button id="lcTagNonfood" class="chip" type="button">Non-food</button>
   </div>
-  <div class="lc-flags" role="group" aria-label="House or shop">
+  <div class="lc-flags" role="group" aria-label="House, shop or trunk">
     <button class="chip lc-kind" data-kind="house" type="button" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-home"/></svg>House</button>
     <button class="chip lc-kind" data-kind="shop" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><use href="#i-bag"/></svg>Shop</button>
+    <button class="chip lc-kind" data-kind="trunk" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><path d="M6.8 11 8.5 6.2h7L17.2 11"/><path d="M4.5 11h15v5h-15Z"/><path d="M6.2 16v3.2M17.8 16v3.2"/></svg>Trunk</button>
   </div>
   <div class="lc-flags" role="group" aria-label="Treat status">
     <button class="chip lc-flag" data-flag="candy" type="button" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-star"/></svg>Giving candy</button>
@@ -922,6 +1006,7 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
 <div id="pinSheet" class="overlay" hidden>
   <div class="ocard card" role="dialog" aria-modal="true" aria-labelledby="pinTitle">
     <h2 id="pinTitle">Mark this spot</h2>
+    <button id="pinSheetClose" class="btn-close" type="button" aria-label="Close"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button>
     <div class="seg" id="pinWhere">
       <button data-where="gps" type="button" aria-pressed="true">My location</button>
       <button data-where="tap" type="button" aria-pressed="false">Tap the map</button>
@@ -931,7 +1016,7 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
     <div class="pingrid">
       <button data-type="candy" type="button"><span class="e"><svg viewBox="0 0 24 24" style="width:30px;height:30px;fill:none;stroke:var(--org2);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><use href="#i-star"/></svg></span>Candy here</button>
       <button data-type="decor" type="button"><span class="e"><svg viewBox="0 0 24 24" style="width:30px;height:30px;fill:none;stroke:var(--pur2);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><use href="#i-spark"/></svg></span>Great decorations</button>
-      <button data-type="nonfood" type="button"><span class="e"><span class="mk mk-teal" style="width:30px;height:30px"><span class="oct"><i></i><b class="plus"></b></span></span></span>Non-food treats</button>
+      <button data-type="nonfood" type="button"><span class="e"><span class="mk mk-teal" style="width:30px;height:30px"><span class="oct"><i></i><svg class="glyph" viewBox="0 0 24 24"><path d="M6 10.5h12V18.5A1.5 1.5 0 0 1 16.5 20h-9A1.5 1.5 0 0 1 6 18.5Z"/><path d="M12 10.5V20"/><path d="M12 10.5c-2.5 0-4-2-3.2-3.7C9.6 5.2 12 6.8 12 10.5c0-3.7 2.4-5.3 3.2-3.7.8 1.7-.7 3.7-3.2 3.7Z"/></svg></span></span></span>Non-food treats</button>
       <button data-type="out" type="button"><span class="e"><span class="mk mk-out" style="width:30px;height:30px"><span class="td"></span><i class="mk-slash"></i></span></span>Out of candy</button>
     </div>
     <button id="pinCancel" class="btn btn-ghost" type="button" style="width:100%">Cancel</button>
@@ -966,7 +1051,7 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
   <div id="kidNextDist"></div>
   <div id="kidCounts"></div>
   <button id="kidCandy" class="btn btn-org" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-plus"/></svg>We got candy!</button>
-  <button id="kidExit" class="btn btn-ghost" type="button" style="width:100%"><span class="ringwrap"><svg viewBox="0 0 36 36"><circle class="bgc" cx="18" cy="18" r="15.5"/><circle class="fgc" id="kidRingFg" cx="18" cy="18" r="15.5" stroke-dasharray="97.4" stroke-dashoffset="97.4"/></svg><span class="xmark">&#10005;</span></span>Hold to exit &middot; Grown-ups</button>
+  <button id="kidExit" class="btn btn-ghost" type="button" style="width:100%"><span class="ringwrap"><svg viewBox="0 0 36 36"><circle class="bgc" cx="18" cy="18" r="15.5"/><circle class="fgc" id="kidRingFg" cx="18" cy="18" r="15.5" stroke-dasharray="97.4" stroke-dashoffset="97.4"/></svg><span class="xmark"><svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px" aria-hidden="true"><use href="#i-x"/></svg></span></span>Hold to exit &middot; Grown-ups</button>
 </div>
 
 <div id="toasts" aria-live="polite"></div>
@@ -990,6 +1075,22 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
   </div>
 </div>
 
+<div id="photoView" hidden role="dialog" aria-modal="true" aria-label="Stop photo">
+  <img id="photoViewImg" alt="Stop photo">
+  <button id="photoViewClose" class="btn-close overlay" type="button" aria-label="Close photo"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button>
+</div>
+
+<div id="identityPop" class="overlay center" hidden>
+  <div class="ocard card" role="dialog" aria-modal="true" aria-labelledby="identityTitle">
+    <h2 id="identityTitle">Your walker</h2>
+    <div id="identityPreview" class="walker-preview"></div>
+    <div id="identityColors" class="party-colors" role="group" aria-label="Your color"></div>
+    <div class="label" style="margin-top:12px">Pick your walker</div>
+    <div id="identityGrid" class="walker-grid"></div>
+    <button id="identityDone" class="btn btn-org" type="button" style="width:100%;margin-top:12px">Done</button>
+  </div>
+</div>
+
 <div id="dlg" class="overlay center" hidden>
   <div class="ocard card" role="alertdialog" aria-modal="true" aria-labelledby="dlgTitle">
     <h2 id="dlgTitle"></h2>
@@ -1000,7 +1101,7 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
-var HEIGHTS_STOPS = [{"t":"biz","name":"Tutu School","addr":"499 Palisade Ave","lat":40.74549,"lon":-74.04326,"acts":["candy","decor","costume"],"hours":"2\u20138pm","notes":["Ballet studio!"]},{"t":"biz","name":"Spark Place","addr":"411 Palisade Ave","lat":40.74266,"lon":-74.04524,"acts":["candy","decor"],"hours":"2\u20136pm","extras":["Sponsoring a Pumpkin Contest prize"]},{"t":"biz","name":"StudyCompleteK12","addr":"178 Central Ave","lat":40.74094,"lon":-74.05295,"acts":["candy","decor","costume"],"hours":"9am\u20132pm"},{"t":"biz","name":"Novick Hardware","addr":"302 Central Ave","lat":40.74527,"lon":-74.04978,"acts":["candy"],"hours":"4\u20136pm","notes":["Do the \u201c Monster Walk\u201d at Novick Hardware"]},{"t":"biz","name":"Lucky Honeybee","addr":"487 Palisade Ave","lat":40.74521,"lon":-74.04362,"acts":["candy"],"hours":"2\u20134pm","allergy":"Stickers for allergy sufferers"},{"t":"biz","name":"The Hair Room Jersey City","addr":"467 Palisade Ave","lat":40.74455,"lon":-74.04404,"acts":["candy","decor","costume"],"hours":"2\u20136pm","notes":["Doggie treats too \ud83d\udc3e"],"allergy":"Non-food treats too"},{"t":"biz","name":"Neighborgood","addr":"418 Baldwin Ave","lat":40.73506,"lon":-74.05287,"acts":["candy","decor","costume"],"hours":"2\u20138pm"},{"t":"biz","name":"The Cliff","addr":"38 Congress St","lat":40.74923,"lon":-74.04154,"acts":["candy","decor","pumpkin"],"hours":"8 am - 3 pm, then bowl outside after 3","extras":["Special: vampire blood and spooky themed coffee drinks, matcha and  lemonade","Sponsoring a Pumpkin Contest prize"],"notes":["Includes DOTD window puppet and Ofrenda"],"allergy":"Non-food treats too"},{"t":"biz","name":"Atacama Clay Studio","addr":"273 New York Ave","lat":40.7455,"lon":-74.04448,"acts":["candy"],"hours":"12 noon- 4pm","extras":["Little Hands mini clay pumpkin workshop, 3\u20134pm, ages 5\u20137, $5, 10 kids max, walk-ins only"],"allergy":"Allergy-safe candy (no nuts)"},{"t":"biz","name":"St. John's Lutheran Church","addr":"155 North St","lat":40.7535,"lon":-74.0482,"acts":["candy","costume"],"hours":"2pm-6pm","notes":["On the church steps"],"allergy":"Non-food treats too"},{"t":"biz","name":"New Heights Pilates","addr":"10 South St (corner of Palisade)","lat":40.7474,"lon":-74.04167,"acts":["candy","costume"],"hours":"2\u20136pm","notes":["We will have dog treats and Gluten Free & Nut Free Candy!"],"allergy":"Allergy-safe candy (no nuts)"},{"t":"biz","name":"Renato's Pizza Masters","addr":"278 Central Ave","lat":40.74272,"lon":-74.05154,"acts":["candy","decor","costume"],"hours":"2\u20134pm","extras":["Giving out Pok\u00e9mon card packs"],"allergy":"Non-food treats too"},{"t":"biz","name":"Cub & Fox Playhouse","addr":"367 Central Ave","lat":40.74777,"lon":-74.04823,"acts":["candy","decor","costume"],"hours":"2\u20138pm","allergy":"Non-food treats too"},{"t":"home","addr":"85 Laidlaw Ave","lat":40.73727,"lon":-74.05336,"acts":["candy","costume"]},{"t":"home","addr":"65 Congress St","lat":40.74977,"lon":-74.04296,"acts":["candy","decor","costume","pumpkin"],"notes":["Will have allergy safe treats! we will be trick or treating as well so may not be available all night\u2014 but will still leave candy out when we aren\u2019t home. Will have music and lots of decorations!"]},{"t":"home","addr":"616 Palisade Ave","lat":40.74939,"lon":-74.04092,"acts":["candy","decor"]},{"t":"home","addr":"127 New York Ave","lat":40.74062,"lon":-74.04759,"acts":["candy","costume"]},{"t":"home","addr":"57 South St","lat":40.74824,"lon":-74.04388,"acts":["candy","decor"],"notes":["Handing out candy in person 2 -5, after that honor system there will be a help yourself box!"]},{"t":"home","addr":"80 Bowers St","lat":40.74648,"lon":-74.04611,"acts":["candy","decor"]},{"t":"home","addr":"260 Griffith St","lat":40.74775,"lon":-74.05371,"acts":["candy","decor"],"notes":["Beetle juice sand worm tentacles and a friendly dog guaranteed"]},{"t":"home","addr":"184 Nelson Ave","lat":40.75809,"lon":-74.04922,"acts":["candy","decor","costume"]},{"t":"home","addr":"26 South St","lat":40.74772,"lon":-74.04251,"acts":["candy","decor","costume","pumpkin"],"notes":["Come by if you\u2019re thirsty \ud83e\ude78 \ud83e\uddd9\u200d\u2640\ufe0f"]},{"t":"home","addr":"83 Bowers St","lat":40.74654,"lon":-74.04629,"acts":["candy","decor"]},{"t":"home","addr":"101 Hancock Ave","lat":40.74606,"lon":-74.04713,"acts":["candy","decor"],"notes":["Will leave candy out for kids to grab"]},{"t":"home","addr":"248 New York Ave","lat":40.74464,"lon":-74.04503,"acts":["candy","decor","costume"],"notes":["No need to ring the doorbell, we\u2019ll be outside with candy"]},{"t":"home","addr":"108 Booraem Ave","lat":40.74039,"lon":-74.05068,"acts":["candy","decor","costume"]},{"t":"home","addr":"861 Summit Ave","lat":40.74355,"lon":-74.0542,"acts":["candy","decor","costume"]},{"t":"home","addr":"82 Hancock Ave","lat":40.7454,"lon":-74.04756,"acts":["candy"],"notes":["There will be a table outside\ud83d\udc95"]},{"t":"home","addr":"285 Webster Ave","lat":40.74828,"lon":-74.04376,"acts":["candy","decor"]},{"t":"home","addr":"99 Sherman Pl","lat":40.74547,"lon":-74.05535,"acts":["candy","decor"]},{"t":"home","addr":"151 Manhattan Ave","lat":40.74444,"lon":-74.05534,"acts":["candy","decor","costume"]},{"t":"home","addr":"275 Columbia Ave","lat":40.75716,"lon":-74.05091,"acts":["candy","decor","costume"]},{"t":"home","addr":"247 Griffith St","lat":40.74755,"lon":-74.05319,"acts":["candy","decor"],"notes":["Should be home around 7ish to pass out candy after my kid is done doing trick or treat. Will leave a bowl of candy on the stoop before hand."]},{"t":"home","addr":"31 Griffith St","lat":40.74414,"lon":-74.04475,"acts":["candy","decor"],"notes":["Pumpkin on stoop"]},{"t":"home","addr":"138 South St","lat":40.74988,"lon":-74.04919,"acts":["candy"],"notes":["Will have 2 sets of treats: with and without nuts"]},{"t":"home","addr":"430 Ogden Ave","lat":40.7479,"lon":-74.04066,"acts":["candy","decor","costume"]},{"t":"home","addr":"376 Ogden Ave","lat":40.74508,"lon":-74.04266,"acts":["candy"]},{"t":"home","addr":"82 Manhattan Ave","lat":40.74317,"lon":-74.05223,"acts":["candy","decor","costume"]},{"t":"home","addr":"418 Ogden Ave","lat":40.74757,"lon":-74.04087,"acts":["candy"]},{"t":"home","addr":"28 South St","lat":40.74777,"lon":-74.04263,"acts":["candy"]},{"t":"home","addr":"15 Leonard St","lat":40.75501,"lon":-74.04386,"acts":["candy","decor","costume"],"notes":["Fog machine in full effect and annual window display! All are welcome \ud83d\udc7b"]},{"t":"home","addr":"317 New York Ave","lat":40.74698,"lon":-74.04353,"acts":["candy","decor"]},{"t":"home","addr":"187 Ogden Ave","lat":40.74042,"lon":-74.04547,"acts":["candy","decor"],"notes":["Candy boxes will be out on the stoop for kids to take- one per person please!"]},{"t":"home","addr":"30 Graham St","lat":40.75201,"lon":-74.04685,"acts":["candy","decor","costume"]},{"t":"home","addr":"26 Reservoir Ave","lat":40.73869,"lon":-74.04911,"acts":["candy","decor","costume"]},{"t":"home","addr":"246 Hancock Ave","lat":40.75086,"lon":-74.04424,"acts":["candy","decor","costume"],"notes":["We will have allergy friendly treats!"]},{"t":"home","addr":"254 Hancock Ave","lat":40.75109,"lon":-74.04409,"acts":["candy","decor"]},{"t":"home","addr":"278 Sherman Ave","lat":40.75009,"lon":-74.04371,"acts":["candy"]},{"t":"home","addr":"231 Ogden Ave","lat":40.74146,"lon":-74.04481,"acts":["candy","decor"]},{"t":"home","addr":"371 New York Ave","lat":40.74884,"lon":-74.04234,"acts":["decor"],"notes":["Decorations for the littlest ones"]},{"t":"home","addr":"284 Sherman Ave","lat":40.75016,"lon":-74.04366,"acts":["candy"],"notes":["I will have a bowl of candy out on the doorstep! Honor system!"]},{"t":"home","addr":"295 New York Ave","lat":40.74621,"lon":-74.04402,"acts":["candy","decor"],"notes":["We will have a candy bowl out - we will be trick or treating"]},{"t":"home","addr":"90 Webster Ave","lat":40.74172,"lon":-74.04789,"acts":["candy","decor","costume"],"notes":["Graveyard and skeletons"]},{"t":"home","addr":"48 Lienau Pl","lat":40.74011,"lon":-74.05128,"acts":["candy","costume"],"notes":["Scream will be around"]},{"t":"home","addr":"145 Sherman Ave","lat":40.74576,"lon":-74.04631,"acts":["candy"],"notes":["Allergy and baby friendly treats!"]},{"t":"home","addr":"121 Ogden Ave","lat":40.73855,"lon":-74.04666,"acts":["candy","decor","costume"]},{"t":"home","addr":"170\u00bd Manhattan Ave","lat":40.74477,"lon":-74.05616,"acts":["candy","decor"],"notes":["Play a game to win your treats! No tricks ;)"]},{"t":"home","addr":"49 Ravine Ave","lat":40.74041,"lon":-74.04904,"acts":["candy","decor"],"notes":["Talking skeleton!"]},{"t":"home","addr":"421 Palisade Ave","lat":40.74307,"lon":-74.04498,"acts":["candy","decor"],"notes":["Ring 1B!"]},{"t":"home","addr":"182 Hancock Ave (corner of South St)","lat":40.74862,"lon":-74.04531,"acts":["candy","decor","costume"],"notes":["Ring bell, house on the corner with eyes on window"]},{"t":"home","addr":"103 Waverly St","lat":40.7386,"lon":-74.05297,"acts":["candy","decor"],"notes":["Decorations from the movies Coco and Nightmare before Christmas. There will be a tray in front of the house with treats. No need to climb the stairs"]},{"t":"home","addr":"149 Laidlaw Ave","lat":40.73859,"lon":-74.05629,"acts":["candy","decor","costume"]},{"t":"home","addr":"244 Hancock Ave","lat":40.7508,"lon":-74.04428,"acts":["candy"]},{"t":"home","addr":"157 South St","lat":40.74993,"lon":-74.04932,"acts":["candy"]},{"t":"home","addr":"61 South St","lat":40.74833,"lon":-74.04413,"acts":["candy","decor"]},{"t":"home","addr":"69 South St","lat":40.74846,"lon":-74.04486,"acts":["candy","decor","costume"],"notes":["Singing Skeleton"]},{"t":"home","addr":"13 Graham St","lat":40.75172,"lon":-74.04609,"acts":["candy","decor","costume"]},{"t":"home","addr":"139 Congress St","lat":40.75137,"lon":-74.04678,"acts":["candy","decor","costume"]},{"t":"home","addr":"30 Charles St","lat":40.7484,"lon":-74.04941,"acts":["candy","decor","costume"]},{"t":"home","addr":"38 Charles St","lat":40.74855,"lon":-74.04978,"acts":["candy","decor","costume"]},{"t":"home","addr":"27 Sherman Pl","lat":40.74426,"lon":-74.05209,"acts":["candy","decor","costume"]},{"t":"home","addr":"39 Sherman Pl","lat":40.74447,"lon":-74.05266,"acts":["candy","decor","costume"]},{"t":"home","addr":"110 Sherman Pl","lat":40.74566,"lon":-74.05586,"acts":["candy","decor","costume"]},{"t":"home","addr":"98 Sherman Ave","lat":40.74414,"lon":-74.04734,"acts":["candy","decor","costume"]},{"t":"home","addr":"135 Sherman Ave","lat":40.74541,"lon":-74.04653,"acts":["candy","decor","costume"]},{"t":"home","addr":"179 Sherman Ave","lat":40.74687,"lon":-74.04559,"acts":["candy","decor","costume"]},{"t":"home","addr":"187 Sherman Ave","lat":40.74714,"lon":-74.04542,"acts":["candy","decor","costume"]},{"t":"home","addr":"228 Sherman Ave","lat":40.74847,"lon":-74.04467,"acts":["candy","decor","costume"]},{"t":"home","addr":"240 Sherman Ave","lat":40.74895,"lon":-74.04444,"acts":["candy","decor","costume"]},{"t":"home","addr":"281 Sherman Ave","lat":40.75013,"lon":-74.04368,"acts":["candy","decor","costume"]},{"t":"home","addr":"299 Sherman Ave","lat":40.75035,"lon":-74.04353,"acts":["candy","decor","costume"]},{"t":"home","addr":"368 Webster Ave","lat":40.75101,"lon":-74.04201,"acts":["candy","decor","costume"]},{"t":"home","addr":"357 Webster Ave","lat":40.75065,"lon":-74.04224,"acts":["candy","decor","costume"]},{"t":"home","addr":"105 Paterson St","lat":40.75196,"lon":-74.05054,"acts":["candy","decor","costume"]},{"t":"block","addr":"New York Ave between South St and Congress St","lat":40.74856,"lon":-74.04243,"acts":["candy","decor","costume"],"notes":["We might leave treats out to go trick or treating ourselves"]},{"t":"block","addr":"Corner of Palisade Ave & Ferry St","lat":40.74,"lon":-74.04684,"acts":["candy"]},{"t":"block","addr":"Paterson St between Central Ave and Passaic Ave","lat":40.75069,"lon":-74.0472,"acts":["decor","costume"]},{"t":"block","addr":"Bowers St between Hancock Ave and Cambridge Ave","lat":40.74688,"lon":-74.04701,"acts":["candy","decor"]},{"t":"block","addr":"Corner of Ferry St & Ogden Ave","lat":40.73968,"lon":-74.04601,"acts":["candy","decor","costume"],"notes":["Ring the doorbell at the bottom of the steps. Press the button on the skeleton!"]},{"t":"block","addr":"Charles St between Central Ave and Summit Ave","lat":40.7484,"lon":-74.04924,"acts":["candy","decor","costume","pumpkin"]},{"t":"block","addr":"Hancock Ave between Congress St and North St","lat":40.75109,"lon":-74.044,"acts":["candy","decor"]},{"t":"block","addr":"New York Ave between Hutton St and Griffith St","lat":40.74354,"lon":-74.04563,"acts":["candy"],"notes":["We will be outside with dog that is VERY people and kid friendly - who will also be in a costume."]},{"t":"block","addr":"Ogden Ave between Bowers St and South St","lat":40.74617,"lon":-74.04187,"acts":["candy","decor"],"notes":["We'll be sitting at the end of our driveway with kid friendly Halloween music playing and lots of candy! We will also have small milkbone dog treats for furry friends!"]},{"t":"block","addr":"South St between Hancock Ave and Sherman Ave","lat":40.74859,"lon":-74.04501,"acts":["candy","decor","costume"],"notes":["Ring the bell the dog is friendly","Power to the People!"]},{"t":"block","addr":"Somewhere on Ogden Ave","lat":40.74214,"lon":-74.04446,"acts":["candy","decor"]},{"t":"block","addr":"Graham St between Central Ave and Summit Ave","lat":40.75204,"lon":-74.04672,"acts":["candy","decor"],"notes":["Candy on stoop"]},{"t":"block","addr":"Manhattan Ave between Montrose Ave and Summit Ave","lat":40.74416,"lon":-74.05484,"acts":["candy"]},{"t":"block","addr":"Webster Ave between Bowers St and South St","lat":40.74712,"lon":-74.04435,"acts":["candy","costume"],"notes":["We\u2019ll be sitting on our stoop handing out candy and other fun treats!!","lots of Halloween treats"]},{"t":"block","addr":"Ogden Ave between Wood Pl and Cuneo Pl","lat":40.73887,"lon":-74.04655,"acts":["candy","decor","costume"],"notes":["Doorbell doesn\u2019t work so we\u2019ll all be sitting on the porch!"]},{"t":"block","addr":"Webster Ave between Franklin St and Hutton St","lat":40.74252,"lon":-74.04729,"acts":["candy","decor","costume"]},{"t":"block","addr":"Corner of Ogden Ave & Griffith St","lat":40.74337,"lon":-74.04364,"acts":["candy","decor","costume"]},{"t":"block","addr":"New York Ave between Bowers St and South St","lat":40.74682,"lon":-74.04354,"acts":["candy","decor"]},{"t":"block","addr":"Troy St between Montrose Ave and Reservoir Ave","lat":40.74186,"lon":-74.05656,"acts":["candy","costume"]},{"t":"block","addr":"Pierce Ave between Bleecker St and Paterson St","lat":40.75149,"lon":-74.05024,"acts":["candy","decor"],"notes":["Hello Kitty inflatable"]},{"t":"block","addr":"Corner of Bowers St & Sherman Ave","lat":40.74649,"lon":-74.04572,"acts":["candy","decor","costume"]},{"t":"block","addr":"Griffith St between Milton Ave and Summit Ave","lat":40.74726,"lon":-74.0526,"acts":["candy","decor","costume"]},{"t":"block","addr":"Liberty Ave between Zabriskie St and Lincoln St","lat":40.749,"lon":-74.05759,"acts":["decor","pumpkin"],"notes":["Friendly Halloween decorations and bowls of candy on the front"]},{"t":"block","addr":"Ogden Ave between Griffith St and Franklin St","lat":40.74214,"lon":-74.04446,"acts":["candy","decor"]},{"t":"block","addr":"Sherman Ave between South St and Congress St","lat":40.74921,"lon":-74.04418,"acts":["candy","decor","costume"]},{"t":"block","addr":"New York Ave between Congress St and North St","lat":40.75012,"lon":-74.04141,"acts":["candy","decor","costume"],"notes":["We'll be taking our daughter trick or treating along Central but we'll leave candy on the porch until we get home."]},{"t":"block","addr":"Lincoln St, north side, mid-block","lat":40.74922,"lon":-74.05582,"acts":["candy"]},{"t":"block","addr":"Sherman Pl between Central Ave and Summit Ave","lat":40.74432,"lon":-74.05206,"acts":["candy","decor","costume"],"notes":["Candy shoot"]},{"t":"block","addr":"South St between Passaic Ave and Summit Ave","lat":40.74997,"lon":-74.04923,"acts":["candy","decor","costume"]},{"t":"block","addr":"Somewhere on Troy St","lat":40.74186,"lon":-74.05656,"acts":["candy","decor"],"notes":["Teal pumpkin - allergy safe treats also available"]},{"t":"block","addr":"Sherman Ave between Griffith St and Bowers St","lat":40.74563,"lon":-74.04631,"acts":["candy","decor","costume"],"notes":["Dressed as shrek"]},{"t":"block","addr":"Somewhere on Sherman Pl","lat":40.74525,"lon":-74.05457,"acts":["candy","decor"]},{"t":"block","addr":"Palisade Ave, 200 block","lat":40.73773,"lon":-74.04831,"acts":["candy"]},{"t":"block","addr":"Hopkins Ave between Central Ave and Summit Ave","lat":40.73785,"lon":-74.05773,"acts":["candy","decor"],"notes":["We'll probably be on the porch until around 6 before going out with pals"]},{"t":"block","addr":"Sherman Ave between Bowers St and South St","lat":40.74742,"lon":-74.04515,"acts":["candy","decor","costume"],"notes":["Dog Machine! Decorations! Treats for kids, dogs AND adults!"]},{"t":"block","addr":"South St between Sherman Ave and Webster Ave","lat":40.74827,"lon":-74.04416,"acts":["candy","decor","costume"]},{"t":"block","addr":"South St between Webster Ave and New York Ave","lat":40.74796,"lon":-74.04332,"acts":["candy","decor","costume"],"notes":["Chocolate, non chocolate and peanut free options, plus lots of decorations!"]},{"t":"block","addr":"Lincoln St between Summit Ave and Milton Ave","lat":40.7479,"lon":-74.05216,"acts":["candy","decor","costume"]},{"t":"block","addr":"Central Ave between Graham St and North St","lat":40.75188,"lon":-74.0453,"acts":["candy","decor","costume"]},{"t":"block","addr":"Sherman Pl between Summit Ave and Sanford Pl","lat":40.74525,"lon":-74.05457,"acts":["candy","decor","costume"]},{"t":"block","addr":"Sherman Ave at Hutton St","lat":40.74354,"lon":-74.04763,"acts":["candy","decor","costume"]},{"t":"block","addr":"Sherman Ave between Hutton St and Griffith St","lat":40.74423,"lon":-74.0472,"acts":["candy","decor","costume"]},{"t":"block","addr":"Sherman Ave between Congress St and North St","lat":40.75078,"lon":-74.04316,"acts":["candy","decor","costume"]},{"t":"block","addr":"Webster Ave between Congress St and North St","lat":40.75046,"lon":-74.04228,"acts":["candy","decor","costume"]},{"t":"block","addr":"Paterson St between Pierce Ave and John F Kennedy Blvd","lat":40.75224,"lon":-74.05109,"acts":["candy","decor","costume"]},{"t":"biz","name":"Hudson City Kids","addr":"474 Central Ave, Jersey City","lat":40.751087,"lon":-74.045747,"acts":["candy"],"notes":["Listed as a participating business in the Heights Halloween Trails promo"]},{"t":"biz","name":"Griot Cafe","addr":"398 Central Ave, Jersey City","lat":40.748309,"lon":-74.047628,"acts":["candy"],"notes":["Listed as a participating business in the Heights Halloween Trails promo"]}];
+var HEIGHTS_STOPS = [{"t":"biz","name":"Tutu School","addr":"499 Palisade Ave","lat":40.74549,"lon":-74.04326,"acts":["candy","decor","costume"],"hours":"2\u20138pm","notes":["Ballet studio!"]},{"t":"biz","name":"Spark Place","addr":"411 Palisade Ave","lat":40.74266,"lon":-74.04524,"acts":["candy","decor"],"hours":"2\u20136pm","extras":["Sponsoring a Pumpkin Contest prize"]},{"t":"biz","name":"StudyCompleteK12","addr":"178 Central Ave","lat":40.74094,"lon":-74.05295,"acts":["candy","decor","costume"],"hours":"9am\u20132pm"},{"t":"biz","name":"Novick Hardware","addr":"302 Central Ave","lat":40.74527,"lon":-74.04978,"acts":["candy"],"hours":"4\u20136pm","notes":["Do the \u201c Monster Walk\u201d at Novick Hardware"]},{"t":"biz","name":"Lucky Honeybee","addr":"487 Palisade Ave","lat":40.74521,"lon":-74.04362,"acts":["candy"],"hours":"2\u20134pm","allergy":"Stickers for allergy sufferers"},{"t":"biz","name":"The Hair Room Jersey City","addr":"467 Palisade Ave","lat":40.74455,"lon":-74.04404,"acts":["candy","decor","costume"],"hours":"2\u20136pm","notes":["Doggie treats too \ud83d\udc3e"],"allergy":"Non-food treats too"},{"t":"biz","name":"Neighborgood","addr":"418 Baldwin Ave","lat":40.73506,"lon":-74.05287,"acts":["candy","decor","costume"],"hours":"2\u20138pm"},{"t":"biz","name":"The Cliff","addr":"38 Congress St","lat":40.74923,"lon":-74.04154,"acts":["candy","decor","pumpkin"],"hours":"8 am - 3 pm, then bowl outside after 3","extras":["Special: vampire blood and spooky themed coffee drinks, matcha and  lemonade","Sponsoring a Pumpkin Contest prize"],"notes":["Includes DOTD window puppet and Ofrenda"],"allergy":"Non-food treats too"},{"t":"biz","name":"Atacama Clay Studio","addr":"273 New York Ave","lat":40.7455,"lon":-74.04448,"acts":["candy"],"hours":"12 noon- 4pm","extras":["Little Hands mini clay pumpkin workshop, 3\u20134pm, ages 5\u20137, $5, 10 kids max, walk-ins only"],"allergy":"Allergy-safe candy (no nuts)"},{"t":"biz","name":"St. John's Lutheran Church","addr":"155 North St","lat":40.7535,"lon":-74.0482,"acts":["candy","costume"],"hours":"2pm-6pm","notes":["On the church steps"],"allergy":"Non-food treats too"},{"t":"biz","name":"New Heights Pilates","addr":"10 South St (corner of Palisade)","lat":40.7474,"lon":-74.04167,"acts":["candy","costume"],"hours":"2\u20136pm","notes":["We will have dog treats and Gluten Free & Nut Free Candy!"],"allergy":"Allergy-safe candy (no nuts)"},{"t":"biz","name":"Renato's Pizza Masters","addr":"278 Central Ave","lat":40.74272,"lon":-74.05154,"acts":["candy","decor","costume"],"hours":"2\u20134pm","extras":["Giving out Pok\u00e9mon card packs"],"allergy":"Non-food treats too"},{"t":"biz","name":"Cub & Fox Playhouse","addr":"367 Central Ave","lat":40.74777,"lon":-74.04823,"acts":["candy","decor","costume"],"hours":"2\u20138pm","allergy":"Non-food treats too"},{"t":"home","addr":"85 Laidlaw Ave","lat":40.73727,"lon":-74.05336,"acts":["candy","costume"]},{"t":"home","addr":"65 Congress St","lat":40.74977,"lon":-74.04296,"acts":["candy","decor","costume","pumpkin"],"notes":["Will have allergy safe treats! we will be trick or treating as well so may not be available all night\u2014 but will still leave candy out when we aren\u2019t home. Will have music and lots of decorations!"],"allergy":"Allergy-safe candy (no nuts)"},{"t":"home","addr":"616 Palisade Ave","lat":40.74939,"lon":-74.04092,"acts":["candy","decor"]},{"t":"home","addr":"127 New York Ave","lat":40.74062,"lon":-74.04759,"acts":["candy","costume"]},{"t":"home","addr":"57 South St","lat":40.74824,"lon":-74.04388,"acts":["candy","decor"],"notes":["Handing out candy in person 2 -5, after that honor system there will be a help yourself box!"]},{"t":"home","addr":"80 Bowers St","lat":40.74648,"lon":-74.04611,"acts":["candy","decor"]},{"t":"home","addr":"260 Griffith St","lat":40.74775,"lon":-74.05371,"acts":["candy","decor"],"notes":["Beetle juice sand worm tentacles and a friendly dog guaranteed"]},{"t":"home","addr":"184 Nelson Ave","lat":40.75809,"lon":-74.04922,"acts":["candy","decor","costume"]},{"t":"home","addr":"26 South St","lat":40.74772,"lon":-74.04251,"acts":["candy","decor","costume","pumpkin"],"notes":["Come by if you\u2019re thirsty \ud83e\ude78 \ud83e\uddd9\u200d\u2640\ufe0f"]},{"t":"home","addr":"83 Bowers St","lat":40.74654,"lon":-74.04629,"acts":["candy","decor"]},{"t":"home","addr":"101 Hancock Ave","lat":40.74606,"lon":-74.04713,"acts":["candy","decor"],"notes":["Will leave candy out for kids to grab"]},{"t":"home","addr":"248 New York Ave","lat":40.74464,"lon":-74.04503,"acts":["candy","decor","costume"],"notes":["No need to ring the doorbell, we\u2019ll be outside with candy"]},{"t":"home","addr":"108 Booraem Ave","lat":40.74039,"lon":-74.05068,"acts":["candy","decor","costume"]},{"t":"home","addr":"861 Summit Ave","lat":40.74355,"lon":-74.0542,"acts":["candy","decor","costume"]},{"t":"home","addr":"82 Hancock Ave","lat":40.7454,"lon":-74.04756,"acts":["candy"],"notes":["There will be a table outside\ud83d\udc95"]},{"t":"home","addr":"285 Webster Ave","lat":40.74828,"lon":-74.04376,"acts":["candy","decor"]},{"t":"home","addr":"99 Sherman Pl","lat":40.74547,"lon":-74.05535,"acts":["candy","decor"]},{"t":"home","addr":"151 Manhattan Ave","lat":40.74444,"lon":-74.05534,"acts":["candy","decor","costume"]},{"t":"home","addr":"275 Columbia Ave","lat":40.75716,"lon":-74.05091,"acts":["candy","decor","costume"]},{"t":"home","addr":"247 Griffith St","lat":40.74755,"lon":-74.05319,"acts":["candy","decor"],"notes":["Should be home around 7ish to pass out candy after my kid is done doing trick or treat. Will leave a bowl of candy on the stoop before hand."]},{"t":"home","addr":"31 Griffith St","lat":40.74414,"lon":-74.04475,"acts":["candy","decor"],"notes":["Pumpkin on stoop"]},{"t":"home","addr":"138 South St","lat":40.74988,"lon":-74.04919,"acts":["candy"],"notes":["Will have 2 sets of treats: with and without nuts"]},{"t":"home","addr":"430 Ogden Ave","lat":40.7479,"lon":-74.04066,"acts":["candy","decor","costume"]},{"t":"home","addr":"376 Ogden Ave","lat":40.74508,"lon":-74.04266,"acts":["candy"]},{"t":"home","addr":"82 Manhattan Ave","lat":40.74317,"lon":-74.05223,"acts":["candy","decor","costume"]},{"t":"home","addr":"418 Ogden Ave","lat":40.74757,"lon":-74.04087,"acts":["candy"]},{"t":"home","addr":"28 South St","lat":40.74777,"lon":-74.04263,"acts":["candy"]},{"t":"home","addr":"15 Leonard St","lat":40.75501,"lon":-74.04386,"acts":["candy","decor","costume"],"notes":["Fog machine in full effect and annual window display! All are welcome \ud83d\udc7b"]},{"t":"home","addr":"317 New York Ave","lat":40.74698,"lon":-74.04353,"acts":["candy","decor"]},{"t":"home","addr":"187 Ogden Ave","lat":40.74042,"lon":-74.04547,"acts":["candy","decor"],"notes":["Candy boxes will be out on the stoop for kids to take- one per person please!"]},{"t":"home","addr":"30 Graham St","lat":40.75201,"lon":-74.04685,"acts":["candy","decor","costume"]},{"t":"home","addr":"26 Reservoir Ave","lat":40.73869,"lon":-74.04911,"acts":["candy","decor","costume"]},{"t":"home","addr":"246 Hancock Ave","lat":40.75086,"lon":-74.04424,"acts":["candy","decor","costume"],"notes":["We will have allergy friendly treats!"],"allergy":"Allergy-safe candy (no nuts)"},{"t":"home","addr":"254 Hancock Ave","lat":40.75109,"lon":-74.04409,"acts":["candy","decor"]},{"t":"home","addr":"278 Sherman Ave","lat":40.75009,"lon":-74.04371,"acts":["candy"]},{"t":"home","addr":"231 Ogden Ave","lat":40.74146,"lon":-74.04481,"acts":["candy","decor"]},{"t":"home","addr":"371 New York Ave","lat":40.74884,"lon":-74.04234,"acts":["decor"],"notes":["Decorations for the littlest ones"]},{"t":"home","addr":"284 Sherman Ave","lat":40.75016,"lon":-74.04366,"acts":["candy"],"notes":["I will have a bowl of candy out on the doorstep! Honor system!"]},{"t":"home","addr":"295 New York Ave","lat":40.74621,"lon":-74.04402,"acts":["candy","decor"],"notes":["We will have a candy bowl out - we will be trick or treating"]},{"t":"home","addr":"90 Webster Ave","lat":40.74172,"lon":-74.04789,"acts":["candy","decor","costume"],"notes":["Graveyard and skeletons"]},{"t":"home","addr":"48 Lienau Pl","lat":40.74011,"lon":-74.05128,"acts":["candy","costume"],"notes":["Scream will be around"]},{"t":"home","addr":"145 Sherman Ave","lat":40.74576,"lon":-74.04631,"acts":["candy"],"notes":["Allergy and baby friendly treats!"],"allergy":"Allergy-safe candy (no nuts)"},{"t":"home","addr":"121 Ogden Ave","lat":40.73855,"lon":-74.04666,"acts":["candy","decor","costume"]},{"t":"home","addr":"170\u00bd Manhattan Ave","lat":40.74477,"lon":-74.05616,"acts":["candy","decor"],"notes":["Play a game to win your treats! No tricks ;)"]},{"t":"home","addr":"49 Ravine Ave","lat":40.74041,"lon":-74.04904,"acts":["candy","decor"],"notes":["Talking skeleton!"]},{"t":"home","addr":"421 Palisade Ave","lat":40.74307,"lon":-74.04498,"acts":["candy","decor"],"notes":["Ring 1B!"]},{"t":"home","addr":"182 Hancock Ave (corner of South St)","lat":40.74862,"lon":-74.04531,"acts":["candy","decor","costume"],"notes":["Ring bell, house on the corner with eyes on window"]},{"t":"home","addr":"103 Waverly St","lat":40.7386,"lon":-74.05297,"acts":["candy","decor"],"notes":["Decorations from the movies Coco and Nightmare before Christmas. There will be a tray in front of the house with treats. No need to climb the stairs"]},{"t":"home","addr":"149 Laidlaw Ave","lat":40.73859,"lon":-74.05629,"acts":["candy","decor","costume"]},{"t":"home","addr":"244 Hancock Ave","lat":40.7508,"lon":-74.04428,"acts":["candy"]},{"t":"home","addr":"157 South St","lat":40.74993,"lon":-74.04932,"acts":["candy"]},{"t":"home","addr":"61 South St","lat":40.74833,"lon":-74.04413,"acts":["candy","decor"]},{"t":"home","addr":"69 South St","lat":40.74846,"lon":-74.04486,"acts":["candy","decor","costume"],"notes":["Singing Skeleton"]},{"t":"home","addr":"13 Graham St","lat":40.75172,"lon":-74.04609,"acts":["candy","decor","costume"]},{"t":"home","addr":"139 Congress St","lat":40.75137,"lon":-74.04678,"acts":["candy","decor","costume"]},{"t":"home","addr":"30 Charles St","lat":40.7484,"lon":-74.04941,"acts":["candy","decor","costume"]},{"t":"home","addr":"38 Charles St","lat":40.74855,"lon":-74.04978,"acts":["candy","decor","costume"]},{"t":"home","addr":"27 Sherman Pl","lat":40.74426,"lon":-74.05209,"acts":["candy","decor","costume"]},{"t":"home","addr":"39 Sherman Pl","lat":40.74447,"lon":-74.05266,"acts":["candy","decor","costume"]},{"t":"home","addr":"110 Sherman Pl","lat":40.74566,"lon":-74.05586,"acts":["candy","decor","costume"]},{"t":"home","addr":"98 Sherman Ave","lat":40.74414,"lon":-74.04734,"acts":["candy","decor","costume"]},{"t":"home","addr":"135 Sherman Ave","lat":40.74541,"lon":-74.04653,"acts":["candy","decor","costume"]},{"t":"home","addr":"179 Sherman Ave","lat":40.74687,"lon":-74.04559,"acts":["candy","decor","costume"]},{"t":"home","addr":"187 Sherman Ave","lat":40.74714,"lon":-74.04542,"acts":["candy","decor","costume"]},{"t":"home","addr":"228 Sherman Ave","lat":40.74847,"lon":-74.04467,"acts":["candy","decor","costume"]},{"t":"home","addr":"240 Sherman Ave","lat":40.74895,"lon":-74.04444,"acts":["candy","decor","costume"]},{"t":"home","addr":"281 Sherman Ave","lat":40.75013,"lon":-74.04368,"acts":["candy","decor","costume"]},{"t":"home","addr":"299 Sherman Ave","lat":40.75035,"lon":-74.04353,"acts":["candy","decor","costume"]},{"t":"home","addr":"368 Webster Ave","lat":40.75101,"lon":-74.04201,"acts":["candy","decor","costume"]},{"t":"home","addr":"357 Webster Ave","lat":40.75065,"lon":-74.04224,"acts":["candy","decor","costume"]},{"t":"home","addr":"105 Paterson St","lat":40.75196,"lon":-74.05054,"acts":["candy","decor","costume"]},{"t":"block","addr":"New York Ave between South St and Congress St","lat":40.74856,"lon":-74.04243,"acts":["candy","decor","costume"],"notes":["We might leave treats out to go trick or treating ourselves"]},{"t":"block","addr":"Corner of Palisade Ave & Ferry St","lat":40.74,"lon":-74.04684,"acts":["candy"]},{"t":"block","addr":"Paterson St between Central Ave and Passaic Ave","lat":40.75069,"lon":-74.0472,"acts":["decor","costume"]},{"t":"block","addr":"Bowers St between Hancock Ave and Cambridge Ave","lat":40.74688,"lon":-74.04701,"acts":["candy","decor"]},{"t":"block","addr":"Corner of Ferry St & Ogden Ave","lat":40.73968,"lon":-74.04601,"acts":["candy","decor","costume"],"notes":["Ring the doorbell at the bottom of the steps. Press the button on the skeleton!"]},{"t":"block","addr":"Charles St between Central Ave and Summit Ave","lat":40.7484,"lon":-74.04924,"acts":["candy","decor","costume","pumpkin"]},{"t":"block","addr":"Hancock Ave between Congress St and North St","lat":40.75109,"lon":-74.044,"acts":["candy","decor"]},{"t":"block","addr":"New York Ave between Hutton St and Griffith St","lat":40.74354,"lon":-74.04563,"acts":["candy"],"notes":["We will be outside with dog that is VERY people and kid friendly - who will also be in a costume."]},{"t":"block","addr":"Ogden Ave between Bowers St and South St","lat":40.74617,"lon":-74.04187,"acts":["candy","decor"],"notes":["We'll be sitting at the end of our driveway with kid friendly Halloween music playing and lots of candy! We will also have small milkbone dog treats for furry friends!"]},{"t":"block","addr":"South St between Hancock Ave and Sherman Ave","lat":40.74859,"lon":-74.04501,"acts":["candy","decor","costume"],"notes":["Ring the bell the dog is friendly","Power to the People!"]},{"t":"block","addr":"Somewhere on Ogden Ave","lat":40.74214,"lon":-74.04446,"acts":["candy","decor"]},{"t":"block","addr":"Graham St between Central Ave and Summit Ave","lat":40.75204,"lon":-74.04672,"acts":["candy","decor"],"notes":["Candy on stoop"]},{"t":"block","addr":"Manhattan Ave between Montrose Ave and Summit Ave","lat":40.74416,"lon":-74.05484,"acts":["candy"]},{"t":"block","addr":"Webster Ave between Bowers St and South St","lat":40.74712,"lon":-74.04435,"acts":["candy","costume"],"notes":["We\u2019ll be sitting on our stoop handing out candy and other fun treats!!","lots of Halloween treats"]},{"t":"block","addr":"Ogden Ave between Wood Pl and Cuneo Pl","lat":40.73887,"lon":-74.04655,"acts":["candy","decor","costume"],"notes":["Doorbell doesn\u2019t work so we\u2019ll all be sitting on the porch!"]},{"t":"block","addr":"Webster Ave between Franklin St and Hutton St","lat":40.74252,"lon":-74.04729,"acts":["candy","decor","costume"]},{"t":"block","addr":"Corner of Ogden Ave & Griffith St","lat":40.74337,"lon":-74.04364,"acts":["candy","decor","costume"]},{"t":"block","addr":"New York Ave between Bowers St and South St","lat":40.74682,"lon":-74.04354,"acts":["candy","decor"]},{"t":"block","addr":"Troy St between Montrose Ave and Reservoir Ave","lat":40.74186,"lon":-74.05656,"acts":["candy","costume"]},{"t":"block","addr":"Pierce Ave between Bleecker St and Paterson St","lat":40.75149,"lon":-74.05024,"acts":["candy","decor"],"notes":["Hello Kitty inflatable"]},{"t":"block","addr":"Corner of Bowers St & Sherman Ave","lat":40.74649,"lon":-74.04572,"acts":["candy","decor","costume"]},{"t":"block","addr":"Griffith St between Milton Ave and Summit Ave","lat":40.74726,"lon":-74.0526,"acts":["candy","decor","costume"]},{"t":"block","addr":"Liberty Ave between Zabriskie St and Lincoln St","lat":40.749,"lon":-74.05759,"acts":["decor","pumpkin"],"notes":["Friendly Halloween decorations and bowls of candy on the front"]},{"t":"block","addr":"Ogden Ave between Griffith St and Franklin St","lat":40.74214,"lon":-74.04446,"acts":["candy","decor"]},{"t":"block","addr":"Sherman Ave between South St and Congress St","lat":40.74921,"lon":-74.04418,"acts":["candy","decor","costume"]},{"t":"block","addr":"New York Ave between Congress St and North St","lat":40.75012,"lon":-74.04141,"acts":["candy","decor","costume"],"notes":["We'll be taking our daughter trick or treating along Central but we'll leave candy on the porch until we get home."]},{"t":"block","addr":"Lincoln St, north side, mid-block","lat":40.74922,"lon":-74.05582,"acts":["candy"]},{"t":"block","addr":"Sherman Pl between Central Ave and Summit Ave","lat":40.74432,"lon":-74.05206,"acts":["candy","decor","costume"],"notes":["Candy shoot"]},{"t":"block","addr":"South St between Passaic Ave and Summit Ave","lat":40.74997,"lon":-74.04923,"acts":["candy","decor","costume"]},{"t":"block","addr":"Somewhere on Troy St","lat":40.74186,"lon":-74.05656,"acts":["candy","decor"],"notes":["Teal pumpkin - allergy safe treats also available"],"allergy":"Non-food treats too"},{"t":"block","addr":"Sherman Ave between Griffith St and Bowers St","lat":40.74563,"lon":-74.04631,"acts":["candy","decor","costume"],"notes":["Dressed as shrek"]},{"t":"block","addr":"Somewhere on Sherman Pl","lat":40.74525,"lon":-74.05457,"acts":["candy","decor"]},{"t":"block","addr":"Palisade Ave, 200 block","lat":40.73773,"lon":-74.04831,"acts":["candy"]},{"t":"block","addr":"Hopkins Ave between Central Ave and Summit Ave","lat":40.73785,"lon":-74.05773,"acts":["candy","decor"],"notes":["We'll probably be on the porch until around 6 before going out with pals"]},{"t":"block","addr":"Sherman Ave between Bowers St and South St","lat":40.74742,"lon":-74.04515,"acts":["candy","decor","costume"],"notes":["Dog Machine! Decorations! Treats for kids, dogs AND adults!"]},{"t":"block","addr":"South St between Sherman Ave and Webster Ave","lat":40.74827,"lon":-74.04416,"acts":["candy","decor","costume"]},{"t":"block","addr":"South St between Webster Ave and New York Ave","lat":40.74796,"lon":-74.04332,"acts":["candy","decor","costume"],"notes":["Chocolate, non chocolate and peanut free options, plus lots of decorations!"],"allergy":"Allergy-safe candy (no nuts)"},{"t":"block","addr":"Lincoln St between Summit Ave and Milton Ave","lat":40.7479,"lon":-74.05216,"acts":["candy","decor","costume"]},{"t":"block","addr":"Central Ave between Graham St and North St","lat":40.75188,"lon":-74.0453,"acts":["candy","decor","costume"]},{"t":"block","addr":"Sherman Pl between Summit Ave and Sanford Pl","lat":40.74525,"lon":-74.05457,"acts":["candy","decor","costume"]},{"t":"block","addr":"Sherman Ave at Hutton St","lat":40.74354,"lon":-74.04763,"acts":["candy","decor","costume"]},{"t":"block","addr":"Sherman Ave between Hutton St and Griffith St","lat":40.74423,"lon":-74.0472,"acts":["candy","decor","costume"]},{"t":"block","addr":"Sherman Ave between Congress St and North St","lat":40.75078,"lon":-74.04316,"acts":["candy","decor","costume"]},{"t":"block","addr":"Webster Ave between Congress St and North St","lat":40.75046,"lon":-74.04228,"acts":["candy","decor","costume"]},{"t":"block","addr":"Paterson St between Pierce Ave and John F Kennedy Blvd","lat":40.75224,"lon":-74.05109,"acts":["candy","decor","costume"]},{"t":"biz","name":"Hudson City Kids","addr":"474 Central Ave, Jersey City","lat":40.751087,"lon":-74.045747,"acts":["candy"],"notes":["Listed as a participating business in the Heights Halloween Trails promo"]},{"t":"biz","name":"Griot Cafe","addr":"398 Central Ave, Jersey City","lat":40.748309,"lon":-74.047628,"acts":["candy"],"notes":["Listed as a participating business in the Heights Halloween Trails promo"]}];
 var HEIGHTS_SEGS = {"c":[40.7508,-74.0455],"r":650,"segs":[[40.753077,-74.040101,40.753582,-74.039802,9],[40.753631,-74.039768,40.753696,-74.039728,8],[40.753696,-74.039728,40.7542,-74.039404,11],[40.754252,-74.039369,40.754315,-74.039329,2],[40.744816,-74.046839,40.744883,-74.04679,3],[40.744883,-74.04679,40.745528,-74.04637,21],[40.745528,-74.04637,40.746375,-74.045825,11],[40.746427,-74.045792,40.74649,-74.04575,10],[40.748344,-74.044565,40.748395,-74.044505,11],[40.748454,-74.044663,40.748525,-74.04462,26],[40.749959,-74.043699,40.750029,-74.043654,15],[40.752464,-74.044914,40.752417,-74.044797,3],[40.752417,-74.044797,40.752239,-74.044315,5],[40.752239,-74.044315,40.752215,-74.044247,5],[40.75195,-74.043554,40.751926,-74.04349,2],[40.751926,-74.04349,40.751888,-74.043391,6],[40.751888,-74.043391,40.751734,-74.042992,9],[40.751734,-74.042992,40.751605,-74.042645,6],[40.751605,-74.042645,40.751572,-74.04256,11],[40.751572,-74.04256,40.751299,-74.041846,10],[40.751299,-74.041846,40.751265,-74.041748,5],[40.751233,-74.041662,40.750969,-74.040954,11],[40.750969,-74.040954,40.75094,-74.040877,4],[40.750914,-74.040806,40.750661,-74.040127,2],[40.753693,-74.048886,40.75363,-74.048729,2],[40.75363,-74.048729,40.75314,-74.047503,5],[40.75314,-74.047503,40.753106,-74.047416,6],[40.752223,-74.045188,40.75219,-74.045103,7],[40.752264,-74.053047,40.752188,-74.052858,4],[40.75118,-74.050353,40.75093,-74.049726,10],[40.75093,-74.049726,40.750743,-74.049257,2],[40.750433,-74.048481,40.750405,-74.048411,3],[40.750405,-74.048411,40.749788,-74.046866,2],[40.749788,-74.046866,40.749752,-74.046777,11],[40.752363,-74.049632,40.751871,-74.049976,8],[40.751819,-74.050012,40.751761,-74.050054,5],[40.751761,-74.050054,40.751277,-74.050399,6],[40.751277,-74.050399,40.751216,-74.050442,2],[40.751216,-74.050442,40.751166,-74.050475,17],[40.751166,-74.050475,40.750623,-74.050834,53],[40.752816,-74.044662,40.752851,-74.04475,16],[40.753773,-74.047053,40.753808,-74.047141,4],[40.753808,-74.047141,40.754139,-74.047964,10],[40.754139,-74.047964,40.754186,-74.048084,5],[40.754186,-74.048084,40.754241,-74.048221,2],[40.754241,-74.048221,40.754439,-74.048723,17],[40.755308,-74.05092,40.75535,-74.051027,4],[40.7541,-74.043776,40.754133,-74.043866,14],[40.755086,-74.046257,40.755389,-74.04705,7],[40.755389,-74.04705,40.755439,-74.047182,2],[40.755439,-74.047182,40.755489,-74.047307,17],[40.756566,-74.050044,40.756616,-74.050172,2],[40.752264,-74.053047,40.752436,-74.052997,2],[40.752445,-74.052994,40.753481,-74.052294,3],[40.753537,-74.052256,40.754015,-74.05194,7],[40.754015,-74.05194,40.754072,-74.051902,3],[40.754072,-74.051902,40.754721,-74.051457,13],[40.754859,-74.051361,40.754917,-74.05132,2],[40.754917,-74.05132,40.754982,-74.051276,9],[40.75535,-74.051027,40.755424,-74.050977,11],[40.755424,-74.050977,40.755976,-74.050608,23],[40.755976,-74.050608,40.756616,-74.050172,7],[40.756616,-74.050172,40.756685,-74.050124,6],[40.754862,-74.047737,40.754812,-74.047608,2],[40.754812,-74.047608,40.754763,-74.047481,3],[40.754763,-74.047481,40.754457,-74.046696,2],[40.754457,-74.046696,40.754423,-74.04661,2],[40.754423,-74.04661,40.754388,-74.046537,4],[40.753495,-74.044309,40.753459,-74.044216,6],[40.751562,-74.045527,40.751596,-74.045615,28],[40.752472,-74.047868,40.752506,-74.047954,4],[40.752506,-74.047954,40.752533,-74.048022,15],[40.753411,-74.050201,40.753477,-74.050363,2],[40.753477,-74.050363,40.75403,-74.051794,13],[40.749163,-74.047183,40.7492,-74.04728,12],[40.7492,-74.04728,40.749843,-74.048884,21],[40.749843,-74.048884,40.750088,-74.0495,3],[40.750088,-74.0495,40.750121,-74.049585,2],[40.750121,-74.049585,40.750153,-74.049664,4],[40.750153,-74.049664,40.750623,-74.050834,6],[40.751517,-74.053051,40.751658,-74.053401,21],[40.751658,-74.053401,40.751715,-74.053543,3],[40.74935,-74.047054,40.749312,-74.04695,5],[40.749043,-74.046241,40.749005,-74.046147,2],[40.748745,-74.04544,40.748714,-74.045365,20],[40.748714,-74.045365,40.748454,-74.044663,14],[40.74843,-74.044601,40.748395,-74.044505,4],[40.748395,-74.044505,40.748142,-74.043853,10],[40.748142,-74.043853,40.748106,-74.04376,7],[40.748106,-74.04376,40.748069,-74.043661,2],[40.748069,-74.043661,40.747827,-74.042996,10],[40.747802,-74.042926,40.747773,-74.042849,9],[40.747773,-74.042849,40.747516,-74.042164,14],[40.747516,-74.042164,40.747482,-74.042074,3],[40.74745,-74.041992,40.747192,-74.041318,2],[40.747192,-74.041318,40.747163,-74.041247,3],[40.746071,-74.045013,40.746127,-74.04498,2],[40.756073,-74.046749,40.756019,-74.04661,2],[40.756019,-74.04661,40.755872,-74.04623,6],[40.755872,-74.04623,40.755714,-74.045822,6],[40.745722,-74.048244,40.746257,-74.047912,11],[40.746257,-74.047912,40.746535,-74.047732,2],[40.746535,-74.047732,40.746643,-74.047666,4],[40.746643,-74.047666,40.746968,-74.047454,5],[40.747021,-74.047419,40.747086,-74.047376,4],[40.747086,-74.047376,40.747497,-74.047106,11],[40.747497,-74.047106,40.747741,-74.046945,5],[40.747741,-74.046945,40.748956,-74.046178,4],[40.750352,-74.046363,40.75039,-74.046452,18],[40.75039,-74.046452,40.751008,-74.047971,20],[40.751043,-74.048057,40.751077,-74.048144,7],[40.751077,-74.048144,40.751286,-74.048672,5],[40.751318,-74.048751,40.751353,-74.04884,4],[40.751353,-74.04884,40.751539,-74.049308,12],[40.751539,-74.049308,40.751792,-74.049945,3],[40.751819,-74.050012,40.751849,-74.050088,2],[40.751849,-74.050088,40.75241,-74.051501,8],[40.75241,-74.051501,40.752437,-74.051568,6],[40.752437,-74.051568,40.752586,-74.051943,5],[40.752586,-74.051943,40.75262,-74.052029,5],[40.75262,-74.052029,40.752676,-74.052172,2],[40.749843,-74.048884,40.749895,-74.048848,12],[40.749895,-74.048848,40.750389,-74.04851,13],[40.750433,-74.048481,40.750482,-74.048447,12],[40.750482,-74.048447,40.750985,-74.048097,4],[40.751086,-74.048027,40.751588,-74.047676,15],[40.751918,-74.048351,40.751881,-74.048259,2],[40.751881,-74.048259,40.751632,-74.047646,12],[40.751632,-74.047646,40.751174,-74.046481,15],[40.748987,-74.041099,40.748954,-74.041008,6],[40.748954,-74.041008,40.748861,-74.040748,4],[40.748861,-74.040748,40.748824,-74.040645,3],[40.747915,-74.048046,40.747952,-74.048144,9],[40.74884,-74.050365,40.748871,-74.050443,3],[40.748871,-74.050443,40.748906,-74.050532,8],[40.748906,-74.050532,40.749525,-74.052085,12],[40.750407,-74.054289,40.750458,-74.05442,2],[40.74609,-74.041473,40.746055,-74.041534,16],[40.745141,-74.042226,40.745209,-74.04241,7],[40.747278,-74.048482,40.74732,-74.048587,11],[40.748203,-74.050804,40.748235,-74.050884,5],[40.748235,-74.050884,40.748269,-74.05097,2],[40.748269,-74.05097,40.748853,-74.052432,5],[40.748885,-74.052513,40.748918,-74.052595,10],[40.748227,-74.040629,40.74848,-74.041315,5],[40.74848,-74.041315,40.748515,-74.04141,7],[40.748252,-74.052945,40.748824,-74.052555,14],[40.748885,-74.052513,40.748958,-74.052464,20],[40.748958,-74.052464,40.749477,-74.052117,25],[40.749477,-74.052117,40.749525,-74.052085,32],[40.751926,-74.04349,40.751873,-74.043524,16],[40.751873,-74.043524,40.750876,-74.044172,30],[40.750876,-74.044172,40.750347,-74.044507,8],[40.750274,-74.044554,40.750214,-74.044594,11],[40.747802,-74.042926,40.747741,-74.042965,12],[40.745827,-74.044173,40.745776,-74.044206,3],[40.745776,-74.044206,40.745096,-74.044639,6],[40.746929,-74.051781,40.747566,-74.051352,11],[40.747566,-74.051352,40.74763,-74.051308,3],[40.74763,-74.051308,40.748172,-74.050928,11],[40.748235,-74.050884,40.748309,-74.050832,13],[40.748309,-74.050832,40.748808,-74.050487,13],[40.748871,-74.050443,40.748939,-74.050396,17],[40.748939,-74.050396,40.749442,-74.050049,22],[40.749442,-74.050049,40.749497,-74.050011,3],[40.749497,-74.050011,40.74957,-74.049961,9],[40.74957,-74.049961,40.750056,-74.049629,11],[40.750056,-74.049629,40.750121,-74.049585,2],[40.750121,-74.049585,40.750183,-74.049542,4],[40.750183,-74.049542,40.75065,-74.049218,10],[40.75065,-74.049218,40.75071,-74.049176,2],[40.75077,-74.049134,40.751265,-74.048789,6],[40.751318,-74.048751,40.751372,-74.048715,8],[40.751372,-74.048715,40.751863,-74.048388,10],[40.751863,-74.048388,40.751918,-74.048351,3],[40.753537,-74.052256,40.7535,-74.052164,4],[40.7535,-74.052164,40.753199,-74.051414,2],[40.748987,-74.041099,40.749026,-74.041197,7],[40.749026,-74.041197,40.749279,-74.041865,15],[40.749309,-74.041945,40.749336,-74.042017,9],[40.749336,-74.042017,40.7496,-74.042716,9],[40.7496,-74.042716,40.749634,-74.042806,2],[40.749634,-74.042806,40.749676,-74.04292,16],[40.749676,-74.04292,40.74993,-74.043617,14],[40.749959,-74.043699,40.749987,-74.043774,12],[40.749987,-74.043774,40.750241,-74.044457,8],[40.750274,-74.044554,40.7503,-74.044623,2],[40.7503,-74.044623,40.750551,-74.0453,12],[40.750581,-74.045381,40.750609,-74.045457,9],[40.750609,-74.045457,40.750795,-74.045946,3],[40.748714,-74.045365,40.74866,-74.0454,10],[40.747226,-74.04631,40.746794,-74.046585,6],[40.746734,-74.046623,40.746679,-74.046657,12],[40.750518,-74.045423,40.750581,-74.045381,2],[40.750581,-74.045381,40.750654,-74.045328,8],[40.752182,-74.044351,40.752239,-74.044315,3],[40.748106,-74.04376,40.748189,-74.043749,29],[40.749634,-74.042806,40.749702,-74.042762,24],[40.751212,-74.041782,40.751265,-74.041748,7],[40.751265,-74.041748,40.751327,-74.04171,7],[40.751327,-74.04171,40.751811,-74.041416,4],[40.745555,-74.043427,40.745804,-74.04411,8],[40.745827,-74.044173,40.74586,-74.044242,9],[40.74586,-74.044242,40.746102,-74.044909,6],[40.746127,-74.04498,40.746157,-74.045063,9],[40.746157,-74.045063,40.746402,-74.045726,5],[40.746453,-74.045862,40.746705,-74.046545,8],[40.746763,-74.046703,40.746997,-74.047354,6],[40.747021,-74.047419,40.747048,-74.047492,4],[40.747048,-74.047492,40.747347,-74.048311,5],[40.747163,-74.041247,40.747515,-74.041018,11],[40.747515,-74.041018,40.74805,-74.040669,2],[40.751283,-74.039609,40.751214,-74.039655,3],[40.751214,-74.039655,40.750628,-74.040036,4],[40.750628,-74.040036,40.750567,-74.040075,4],[40.751121,-74.045828,40.751562,-74.045527,23],[40.751562,-74.045527,40.752131,-74.045143,23],[40.75219,-74.045103,40.752396,-74.044967,16],[40.752464,-74.044914,40.752534,-74.044864,7],[40.752816,-74.044662,40.753403,-74.044253,7],[40.745374,-74.049809,40.745802,-74.049506,8],[40.753114,-74.05129,40.75304,-74.051172,3],[40.75304,-74.051172,40.752408,-74.0496,13],[40.752384,-74.049538,40.751947,-74.048426,11],[40.752568,-74.038783,40.753101,-74.038442,5],[40.751756,-74.040933,40.751869,-74.041231,4],[40.751947,-74.04144,40.7522,-74.042109,3],[40.752296,-74.042259,40.752437,-74.04241,2],[40.755763,-74.043427,40.755915,-74.043478,2],[40.756078,-74.043533,40.756523,-74.043662,2],[40.756591,-74.043682,40.7567,-74.043713,2],[40.755637,-74.045775,40.755115,-74.046135,11],[40.755115,-74.046135,40.755055,-74.046176,6],[40.755055,-74.046176,40.754992,-74.046219,8],[40.754992,-74.046219,40.75448,-74.04657,10],[40.75448,-74.04657,40.754423,-74.04661,2],[40.754423,-74.04661,40.754366,-74.046649,14],[40.754366,-74.046649,40.753831,-74.047014,17],[40.753831,-74.047014,40.753773,-74.047053,5],[40.753773,-74.047053,40.753714,-74.047095,6],[40.753714,-74.047095,40.753201,-74.047459,12],[40.753201,-74.047459,40.75314,-74.047503,7],[40.75314,-74.047503,40.752877,-74.04769,7],[40.752877,-74.04769,40.752569,-74.047909,16],[40.752569,-74.047909,40.752506,-74.047954,5],[40.752476,-74.047974,40.752001,-74.048295,9],[40.752001,-74.048295,40.751918,-74.048351,2],[40.754721,-74.051457,40.754679,-74.051353,4],[40.754219,-74.050201,40.753751,-74.04903,2],[40.754625,-74.042438,40.754731,-74.042739,5],[40.754731,-74.042739,40.754859,-74.043102,4],[40.753659,-74.039842,40.754096,-74.041048,4],[40.754134,-74.041146,40.754165,-74.041228,2],[40.754165,-74.041228,40.754275,-74.041515,7],[40.754275,-74.041515,40.754625,-74.042438,2],[40.753163,-74.038402,40.753184,-74.038518,2],[40.753184,-74.038518,40.753607,-74.039695,4],[40.754683,-74.042399,40.754791,-74.042331,3],[40.755237,-74.042045,40.755305,-74.041997,2],[40.755305,-74.041997,40.755821,-74.041681,6],[40.755868,-74.041655,40.755919,-74.041625,4],[40.754772,-74.040744,40.754743,-74.040665,2],[40.754802,-74.040828,40.754772,-74.040744,2],[40.755416,-74.040434,40.755469,-74.04058,6],[40.755469,-74.04058,40.755618,-74.040988,12],[40.755618,-74.040988,40.755836,-74.041586,3],[40.756033,-74.043258,40.755946,-74.043272,2],[40.746632,-74.048923,40.746672,-74.049028,8],[40.747438,-74.051021,40.747537,-74.051278,3],[40.747566,-74.051352,40.748029,-74.052541,19],[40.748689,-74.040268,40.748748,-74.040243,4],[40.748796,-74.040222,40.749179,-74.039962,11],[40.74504,-74.041857,40.745523,-74.04164,4],[40.745523,-74.04164,40.745838,-74.041498,2],[40.74609,-74.04137,40.746229,-74.041257,2],[40.755603,-74.04285,40.756281,-74.042403,5],[40.756383,-74.044165,40.756635,-74.044819,8],[40.755612,-74.043498,40.755673,-74.04369,6],[40.755673,-74.04369,40.756276,-74.045229,17],[40.756276,-74.045229,40.75631,-74.045315,5],[40.75631,-74.045315,40.756343,-74.0454,4],[40.756343,-74.0454,40.756697,-74.046311,24],[40.755673,-74.04369,40.755729,-74.043674,2],[40.756319,-74.04293,40.756357,-74.043009,2],[40.7511,-74.053985,40.751043,-74.053849,8],[40.749497,-74.050011,40.749464,-74.049928,3],[40.75137,-74.040608,40.751007,-74.040835,3],[40.754923,-74.043193,40.755552,-74.043382,2],[40.745519,-74.043326,40.745611,-74.043269,15],[40.747426,-74.04211,40.747482,-74.042074,4],[40.747482,-74.042074,40.747538,-74.042038,15],[40.747538,-74.042038,40.748515,-74.04141,11],[40.746142,-74.049268,40.746112,-74.049185,3],[40.746672,-74.048115,40.746606,-74.047927,2],[40.746672,-74.048115,40.746367,-74.048307,3],[40.748094,-74.047921,40.748066,-74.047842,6],[40.755326,-74.040389,40.754849,-74.040695,8],[40.754772,-74.040744,40.754704,-74.040786,8],[40.754704,-74.040786,40.754231,-74.041083,8],[40.754093,-74.041171,40.753903,-74.041291,3],[40.751317,-74.039709,40.751461,-74.040121,7],[40.751461,-74.040121,40.751528,-74.040312,2],[40.751584,-74.040473,40.751702,-74.04079,2],[40.746067,-74.049321,40.746142,-74.049268,9],[40.746234,-74.047854,40.746139,-74.047589,7],[40.746139,-74.047589,40.74634,-74.047462,5],[40.748861,-74.040748,40.748805,-74.040775,2],[40.748796,-74.040781,40.748656,-74.040863,2],[40.748755,-74.040689,40.748637,-74.040755,2],[40.746779,-74.048039,40.746661,-74.047714,2],[40.755786,-74.046946,40.755741,-74.046827,2],[40.755622,-74.046511,40.755614,-74.04644,4],[40.755623,-74.046398,40.755752,-74.046307,2],[40.755752,-74.046307,40.755809,-74.046267,7],[40.752908,-74.051701,40.752856,-74.051576,3],[40.752856,-74.051576,40.752727,-74.051273,6],[40.752727,-74.051273,40.752605,-74.05136,3],[40.752605,-74.05136,40.752448,-74.051474,4],[40.754439,-74.048723,40.754483,-74.04868,7],[40.754511,-74.04866,40.754683,-74.048541,28],[40.745472,-74.047753,40.745379,-74.047554,4],[40.751455,-74.053081,40.751305,-74.053169,10],[40.751289,-74.053251,40.751406,-74.053561,9],[40.75142,-74.053596,40.751473,-74.053722,4],[40.747438,-74.051021,40.747491,-74.050989,3],[40.747491,-74.050989,40.74754,-74.050957,15],[40.74754,-74.050957,40.747608,-74.051114,2],[40.751008,-74.049673,40.751491,-74.049342,4],[40.747474,-74.047037,40.747263,-74.046417,31],[40.752413,-74.052478,40.752355,-74.052387,2],[40.752355,-74.052387,40.752312,-74.052271,4],[40.752312,-74.052271,40.752277,-74.052165,4],[40.752277,-74.052165,40.752328,-74.0521,3],[40.752328,-74.0521,40.752375,-74.052046,2],[40.752485,-74.052125,40.752482,-74.052027,2],[40.75307,-74.048197,40.752911,-74.047775,5],[40.754445,-74.050557,40.754677,-74.050389,3],[40.754677,-74.050389,40.754525,-74.049992,24],[40.747493,-74.040958,40.747459,-74.040866,2],[40.74934,-74.039483,40.749516,-74.039949,14],[40.756708,-74.045045,40.756382,-74.045266,9],[40.748549,-74.047615,40.748611,-74.047569,9],[40.748611,-74.047569,40.749163,-74.047183,4],[40.749163,-74.047183,40.749297,-74.04709,6],[40.749297,-74.04709,40.74935,-74.047054,2],[40.74935,-74.047054,40.749694,-74.04682,5],[40.749752,-74.046777,40.750352,-74.046363,8],[40.750352,-74.046363,40.750431,-74.046303,15],[40.750431,-74.046303,40.750762,-74.046076,10],[40.755683,-74.045743,40.75565,-74.045661,5],[40.75631,-74.045315,40.756251,-74.045355,6],[40.756251,-74.045355,40.755752,-74.045695,10],[40.754723,-74.04337,40.754529,-74.043501,6],[40.751382,-74.040182,40.751342,-74.040239,3],[40.75135,-74.040536,40.75137,-74.040608,3],[40.747383,-74.048406,40.747458,-74.048352,8],[40.747458,-74.048352,40.747864,-74.048082,8],[40.747864,-74.048082,40.747915,-74.048046,8],[40.747915,-74.048046,40.748094,-74.047921,11],[40.748094,-74.047921,40.748495,-74.047653,8],[40.751193,-74.046011,40.751156,-74.04591,2],[40.751156,-74.04591,40.751121,-74.045828,8],[40.751128,-74.046229,40.75125,-74.04615,10],[40.74658,-74.04896,40.746632,-74.048923,2],[40.746632,-74.048923,40.746905,-74.048736,7],[40.746905,-74.048736,40.747208,-74.04853,4],[40.756697,-74.046311,40.756137,-74.046704,8],[40.756073,-74.046749,40.756018,-74.046786,8],[40.756018,-74.046786,40.755786,-74.046946,8],[40.755786,-74.046946,40.755504,-74.047138,7],[40.755439,-74.047182,40.75539,-74.047215,10],[40.75539,-74.047215,40.754875,-74.047566,13],[40.754875,-74.047566,40.754812,-74.047608,2],[40.754812,-74.047608,40.754759,-74.047645,14],[40.754759,-74.047645,40.75439,-74.047895,6],[40.75439,-74.047895,40.754276,-74.047987,3],[40.754249,-74.048016,40.754186,-74.048084,2],[40.754186,-74.048084,40.754137,-74.048147,5],[40.754124,-74.048164,40.753906,-74.048457,8],[40.753906,-74.048457,40.753736,-74.048782,2],[40.753667,-74.048969,40.753634,-74.049056,6],[40.753634,-74.049056,40.75358,-74.049252,4],[40.75358,-74.049252,40.75354,-74.049444,17],[40.75354,-74.049444,40.753429,-74.050077,12],[40.753429,-74.050077,40.753411,-74.050201,3],[40.753411,-74.050201,40.753391,-74.050316,9],[40.753391,-74.050316,40.753299,-74.050828,15],[40.753299,-74.050828,40.753257,-74.050977,6],[40.753257,-74.050977,40.753201,-74.051111,3],[40.753201,-74.051111,40.753154,-74.051214,3],[40.753114,-74.05129,40.75308,-74.051357,4],[40.75308,-74.051357,40.752908,-74.051701,2],[40.752908,-74.051701,40.752833,-74.051857,3],[40.752833,-74.051857,40.752676,-74.052172,2],[40.752676,-74.052172,40.752641,-74.052246,3],[40.752641,-74.052246,40.752486,-74.052577,8],[40.752486,-74.052577,40.752348,-74.05287,6],[40.752348,-74.05287,40.752264,-74.053047,17],[40.746127,-74.04498,40.7462,-74.044935,19],[40.748043,-74.043765,40.748106,-74.04376,6],[40.751756,-74.040933,40.751843,-74.040876,2]]};
 /* ============================================================
    Candy Trail - app engine (written by Ziggy after the agy
@@ -1755,17 +1856,21 @@ var PIN_TYPES = {
 };
 /* v6 markers: Ember & Ink shapes (shell CSS .mk). Candy status is carried
    by shape + color, never emoji. */
-var SVG_BAG = '<svg class="glyph" viewBox="0 0 24 24"><path d="M5.5 8h13l-1 12h-11z"/><path d="M9 10V6.5a3 3 0 0 1 6 0V10"/></svg>';
-var SVG_SPARK = '<svg class="glyph" viewBox="0 0 24 24"><path d="M12 3.5 13.8 9l5.5 3-5.5 3L12 20.5 10.2 15 4.7 12l5.5-3z"/></svg>';
-var SVG_CHECK = '<svg class="glyph" viewBox="0 0 24 24"><path d="m5 12.8 4.5 4.5L19 7.5"/></svg>';
+var SVG_BAG = '<svg class="glyph" viewBox="0 0 24 24"><path d="M6.2 8.5h11.6l1 9.7a1.8 1.8 0 0 1-1.8 1.8H7a1.8 1.8 0 0 1-1.8-1.8l1-9.7Z"/><path d="M9.2 8.5V6.8a2.8 2.8 0 0 1 5.6 0v1.7"/></svg>';
+var SVG_CANDY = '<svg class="glyph" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.8"/><path d="M14 8.7 16.5 4.2 19.8 7.5 15.3 10"/><path d="M10 15.3 7.5 19.8 4.2 16.5 8.7 14"/></svg>';
+var SVG_TRUNK = '<svg class="glyph" viewBox="0 0 24 24"><path d="M6.8 11 8.5 6.2h7L17.2 11"/><path d="M4.5 11h15v5h-15Z"/><path d="M6.2 16v3.2M17.8 16v3.2"/></svg>';
+var SVG_DECOR = '<svg class="glyph" viewBox="0 0 24 24"><path d="M12 3.5 14.3 9.7 20.5 12 14.3 14.3 12 20.5 9.7 14.3 3.5 12 9.7 9.7Z"/><path d="M16.5 7.5 18 6M7.5 7.5 6 6M16.5 16.5 18 18M7.5 16.5 6 18"/></svg>';
+var SVG_PRIZE = '<svg class="glyph" viewBox="0 0 24 24"><path d="M6 10.5h12V18.5A1.5 1.5 0 0 1 16.5 20h-9A1.5 1.5 0 0 1 6 18.5Z"/><path d="M12 10.5V20"/><path d="M12 10.5c-2.5 0-4-2-3.2-3.7C9.6 5.2 12 6.8 12 10.5c0-3.7 2.4-5.3 3.2-3.7.8 1.7-.7 3.7-3.2 3.7Z"/></svg>';
+var SVG_CHECK = '<svg class="glyph" viewBox="0 0 24 24"><path d="M6.5 12.5 10.2 16.2 17.8 8.2"/></svg>';
 var SVG_SPARK_BADGE = '<svg class="mk-badge" viewBox="0 0 24 24"><path d="M12 2 14 10 22 12 14 14 12 22 10 14 2 12 10 10Z" fill="#F5EFE6" stroke="#0E0A16" stroke-width="1.6"/></svg>';
 function markerHtml(cls, inner) { return '<div class="mk ' + cls + '"><div class="td">' + inner + '</div></div>'; }
 function pinIconHtml(type, kind) {
   if (type === 'out') return '<div class="mk mk-out"><div class="td"></div><i class="mk-slash"></i></div>';
-  if (type === 'nonfood') return '<div class="mk mk-teal"><div class="oct"><i></i><b class="plus"></b></div></div>';
-  if (type === 'decor') return markerHtml('mk-decor', SVG_SPARK);
+  if (type === 'nonfood') return '<div class="mk mk-teal"><div class="oct"><i></i>' + SVG_PRIZE + '</div></div>';
+  if (kind === 'trunk') return markerHtml('mk-candy', SVG_TRUNK);
   if (kind === 'shop') return markerHtml('mk-candy', SVG_BAG);
-  return markerHtml('mk-candy', '<i class="dot"></i>');
+  if (type === 'decor') return markerHtml('mk-decor', SVG_DECOR);
+  return markerHtml('mk-candy', SVG_CANDY);
 }
 function trimPinPhotos() {
   var withPhotos = S.pins.filter(function (p) { return p.photo; });
@@ -1782,7 +1887,7 @@ function renderPins() {
     });
     var pop = document.createElement('div');
     pop.className = 'pop';
-    var popHead = (p.kind === 'shop' && p.type === 'candy') ? 'Shop with treats' : esc(PIN_TYPES[p.type].label);
+    var popHead = (p.kind === 'shop' && p.type === 'candy') ? 'Shop with treats' : (p.kind === 'trunk' && p.type === 'candy') ? 'Trunk stop' : esc(PIN_TYPES[p.type].label);
     pop.innerHTML = '<b>' + popHead + '</b>' + (p.via === 'house' ? '<br><span class="muted" style="font-size:12px">Logged from your GPS when you tapped House visited</span>' : '') + (p.note ? '<br><i>' + esc(p.note) + '</i>' : '') + (p.photo ? '<br><img src="' + p.photo + '" style="max-width:150px;border-radius:10px;margin-top:4px" alt="Stop photo">' : '');
     var del = document.createElement('button');
     del.className = 'btn btn-ghost btn-sm'; del.textContent = 'Remove pin';
@@ -1865,14 +1970,14 @@ function stopVisited(lat, lng) {
   return false;
 }
 function heightsIconFor(s, lat, lng) {
-  if (S.ghostMode) return L.divIcon({ className: 'pinicon', iconSize: [28, 28], iconAnchor: [14, 24], html: '<div class="mk mk-ghost"><div class="td"><i class="dot"></i></div></div>' });
+  if (S.ghostMode) return L.divIcon({ className: 'pinicon', iconSize: [28, 28], iconAnchor: [14, 24], html: '<div class="mk mk-ghost"><div class="td">' + SVG_CANDY + '</div></div>' });
   if (stopVisited(lat, lng)) return L.divIcon({ className: 'pinicon', iconSize: [28, 28], iconAnchor: [14, 24], html: '<div class="mk mk-visited"><div class="td">' + SVG_CHECK + '</div></div>' });
-  var inner = s.t === 'biz' ? SVG_BAG : '<i class="dot"></i>';
+  var inner = s.t === 'biz' ? SVG_BAG : SVG_CANDY;
   var badge = s.seed ? SVG_SPARK_BADGE : '';
   return L.divIcon({ className: 'pinicon', iconSize: [34, 34], iconAnchor: [17, 30], html: '<div class="mk mk-candy"><div class="td">' + inner + '</div>' + badge + '</div>' });
 }
 function heightsPassHtml(s) {
-  var inner = s.t === 'biz' ? SVG_BAG : '<i class="dot"></i>';
+  var inner = s.t === 'biz' ? SVG_BAG : SVG_CANDY;
   return '<div class="mk mk-mini mk-candy"><div class="td">' + inner + '</div></div>';
 }
 function renderHeightsStops() {
@@ -2307,7 +2412,7 @@ function renderRoute(route) {
   });
   (route.passThrough || []).forEach(function (pt) {
     var m = L.marker([pt.lat, pt.lng], {
-      icon: L.divIcon({ className: 'pinicon', iconSize: [22, 22], iconAnchor: [11, 19], html: pt.stop ? heightsPassHtml(pt.stop) : '<div class="mk mk-mini mk-candy"><div class="td"><i class="dot"></i></div></div>' })
+      icon: L.divIcon({ className: 'pinicon', iconSize: [22, 22], iconAnchor: [11, 19], html: pt.stop ? heightsPassHtml(pt.stop) : '<div class="mk mk-mini mk-candy"><div class="td">' + SVG_CANDY + '</div></div>' })
     }).addTo(stopLayer);
     if (pt.stop) {
       m.bindPopup('<div class="pop"><b>' + esc(pt.stop.name || 'Treat stop') + '</b>' +
@@ -3762,7 +3867,7 @@ function paintLogKind() {
   if (!logCardPin) return;
   var k = logCardPin.kind || 'house';
   document.querySelectorAll('.lc-kind').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-kind') === k ? 'true' : 'false'); });
-  $('lcTitle').textContent = (k === 'shop') ? 'Shop with treats, logged' : 'Candy here, logged';
+  $('lcTitle').textContent = (k === 'shop') ? 'Shop with treats, logged' : (k === 'trunk') ? 'Trunk stop, logged' : 'Candy here, logged';
 }
 document.querySelectorAll('.lc-kind').forEach(function (b) {
   b.addEventListener('click', function () {
@@ -3777,13 +3882,16 @@ document.querySelectorAll('.lc-kind').forEach(function (b) {
    ~20 s while moving), pins (mirrored from crowdSyncPin), and haul counts.
    Backed by the Supabase party_posts table (public read/insert, rows simply
    age out client-side: positions 45 min, pins 6 h). */
-var PARTY = { code: '', name: '', timer: null, lastPosPost: 0, lastPosLL: null, lastCountJson: '', members: {}, counts: {}, joinTs: 0, kicked: {}, kickedLocal: {}, lastRows: [], chat: [], trails: {} };
+var PARTY = { code: '', name: '', timer: null, lastPosPost: 0, lastPosLL: null, lastCountJson: '', members: {}, counts: {}, joinTs: 0, kicked: {}, kickedLocal: {}, lastRows: [], chat: [], trails: {}, avatar: '', color: '', avatarDraft: '', avatarExplicit: false, colorDraft: '', meta: {}, markers: {}, iconSigs: {}, posRows: {}, trailRows: {}, states: {}, dock: {}, dockHidden: {}, dockOverflow: null, dockPill: null, labelUntil: {}, pinSeen: {}, pinSeenInit: false, compact: false, _avatarYielded: false };
 var partyLayer = L.layerGroup().addTo(map);
-try { var savedParty = store.get('party', null); if (savedParty && savedParty.code) { PARTY.code = String(savedParty.code); PARTY.name = String(savedParty.name || ''); PARTY.joinTs = savedParty.joinTs || Date.now(); } } catch (e) {}
+var partyMarkLayer = L.layerGroup().addTo(map);
+try { var savedParty = store.get('party', null); if (savedParty && savedParty.code) { PARTY.code = String(savedParty.code); PARTY.name = String(savedParty.name || ''); PARTY.joinTs = savedParty.joinTs || Date.now(); PARTY.avatar = String(savedParty.avatar || ''); PARTY.color = String(savedParty.color || ''); } } catch (e) {}
 function partyOn() { return !!(PARTY.code && PARTY.name && crowdOn()); }
+function partyTag() { return PARTY.avatar ? ('av1|' + PARTY.avatar + '|' + (PARTY.color || partyColor(PARTY.name))) : ''; }
 function partyPost(obj) {
   if (!partyOn()) return;
   obj.room = PARTY.code; obj.name = PARTY.name;
+  if ((obj.kind === 'pos' || obj.kind === 'count') && !obj.msg) { var tg = partyTag(); if (tg) obj.msg = tg; }
   fetch(CROWD.url + '/rest/v1/party_posts', { method: 'POST', headers: crowdHeaders(), body: JSON.stringify(obj) }).catch(function () {});
 }
 function partyGenCode() {
@@ -3801,6 +3909,127 @@ function partyPoll() {
     .catch(function () {});
   var cj = JSON.stringify({ h: S.counts.houses, c: S.counts.candy });
   if (cj !== PARTY.lastCountJson) { PARTY.lastCountJson = cj; partyPost({ kind: 'count', houses: S.counts.houses, candy: S.counts.candy }); }
+}
+/* ---------- Party avatars (v6.4 phase 2, Argon spec) ----------
+   Eight walkers on the 24 grid, stroke currentColor 1.9, solid micro
+   accents for eyes/fangs, .avatar-detail lines hidden at small sizes. */
+var AVATAR_ORDER = ['wisp', 'gourd', 'jinx', 'vesper', 'marrow', 'volt', 'hex', 'lazlo'];
+var AVATAR_NAMES = { wisp: 'Wisp', gourd: 'Gourd', jinx: 'Jinx', vesper: 'Vesper', marrow: 'Marrow', volt: 'Volt', hex: 'Hex', lazlo: 'Lazlo' };
+var AVATAR_BODY = {
+  wisp: '<path d="M6 19.5 L6 10.5 C6 6.2 8.8 3.5 12.5 3.5 C15.8 3.5 18 6.2 18 10.5 L18 19.5 C16.5 19.5 15.8 17.6 14.5 17.6 C13.2 17.6 13 20.2 12 20.2 C11 20.2 10.8 17.6 9.5 17.6 C8.2 17.6 7.5 19.5 6 19.5 Z"/><ellipse cx="10.2" cy="10.5" rx="1.1" ry="1.5" fill="currentColor" stroke="none"/><ellipse cx="14.2" cy="10.5" rx="1.1" ry="1.5" fill="currentColor" stroke="none"/><circle cx="12.2" cy="13.8" r="0.85" fill="currentColor" stroke="none"/>',
+  gourd: '<path d="M12 7 C9.5 6.5 3.5 7.5 3.5 13.8 C3.5 19.2 8.5 20.5 12 19.8 C15.5 20.5 20.5 19.2 20.5 13.8 C20.5 7.5 14.5 6.5 12 7 Z"/><path d="M12 7 C12 4.8 13.2 3.5 15 3.5"/><path class="avatar-detail" d="M8.2 15.8 C9.8 17.4 14.2 17.4 15.8 15.8"/><path d="M7.8 13 L9.4 10.4 L10.8 13 Z" fill="currentColor" stroke="none"/><path d="M13.2 13 L14.6 10.4 L16.2 13 Z" fill="currentColor" stroke="none"/>',
+  jinx: '<path d="M5.5 13.8 C5.5 17.8 8.3 20 12 20 C15.7 20 18.5 17.8 18.5 13.8 L18.5 5 L14.6 8.6 C13.8 8.3 12.9 8.2 12 8.2 C11.1 8.2 10.2 8.3 9.4 8.6 L5.5 5 Z"/><path class="avatar-detail" d="M2.5 13.2 L5.5 13.8 M2.8 16 L5.8 15.6 M21.5 13.2 L18.5 13.8 M21.2 16 L18.2 15.6"/><circle cx="9.3" cy="13.5" r="1.25" fill="currentColor" stroke="none"/><circle cx="14.7" cy="13.5" r="1.25" fill="currentColor" stroke="none"/><path d="M11.1 15.6 L12.9 15.6 L12 16.8 Z" fill="currentColor" stroke="none"/>',
+  vesper: '<path d="M12 8.8 L10.2 6 L9.2 9.2 C6.5 7.8 3.5 8.5 2 11.5 C4.6 11.6 5.8 13 6 15.2 C8 14 10 15 12 17.8 C14 15 16 14 18 15.2 C18.2 13 19.4 11.6 22 11.5 C20.5 8.5 17.5 7.8 14.8 9.2 L13.8 6 Z"/><circle cx="10.6" cy="11.8" r="0.95" fill="currentColor" stroke="none"/><circle cx="13.4" cy="11.8" r="0.95" fill="currentColor" stroke="none"/>',
+  marrow: '<path d="M8.5 17.2 L8.5 20.2 L15.5 20.2 L15.5 17.2 C18 16 19.5 13.6 19.5 10.8 C19.5 6.5 16.1 3.5 12 3.5 C7.9 3.5 4.5 6.5 4.5 10.8 C4.5 13.6 6 16 8.5 17.2 Z"/><path class="avatar-detail" d="M10.8 17.8 L10.8 20.2 M13.2 17.8 L13.2 20.2"/><circle cx="9.2" cy="11.2" r="1.55" fill="currentColor" stroke="none"/><circle cx="14.8" cy="11.2" r="1.55" fill="currentColor" stroke="none"/><path d="M11.1 14.8 L12.9 14.8 L12 13.1 Z" fill="currentColor" stroke="none"/>',
+  volt: '<path d="M6.5 4 L17.5 4 L17 17 C17 19.2 15 20.5 12 20.5 C9 20.5 7 19.2 7 17 Z"/><path class="avatar-detail" d="M6.6 8.2 L9.5 9.2 L11.5 7.6 L13.8 9.2 L17.4 8.2 M10 17.2 L14 17.2"/><path d="M6.8 14.5 L3 14.5 M3 12.8 L3 16.2 M17.2 14.5 L21 14.5 M21 12.8 L21 16.2"/><circle cx="9.6" cy="12.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="14.4" cy="12.5" r="1.2" fill="currentColor" stroke="none"/>',
+  hex: '<path d="M7 13.5 L10.5 5.2 C11.1 3.8 12.6 3.3 14.2 4 L17.8 5.8 L14.5 7.5 L17 13.5"/><path d="M3 13.8 C8.5 12.2 15.5 12.2 21 13.8"/><path d="M7.5 14 C7.5 18.2 9.4 20.5 12 20.5 C14.6 20.5 16.5 18.2 16.5 14"/><circle cx="10" cy="16.5" r="1.15" fill="currentColor" stroke="none"/><circle cx="14" cy="16.5" r="1.15" fill="currentColor" stroke="none"/>',
+  lazlo: '<path d="M7.2 10.5 L3.5 8.5 L6.5 16.5 L12 20.5 L17.5 16.5 L20.5 8.5 L16.8 10.5"/><path d="M7.2 11.5 C7.2 7.2 9.2 4.2 12 5.8 C14.8 4.2 16.8 7.2 16.8 11.5 C16.8 14.8 14.8 16.8 12 16.8 C9.2 16.8 7.2 14.8 7.2 11.5 Z"/><circle cx="10" cy="11.2" r="1.1" fill="currentColor" stroke="none"/><circle cx="14" cy="11.2" r="1.1" fill="currentColor" stroke="none"/><path d="M9.8 14.2 L10.6 15.6 L11.4 14.2 Z" fill="currentColor" stroke="none"/><path d="M12.6 14.2 L13.4 15.6 L14.2 14.2 Z" fill="currentColor" stroke="none"/>'
+};
+function avatarSvg(id) {
+  if (!AVATAR_BODY[id]) return '';
+  var nudge = (id === 'hex' || id === 'wisp') ? ' transform="translate(0,-0.6)"' : ((id === 'lazlo' || id === 'marrow') ? ' transform="translate(0,0.6)"' : '');
+  return '<svg class="avatar-glyph av-' + id + '" viewBox="0 0 24 24" aria-hidden="true"><g' + nudge + '>' + AVATAR_BODY[id] + '</g></svg>';
+}
+function partyHash(str) { var h = 0; var t = String(str || ''); for (var i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) >>> 0; return h; }
+function partyMetaFor(name) {
+  if (name === PARTY.name && PARTY.avatar) return { avatar: PARTY.avatar, color: PARTY.color || partyColor(name) };
+  var m = PARTY.meta[name];
+  if (m && (m.avatar || m.color)) return { avatar: m.avatar || null, color: m.color || partyColor(name) };
+  return { avatar: null, color: partyColor(name) };
+}
+function partyDefaultAvatar(seed, taken) {
+  var start = partyHash(seed || 'party') % 8;
+  for (var i = 0; i < 8; i++) { var id = AVATAR_ORDER[(start + i) % 8]; if (!taken || !taken[id]) return id; }
+  return AVATAR_ORDER[start];
+}
+function partyTakenMap(exceptName) {
+  var t = {};
+  Object.keys(PARTY.meta || {}).forEach(function (n) { if (n !== exceptName && PARTY.meta[n] && PARTY.meta[n].avatar) t[PARTY.meta[n].avatar] = n; });
+  return t;
+}
+function partyBearing(a, b) {
+  var dy = b.lat - a.lat, dx = (b.lng - a.lng) * Math.cos(b.lat * Math.PI / 180);
+  return (Math.atan2(dx, dy) * 180 / Math.PI + 360) % 360;
+}
+function partyMemberState(name) {
+  var rows = PARTY.trailRows[name] || [];
+  if (rows.length < 2) return { dwell: true, bearing: null, speed: 0 };
+  var nw = rows[0], ol = rows[1];
+  var d = haversine({ lat: ol.lat, lng: ol.lng }, { lat: nw.lat, lng: nw.lng });
+  var dt = Math.max(1, (new Date(nw.created_at).getTime() - new Date(ol.created_at).getTime()) / 1000);
+  var sp = d / dt;
+  return { dwell: d < 8 || sp < 0.5, bearing: d >= 8 ? partyBearing(ol, nw) : null, speed: sp };
+}
+function partyPuckHtml(name, st) {
+  var meta = partyMetaFor(name);
+  var inner = meta.avatar ? avatarSvg(meta.avatar) : '<span class="puck-ini">' + esc(partyInitials(name)) + '</span>';
+  var showLabel = !PARTY.dock[name] && ((PARTY.labelUntil[name] || 0) > Date.now() || (map.getZoom && map.getZoom() >= 17.5));
+  var off = PARTY.dock[name];
+  var style = '--pc:' + meta.color + (off ? ';transform:translate(' + off.x + 'px,' + off.y + 'px)' : '');
+  var pip = (!st.dwell && st.bearing != null) ? '<span class="puck-pipwrap" style="transform:rotate(' + Math.round(st.bearing) + 'deg)"><span class="puck-pip"></span></span>' : '';
+  return '<div class="puck' + (PARTY.compact ? ' puck-compact' : '') + (st.dwell ? ' puck-dwell' : '') + '" style="' + style + '">' + inner + pip + (showLabel ? '<span class="puck-label">' + esc(name) + '</span>' : '') + '</div>';
+}
+function partyFlashPuck(name) {
+  var m = PARTY.markers[name]; if (!m || !m.getElement) return;
+  var el = m.getElement(); if (!el || !el.querySelector) return;
+  var puck = el.querySelector('.puck'); if (!puck) return;
+  puck.classList.add('puck-flash');
+  var g = puck.querySelector('.avatar-glyph'); if (g) g.classList.add('puck-glyph-spring');
+  setTimeout(function () { puck.classList.remove('puck-flash'); if (g) g.classList.remove('puck-glyph-spring'); }, 420);
+}
+function partyRefreshMarkers(force) {
+  if (!partyOn()) return;
+  var seen = {};
+  Object.keys(PARTY.posRows).forEach(function (name) {
+    if (PARTY.dockHidden && PARTY.dockHidden[name]) {
+      var hm = PARTY.markers[name];
+      if (hm) { try { if (partyMarkLayer.removeLayer) partyMarkLayer.removeLayer(hm); } catch (e) {} delete PARTY.markers[name]; delete PARTY.iconSigs[name]; }
+      return;
+    }
+    seen[name] = 1;
+    var r = PARTY.posRows[name];
+    var st = partyMemberState(name);
+    var was = PARTY.states[name];
+    if (was && was.dwell && !st.dwell) PARTY.labelUntil[name] = Date.now() + 3500;
+    PARTY.states[name] = st;
+    var size = PARTY.compact ? 24 : 32;
+    var html = partyPuckHtml(name, st);
+    var sig = html + '|' + size;
+    var m = PARTY.markers[name];
+    if (!m) {
+      m = L.marker([r.lat, r.lng], { icon: L.divIcon({ className: 'partyicon', iconSize: [size, size], iconAnchor: [size / 2, size / 2], html: html }) });
+      if (name !== PARTY.name) {
+        m.bindPopup('<div class="pop"><b>' + esc(name) + '</b><br><span class="muted" style="font-size:12px">In your party · ' + partyAge(new Date(r.created_at).getTime()) + '</span></div>');
+        m.on('click', function () { PARTY.labelUntil[name] = Date.now() + 6000; PARTY.iconSigs[name] = ''; setTimeout(function () { partyRefreshMarkers(false); }, 6300); });
+      }
+      m.addTo(partyMarkLayer);
+      PARTY.markers[name] = m; PARTY.iconSigs[name] = sig;
+      if (!PARTY.labelUntil[name]) PARTY.labelUntil[name] = Date.now() + 4000;
+      return;
+    }
+    m.setLatLng([r.lat, r.lng]);
+    if (force || PARTY.iconSigs[name] !== sig) { m.setIcon(L.divIcon({ className: 'partyicon', iconSize: [size, size], iconAnchor: [size / 2, size / 2], html: html })); PARTY.iconSigs[name] = sig; }
+  });
+  Object.keys(PARTY.markers).forEach(function (name) {
+    if (seen[name]) return;
+    try { if (partyMarkLayer.removeLayer) partyMarkLayer.removeLayer(PARTY.markers[name]); } catch (e) {}
+    delete PARTY.markers[name]; delete PARTY.iconSigs[name];
+  });
+  /* Dock overflow pill: a >6 co-located group shows 5 pucks plus this. */
+  var ov = PARTY.dockOverflow;
+  if (ov) {
+    var pillHtml = '<div class="puck-overflow" style="transform:translate(' + ov.x + 'px,0)">+' + ov.count + '</div>';
+    var pillIcon = L.divIcon({ className: 'partyicon', iconSize: [32, 32], iconAnchor: [16, 16], html: pillHtml });
+    if (!PARTY.dockPill) { PARTY.dockPill = L.marker([ov.lat, ov.lng], { icon: pillIcon }); PARTY.dockPill.addTo(partyMarkLayer); }
+    else { PARTY.dockPill.setLatLng([ov.lat, ov.lng]); if (PARTY.dockPill.setIcon) PARTY.dockPill.setIcon(pillIcon); }
+  } else if (PARTY.dockPill) {
+    try { if (partyMarkLayer.removeLayer) partyMarkLayer.removeLayer(PARTY.dockPill); } catch (e) {}
+    PARTY.dockPill = null;
+  }
+}
+function partyMarkClear() {
+  try { partyMarkLayer.clearLayers(); } catch (e) {}
+  PARTY.markers = {}; PARTY.iconSigs = {}; PARTY.states = {}; PARTY.posRows = {}; PARTY.dockPill = null;
 }
 function partyInitials(name) {
   var parts = String(name || '?').trim().split(/\s+/);
@@ -3828,27 +4057,87 @@ function partyApply(rows) {
       if (!pinMap[k]) pinMap[k] = r;
     }
   });
+  /* Avatar meta: newest 'av1|<id>|<color>' tag per member wins; the
+     created_at of the post carrying it is the member's claim time (ts). */
+  var meta = {};
+  rows.forEach(function (r) {
+    if (meta[r.name] || !r.msg || String(r.msg).indexOf('av1|') !== 0) return;
+    var parts = String(r.msg).split('|');
+    var rts = new Date(r.created_at).getTime();
+    if (AVATAR_BODY[parts[1]]) meta[r.name] = { avatar: parts[1], color: /^#[0-9a-f]{6}$/i.test(parts[2] || '') ? parts[2] : null, ts: isFinite(rts) ? rts : 0 };
+  });
+  PARTY.meta = meta;
+  /* Uniqueness, deterministic: of two members claiming one walker, the
+     earlier claim holds (claim time = created_at of the newest av1 post;
+     ours falls back to joinTs). Equal times go to the lexicographically
+     smaller name. Only the loser yields, once. */
+  if (PARTY.avatar && !PARTY._avatarYielded) {
+    var ownMeta = meta[PARTY.name];
+    var ourTs = (ownMeta && ownMeta.avatar === PARTY.avatar && ownMeta.ts) ? ownMeta.ts : (PARTY.joinTs || 0);
+    var holder = null;
+    Object.keys(meta).forEach(function (n) {
+      if (n === PARTY.name || meta[n].avatar !== PARTY.avatar) return;
+      var hts = meta[n].ts || 0;
+      if (hts < ourTs || (hts === ourTs && n < PARTY.name)) holder = n;
+    });
+    if (holder) {
+      var takenY = partyTakenMap(PARTY.name); takenY[PARTY.avatar] = holder;
+      PARTY.avatar = partyDefaultAvatar(PARTY.code + PARTY.name, takenY);
+      PARTY._avatarYielded = true;
+      try { store.set('party', { code: PARTY.code, name: PARTY.name, avatar: PARTY.avatar, color: PARTY.color, joinTs: PARTY.joinTs }); } catch (e) {}
+      partyPost({ kind: 'count', houses: S.counts.houses, candy: S.counts.candy });
+      toast('That walker was taken, so tonight you are ' + (AVATAR_NAMES[PARTY.avatar] || 'another walker') + '.', 'ok');
+    }
+  }
   PARTY.members = pos; PARTY.counts = counts;
   PARTY.trails = trails;
+  PARTY.trailRows = trails;
   PARTY.chat = chats.slice().reverse().slice(-30);
+  if (partyOn() && S.pos && !pos[PARTY.name]) pos[PARTY.name] = { lat: S.pos.lat, lng: S.pos.lng, created_at: new Date().toISOString() };
+  PARTY.posRows = pos;
   partyLayer.clearLayers();
   Object.keys(trails).forEach(function (name) {
     var pts = trails[name].slice(0, 14).reverse().map(function (r) { return [r.lat, r.lng]; });
-    if (pts.length >= 2) L.polyline(pts, { color: partyColor(name), weight: 3, opacity: 0.55, dashArray: '1 7', lineCap: 'round' }).addTo(partyLayer);
+    if (pts.length >= 2) {
+      L.polyline(pts, { color: '#0B0A0E', weight: 6, opacity: 0.55, lineCap: 'round' }).addTo(partyLayer);
+      L.polyline(pts, { color: partyMetaFor(name).color, weight: 3, opacity: 0.6, lineCap: 'round' }).addTo(partyLayer);
+    }
   });
-  Object.keys(pos).forEach(function (name) {
-    if (name === PARTY.name) return;
-    var r = pos[name];
-    var m = L.marker([r.lat, r.lng], { icon: L.divIcon({ className: 'partyicon', iconSize: [36, 36], iconAnchor: [18, 18], html: '<div class="party-dot" style="border-color:' + partyColor(name) + ';background:#F5EFE6;background:color-mix(in srgb,' + partyColor(name) + ' 38%, #F5EFE6);color:#0E0A16">' + esc(partyInitials(name)) + '</div>' }) });
-    m.bindPopup('<div class="pop"><b>' + esc(name) + '</b><br><span class="muted" style="font-size:12px">In your party · ' + partyAge(new Date(r.created_at).getTime()) + '</span></div>');
-    m.addTo(partyLayer);
-  });
+  /* Co-location dock: 2-6 members within 18 screen px fan out sideways
+     (26px centers) instead of stacking, own name sorted first. Beyond 6,
+     the first 5 pucks show plus a bone +N overflow pill in the 6th slot;
+     the rest stay hidden until the group thins out. */
+  PARTY.dock = {}; PARTY.dockHidden = {}; PARTY.dockOverflow = null;
+  try {
+    var pnames = Object.keys(pos), ppx = {};
+    pnames.forEach(function (n) { ppx[n] = map.latLngToContainerPoint([pos[n].lat, pos[n].lng]); });
+    pnames.forEach(function (n) {
+      var grp = pnames.filter(function (o) { var a = ppx[n], b = ppx[o]; return Math.hypot(a.x - b.x, a.y - b.y) <= 18; });
+      if (grp.length < 2) return;
+      grp.sort(function (a, b) { if (a === PARTY.name) return -1; if (b === PARTY.name) return 1; return a < b ? -1 : 1; });
+      var gi = grp.indexOf(n);
+      if (grp.length <= 6) {
+        PARTY.dock[n] = { x: Math.round((gi - (grp.length - 1) / 2) * 26), y: 0 };
+      } else if (gi < 5) {
+        PARTY.dock[n] = { x: Math.round((gi - 2.5) * 26), y: 0 };
+        if (!PARTY.dockOverflow) PARTY.dockOverflow = { lat: pos[n].lat, lng: pos[n].lng, count: grp.length - 5, x: Math.round(2.5 * 26) };
+      } else {
+        PARTY.dockHidden[n] = 1;
+        if (!PARTY.dockOverflow) PARTY.dockOverflow = { lat: pos[n].lat, lng: pos[n].lng, count: grp.length - 5, x: Math.round(2.5 * 26) };
+      }
+    });
+  } catch (e) { PARTY.dock = {}; PARTY.dockHidden = {}; PARTY.dockOverflow = null; }
+  partyRefreshMarkers(false);
+  var firstPins = !PARTY.pinSeenInit;
   Object.keys(pinMap).forEach(function (k) {
     var r = pinMap[k];
-    var m = L.marker([r.lat, r.lng], { icon: L.divIcon({ className: 'pinicon', iconSize: [34, 34], iconAnchor: [17, 30], html: '<div style="position:relative">' + pinIconHtml(r.status, r.pkind) + '<span class="party-badge"><svg viewBox="0 0 24 24"><use href="#i-users"/></svg></span></div>' }) });
+    var m = L.marker([r.lat, r.lng], { icon: L.divIcon({ className: 'pinicon', iconSize: [34, 34], iconAnchor: [17, 30], html: '<div style="position:relative">' + pinIconHtml(r.status, r.pkind) + '<span class="party-collar" style="border-color:' + partyMetaFor(r.name).color + '"></span><span class="party-badge"><svg viewBox="0 0 24 24"><use href="#i-users"/></svg></span></div>' }) });
     m.bindPopup('<div class="pop"><b>' + esc(PIN_TYPES[r.status] ? PIN_TYPES[r.status].label : 'Treat spot') + '</b><br><span class="muted" style="font-size:12px">Logged by ' + esc(r.name) + ' · ' + partyAge(new Date(r.created_at).getTime()) + '</span></div>');
     m.addTo(partyLayer);
+    if (!firstPins && !PARTY.pinSeen[k] && r.name !== PARTY.name) partyFlashPuck(r.name);
+    PARTY.pinSeen[k] = 1;
   });
+  PARTY.pinSeenInit = true;
   renderPartyInfo();
 }
 function partyTotals() {
@@ -3879,9 +4168,65 @@ function rosterHtml() {
     var c = PARTY.counts[n];
     var right = c ? ((c.houses || 0) + ' houses · ' + (c.candy || 0) + ' candies') : 'on the map';
     var kick = (isAdmin && n !== PARTY.name) ? ' <button class="btn btn-ghost btn-sm partyKick" data-name="' + esc(n) + '">Kick</button>' : '';
-    return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:2px 0"><span>' + (n === PARTY.name ? '' : '') + esc(n) + (n === PARTY.name && isAdmin ? ' (host)' : '') + '</span><span class="muted">' + right + kick + '</span></div>';
+    var meta = partyMetaFor(n);
+    var av = meta.avatar ? '<span class="roster-av" style="border-color:' + meta.color + '">' + avatarSvg(meta.avatar) + '</span>' : '';
+    var idBtn = (n === PARTY.name) ? ' <button class="btn btn-ghost btn-sm partyIdentityBtn" type="button">Walker</button>' : '';
+    return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:2px 0"><span>' + av + esc(n) + (n === PARTY.name && isAdmin ? ' (host)' : '') + '</span><span class="muted">' + right + kick + idBtn + '</span></div>';
   }).join('');
 }
+/* Walker picker (join sheet) + identity popover (mid-party changes). */
+function walkerTilesHtml(selected, taken) {
+  return AVATAR_ORDER.map(function (id) {
+    var by = taken && taken[id];
+    return '<button type="button" class="walker-tile' + (by ? ' taken' : '') + '" data-avatar="' + id + '" aria-pressed="' + String(selected === id) + '" aria-label="' + AVATAR_NAMES[id] + (by ? ', taken by ' + esc(by) : '') + '">' + avatarSvg(id) +
+      (by ? '<span class="walker-claim"><i style="background:' + partyMetaFor(by).color + '"></i>' + esc(String(by).slice(0, 4).toUpperCase()) + '</span>' : '') + '</button>';
+  }).join('');
+}
+function colorsHtml(selected) {
+  return PARTY_COLORS.map(function (c) {
+    return '<button type="button" class="cdot" data-color="' + c + '" style="background:' + c + '" aria-pressed="' + String(selected === c) + '" aria-label="Party color ' + c + '"></button>';
+  }).join('');
+}
+function paintPartyDraft() {
+  var pv = $('partyPreview'), gr = $('walkerGrid'), cr = $('partyColors');
+  if (!pv || !gr || !cr) return;
+  var nameEl = $('partyName');
+  var nm = (nameEl && nameEl.value.trim()) || PARTY.name || 'You';
+  if (!PARTY.avatarDraft) PARTY.avatarDraft = PARTY.avatar || partyDefaultAvatar(nm, {});
+  var col = PARTY.colorDraft || partyColor(nm === 'You' ? '' : nm);
+  pv.innerHTML = '<div class="puck puck-lg" style="--pc:' + col + '">' + avatarSvg(PARTY.avatarDraft) + '</div>';
+  cr.innerHTML = colorsHtml(col);
+  gr.innerHTML = walkerTilesHtml(PARTY.avatarDraft, {});
+  cr.querySelectorAll('.cdot').forEach(function (b) { b.addEventListener('click', function () { PARTY.colorDraft = b.getAttribute('data-color'); paintPartyDraft(); }); });
+  gr.querySelectorAll('.walker-tile').forEach(function (b) { b.addEventListener('click', function () { PARTY.avatarDraft = b.getAttribute('data-avatar'); PARTY.avatarExplicit = true; paintPartyDraft(); }); });
+}
+function partyIdentitySaved() {
+  try { store.set('party', { code: PARTY.code, name: PARTY.name, avatar: PARTY.avatar, color: PARTY.color, joinTs: PARTY.joinTs }); } catch (e) {}
+  partyRefreshMarkers(true);
+  if (S.pos) partyPost({ kind: 'pos', lat: S.pos.lat, lng: S.pos.lng });
+  partyPost({ kind: 'count', houses: S.counts.houses, candy: S.counts.candy });
+  renderPartyBox();
+}
+function paintIdentity() {
+  var pv = $('identityPreview'), gr = $('identityGrid'), cr = $('identityColors');
+  if (!pv || !gr || !cr) return;
+  var col = PARTY.color || partyColor(PARTY.name);
+  pv.innerHTML = '<div class="puck puck-lg" style="--pc:' + col + '">' + (PARTY.avatar ? avatarSvg(PARTY.avatar) : '<span class="puck-ini">' + esc(partyInitials(PARTY.name)) + '</span>') + '</div>';
+  cr.innerHTML = colorsHtml(col);
+  gr.innerHTML = walkerTilesHtml(PARTY.avatar, partyTakenMap(PARTY.name));
+  cr.querySelectorAll('.cdot').forEach(function (b) { b.addEventListener('click', function () { PARTY.color = b.getAttribute('data-color'); partyIdentitySaved(); paintIdentity(); }); });
+  gr.querySelectorAll('.walker-tile').forEach(function (b) {
+    b.addEventListener('click', function () {
+      if (b.classList.contains('taken')) {
+        if (b.animate) b.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-2px)' }, { transform: 'translateX(2px)' }, { transform: 'translateX(0)' }], { duration: 120 });
+        return;
+      }
+      PARTY.avatar = b.getAttribute('data-avatar'); partyIdentitySaved(); paintIdentity();
+    });
+  });
+}
+function openIdentity() { if (!partyOn()) return; $('identityPop').hidden = false; paintIdentity(); }
+function closeIdentity() { var p = $('identityPop'); if (p) p.hidden = true; }
 function renderPartyBox() {
   var box = $('partyBox'); if (!box) return;
   var keepChat = null, keepFocus = false;
@@ -3892,6 +4237,10 @@ function renderPartyBox() {
       '<div class="label">Party mode</div>' +
       '<p class="muted" style="margin:2px 0 8px;font-size:13px">Trick-or-treat together: see each other live on the map, share the spots you log, and pool your haul.</p>' +
       '<input id="partyName" type="text" autocomplete="off" placeholder="Your name, e.g. Steve" value="' + esc(PARTY.name || '') + '">' +
+      '<div class="walker-preview" id="partyPreview"></div>' +
+      '<div class="party-colors" id="partyColors" role="group" aria-label="Your color"></div>' +
+      '<div class="label" style="margin-top:12px">Pick your walker</div>' +
+      '<div class="walker-grid" id="walkerGrid"></div>' +
       '<div class="party-actions"><button id="partyStart" class="btn btn-pur">Start a party</button><button id="partyJoinBtn" class="btn btn-ghost">Join with a code</button></div>' +
       '<div id="partyJoinRow" hidden style="margin-top:12px"><input id="partyCode" type="text" autocomplete="off" placeholder="Party code, e.g. TREAT123" style="text-transform:uppercase"><button id="partyJoinGo" class="btn btn-org" style="width:100%">Join party</button></div>';
     $('partyStart').addEventListener('click', function () {
@@ -3906,6 +4255,8 @@ function renderPartyBox() {
       var code = $('partyCode').value.trim().toUpperCase(); if (!code) { toast('Type the party code first.', 'warn'); return; }
       partyJoin(code, name);
     });
+    $('partyName').addEventListener('input', paintPartyDraft);
+    paintPartyDraft();
     if (typeof INVITE_CODE !== 'undefined' && INVITE_CODE) {
       var inv = $('partyInvite');
       inv.hidden = false;
@@ -3940,6 +4291,8 @@ function renderPartyBox() {
   box.querySelectorAll('.partyKick').forEach(function (b) {
     b.addEventListener('click', function () { partyKick(b.getAttribute('data-name')); });
   });
+  var pib = box.querySelector('.partyIdentityBtn');
+  if (pib) pib.addEventListener('click', openIdentity);
   var pcs = $('partyChatSend');
   if (pcs) pcs.addEventListener('click', partyChatSend);
   var pci = $('partyChatInput');
@@ -3949,7 +4302,9 @@ function renderPartyBox() {
 function partyJoin(code, name) {
   PARTY.code = code; PARTY.name = cleanName(name); PARTY.lastCountJson = '';
   PARTY.joinTs = Date.now();
-  try { store.set('party', { code: code, name: name, joinTs: PARTY.joinTs }); } catch (e) {}
+  PARTY.avatar = (PARTY.avatarExplicit && PARTY.avatarDraft) ? PARTY.avatarDraft : partyDefaultAvatar(code + PARTY.name, {});
+  PARTY.color = PARTY.colorDraft || partyColor(PARTY.name);
+  try { store.set('party', { code: code, name: PARTY.name, avatar: PARTY.avatar, color: PARTY.color, joinTs: PARTY.joinTs }); } catch (e) {}
   document.body.classList.add('in-party');
   $('partyBar').hidden = false;
   ensureWatch();
@@ -3966,7 +4321,7 @@ function partyLeave() {
   PARTY.code = ''; PARTY.lastCountJson = '';
   try { store.set('party', { code: '', name: PARTY.name }); } catch (e) {}
   if (PARTY.timer) { clearInterval(PARTY.timer); PARTY.timer = null; }
-  partyLayer.clearLayers();
+  partyLayer.clearLayers(); partyMarkClear();
   document.body.classList.remove('in-party');
   $('partyBar').hidden = true;
   var cpl = $('chipParty'); if (cpl) cpl.setAttribute('aria-pressed', 'false');
@@ -3986,6 +4341,9 @@ function partyTick() {
   partyPoll();
 }
 $('partyLeave').addEventListener('click', partyLeave);
+map.on('zoomend', function () { var c = map.getZoom() < 15; if (c !== PARTY.compact) { PARTY.compact = c; if (partyOn()) partyRefreshMarkers(true); } });
+$('identityDone').addEventListener('click', closeIdentity);
+$('identityPop').addEventListener('click', function (e) { if (e.target === this) closeIdentity(); });
 var INVITE_CODE = '';
 try { INVITE_CODE = (new URLSearchParams(location.search).get('party') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 16); } catch (e) {}
 renderPartyBox();
@@ -4114,6 +4472,42 @@ function haulModeText() {
 }
 
 var REC = { on: false, mode: 'free', startedAt: 0, origStartedAt: 0, baseElapsed: 0, seeded: false, points: [], houses: [], timer: null, layer: L.layerGroup().addTo(map), wake: null, confirming: false };
+/* Haul tab trail (v6.4 phase 2, R2-5): opening Haul draws tonight's
+   recorded trail on the main map and fits to it + tonight's pins, once
+   per opening; leaving the tab restores the view that was there. While
+   a recording is live the live trail already draws, so nothing moves. */
+var haulTrailLayer = L.layerGroup().addTo(map);
+var haulViewSave = null, haulTrailShown = false;
+function haulTrailPts() {
+  if (typeof REC !== 'undefined' && REC && REC.on) return null;
+  var w = walkLastObj() || walkActiveObj();
+  if (w && w.points && w.points.length >= 2) return w.points;
+  return null;
+}
+function showHaulTrail() {
+  var pts = haulTrailPts();
+  if (!pts) return;
+  haulTrailLayer.clearLayers();
+  splitSegments(pts).forEach(function (seg) {
+    var lls = seg.map(function (p) { return [p[0], p[1]]; });
+    if (lls.length >= 2) {
+      L.polyline(lls, { color: '#0E0A16', weight: 10, opacity: 0.9 }).addTo(haulTrailLayer);
+      L.polyline(lls, { color: '#E85D26', weight: 5, opacity: 0.95 }).addTo(haulTrailLayer);
+    } else if (lls.length === 1) {
+      L.circleMarker(lls[0], { radius: 4, color: '#0E0A16', weight: 2, fillColor: '#E85D26', fillOpacity: 1 }).addTo(haulTrailLayer);
+    }
+  });
+  try { haulViewSave = { c: map.getCenter(), z: map.getZoom() }; } catch (e) { haulViewSave = null; }
+  var all = pts.map(function (p) { return [p[0], p[1]]; });
+  S.pins.forEach(function (p) { all.push([p.lat, p.lng]); });
+  try { map.fitBounds(L.latLngBounds(all).pad(0.12)); } catch (e) {}
+  haulTrailShown = true;
+}
+function hideHaulTrail() {
+  haulTrailLayer.clearLayers();
+  if (haulTrailShown && haulViewSave && haulViewSave.c) { try { map.setView(haulViewSave.c, haulViewSave.z); } catch (e) {} }
+  haulTrailShown = false; haulViewSave = null;
+}
 function recPersist() { lsRawSet('ct_track_active', { startedAt: REC.startedAt, origStartedAt: REC.origStartedAt, baseElapsed: REC.baseElapsed, points: REC.points, houses: REC.houses }); }
 function recDrawPts(pts) {
   REC.layer.clearLayers();
@@ -4551,7 +4945,7 @@ function partyEject() {
   PARTY.code = ''; PARTY.lastCountJson = '';
   try { store.set('party', { code: '', name: PARTY.name }); } catch (e) {}
   if (PARTY.timer) { clearInterval(PARTY.timer); PARTY.timer = null; }
-  partyLayer.clearLayers();
+  partyLayer.clearLayers(); partyMarkClear();
   document.body.classList.remove('in-party');
   $('partyBar').hidden = true;
   var cpe = $('chipParty'); if (cpe) cpe.setAttribute('aria-pressed', 'false');
@@ -4638,7 +5032,9 @@ function chatHtml() {
   if (!PARTY.chat || !PARTY.chat.length) return '<p class="muted" style="font-size:13px">No messages yet. Say hi to your party.</p>';
   return PARTY.chat.slice(-8).map(function (r) {
     var when = new Date(r.created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-    return '<div style="font-size:13px;padding:2px 0"><b>' + esc(r.name) + '</b> <span class="muted">' + when + '</span><br>' + esc(r.msg || '') + '</div>';
+    var cm = partyMetaFor(r.name);
+    var av = cm.avatar ? '<span class="chat-av" style="border-color:' + cm.color + '">' + avatarSvg(cm.avatar) + '</span>' : '';
+    return '<div style="font-size:13px;padding:2px 0">' + av + '<b>' + esc(r.name) + '</b> <span class="muted">' + when + '</span><br>' + esc(r.msg || '') + '</div>';
   }).join('');
 }
 function partyChatSend() {
@@ -4673,7 +5069,8 @@ function switchTab(name) {
   $('tabParty').hidden = name !== 'party';
   $('tabHaul').hidden = name !== 'haul';
   if (name === 'party') renderPartyBox();
-  if (name === 'haul') { renderCounts(); if (typeof renderPinsList === 'function') renderPinsList(); }
+  if (name === 'haul') { renderCounts(); if (typeof renderPinsList === 'function') renderPinsList(); showHaulTrail(); }
+  else hideHaulTrail();
   updatePeek();
 }
 $$('#sheetTabs button').forEach(function (b) {
@@ -4682,19 +5079,81 @@ $$('#sheetTabs button').forEach(function (b) {
     if (sheetSnap === 'peek') applySnap(lastSnap);
   });
 });
+/* Photo viewer (v6.4 phase 2): one overlay surface, closed by the
+   Argon overlay-mode close component, a backdrop tap, or swipe. */
+function openPhotoView(src) {
+  if (!src) return;
+  var v = $('photoView'), im = $('photoViewImg');
+  if (!v || !im) return;
+  im.src = src; v.hidden = false;
+}
+function closePhotoView() { var v = $('photoView'); if (v) v.hidden = true; }
+/* My Pins addresses (v6.4 phase 2): prefer the address of the community
+   stop the pin sits on (within 40 m, data the app already has); else a
+   cached Nominatim reverse lookup; never an invented address. */
+var pinAddrCache = {};
+function pinAddrKey(p) { return p.lat.toFixed(4) + ',' + p.lng.toFixed(4); }
+function pinAddrText(p) {
+  var best = null, bd = 40;
+  var all = (typeof HEIGHTS_STOPS !== 'undefined' ? HEIGHTS_STOPS : []).concat(typeof SEED_STOPS !== 'undefined' ? SEED_STOPS : []);
+  for (var i = 0; i < all.length; i++) {
+    var st = all[i]; if (!st.addr) continue;
+    var d = haversine(p, { lat: st.lat, lng: st.lon });
+    if (d < bd) { bd = d; best = st; }
+  }
+  if (best) return (best.name ? best.name + ' · ' : '') + best.addr;
+  return pinAddrCache[pinAddrKey(p)] || '';
+}
+function revGeocodePin(p) {
+  var key = pinAddrKey(p);
+  if (key in pinAddrCache) return;
+  pinAddrCache[key] = '';
+  fetchT('https://nominatim.openstreetmap.org/reverse?format=json&zoom=18&addressdetails=1&lat=' + p.lat + '&lon=' + p.lng, {}, 6000)
+    .then(function (r) { return r.json(); })
+    .then(function (j) {
+      if (!j) return;
+      var a = j.address || {};
+      var txt = ((a.house_number ? a.house_number + ' ' : '') + (a.road || '')).trim() || j.display_name || '';
+      if (!txt) return;
+      pinAddrCache[key] = txt;
+      $$('#pinsList [data-addrkey="' + key + '"]').forEach(function (el2) { el2.textContent = txt; });
+    }).catch(function () {});
+}
 function renderPinsList() {
   var el = $('pinsList'); if (!el) return;
   if (!S.pins.length) { el.innerHTML = '<p class="muted" style="font-size:13.5px;margin:2px">No pins yet tonight.</p>'; return; }
   el.innerHTML = S.pins.slice().reverse().map(function (p, ri) {
     var i = S.pins.length - 1 - ri;
     var when = new Date(p.ts).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-    return '<button class="pinrow" type="button" data-i="' + i + '"><span class="pinrow-ic">' + pinIconHtml(p.type, p.kind) + '</span><span style="flex:1;min-width:0"><b>' + esc(PIN_TYPES[p.type] ? PIN_TYPES[p.type].label : 'Pin') + (p.kind === 'shop' && p.type === 'candy' ? ' · Shop' : '') + '</b><br><span class="muted" style="font-size:12px">' + when + (p.note ? ' · ' + esc(p.note) : '') + '</span></span></button>';
+    var tags = [];
+    if (p.kind === 'shop') tags.push('Shop');
+    if (p.kind === 'trunk') tags.push('Trunk');
+    if (p.type === 'nonfood') tags.push('Non-food');
+    if (p.type === 'out') tags.push('Ran out');
+    if (p.type === 'decor') tags.push('Decor');
+    if (p.via === 'house') tags.push('GPS log');
+    var title = (p.kind === 'shop' && p.type === 'candy') ? 'Shop with treats' : (p.kind === 'trunk' && p.type === 'candy') ? 'Trunk stop' : (PIN_TYPES[p.type] ? PIN_TYPES[p.type].label : 'Pin');
+    return '<div class="pinrow" data-i="' + i + '">' +
+      '<span class="pinrow-ic">' + pinIconHtml(p.type, p.kind) + '</span>' +
+      '<span class="pinrow-main" data-act="go"><b>' + esc(title) + '</b>' +
+      '<span class="pinrow-addr" data-addrkey="' + pinAddrKey(p) + '">' + esc(pinAddrText(p) || 'Finding address\u2026') + '</span>' +
+      (tags.length ? '<span class="pinrow-tags">' + tags.map(function (t) { return '<span class="tag">' + t + '</span>'; }).join('') + '</span>' : '') +
+      '<span class="muted" style="display:block;font-size:12px">' + when + (p.note ? ' · ' + esc(p.note) : '') + '</span></span>' +
+      (p.photo ? '<button class="pinrow-thumb" type="button" data-act="photo" aria-label="View photo of this stop"><img src="' + p.photo + '" alt=""></button>' : '') +
+      '<button class="pinrow-del" type="button" data-act="del" aria-label="Delete this pin"><svg class="ic" viewBox="0 0 24 24"><use href="#i-trash"/></svg></button>' +
+      '</div>';
   }).join('');
   $$('.pinrow', el).forEach(function (r) {
-    r.addEventListener('click', function () {
-      var p = S.pins[+r.getAttribute('data-i')];
-      if (p) map.flyTo([p.lat, p.lng], 17, { duration: 0.5 });
+    var p = S.pins[+r.getAttribute('data-i')];
+    if (!p) return;
+    r.querySelector('[data-act="go"]').addEventListener('click', function () { map.flyTo([p.lat, p.lng], 17, { duration: 0.5 }); });
+    var th = r.querySelector('[data-act="photo"]');
+    if (th) th.addEventListener('click', function () { openPhotoView(p.photo); });
+    r.querySelector('[data-act="del"]').addEventListener('click', function () {
+      var ix = S.pins.indexOf(p);
+      if (ix >= 0) { S.pins.splice(ix, 1); store.set('pins', S.pins); renderPins(); }
     });
+    if (!pinAddrText(p)) revGeocodePin(p);
   });
 }
 /* Preferences slide-over */
@@ -4703,6 +5162,10 @@ function closePrefs() { $('prefsMenu').hidden = true; $('prefsScrim').hidden = t
 $('btnPrefsOpen').addEventListener('click', openPrefs);
 $('prefsClose').addEventListener('click', closePrefs);
 $('prefsScrim').addEventListener('click', closePrefs);
+$('photoViewClose').addEventListener('click', closePhotoView);
+$('photoView').addEventListener('click', function (e) { if (e.target === this) closePhotoView(); });
+$('lcThumb').addEventListener('click', function () { if (logCardPin && logCardPin.photo) openPhotoView(logCardPin.photo); });
+$('pinSheetClose').addEventListener('click', function () { $('pinSheet').hidden = true; });
 $('prefKid').addEventListener('click', function () { closePrefs(); kidSet(true); });
 $('prefShare').addEventListener('click', function () { var b = $('btnShareApp'); if (b) b.click(); });
 $('prefExport').addEventListener('click', function () { var b = $('btnSumExport'); if (b) b.click(); });
