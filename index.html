@@ -5862,7 +5862,7 @@ $('barPartySeg').addEventListener('click', partySegTap);
 $('drawerChat').addEventListener('click', function () { partyCardClose(); setChatChannel('party'); switchTab('chat'); });
 $('barPreview').addEventListener('click', function () { BAR.previewUntil = 0; if (BAR.previewTimer) clearTimeout(BAR.previewTimer); setChatChannel('party'); switchTab('chat'); paintBar(); });
 $('barBackMap').addEventListener('click', function () { applySnap('peek'); });
-$('barNavX').addEventListener('click', function () { endNav(false); openBarSearch(); });
+$('barNavX').addEventListener('click', function () { endNav(false); if (typeof paintBar === 'function') paintBar(); });
 /* Pull-down on the bar's middle slot opens the drawer (24px threshold);
    a swipe up on the drawer closes it. */
 (function () {
@@ -6156,6 +6156,7 @@ function recBegin(mode) {
   if (mode === 'free') {
     document.body.classList.add('is-recording');
     paintDeck(); recSetConfirm(false);
+    if (typeof paintBar === 'function') paintBar();
     toast('Recording your walk. The trail draws itself as you go.', 'ok');
   }
 }
@@ -6259,6 +6260,7 @@ document.addEventListener('visibilitychange', function () {
     document.body.classList.add('is-recording');
     paintChromeState();
     paintDeck(); recSetConfirm(false);
+    if (typeof paintBar === 'function') paintBar();
     recDrawPts(REC.points);
     REC.timer = setInterval(recTick, 1000); recTick();
     recWakeReq();
