@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0A16">
-<meta name="version" content="6.5">
+<meta name="version" content="6.6">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -127,7 +127,8 @@ body.kid #fabSpot{display:none}
 #sheetHandle i{display:block;width:44px;height:5px;border-radius:3px;background:var(--line2)}
 #sheetBrand{display:flex;align-items:center;gap:9px;padding:3px 0 7px;flex:none}
 #sheetBrand .mark{width:28px;height:28px;flex:none}
-#sheetBrand .wordmark{font-size:19px}
+#sheetBrand .wordmark{font-size:19px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#btnSheetLog{flex:none;white-space:nowrap}
 #sheet.snap-peek #sheetBrand{display:none}
 #btnSheetLog{margin-left:auto;display:none;min-height:40px;padding:6px 14px;font-size:14px}
 #sheet.logpill #btnSheetLog{display:inline-flex}
@@ -283,10 +284,9 @@ dialog .row .btn{flex:1;min-width:130px}
 /* ---------- context menu / banners ---------- */
 #ctxMenu{position:fixed;z-index:1600;display:flex;flex-direction:column;gap:8px;padding:10px;min-width:210px}
 #ctxMenu .btn{justify-content:flex-start}
-#gpsFuzzy{position:fixed;z-index:1115;left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);top:calc(var(--topH) + 8px);display:flex;flex-direction:column;gap:1px;padding:9px 14px;border:1px solid #f59e0b;border-radius:12px;font-size:13px}
-#gpsFuzzy[hidden]{display:none}
-#gpsFuzzy span{color:var(--mut);font-size:12px}
-#partyPill{position:fixed;z-index:1120;top:calc(var(--topH) + 8px);left:50%;transform:translateX(-50%);max-width:88vw;height:36px;
+/* (v6.6 Phase 4A, Argon ruling A: the two-line fuzzy banner is deleted.
+   GPS degradation folds into the Locate button and the party pill.) */
+#partyPill{position:fixed;z-index:1120;top:calc(var(--topH) + 8px);left:50%;transform:translateX(-50%);max-width:88vw;height:48px;
   display:flex;align-items:center;gap:8px;padding:0 14px 0 10px;border-radius:999px;background:rgba(20,14,28,.90);
   border:1px solid var(--line2);color:var(--txt);font-size:13px;font-weight:700;box-shadow:0 8px 22px rgba(0,0,0,.45);cursor:pointer}
 #partyPill[hidden]{display:none}
@@ -294,6 +294,53 @@ dialog .row .btn{flex:1;min-width:130px}
 #partyPillDots i{width:14px;height:14px;border-radius:50%;border:2px solid #16101E;margin-left:-5px;display:block}
 #partyPillDots i:first-child{margin-left:0}
 #partyPillText{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* ---------- v6.6 Phase 4A: pill card, walk chrome, update bar, zone lock ---------- */
+#partyPillDots i.gpsdot{background:transparent;border:2px dashed var(--org);width:12px;height:12px}
+#fabLocate.degraded{color:var(--org);border:1.5px dashed var(--org)}
+#partyCard{position:fixed;z-index:1120;top:calc(var(--topH) + 8px);left:50%;transform:translateX(-50%);width:300px;max-width:88vw;background:rgba(20,14,28,.97);border:1px solid var(--line2);border-radius:18px;box-shadow:0 16px 40px rgba(0,0,0,.55);color:var(--txt);overflow:hidden}
+#partyCard[hidden]{display:none}
+#partyCard.pop{animation:pcpop .18s ease}
+@keyframes pcpop{from{opacity:.4;transform:translateX(-50%) scale(.96)}to{opacity:1;transform:translateX(-50%) scale(1)}}
+#pcHead{display:flex;align-items:center;gap:8px;width:100%;min-height:48px;padding:6px 8px 6px 14px;background:transparent;border:0;color:var(--txt);cursor:pointer;text-align:left;font-family:inherit}
+#pcTitle{font-weight:800;font-size:14.5px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pcWalking{color:var(--mut);font-size:12.5px;font-weight:700;white-space:nowrap}
+#pcChev{flex:none;display:grid;place-items:center;width:32px;height:32px;color:var(--mut)}
+#pcRows{max-height:192px;overflow-y:auto;border-top:1px solid var(--line)}
+.pc-row{display:flex;align-items:center;gap:9px;width:100%;min-height:48px;padding:4px 8px 4px 14px;background:transparent;border:0;border-bottom:1px solid var(--line);color:var(--txt);cursor:pointer;text-align:left;font-family:inherit}
+.pc-row:last-child{border-bottom:0}
+.pc-dot{flex:none;width:10px;height:10px;border-radius:50%}
+.pc-name{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px;font-weight:700}
+.pc-state{color:var(--mut);font-size:12px;white-space:nowrap}
+.pc-houses{font-size:12.5px;font-weight:700;white-space:nowrap}
+.pc-x{flex:none;display:grid;place-items:center;width:32px;height:32px;color:var(--mut)}
+#pcFoot{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
+#pcChat{flex:1;min-height:48px}
+#pcChat .cnt{background:#241631;color:var(--ink);border-radius:99px;font-size:10px;font-weight:800;padding:1px 6px;margin-left:6px}
+#pcInvite{flex:none;width:96px;min-height:48px}
+#updateBar{display:flex;align-items:center;gap:9px;width:100%;min-height:48px;margin:0 0 4px;padding:6px 4px;background:#241631;border:1px solid var(--org);border-radius:14px;color:var(--ink);font-size:14.5px;font-weight:700;font-family:inherit;cursor:pointer;flex:none;text-align:left}
+#updateBar[hidden]{display:none}
+#updateBar .udot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--org);margin-left:8px}
+#updateBar .utxt{flex:1;min-width:0}
+#updateBar .uref{flex:none;color:var(--org);font-weight:800;padding-right:10px}
+body.has-update #sheet.snap-peek{height:214px}
+body.walk-slim #sheet.snap-peek{height:104px}
+body.walk-slim #sheetHandle{min-height:10px;padding:1px 0 0}
+body.walk-slim #sheetTabs{padding:2px;margin:0}
+body.walk-slim #sheetTabs button{min-height:26px}
+body.walk-slim #peek{min-height:52px}
+body.walk-slim:not(.mode-nav) #fabSpot{bottom:calc(var(--sab) + 120px)}
+body.walk-on #btnFind,body.walk-on #btnPrefsOpen,body.walk-on #layerChips{display:none}
+body.walk-on #fabLocate{position:fixed;right:calc(var(--sar) + 16px);bottom:calc(var(--sab) + 234px);z-index:1200}
+body.walk-on.walk-slim #fabLocate{bottom:calc(var(--sab) + 176px)}
+body.walk-on.snap-half #fabLocate{bottom:calc(48dvh + var(--sab) + 24px)}
+#topChrome,#partyPill,#partyCard,#exploreCard,#drawPill{transition:opacity .2s ease}
+body.snap-full #topChrome,body.snap-full #partyPill,body.snap-full #partyCard,body.snap-full #fabSpot,body.snap-full #fabLocate,body.snap-full #exploreCard,body.snap-full #drawPill,body.snap-full #pickBanner{opacity:0;pointer-events:none}
+#zoneLockBar{flex:none;display:flex;align-items:center;justify-content:center;gap:6px;min-height:48px;margin-top:8px;padding:6px 12px;border:1px solid var(--line);border-radius:14px;background:var(--bg2);color:var(--mut);font-size:13.5px}
+#zoneLockBar[hidden]{display:none}
+.zone-lock-pin{border:0;background:transparent;color:var(--org2);font-weight:800;font-size:13.5px;font-family:inherit;min-height:48px;padding:0 6px;cursor:pointer;text-decoration:underline}
+.chat-lock-note{color:var(--mut);font-size:13.5px;text-align:center;padding:18px 18px 8px;line-height:1.5}
+.chat-lock-note b{color:var(--txt);font-size:14.5px}
+.zone-pin-cta{margin-top:12px;min-height:48px;padding:0 22px}
 #gpsBanner{position:fixed;z-index:1120;left:calc(50% + var(--sal) / 2 - var(--sar) / 2);transform:translateX(-50%);top:calc(var(--topH) + 8px);
   padding:8px 14px;border-radius:999px;background:var(--card);border:1px solid var(--cau);color:var(--cau2);font-size:13px;font-weight:700;box-shadow:0 8px 22px rgba(0,0,0,.45)}
 
@@ -312,10 +359,10 @@ dialog .row .btn{flex:1;min-width:130px}
 .roster-puck{flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:#16101E;--av-stage:#16101E;border:2.5px solid var(--pc,#888);color:var(--pc,#888)}
 .roster-puck .avatar-glyph{width:22px;height:22px}
 .roster-puck .puck-ini{font-size:12px;font-weight:800;color:var(--pc,#888)}
-.roster-main{flex:1;min-width:0}
-.roster-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.roster-main{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
+.roster-name{display:block;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .roster-name .youtag{color:var(--org2);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-left:6px}
-.roster-sub{color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.roster-sub{display:block;color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .roster-right{flex:none;text-align:right;font-size:12.5px}
 .roster-right .muted{display:block;font-size:11.5px}
 #partyOpenChat{width:100%;margin-top:10px;min-height:48px}
@@ -326,26 +373,22 @@ dialog .row .btn{flex:1;min-width:130px}
 .chat-seg button[aria-pressed="true"]{background:var(--pur);color:var(--ink)}
 .chat-seg .cnt{background:var(--org);color:var(--ink);border-radius:99px;font-size:10px;font-weight:800;padding:1px 6px}
 .chat-solo{display:flex;align-items:center;gap:8px;min-height:48px}
-.chat-solo .cs-title{flex:1;min-width:0;font-weight:800;font-size:14px}
+.chat-solo .cs-title{flex:1;min-width:0;font-weight:800;font-size:14px;font-family:"Fraunces",Georgia,serif}
 .chat-solo .cs-title span{display:block;color:var(--mut);font-weight:600;font-size:12px}
 #zoneBar{flex:none;background:#1D1526;color:var(--mut);font-size:12px;border-radius:10px;padding:8px 12px;margin-bottom:8px;text-align:center}
 #chatScroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:2px 2px 6px}
 .chat-empty{color:var(--mut);font-size:13.5px;text-align:center;padding:26px 18px;line-height:1.5}
 .cb-div{text-align:center;color:#8A7F96;font-size:11px;margin:12px 0 8px}
-.cb-row{display:flex;align-items:flex-end;gap:6px;margin-top:8px}
+.cb-row{display:flex;align-items:flex-end;margin-top:8px}
 .cb-row.me{justify-content:flex-end}
-.cb-col{display:flex;flex-direction:column;gap:4px;max-width:80%;min-width:0}
+.cb-col{display:flex;flex-direction:column;gap:4px;flex:0 1 auto;min-width:0;max-width:82%}
 .cb-row.me .cb-col{align-items:flex-end}
-.cb-av{flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#16101E;--av-stage:#16101E;border:2px solid var(--pc,#888);color:var(--pc,#888)}
-.cb-av .avatar-glyph{width:17px;height:17px}
-.cb-av .avatar-detail{display:none}
-.cb-b{border:1.5px solid;border-radius:14px;padding:7px 10px;font-size:15px;line-height:1.4;color:#F4EFEA;word-break:break-word;max-width:100%}
-.cb-row.other .cb-b{background:#1F172B;border-bottom-left-radius:14px}
-.cb-row.other .cb-b.last{border-bottom-left-radius:4px}
-.cb-row.me .cb-b{background:#26192E;border-bottom-right-radius:14px}
-.cb-row.me .cb-b.last{border-bottom-right-radius:4px}
-.cb-h{font-size:12px;font-weight:600;margin-bottom:2px}
-.cb-ts{display:block;text-align:right;color:#8A7F96;font-size:11px;margin-top:3px}
+.cb-b{width:fit-content;max-width:100%;border:1px solid rgba(244,239,234,.14);border-radius:14px;padding:7px 10px;font-size:15px;line-height:1.4;color:#F4EFEA;word-break:break-word;overflow-wrap:break-word}
+.cb-row.other .cb-b{background:rgba(255,255,255,.05)}
+.cb-row.me .cb-b{background:rgba(232,93,4,.16);border-color:rgba(232,93,4,.45)}
+.cb-h{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;margin-bottom:2px}
+.cb-dot{flex:none;width:8px;height:8px;border-radius:50%}
+.cb-ts{font-size:11px;color:#8A7F96;margin-top:1px}
 .cb-jumbo{font-size:32px;line-height:1.25}
 .cb-img{display:block;max-width:210px;max-height:230px;width:100%;border-radius:10px;object-fit:cover;cursor:pointer;background:#16101E}
 #chatComposer{flex:none;display:flex;gap:8px;align-items:stretch;padding-top:8px}
@@ -756,6 +799,28 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
 #haulPhotoRow{margin-top:12px}
 #haulPhotoAdd{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:48px}
 #haulPhotoBar label.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px}
+/* ---------- v6.6 Phase 4A fix 11: Unified Loop Bar ---------- */
+#loopBar{margin:2px 0 10px}
+.loop-meta{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:.09em;color:var(--mut)}
+#loopHint{color:#f59e0b;letter-spacing:.02em;font-weight:700}
+#loopHint[hidden]{display:none}
+.loop-main{display:flex;gap:8px;align-items:stretch;margin-top:4px;min-height:48px}
+#loopReadout{flex:1;min-width:0;display:flex;align-items:center;gap:8px;padding:0 12px;border:1px solid var(--line2);border-radius:14px;background:var(--bg2);color:var(--txt);font-size:14.5px;font-weight:600;font-family:inherit;cursor:pointer;text-align:left}
+#loopReadout[hidden]{display:none}
+#loopReadout svg{flex:none;color:var(--org2)}
+#loopValue{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.loop-form{flex:1;min-width:0;position:relative;display:flex;align-items:center}
+.loop-form[hidden]{display:none}
+.loop-form input{flex:1;min-width:0;min-height:48px;border-radius:14px;border:1px solid var(--org);background:var(--bg2);color:var(--txt);padding:0 44px 0 12px;font-size:16px}
+#loopClear{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;border-radius:50%;background:transparent;color:var(--mut);font-size:20px;font-family:inherit;cursor:pointer}
+#loopSugg{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:30;background:var(--card);border:1px solid var(--line2);border-radius:14px;overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.5)}
+#loopSugg[hidden]{display:none}
+#loopSugg button{display:block;width:100%;padding:11px 12px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--txt);font-size:13.5px;font-family:inherit;text-align:left;cursor:pointer}
+#loopSugg button:last-child{border-bottom:0}
+.loop-actions{display:flex;gap:8px;flex:none}
+.loop-pill{min-height:48px;padding:0 14px;white-space:nowrap}
+.loop-pill[hidden]{display:none}
+#btnDrop.loop-outline{border:1.5px solid var(--org);color:var(--org2)}
 </style>
 </head>
 <body class="mode-plan">
@@ -815,7 +880,6 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
   </div>
 </div>
 
-<div id="gpsFuzzy" class="card" hidden role="status"><b>Weak GPS signal (usually indoors)</b><span>Showing your general area &middot; Step outside or drag your start pin.</span></div>
 
 <button id="fabSpot" type="button" aria-label="Mark a spot at your location"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6c-3.7 0-6.4 2.8-6.4 6.3 0 4.3 6.4 10.5 6.4 10.5s6.4-6.2 6.4-10.5c0-3.5-2.7-6.3-6.4-6.3Z"/><path d="M12 8.2v5M9.5 10.7h5"/></svg><span>Mark Spot</span></button>
 
@@ -843,6 +907,12 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
   <span id="partyPillDots" aria-hidden="true"></span><span id="partyPillText"></span>
 </button>
 
+<div id="partyCard" hidden role="dialog" aria-label="Party summary">
+  <button id="pcHead" type="button"><span id="pcTitle">Party</span><span id="pcWalking"></span><span id="pcChev"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chev"/></svg></span></button>
+  <div id="pcRows"></div>
+  <div id="pcFoot"><button id="pcChat" class="btn btn-org" type="button">Chat<span class="cnt" id="pcChatCnt" hidden>0</span></button><button id="pcInvite" class="btn btn-ghost" type="button">Invite</button></div>
+</div>
+
 <div id="recBar" hidden role="status">
   <span class="recdot" aria-hidden="true"></span>
   <span class="rectime" id="recTime">0:00</span>
@@ -857,6 +927,7 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
 </div>
 
 <div id="sheet" class="card snap-peek">
+  <button id="updateBar" type="button" hidden><span class="udot" aria-hidden="true"></span><span class="utxt">New version ready</span><span class="uref">Refresh</span></button>
   <button id="sheetHandle" type="button" aria-label="Expand or collapse the panel"><i></i></button>
   <div id="sheetBrand">
     <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon"/></svg>
@@ -898,16 +969,21 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
       </div>
       <div id="planInputs" class="plan-edit">
         <button id="btnStart" class="btn btn-org btn-xl" type="button" style="width:100%;margin-bottom:12px"><svg class="ic" viewBox="0 0 24 24"><use href="#i-flag"/></svg>Start</button>
-        <div class="label">Where do we start?</div>
-        <div class="row2">
-          <button id="btnLocate" class="btn btn-org" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-locate"/></svg>Use my location</button>
-          <button id="btnDrop" class="btn" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-pin"/></svg>Drop a pin</button>
+        <div id="loopBar">
+          <div class="loop-meta"><span>START &amp; END &middot; LOOP</span><span id="loopHint" hidden>Fuzzy GPS &middot; drag pin to fix</span></div>
+          <div class="loop-main">
+            <button id="loopReadout" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-pin"/></svg><span id="loopValue">Type an address or use GPS</span></button>
+            <form class="search loop-form" id="searchForm" hidden>
+              <input id="searchInput" type="search" placeholder="Type an address or place" autocomplete="off" enterkeyhint="search" aria-label="Start address">
+              <button id="loopClear" type="button" aria-label="Clear address">&times;</button>
+              <div id="loopSugg" hidden></div>
+            </form>
+            <span class="loop-actions">
+              <button id="btnLocate" class="btn btn-org loop-pill" type="button">Use GPS</button>
+              <button id="btnDrop" class="btn loop-pill" type="button">Drop pin</button>
+            </span>
+          </div>
         </div>
-        <form class="search" id="searchForm">
-          <input id="searchInput" type="search" placeholder="Or type an address or place" autocomplete="off" enterkeyhint="search" aria-label="Start address">
-          <button class="btn" type="submit" aria-label="Search address"><svg class="ic" viewBox="0 0 24 24"><use href="#i-search"/></svg></button>
-        </form>
-        <div id="homeRow"><span id="homeRowLabel">Start &amp; end: My GPS location</span><button id="homeRowBtn" type="button">Set on map</button></div>
         <div class="label">How long do we have?</div>
         <div class="budgetCtl">
           <div class="budgetHead"><span class="budgetLbl">Walk time</span><span id="budgetReadout" class="budgetVal">60 min</span></div>
@@ -932,7 +1008,7 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
       </div>
       <div class="sheetfoot">
         <div class="wm">Candy Trail</div>
-        <div class="ver" id="appVer">Candy Trail v6.5</div>
+        <div class="ver" id="appVer">Candy Trail v6.6</div>
       </div>
     </div>
 
@@ -946,13 +1022,14 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
       <div id="zoneBar" hidden>In Jersey City Heights &middot; Visible to nearby walkers &middot; Clears in 4h</div>
       <div id="chatScroll"><div id="chatLog"></div></div>
       <div id="chatComposer">
-        <button id="chatPersonaBtn" type="button" hidden aria-label="Your Heights Live walker"></button>
+        <button id="chatPersonaBtn" type="button" hidden aria-label="Your Local walker"></button>
         <label id="chatPhotoBtn" for="chatPhoto" aria-label="Send a photo"><svg class="ic" viewBox="0 0 24 24"><use href="#i-camera"/></svg></label>
         <input id="chatPhoto" type="file" accept="image/*" hidden>
         <input id="chatInput" type="text" autocomplete="off" placeholder="Message your party" maxlength="140">
         <span id="chatCount" hidden></span>
         <button id="chatSend" class="btn btn-org" type="button">Send</button>
       </div>
+      <div id="zoneLockBar" hidden></div>
     </div>
 
     <div id="tabHaul" role="tabpanel" hidden>
@@ -1688,9 +1765,9 @@ function voiceCmdVisited() {
   }
   if (idx < 0) idx = nav.stopIdx;
   var st = nav.stops[idx];
+  var prevIdx = nav.stopIdx;
   nav.stopIdx = idx + 1;
-  if (!nav.visited) nav.visited = new Set();
-  for (var vi = 0; vi <= idx; vi++) nav.visited.add(vi);
+  for (var vi = prevIdx; vi <= idx; vi++) navMarkVisited(vi);
   S.counts.houses++; S.counts.hist.push('houses');
   store.set('counts', S.counts); renderCounts();
   if (navigator.vibrate) navigator.vibrate(60);
@@ -1834,8 +1911,21 @@ function ensureWatch() {
 var bestTrustedFix = null, fuzzySince = 0, fuzzyTimer = null;
 var FUZZY_PILL_DELAY_MS = 4000;
 function accTier(acc) { acc = (acc == null ? 999 : acc); return acc <= 35 ? 1 : (acc <= 65 ? 2 : 3); }
-function showFuzzyPill() { var el = $('gpsFuzzy'); if (el) el.hidden = false; }
-function hideFuzzyPill() { var el = $('gpsFuzzy'); if (el) el.hidden = true; }
+/* GPS degradation surface (v6.6 Phase 4A, Argon ruling A): the fuzzy
+   banner component is gone. The state folds into the Locate button
+   (broken ember ring when solo) and the party status pill (ember dot
+   + "Weak GPS"). The show/hide entry points keep their names because
+   the honesty machinery calls them: tier-3 fixes still never drive
+   visited checks or the recorder; only the presentation moved. */
+var GPS_DEGRADED = false;
+function showFuzzyPill() { GPS_DEGRADED = true; paintGpsDegraded(); }
+function hideFuzzyPill() { GPS_DEGRADED = false; paintGpsDegraded(); }
+function paintGpsDegraded() {
+  var b = $('fabLocate');
+  if (b) b.classList.toggle('degraded', GPS_DEGRADED);
+  paintLoopBar();
+  paintPartyPill();
+}
 function noteFuzzyFix() {
   if (!fuzzySince) fuzzySince = Date.now();
   if (fuzzyTimer) return;
@@ -1956,6 +2046,14 @@ $('btnIntroOk').addEventListener('click', function () {
    its v5 contract for existing callers: true -> peek, false -> last open snap. */
 var SHEET_SNAPS = { peek: 162, half: function () { return Math.round(window.innerHeight * 0.48); }, full: function () { return Math.round(window.innerHeight * 0.88); } };
 var sheetSnap = 'peek', lastSnap = 'half';
+/* One chrome state for every floating control (v6.6 Phase 4A): walk-on
+   while a walk or a party is live (search + chips collapse away, the
+   Locate button docks by the sheet lip); the snap classes set in
+   applySnap drive the overlay fade past ~65% viewport height. */
+function paintChromeState() {
+  var on = !!S.nav || (typeof REC !== 'undefined' && !!REC.on) || (typeof partyOn === 'function' && partyOn());
+  document.body.classList.toggle('walk-on', on);
+}
 function snapH(name) { var v = SHEET_SNAPS[name]; return typeof v === 'function' ? v() : v; }
 function applySnap(name) {
   sheetSnap = name; if (name !== 'peek') lastSnap = name;
@@ -1965,6 +2063,9 @@ function applySnap(name) {
   sh.style.height = '';
   document.body.classList.toggle('sheet-collapsed', name === 'peek');
   document.body.classList.toggle('fab-hide', name !== 'peek');
+  document.body.classList.remove('snap-peek', 'snap-half', 'snap-full');
+  document.body.classList.add('snap-' + name);
+  if (name === 'full' && typeof partyCardClose === 'function') partyCardClose();
   sh.classList.toggle('logpill', name !== 'peek');
   document.documentElement.style.setProperty('--bottomH', name === 'peek' ? '172px' : (name === 'half' ? '52vh' : '92vh'));
   try { map.invalidateSize(); } catch (e) {}
@@ -2031,6 +2132,7 @@ renderMute();
 
 /* locate fab */
 $('fabLocate').addEventListener('click', function () {
+  if (GPS_DEGRADED) toast('Showing your general area · Step outside or drag your start pin', 'warn');
   ensureWatch();
   getPosOnce().then(function (p) {
     S.follow = true;
@@ -2041,15 +2143,38 @@ $('fabLocate').addEventListener('click', function () {
 /* ---------------- start point ---------------- */
 var homeMarker = null;
 function startIsCustom() { return !!(S.start && S.start.label !== 'My location'); }
-function paintHomeRow() {
-  var lbl = $('homeRowLabel'), btn = $('homeRowBtn');
-  if (!lbl || !btn) return;
-  if (startIsCustom()) { lbl.textContent = 'Start & end: Custom pin · Drag on map'; btn.textContent = 'Use GPS'; }
-  else { lbl.textContent = 'Start & end: My GPS location'; btn.textContent = 'Set on map'; }
+/* Unified Loop Bar paint (v6.6 Phase 4A, fix 11): the readout shows
+   the current anchor; the trailing pills show only the modes that are
+   NOT active (Use GPS is ember primary only when nothing is anchored;
+   Drop pin wears an ember outline in the weak-GPS state). */
+function loopAnchorState() {
+  if (!S.start) return 'none';
+  if (S.start.label === 'My location') return (GPS_DEGRADED || S.locTier === 3) ? 'gpsfuzzy' : 'gps';
+  if (S.start.label === 'Dropped pin') return 'pin';
+  return 'addr';
+}
+function paintLoopBar() {
+  var val = $('loopValue'), hint = $('loopHint'), gps = $('btnLocate'), drop = $('btnDrop');
+  if (!val) return;
+  var st = loopAnchorState();
+  val.textContent = st === 'none' ? 'Type an address or use GPS'
+    : st === 'gps' ? 'My GPS location'
+    : st === 'gpsfuzzy' ? 'My GPS (approximate)'
+    : st === 'pin' ? 'Custom map pin'
+    : (S.start.label || 'Custom map pin');
+  if (hint) hint.hidden = st !== 'gpsfuzzy';
+  if (gps) {
+    gps.hidden = st === 'gps' || st === 'gpsfuzzy';
+    gps.className = 'btn loop-pill' + (st === 'none' ? ' btn-org' : '');
+  }
+  if (drop) {
+    drop.hidden = st === 'pin' || st === 'addr';
+    drop.className = 'btn loop-pill' + (st === 'gpsfuzzy' ? ' loop-outline' : '');
+  }
 }
 function renderStart() {
   if (homeMarker) { map.removeLayer(homeMarker); homeMarker = null; }
-  paintHomeRow();
+  paintLoopBar();
   if (S.start) {
     homeMarker = L.marker([S.start.lat, S.start.lng], {
       icon: L.divIcon({ className: 'homeicon', iconSize: [42, 42], iconAnchor: [21, 38], html: '<div class="tdh"><svg viewBox="0 0 24 24"><path d="M4 11.2 12 4l8 7.2"/><path d="M6.2 9.8V20h11.6V9.8"/></svg></div>' }),
@@ -2084,15 +2209,6 @@ function setStart(lat, lng, label, fly) {
   renderStart();
   if (fly) map.flyTo([lat, lng], Math.max(map.getZoom(), 16), { duration: 0.6 });
 }
-$('homeRowBtn').addEventListener('click', function () {
-  if (startIsCustom()) {
-    var p = S.pos;
-    S.start = null; store.set('start', null);
-    if (p) setStart(p.lat, p.lng, 'My location', false); else renderStart();
-  } else {
-    enterPick('start', 'Tap the map to drop your start');
-  }
-});
 $('btnLocate').addEventListener('click', function () {
   ensureWatch();
   showBusy('Finding you…', 'GPS can take a few seconds outside.');
@@ -2124,6 +2240,7 @@ $('btnDrop').addEventListener('click', function () {
   enterPick('start', 'Tap the map to drop your start');
 });
 map.on('click', function (e) {
+  if (typeof PC !== 'undefined' && PC.open) partyCardClose();
   if (S.draw) { drawAdd(snapDrawPoint({ lat: e.latlng.lat, lng: e.latlng.lng })); return; }
   if (S.pickMode === 'start') {
     setStart(e.latlng.lat, e.latlng.lng, 'Dropped pin', false);
@@ -2163,8 +2280,62 @@ $('searchForm').addEventListener('submit', function (ev) {
     if (!arr || !arr.length) { toast('No match for that address. Try adding the city.', 'warn'); return; }
     var a = arr[0];
     setStart(parseFloat(a.lat), parseFloat(a.lon), (a.display_name || '').split(',').slice(0, 2).join(','), true);
+    loopEditClose();
     toast('Start set from search.', 'ok');
   }).catch(function () { hideBusy(); toast('Search failed. Check your connection.', 'err'); });
+});
+
+/* Loop Bar edit mode (fix 11): tapping the readout turns it into the
+   address input; suggestions geocode live through the same Nominatim
+   endpoint the submit path uses, and picking one sets the anchor with
+   the same label rule. Enter still submits through the form handler. */
+function loopEditOpen() {
+  var ro = $('loopReadout'), f = $('searchForm');
+  if (ro) ro.hidden = true;
+  if (f) f.hidden = false;
+  var inp = $('searchInput');
+  if (inp) {
+    if (S.start && S.start.label && S.start.label !== 'My location' && S.start.label !== 'Dropped pin') inp.value = S.start.label;
+    try { inp.focus(); } catch (e) {}
+  }
+}
+function loopEditClose() {
+  var ro = $('loopReadout'), f = $('searchForm'), sg = $('loopSugg');
+  if (ro) ro.hidden = false;
+  if (f) f.hidden = true;
+  if (sg) sg.hidden = true;
+}
+$('loopReadout').addEventListener('click', loopEditOpen);
+$('loopClear').addEventListener('click', function () {
+  var inp = $('searchInput');
+  if (inp) { inp.value = ''; try { inp.focus(); } catch (e) {} }
+  var sg = $('loopSugg'); if (sg) sg.hidden = true;
+});
+var loopSuggTimer = null;
+$('searchInput').addEventListener('input', function () {
+  var q = $('searchInput').value.trim();
+  var sg = $('loopSugg');
+  if (loopSuggTimer) clearTimeout(loopSuggTimer);
+  if (q.length < 3) { if (sg) sg.hidden = true; return; }
+  loopSuggTimer = setTimeout(function () {
+    var near = S.pos || S.start;
+    var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=5&q=' + encodeURIComponent(q) +
+      (near ? '&viewbox=' + (near.lng - 0.3) + ',' + (near.lat + 0.3) + ',' + (near.lng + 0.3) + ',' + (near.lat - 0.3) : '');
+    fetchT(url, { headers: { 'Accept': 'application/json' } }, 12000).then(function (r) { return r.json(); }).then(function (arr) {
+      if (!sg || !arr || !arr.length) { if (sg) sg.hidden = true; return; }
+      sg.innerHTML = arr.map(function (a, i) { return '<button type="button" data-i="' + i + '">' + esc((a.display_name || '').split(',').slice(0, 3).join(',')) + '</button>'; }).join('');
+      sg.hidden = false;
+      sg.querySelectorAll('button').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var a = arr[parseInt(b.getAttribute('data-i'), 10)];
+          if (!a) return;
+          setStart(parseFloat(a.lat), parseFloat(a.lon), (a.display_name || '').split(',').slice(0, 2).join(','), true);
+          loopEditClose();
+          toast('Start set from search.', 'ok');
+        });
+      });
+    }).catch(function () { if (sg) sg.hidden = true; });
+  }, 300);
 });
 
 /* ---------------- budget slider ---------------- */
@@ -2202,7 +2373,7 @@ function bumpCount(kind, btn) {
   while (S.counts.histLog.length < S.counts.hist.length - 1) S.counts.histLog.push(null);
   var logRes = kind === 'houses' ? logHouseLocation() : null;
   S.counts.histLog.push(logRes ? logRes.ts : null);
-  if (logRes) { crowdSyncPin(logRes.pin); toast('House counted.', 'ok'); }
+  if (logRes) { crowdSyncPin(logRes.pin); navMarkNear(logRes.pin.lat, logRes.pin.lng, 25); toast('House counted.', 'ok'); }
   else if (kind === 'houses') toast(logFailToast(), 'warn');
   store.set('counts', S.counts); renderCounts(btn);
 }
@@ -2436,6 +2607,7 @@ function spotSetCounted(pin, on) {
     S.counts.hist.push('houses');
     while (S.counts.histLog.length < S.counts.hist.length - 1) S.counts.histLog.push(null);
     S.counts.histLog.push(pin.ts);
+    navMarkNear(pin.lat, pin.lng, 25);
   } else if (!on && ix >= 0) {
     S.counts.histLog.splice(ix, 1);
     if (S.counts.hist[ix] === 'houses') S.counts.hist.splice(ix, 1);
@@ -3622,6 +3794,28 @@ $('btnFitMore').addEventListener('click', function () {
   $('btnFitMore').innerHTML = open ? 'Less &#9652;' : 'More &#9662;';
 });
 
+/* The ONE visited set every path writes (v6.6 Phase 4A, Argon must-fix 1):
+   created with the nav state in startNav; GPS arrival, the Skip button,
+   voice commands, the House button, and the Spot Visited toggle all mark
+   through these helpers, and rerouteFromHere reads the same set. Before
+   this fix only the voice path ever created the set, so a reroute after
+   any other kind of visit could send the walker back to finished houses
+   (and the reroute read itself threw on a voice-free night). */
+function navMarkVisited(idx) {
+  var nav = S.nav; if (!nav) return;
+  if (!nav.visited) nav.visited = new Set();
+  if (idx >= 0 && idx < nav.stops.length) nav.visited.add(idx);
+}
+function navMarkNear(lat, lng, rangeM) {
+  var nav = S.nav; if (!nav || !nav.stops) return;
+  var bd = rangeM, bi = -1;
+  for (var i = 0; i < nav.stops.length; i++) {
+    var d = haversine({ lat: lat, lng: lng }, nav.stops[i]);
+    if (d <= bd) { bd = d; bi = i; }
+  }
+  if (bi >= 0) navMarkVisited(bi);
+}
+
 /* Deviated? One press builds a fresh route from where you stand: new stops
    (skipping ones already visited), sized to the time left, ending at home. */
 function rerouteFromHere() {
@@ -3755,7 +3949,7 @@ function startNav() {
   var nav = S.nav = {
     steps: r.maneuvers, stepIdx: 1, stops: r.stops, stopIdx: 0,
     startedAt: Date.now(), trackDist: 0, lastTrack: null,
-    offCount: 0, lastReroute: 0, announced: {}, timer: null, done: false
+    offCount: 0, lastReroute: 0, announced: {}, visited: new Set(), timer: null, done: false
   };
   /* aim at the first maneuver meaningfully ahead of where we stand */
   if (S.pos) {
@@ -3766,6 +3960,9 @@ function startNav() {
   }
   if (nav.stepIdx >= nav.steps.length) nav.stepIdx = Math.max(1, nav.steps.length - 1);
   document.body.classList.add('mode-nav');
+  document.body.classList.add('walk-slim');
+  paintChromeState();
+  versionMaybeShow();
   S.follow = true;
   applyHeadUp();
   requestWake();
@@ -3865,6 +4062,7 @@ function navOnPos() {
     if (sd < arriveR) {
       var arrivedStop = nav.stops[nav.stopIdx];
       nav.stopIdx++;
+      navMarkVisited(nav.stopIdx - 1);
       S.counts.houses++; S.counts.hist.push('houses');
       store.set('counts', S.counts); renderCounts();
       if (navigator.vibrate) navigator.vibrate(60);
@@ -3980,6 +4178,7 @@ function doHeadHome() {
     S.route.coords = r.coords; S.route.maneuvers = r.maneuvers; S.route.distance = r.distance;
     nav.steps = r.maneuvers; nav.stepIdx = 1; nav.announced = {};
     nav.stops = []; nav.stopIdx = 0; nav.headingHome = true;
+    if (nav.visited) nav.visited.clear();
     routeLayer.clearLayers();
     var latlngs = r.coords.map(function (c) { return [c.lat, c.lng]; });
     L.polyline(latlngs, { color: '#0E0A16', weight: 10, opacity: 0.9 }).addTo(routeLayer);
@@ -4001,6 +4200,7 @@ $('btnHeadHome').addEventListener('click', function () {
 $('btnSkipStop').addEventListener('click', function () {
   var nav = S.nav; if (!nav) return;
   if (nav.stopIdx >= nav.stops.length) { toast('No more stops to skip.', 'warn'); return; }
+  navMarkVisited(nav.stopIdx);
   nav.stopIdx++;
   updateStopMarkers();
   speakNow('Skipped. Next stop, ' + (nav.stopIdx + 1) + ' of ' + nav.stops.length + '.');
@@ -4029,11 +4229,14 @@ function endNav(showSummary) {
   headUp.manual = false; document.body.classList.remove('rot-manual');
   S.nav = null;
   document.body.classList.remove('mode-nav');
+  document.body.classList.remove('walk-slim');
   var mapEl = $('map');
   mapEl.classList.remove('headup'); mapEl.style.transform = '';
   try { map.invalidateSize(); } catch (e) {}
   if (wakeLock) { try { wakeLock.release(); } catch (e) {} wakeLock = null; }
   recEndSession();
+  paintChromeState();
+  versionMaybeShow();
   if (showSummary) openSummary();
 }
 $('btnNav').addEventListener('click', startNav);
@@ -4716,14 +4919,17 @@ function partyRosterNames() {
    stats are never shown twice (R3-3, R3-5). Tapping it opens Party. */
 function paintPartyPill() {
   var pill = $('partyPill'); if (!pill) return;
+  paintChromeState();
   var show = partyOn() && S.sheetTab !== 'party';
+  if (typeof PC !== 'undefined' && PC.open) show = false;
   pill.hidden = !show;
-  if (!show) return;
+  if (!show) { if (!partyOn()) partyCardClose(); return; }
   var t = partyTotals();
-  $('partyPillDots').innerHTML = partyRosterNames().slice(0, 6).map(function (n) {
+  $('partyPillDots').innerHTML = partyRosterNames().slice(0, 4).map(function (n) {
     return '<i style="background:' + partyMetaFor(n).color + '"></i>';
-  }).join('');
-  $('partyPillText').textContent = t.people + ' walking · ' + t.houses + ' houses';
+  }).join('') + (GPS_DEGRADED ? '<i class="gpsdot" title="Weak GPS"></i>' : '');
+  $('partyPillText').textContent = GPS_DEGRADED ? (t.people + ' walking · Weak GPS') : (t.people + ' walking · ' + t.houses + ' houses');
+  paintPartyCard();
 }
 function renderPartyInfo() {
   if (!partyOn()) return;
@@ -4739,7 +4945,7 @@ function rosterHtml() {
   var isAdmin = (typeof partyIsAdmin === 'function') && partyIsAdmin();
   return partyRosterNames().map(function (n) {
     var c = PARTY.counts[n];
-    var haul = c ? ((c.houses || 0) + ' houses · ' + (c.candy || 0) + ' candies') : 'on the map';
+    var haul = c ? ((c.houses || 0) + ' houses') : 'on the map';
     var meta = partyMetaFor(n);
     var pos = PARTY.posRows[n];
     var fresh = '';
@@ -4857,11 +5063,7 @@ function renderPartyBox() {
     ((typeof INVITE_CODE !== 'undefined' && INVITE_CODE && INVITE_CODE !== PARTY.code) ? '<button id="partySwitch" class="btn btn-ghost" style="width:100%;margin-top:8px">Switch to invited party ' + esc(INVITE_CODE) + '</button>' : '') +
     '<button id="partyOpenChat" class="btn btn-ghost" type="button">Open Party Chat &rarr;</button>';
   var piv = $('partyInviteBtn');
-  if (piv) piv.addEventListener('click', function () {
-    var link = APP_LINK + '?party=' + encodeURIComponent(PARTY.code);
-    if (navigator.share) navigator.share({ title: 'Join my trick-or-treat party', text: 'Join my party ' + PARTY.code + ' in Candy Trail and trick-or-treat with us live on the map.', url: link }).catch(function () {});
-    else if (navigator.clipboard) navigator.clipboard.writeText(link).then(function () { toast('Invite link copied.', 'ok'); });
-  });
+  if (piv) piv.addEventListener('click', partyInviteShare);
   var plb = $('partyLeaveBtn');
   if (plb) plb.addEventListener('click', function () { PARTY.leaveConfirm = true; renderPartyBox(); });
   var ply = $('partyLeaveYes');
@@ -4891,6 +5093,7 @@ function partyJoin(code, name) {
   PARTY.color = PARTY.colorDraft || partyColor(PARTY.name);
   try { store.set('party', { code: code, name: PARTY.name, avatar: PARTY.avatar, color: PARTY.color, joinTs: PARTY.joinTs }); } catch (e) {}
   document.body.classList.add('in-party');
+  paintChromeState();
   PARTY.leaveConfirm = false;
   partyChatReset();
   if (typeof CHAT !== 'undefined') CHAT.channel = 'party';
@@ -4912,6 +5115,7 @@ function partyLeave() {
   partyLayer.clearLayers(); partyMarkClear();
   document.body.classList.remove('in-party');
   partyChatReset();
+  partyCardClose();
   paintPartyPill();
   var cpl = $('chipParty'); if (cpl) cpl.setAttribute('aria-pressed', 'false');
   if (typeof updatePeek === 'function') updatePeek();
@@ -4929,7 +5133,79 @@ function partyTick() {
   }
   partyPoll();
 }
-$('partyPill').addEventListener('click', function () { switchTab('party'); });
+/* Party pill + card (v6.6 Phase 4A, fix 10): the pill no longer just
+   duplicates the Party tab. One tap expands it in place into a floating
+   party card (the sheet never moves); a double-tap fits the map to
+   everyone walking. A 260 ms tap timer separates the two gestures. */
+var PC = { open: false, tapTimer: null };
+function partyInviteShare() {
+  var link = APP_LINK + '?party=' + encodeURIComponent(PARTY.code);
+  if (navigator.share) navigator.share({ title: 'Join my trick-or-treat party', text: 'Join my party ' + PARTY.code + ' in Candy Trail and trick-or-treat with us live on the map.', url: link }).catch(function () {});
+  else if (navigator.clipboard) navigator.clipboard.writeText(link).then(function () { toast('Invite link copied.', 'ok'); });
+}
+function partyCardOpen() {
+  if (typeof PC === 'undefined' || !partyOn()) return;
+  PC.open = true;
+  paintPartyCard();
+  var c = $('partyCard');
+  if (c) { c.hidden = false; c.classList.remove('pop'); void c.offsetWidth; c.classList.add('pop'); }
+  var p = $('partyPill'); if (p) p.hidden = true;
+}
+function partyCardClose() {
+  if (typeof PC === 'undefined') return;
+  var was = PC.open;
+  PC.open = false;
+  var c = $('partyCard'); if (c) c.hidden = true;
+  if (was) paintPartyPill();
+}
+function paintPartyCard() {
+  if (typeof PC === 'undefined' || !PC.open) return;
+  var t = partyTotals();
+  var title = $('pcTitle'); if (title) title.textContent = 'Party · ' + t.houses + ' houses';
+  var walk = $('pcWalking'); if (walk) walk.textContent = t.people + ' walking';
+  var box = $('pcRows'); if (!box) return;
+  box.innerHTML = partyRosterNames().map(function (n) {
+    var c = PARTY.counts[n] || {};
+    var pos = PARTY.posRows[n];
+    var fresh = !!(pos && pos.created_at && (Date.now() - new Date(pos.created_at).getTime() < 180000));
+    return '<button type="button" class="pc-row" data-name="' + esc(n) + '"><span class="pc-dot" style="background:' + partyMetaFor(n).color + '"></span><span class="pc-name">' + esc(n) + '</span><span class="pc-state">' + (fresh ? 'Walking' : 'Paused') + '</span><span class="pc-houses">' + (c.houses || 0) + ' houses</span><span class="pc-x"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-locate"/></svg></span></button>';
+  }).join('');
+  box.querySelectorAll('.pc-row').forEach(function (r) {
+    r.addEventListener('click', function () { partyCardFocus(r.getAttribute('data-name')); });
+  });
+  var cnt = $('pcChatCnt');
+  if (cnt) { cnt.hidden = !(PARTY.unread > 0); cnt.textContent = PARTY.unread; }
+}
+function partyCardFocus(n) {
+  partyCardClose();
+  if (!n || n === PARTY.name) return;
+  var pos = PARTY.posRows[n];
+  var ll = null;
+  if (pos && pos.lat != null) ll = [pos.lat, pos.lng];
+  else if (PARTY.markers && PARTY.markers[n] && PARTY.markers[n].getLatLng) { var m = PARTY.markers[n].getLatLng(); ll = [m.lat, m.lng]; }
+  if (!ll) { toast('No location from ' + n + ' yet.', 'warn'); return; }
+  try { map.flyTo(ll, Math.max(map.getZoom ? map.getZoom() : 16, 16), { duration: 0.5 }); } catch (e) {}
+  try {
+    var ring = L.circleMarker(ll, { radius: 14, color: partyMetaFor(n).color, weight: 3, fillOpacity: 0 }).addTo(map);
+    setTimeout(function () { try { map.removeLayer(ring); } catch (e) {} }, 1200);
+  } catch (e) {}
+  applySnap('peek');
+}
+function partyFitMembers() {
+  var pts = [];
+  partyRosterNames().forEach(function (n) { var p = PARTY.posRows[n]; if (p && p.lat != null) pts.push([p.lat, p.lng]); });
+  if (S.pos) pts.push([S.pos.lat, S.pos.lng]);
+  partyCardClose();
+  if (pts.length > 1) { try { map.flyToBounds(L.latLngBounds(pts), { padding: [40, 40] }); } catch (e) {} }
+  else if (pts.length === 1) { try { map.flyTo(pts[0], 16, { duration: 0.5 }); } catch (e) {} }
+}
+$('partyPill').addEventListener('click', function () {
+  if (PC.tapTimer) { clearTimeout(PC.tapTimer); PC.tapTimer = null; partyFitMembers(); return; }
+  PC.tapTimer = setTimeout(function () { PC.tapTimer = null; partyCardOpen(); }, 260);
+});
+$('pcHead').addEventListener('click', partyCardClose);
+$('pcChat').addEventListener('click', function () { partyCardClose(); setChatChannel('party'); switchTab('chat'); });
+$('pcInvite').addEventListener('click', function () { partyInviteShare(); });
 map.on('zoomend', function () { var c = map.getZoom() < 15; if (c !== PARTY.compact) { PARTY.compact = c; if (partyOn()) partyRefreshMarkers(true); } });
 $('identityDone').addEventListener('click', closeIdentity);
 $('identityPop').addEventListener('click', function (e) { if (e.target === this) closeIdentity(); });
@@ -5134,6 +5410,8 @@ function recBegin(mode) {
   REC.origStartedAt = REC.seeded ? last.startedAt : Date.now();
   REC.startedAt = Date.now();
   REC.on = true; REC.mode = mode; REC.confirming = false;
+  paintChromeState();
+  versionMaybeShow();
   recDrawPts(REC.points);
   ensureWatch();
   recPersist();
@@ -5144,6 +5422,7 @@ function recBegin(mode) {
   recWakeReq();
   if (mode === 'free') {
     document.body.classList.add('is-recording');
+    document.body.classList.add('walk-slim');
     $('recBar').hidden = false; recSetConfirm(false);
     toast('Recording your walk. The trail draws itself as you go.', 'ok');
   }
@@ -5184,6 +5463,7 @@ function recFinish(opts) {
   if (REC.timer) { clearInterval(REC.timer); REC.timer = null; }
   recWakeRel();
   document.body.classList.remove('is-recording');
+  document.body.classList.remove('walk-slim');
   $('recBar').hidden = true;
   var walk = { startedAt: REC.origStartedAt || REC.startedAt, endedAt: Date.now(), elapsedMs: REC.baseElapsed + (Date.now() - REC.startedAt), points: REC.points, houses: REC.houses };
   lsRawDel('ct_track_active');
@@ -5194,6 +5474,8 @@ function recFinish(opts) {
     toast('Walk ended. Too few GPS points to draw a trail.', 'warn');
   }
   REC.seeded = false;
+  paintChromeState();
+  versionMaybeShow();
   renderCounts();
   if (!opts.quiet) {
     switchTab('haul');
@@ -5225,6 +5507,8 @@ document.addEventListener('visibilitychange', function () {
     REC.baseElapsed = (a.baseElapsed || 0) + Math.max(0, lastTs - a.startedAt);
     REC.startedAt = Date.now();
     document.body.classList.add('is-recording');
+    document.body.classList.add('walk-slim');
+    paintChromeState();
     $('recBar').hidden = false; recSetConfirm(false);
     recDrawPts(REC.points);
     REC.timer = setInterval(recTick, 1000); recTick();
@@ -5524,6 +5808,7 @@ function partyEject() {
   partyLayer.clearLayers(); partyMarkClear();
   document.body.classList.remove('in-party');
   partyChatReset();
+  partyCardClose();
   paintPartyPill();
   var cpe = $('chipParty'); if (cpe) cpe.setAttribute('aria-pressed', 'false');
   if (typeof updatePeek === 'function') updatePeek();
@@ -5657,11 +5942,11 @@ function chatBubblesHtml() {
       if (img) body = '<img class="cb-img" src="' + img.src + '" style="aspect-ratio:' + img.w + '/' + img.h + '" alt="Photo shared in party chat">';
       else if (emojiOnly(r.msg)) body = '<span class="cb-jumbo">' + esc(r.msg) + '</span>';
       else body = esc(r.msg || '');
-      var head = (!mine && gi === 0) ? '<div class="cb-h" style="color:' + col + '">' + esc(r.name) + '</div>' : '';
-      var ts = last ? '<span class="cb-ts">' + esc(fmtChatTime(new Date(r.created_at).getTime(), false)) + '</span>' : '';
-      colHtml += '<div class="cb-b' + (last ? ' last' : '') + '" style="border-color:' + col + '">' + head + body + ts + '</div>';
+      var head = (!mine && gi === 0) ? '<div class="cb-h"><span class="cb-dot" style="background:' + col + '"></span><span style="color:' + col + '">' + esc(r.name) + '</span></div>' : '';
+      colHtml += '<div class="cb-b' + (last ? ' last' : '') + '">' + head + body + '</div>';
+      if (last) colHtml += '<div class="cb-ts">' + esc(fmtChatTime(new Date(r.created_at).getTime(), false)) + '</div>';
     });
-    var av = mine ? '' : '<span class="cb-av" style="--pc:' + col + '">' + (meta.avatar ? avatarSvg(meta.avatar) : '<span class="puck-ini">' + esc(partyInitials(first.name)) + '</span>') + '</span>';
+    var av = '';
     out += '<div class="cb-row ' + (mine ? 'me' : 'other') + '">' + av + '<div class="cb-col">' + colHtml + '</div></div>';
     prevTs = new Date(grp[grp.length - 1].created_at).getTime();
     i = j;
@@ -5673,14 +5958,15 @@ function renderChatHead() {
   if (partyOn()) {
     head.innerHTML = '<div class="chat-seg" role="group" aria-label="Chat channel">' +
       '<button type="button" data-chan="party" aria-pressed="' + String(CHAT.channel === 'party') + '">Party' + ((PARTY.unread > 0 && CHAT.channel !== 'party') ? '<span class="cnt">' + PARTY.unread + '</span>' : '') + '</button>' +
-      '<button type="button" data-chan="zone" aria-pressed="' + String(CHAT.channel === 'zone') + '">Heights Live</button></div>';
+      '<button type="button" data-chan="zone" aria-pressed="' + String(CHAT.channel === 'zone') + '">Local</button></div>';
     head.querySelectorAll('[data-chan]').forEach(function (b) {
       b.addEventListener('click', function () { setChatChannel(b.getAttribute('data-chan')); });
     });
   } else {
-    head.innerHTML = '<div class="chat-solo"><div class="cs-title">Heights Live<span>Neighborhood feed</span></div><button id="chatGoParty" class="btn btn-ghost btn-sm" type="button">+ Party Chat</button></div>';
+    head.innerHTML = '<div class="chat-solo"><div class="cs-title"><span id="chatSoloTitle">Local</span><span id="chatSoloSub">Locating your street\u2026</span></div><button id="chatGoParty" class="btn btn-ghost btn-sm" type="button">+ Party Chat</button></div>';
     var gp = $('chatGoParty');
     if (gp) gp.addEventListener('click', function () { switchTab('party'); });
+    if (typeof zoneHeadPaint === 'function') zoneHeadPaint();
   }
 }
 function setChatChannel(ch) {
@@ -5695,6 +5981,7 @@ function renderChat() {
   var comp = $('chatComposer');
   if (zone) { zoneRender(); return; }
   if (comp) comp.style.display = '';
+  var lk = $('zoneLockBar'); if (lk) lk.hidden = true;
   chatComposerMode('party');
   log.innerHTML = chatBubblesHtml();
   log.querySelectorAll('.cb-img').forEach(function (im) {
@@ -5777,6 +6064,13 @@ $('chatPhoto').addEventListener('change', function () {
    channel shows an honest unavailable state. Never a crash, never a
    fake feed. Backend: zone-setup.sql (zone_posts, zone_reports). */
 var ZONE_ID = 'heights';
+
+/* Zone naming (v6.6 Phase 4A, Argon ruling C): the feature is named
+   "Local"; the strings below are the launch zone's resolved values.
+   The Phase 4D zone resolver will supply other neighborhoods through
+   this same object. */
+var ZONE_INFO = { name: 'Heights', place: 'The Heights', placeLower: 'the Heights', area: 'Jersey City Heights' };
+function zonePlace() { return ZONE_INFO.place; }
 var ZONE_TTL_MS = 4 * 3600 * 1000;
 var ZONE_STICKY_MS = 2 * 3600 * 1000;
 var ZONE_PRES_MS = 30 * 60000;        /* neighbor-count window */
@@ -5809,7 +6103,7 @@ var ZONE_BANDS = [
 ];
 var ZONE_ADJ = ['Ember', 'Cinder', 'Velvet', 'Hollow', 'Amber', 'Bramble', 'Garnet', 'Misty', 'Onyx', 'Pumpkin', 'Cobweb', 'Midnight'];
 var ZONE_CREATURE = { wisp: 'Ghost', gourd: 'Pumpkin', jinx: 'Cat', vesper: 'Bat', marrow: 'Skeleton', volt: 'Bolt', hex: 'Witch', lazlo: 'Vampire' };
-var ZONE = { ready: false, dev: '', persona: null, inside: false, stickyUntil: 0, posts: [], presDevs: [], init: false, fetching: false, cursor: '', down: false, downAt: 0, neighbors: null, hidden: {}, repCounts: {}, repMine: {}, lastSend: 0, lastPresence: 0, timer: null, modId: null };
+var ZONE = { ready: false, loaded: false, dev: '', persona: null, inside: false, viaPin: false, lockCoarse: false, downVis: false, stickyUntil: 0, posts: [], presDevs: [], init: false, fetching: false, cursor: '', down: false, downAt: 0, neighbors: null, hidden: {}, repCounts: {}, repMine: {}, lastSend: 0, lastPresence: 0, timer: null, modId: null };
 var ZONE_DRAFT = null;
 
 function zoneHash53(str, seed) {
@@ -5834,27 +6128,43 @@ function zonePersonaFor(dev) {
     avatar: avatar
   };
 }
-function zoneSeed() {
-  if (ZONE.ready) return;
-  ZONE.ready = true;
+/* Identity loading is split in v6.6 Phase 4A: the read-only outside
+   view (fix 2) loads any STORED identity but must never mint one for
+   someone who has not entered the zone. zoneSeed remains the only
+   place a persona is created, and zoneRender calls it only once the
+   visitor is actually inside with the channel open. */
+function zoneLoadIdentity() {
+  if (ZONE.loaded) return;
+  ZONE.loaded = true;
   var dev = '';
   try { dev = String(store.get('zoneDev', '') || ''); } catch (e) {}
-  if (!dev) {
-    var raw = 'ct-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1e9).toString(36) + '-' + Math.floor(Math.random() * 1e9).toString(36);
-    dev = zoneHash53(raw, 7);
-    try { store.set('zoneDev', dev); } catch (e) {}
-  }
-  ZONE.dev = dev;
-  var saved = null;
-  try { saved = store.get('zonePersona', null); } catch (e) {}
-  if (saved && saved.name && saved.color && saved.avatar && AVATAR_BODY[saved.avatar]) {
-    ZONE.persona = { name: String(saved.name), color: String(saved.color), avatar: String(saved.avatar) };
-  } else {
-    ZONE.persona = zonePersonaFor(dev);
+  if (dev) {
+    ZONE.dev = dev;
+    var saved = null;
+    try { saved = store.get('zonePersona', null); } catch (e) {}
+    if (saved && saved.name && saved.color && saved.avatar && AVATAR_BODY[saved.avatar]) {
+      ZONE.persona = { name: String(saved.name), color: String(saved.color), avatar: String(saved.avatar) };
+    } else {
+      ZONE.persona = zonePersonaFor(dev);
+    }
   }
   var hid = [];
   try { hid = store.get('zoneHidden', []); } catch (e) {}
   if (Array.isArray(hid)) hid.forEach(function (id) { ZONE.hidden[String(id)] = 1; });
+}
+function zoneMintDev() {
+  var raw = 'ct-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1e9).toString(36) + '-' + Math.floor(Math.random() * 1e9).toString(36);
+  var dev = zoneHash53(raw, 7);
+  try { store.set('zoneDev', dev); } catch (e) {}
+  ZONE.dev = dev;
+  return dev;
+}
+function zoneSeed() {
+  zoneLoadIdentity();
+  if (ZONE.ready) return;
+  ZONE.ready = true;
+  if (!ZONE.dev) zoneMintDev();
+  if (!ZONE.persona) ZONE.persona = zonePersonaFor(ZONE.dev);
 }
 /* ---------- zone geometry ---------- */
 function zoneInPoly(lat, lng) {
@@ -5882,17 +6192,49 @@ function zoneDistToPoly(lat, lng) {
   return best;
 }
 function zoneInside(lat, lng) { return zoneInPoly(lat, lng) || zoneDistToPoly(lat, lng) <= ZONE_BUFFER_M; }
-/* Session state from the latest fix: a usable fix (<= 65 m, or a
-   trusted tier-1 fix) inside the zone (re)starts the 2 h sticky
-   session; the session then survives GPS drift until it lapses. */
+/* Session state (v6.6 Phase 4A fix 8, an owner-reported defect: the
+   Stage B gate required a trusted fix, so the channel stayed locked at
+   home indoors, where fixes are coarse). Membership now comes from:
+   (a) the best available fix, crediting its own accuracy radius on top
+   of the 500 m buffer; (b) a saved start pin inside the zone, on its
+   own; (c) the 2 h sticky session; (d) once unlocked, drifting to a
+   coarse fix never re-locks during the same session. Corridor privacy
+   is untouched: posts and presence still carry a band, never coords. */
 function zoneEval() {
-  zoneSeed();
+  zoneLoadIdentity();
   var now = Date.now();
   var fix = (typeof S !== 'undefined' && S.pos && isFinite(S.pos.lat) && isFinite(S.pos.lng)) ? S.pos : null;
   var usable = !!fix && (fix.acc == null || fix.acc <= 65 || S.posTrusted);
-  if (usable && zoneInside(fix.lat, fix.lng)) { ZONE.inside = true; ZONE.stickyUntil = now + ZONE_STICKY_MS; return true; }
-  if (now < ZONE.stickyUntil) { ZONE.inside = true; return true; }
+  var inside = false, viaPin = false;
+  /* Candidates: the displayed fix, plus the latest RAW fix. Indoors
+     the displayed puck may be held on an older trusted fix while the
+     raw coarse fix is the one actually at home; both get the accuracy
+     credit, which is what "best available fix" means here. */
+  var cands = [];
+  if (fix) cands.push(fix);
+  var rawC = (S.lastPos && S.lastPos.coords) ? S.lastPos.coords : null;
+  if (rawC && isFinite(rawC.latitude) && isFinite(rawC.longitude)) {
+    var rawFix = { lat: rawC.latitude, lng: rawC.longitude, acc: rawC.accuracy };
+    if (!fix || Math.abs(rawFix.lat - fix.lat) > 0.00001 || Math.abs(rawFix.lng - fix.lng) > 0.00001) cands.push(rawFix);
+  }
+  var anyUsable = usable || cands.some(function (cf) { return cf.acc == null || cf.acc <= 65; });
+  for (var ci = 0; ci < cands.length && !inside; ci++) {
+    var cfd = cands[ci], accd = cfd.acc == null ? 0 : cfd.acc;
+    if (zoneInside(cfd.lat, cfd.lng) || zoneDistToPoly(cfd.lat, cfd.lng) <= ZONE_BUFFER_M + accd) inside = true;
+  }
+  if (!inside && S.start && isFinite(S.start.lat) && isFinite(S.start.lng) && zoneInside(S.start.lat, S.start.lng)) { inside = true; viaPin = true; }
+  if (inside) {
+    ZONE.inside = true;
+    ZONE.viaPin = viaPin;
+    ZONE.lockCoarse = false;
+    ZONE.stickyUntil = now + ZONE_STICKY_MS;
+    return true;
+  }
+  if (now < (ZONE.stickyUntil || 0)) { ZONE.inside = true; return true; }
+  if (ZONE.inside && cands.length && !anyUsable) { ZONE.lockCoarse = false; return true; }
   ZONE.inside = false;
+  ZONE.viaPin = false;
+  ZONE.lockCoarse = !!cands.length && !anyUsable;
   return false;
 }
 function zoneBand(lat, lng) {
@@ -5926,7 +6268,7 @@ function chatComposerMode(mode) {
   if (mode === 'zone') {
     if (photo) photo.style.display = 'none';
     if (per) { per.hidden = false; zonePaintPersonaBtn(); }
-    if (inp) { inp.placeholder = 'Message the Heights'; inp.maxLength = ZONE_MAXLEN; }
+    if (inp) { inp.placeholder = 'Message ' + ZONE_INFO.placeLower; inp.maxLength = ZONE_MAXLEN; }
     zoneCountPaint();
   } else {
     if (photo) photo.style.display = '';
@@ -5941,7 +6283,7 @@ function zoneKey(r) {
   return 'k:' + String((r && r.created_at) || '') + '|' + String((r && r.devhash) || '') + '|' + String((r && r.msg) || '').slice(0, 48);
 }
 function zoneFetch(initial) {
-  if (!crowdOn()) { ZONE.down = true; ZONE.downAt = Date.now(); if (zoneVisible()) zoneRender(); return; }
+  if (!crowdOn()) { ZONE.down = true; ZONE.downAt = Date.now(); ZONE.downVis = zoneVisible(); if (zoneVisible()) zoneRender(); return; }
   ZONE.fetching = true;
   var base = CROWD.url + '/rest/v1/zone_posts?zone=eq.' + encodeURIComponent(ZONE_ID) + '&kind=eq.chat&select=*';
   var url = initial
@@ -5952,7 +6294,7 @@ function zoneFetch(initial) {
     .then(function (rows) { ZONE.fetching = false; if (Array.isArray(rows)) zoneIngest(rows, initial); })
     .catch(function () {
       ZONE.fetching = false;
-      ZONE.down = true; ZONE.downAt = Date.now();
+      ZONE.down = true; ZONE.downAt = Date.now(); ZONE.downVis = zoneVisible();
       if (!ZONE.init && zoneVisible()) zoneRender();
     });
 }
@@ -6043,7 +6385,7 @@ function zoneClean(t) {
 function zoneSend() {
   var inp = $('chatInput'); if (!inp) return;
   zoneSeed();
-  if (!zoneEval()) { toast('Heights Live unlocks when you are in the Heights.', 'warn'); return; }
+  if (!zoneEval()) { toast('Local posting unlocks when you are in the neighborhood.', 'warn'); return; }
   var text = String(inp.value || '').trim();
   if (!text) return;
   var now = Date.now();
@@ -6058,9 +6400,9 @@ function zoneSend() {
     method: 'POST', headers: crowdHeaders(),
     body: JSON.stringify({ zone: ZONE_ID, persona: ZONE.persona.name, color: ZONE.persona.color, avatar: ZONE.persona.avatar, devhash: ZONE.dev, kind: 'chat', corridor: fix ? zoneBand(fix.lat, fix.lng) : 'in the Heights', msg: clean })
   }).then(function (r) {
-    if (!r.ok) { ZONE.down = true; ZONE.downAt = Date.now(); if (zoneVisible()) zoneRender(); }
+    if (!r.ok) { ZONE.down = true; ZONE.downAt = Date.now(); ZONE.downVis = zoneVisible(); if (zoneVisible()) zoneRender(); }
   }).catch(function () {
-    ZONE.down = true; ZONE.downAt = Date.now(); if (zoneVisible()) zoneRender();
+    ZONE.down = true; ZONE.downAt = Date.now(); ZONE.downVis = zoneVisible(); if (zoneVisible()) zoneRender();
   });
   setTimeout(function () { if (ZONE.init) zoneFetch(false); }, 500);
 }
@@ -6080,7 +6422,7 @@ function zoneShown() {
 }
 function zoneBubblesHtml() {
   var rows = zoneShown();
-  if (!rows.length) return '<div class="chat-empty"><b>Heights Live is quiet right now.</b><br>No posts in the last 4 hours. Say the first word.</div>';
+  if (!rows.length) return '<div class="chat-empty"><b>Local is quiet right now.</b><br>No posts in the last 4 hours.</div>';
   var out = '', i = 0, prevTs = 0;
   while (i < rows.length) {
     var first = rows[i], fts = new Date(first.created_at).getTime();
@@ -6098,11 +6440,10 @@ function zoneBubblesHtml() {
     grp.forEach(function (r, gi) {
       var last = gi === grp.length - 1;
       var body = emojiOnly(r.msg) ? '<span class="cb-jumbo">' + esc(r.msg) + '</span>' : esc(r.msg || '');
-      var ts = last ? '<span class="cb-ts">' + esc(fmtChatTime(new Date(r.created_at).getTime(), false)) + '</span>' : '';
       var zid = (!mine && r.id) ? ' data-zid="' + esc(String(r.id)) + '"' : '';
-      colHtml += '<div class="cb-b' + (last ? ' last' : '') + '" style="border-color:' + col + '"' + zid + '>' + body + ts + '</div>';
+      colHtml += '<div class="cb-b' + (last ? ' last' : '') + '"' + zid + '>' + body + '</div>';
     });
-    var av = mine ? '' : '<span class="cb-av" style="--pc:' + col + '">' + (first.avatar && AVATAR_BODY[first.avatar] ? avatarSvg(first.avatar) : '<span class="puck-ini">' + esc(partyInitials(first.persona || '?')) + '</span>') + '</span>';
+    var av = '';
     var lastR = grp[grp.length - 1];
     var sub = '<div class="cb-sub">' +
       (mine ? '' : '<span class="nm" style="color:' + col + '">' + esc(first.persona || 'Walker') + '</span><span>&middot;</span>') +
@@ -6115,55 +6456,108 @@ function zoneBubblesHtml() {
   }
   return out;
 }
+/* Solo chat header (v6.6 Phase 4A, Argon ruling C): the resolved place
+   name in Fraunces with a live status subline. */
+function zoneHeadPaint() {
+  var t = $('chatSoloTitle'); if (!t) return;
+  var sub = $('chatSoloSub');
+  /* "Zone unknown" means we hold no position at all (and no start-pin
+     membership): the feed may already be readable, but we cannot yet
+     say whether this viewer is inside the boundary. */
+  var located = !!S.pos || ZONE.viaPin;
+  if (!located && !ZONE.inside) { t.textContent = 'Local'; if (sub) sub.textContent = 'Locating your street\u2026'; return; }
+  t.textContent = zonePlace();
+  if (!sub) return;
+  if (ZONE.inside && ZONE.viaPin) sub.textContent = 'Joined via start pin';
+  else if (ZONE.inside) sub.textContent = (ZONE.neighbors != null ? ZONE.neighbors : 0) + ' walking tonight';
+  else sub.textContent = 'Outside boundary · Read-only';
+}
 function zoneBarPaint() {
   var bar = $('zoneBar'); if (!bar) return;
-  if (!ZONE.inside) { bar.textContent = 'Heights Live · Jersey City Heights neighborhood feed'; return; }
-  bar.textContent = 'Heights Live' + (ZONE.neighbors != null ? ' · ' + ZONE.neighbors + (ZONE.neighbors === 1 ? ' neighbor' : ' neighbors') + ' here' : '') + ' · Visible to nearby walkers · Clears in 4h';
+  if (!ZONE.init && ZONE.neighbors == null) { bar.textContent = 'Local · ' + ZONE_INFO.area + ' neighborhood feed'; return; }
+  bar.textContent = zonePlace() + (ZONE.neighbors != null ? ' · ' + ZONE.neighbors + (ZONE.neighbors === 1 ? ' neighbor' : ' neighbors') + ' here' : '') + ' · Visible to nearby walkers · Clears in 4h' + (ZONE.inside ? '' : ' · Read-only');
+}
+/* The locked composer slot (v6.6 Phase 4A, Argon ruling C): a muted
+   48px bar where the composer would be. The waiting variant carries an
+   actionable start-pin shortcut. */
+function zoneLockPaint() {
+  var lock = $('zoneLockBar'); if (!lock) return;
+  if (!S.pos || ZONE.lockCoarse) {
+    lock.innerHTML = '<span>Waiting for GPS &middot; </span><button type="button" class="zone-lock-pin" id="zoneLockPin">Set start pin</button>';
+    var b = $('zoneLockPin');
+    if (b) b.addEventListener('click', zonePlaceStartPin);
+  } else {
+    lock.innerHTML = '<span>Step into the neighborhood to post</span>';
+  }
+}
+function zonePlaceStartPin() {
+  applySnap('peek');
+  enterPick('start', 'Tap the map to drop your start pin');
 }
 function zoneRender() {
   var log = $('chatLog'); if (!log) return;
   var comp = $('chatComposer');
-  try { zoneSeed(); } catch (e) {}
+  var lock = $('zoneLockBar');
+  try { zoneLoadIdentity(); } catch (e) {}
   var inside = false;
   try { inside = zoneEval(); } catch (e) {}
+  /* First entry with the channel open is where a posting identity is
+     created (fix 2); outside viewers stay persona-free. */
+  if (inside) { try { zoneSeed(); } catch (e) {} }
   zoneBarPaint();
-  if (!inside) {
-    if (comp) comp.style.display = 'none';
-    log.innerHTML = '<div class="chat-empty"><b>You are outside the Heights.</b><br>Heights Live is the live neighborhood feed for the Jersey City Heights. It unlocks when you arrive, and stays with you for a couple of hours after.</div>';
-    return;
-  }
+  zoneHeadPaint();
   zoneEnsure();
   if (ZONE.down && !ZONE.init) {
     if (comp) comp.style.display = 'none';
-    log.innerHTML = '<div class="chat-empty"><b>Heights Live is not reachable right now.</b><br>The neighborhood feed did not answer. Your party, spots, and haul are fine; try again in a little while.</div>';
+    if (lock) { lock.hidden = inside; if (!inside) zoneLockPaint(); }
+    log.innerHTML = '<div class="chat-empty"><b>Local is not reachable right now.</b><br>The neighborhood feed did not answer. Your party, spots, and haul are fine; try again in a little while.</div>';
     return;
   }
+  if (!inside) {
+    /* Plan 7D, restored in v6.6 Phase 4A (Argon must-fix 2): the feed
+       is readable from anywhere; posting is what the geofence gates.
+       A coarse-only lock explains itself (ruling D). */
+    if (comp) comp.style.display = 'none';
+    if (lock) { lock.hidden = false; zoneLockPaint(); }
+    var note = '';
+    if (ZONE.lockCoarse) note = '<div class="chat-lock-note"><b>Signal is too coarse indoors</b><br>We can\'t confirm your block through the roof. Step outside for a clear fix, or place your start pin in the neighborhood to join.<br><button type="button" class="btn btn-org zone-pin-cta" id="zonePinCta">Place Start Pin</button></div>';
+    log.innerHTML = note + (ZONE.init ? zoneBubblesHtml() : '<div class="chat-empty">Finding the neighborhood\u2026</div>');
+    var cta = $('zonePinCta');
+    if (cta) cta.addEventListener('click', zonePlaceStartPin);
+    log.querySelectorAll('.cb-mod').forEach(function (b) {
+      b.addEventListener('click', function () { zoneModOpen(b.getAttribute('data-mod')); });
+    });
+    return;
+  }
+  if (lock) lock.hidden = true;
   if (comp) comp.style.display = '';
   chatComposerMode('zone');
-  log.innerHTML = ZONE.init ? zoneBubblesHtml() : '<div class="chat-empty">Finding the neighborhood…</div>';
+  log.innerHTML = ZONE.init ? zoneBubblesHtml() : '<div class="chat-empty">Finding the neighborhood\u2026</div>';
   log.querySelectorAll('.cb-mod').forEach(function (b) {
     b.addEventListener('click', function () { zoneModOpen(b.getAttribute('data-mod')); });
   });
 }
 function zoneEnsure() {
-  zoneSeed();
+  zoneLoadIdentity();
   if (!ZONE.timer) ZONE.timer = setInterval(zoneTick, 30000);
-  if (!ZONE.inside || !crowdOn() || ZONE.init || ZONE.fetching) return;
-  if (ZONE.down && Date.now() - (ZONE.downAt || 0) < 30000) return;
+  if (!crowdOn() || ZONE.init || ZONE.fetching) return;
+  /* The 30 s backoff binds failures seen while the channel was open.
+     A failure from a background attempt (a boot-time render before the
+     network is up) must not wedge the first real open behind it. */
+  if (ZONE.down && ZONE.downVis && Date.now() - (ZONE.downAt || 0) < 30000) return;
   zoneFetch(true);
   zoneFetchMeta();
-  zonePresence(true);
+  if (ZONE.inside) zonePresence(true);
 }
 function zoneTick() {
   if (!zoneVisible()) return;
   var was = ZONE.inside;
   zoneEval();
-  if (!ZONE.inside) { if (was) zoneRender(); return; }
-  if (!was) { zoneEnsure(); zoneRender(); return; }
+  if (ZONE.inside !== was) zoneRender();
   if (!ZONE.init) { zoneEnsure(); return; }
   zoneFetch(false);
   zoneFetchMeta();
-  zonePresence(false);
+  if (ZONE.inside) zonePresence(false);
 }
 /* ---------- moderation (client-enforced v1) ---------- */
 function zoneModOpen(id) {
@@ -6190,7 +6584,8 @@ function zoneHidePost() {
   toast('Post hidden on this device.', 'ok');
 }
 function zoneReportPost() {
-  if (!ZONE.modId || !ZONE.dev) { zoneModClose(); return; }
+  if (!ZONE.modId) { zoneModClose(); return; }
+  if (!ZONE.dev) zoneMintDev(); /* a report needs a reporter hash: mint the device hash only, never a persona */
   var id = ZONE.modId;
   if (!ZONE.repMine[id]) {
     ZONE.repMine[id] = 1;
@@ -6501,10 +6896,66 @@ $('btnNavExit').addEventListener('click', function () { endNav(false); openSearc
 renderPinsList();
 updatePeek();
 
+/* ---------- version self-check (v6.6 Phase 4A, fix 4) ----------
+   A stale tab / zombie service worker left the owner's phone on a
+   pre-v6.5 build while production had moved on, and the fixes looked
+   "not fixed". On boot we fetch version.json (stamped by assemble.py)
+   with cache:'no-store'; a NEWER live version raises the slim update
+   bar fused to the sheet's top edge (ruling E). It never reloads on
+   its own, and it waits out any active walk. The Refresh tap
+   unregisters the service worker, deletes every cache, and reloads. */
+var CT_UPDATE = { pending: false, live: '' };
+function ctVersionNewer(live, mine) {
+  var a = String(live || '').split('.'), b = String(mine || '').split('.');
+  for (var i = 0; i < Math.max(a.length, b.length); i++) {
+    var x = parseInt(a[i], 10) || 0, y = parseInt(b[i], 10) || 0;
+    if (x !== y) return x > y;
+  }
+  return false;
+}
+function walkActiveNow() { return !!S.nav || (typeof REC !== 'undefined' && !!REC.on); }
+function versionMaybeShow() {
+  var bar = $('updateBar'); if (!bar) return;
+  var show = CT_UPDATE.pending && !walkActiveNow();
+  bar.hidden = !show;
+  document.body.classList.toggle('has-update', show);
+}
+function versionCheck() {
+  var meta = document.querySelector('meta[name="version"]');
+  var mine = meta ? (meta.getAttribute('content') || '') : '';
+  if (!mine || typeof fetch !== 'function') return;
+  fetch('version.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) {
+    if (j && j.v && ctVersionNewer(j.v, mine)) { CT_UPDATE.pending = true; CT_UPDATE.live = String(j.v); }
+    versionMaybeShow();
+  }).catch(function () {});
+}
+function versionRefresh() {
+  var jobs = [];
+  try {
+    if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
+      jobs.push(navigator.serviceWorker.getRegistrations().then(function (regs) {
+        return Promise.all(regs.map(function (r) { return r.unregister(); }));
+      }));
+    }
+  } catch (e) {}
+  try {
+    if (window.caches && caches.keys) {
+      jobs.push(caches.keys().then(function (ks) {
+        return Promise.all(ks.map(function (k) { return caches.delete(k); }));
+      }));
+    }
+  } catch (e) {}
+  var done = function () { try { window.location.reload(); } catch (e) {} };
+  if (jobs.length) Promise.all(jobs).then(done, done); else done();
+}
+$('updateBar').addEventListener('click', versionRefresh);
+setTimeout(versionCheck, 1500);
+paintChromeState();
+
 /* v6.4.1 boot self-check marker: the shell's checker script verifies this
    was set. If boot died anywhere above, the repair overlay appears instead
    of a silently half-dead app. */
-window.__ctBootOK = '6.5';
+window.__ctBootOK = '6.6';
 
 </script>
 <script>
