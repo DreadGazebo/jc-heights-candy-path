@@ -1,8 +1,9 @@
-/* JC Heights Candy Path service worker.
+/* Candy Trail service worker (v6.0).
    Shell: network-first for pages (updates keep flowing), cache fallback offline.
    Tiles: cache-first with a bounded runtime cache, plus a precache of the
    Heights core at zoom 15-16 so the home neighborhood works offline. */
-var SHELL = 'cp-shell-v1';
+var SHELL = 'ct-shell-v6';
+var FONTS = 'ct-fonts-v6';
 var TILES = 'cp-tiles-v1';
 
 function tileXY(lat, lng, z) {
@@ -37,7 +38,7 @@ self.addEventListener('install', function (event) {
 self.addEventListener('activate', function (event) {
   event.waitUntil((async function () {
     var keys = await caches.keys();
-    await Promise.all(keys.map(function (k) { return (k === SHELL || k === TILES) ? null : caches.delete(k); }));
+    await Promise.all(keys.map(function (k) { return (k === SHELL || k === TILES || k === FONTS) ? null : caches.delete(k); }));
     await self.clients.claim();
   })());
 });
@@ -53,6 +54,18 @@ self.addEventListener('fetch', function (event) {
       if (hit) return hit;
       var res = await fetch(req);
       if (res && res.ok) cache.put(req, res.clone());
+      return res;
+    })());
+    return;
+  }
+  if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
+    /* Webfonts: cache-first (they are versioned/immutable in practice). */
+    event.respondWith((async function () {
+      var cache = await caches.open(FONTS);
+      var hit = await cache.match(req);
+      if (hit) return hit;
+      var res = await fetch(req);
+      if (res && (res.ok || res.type === 'opaque')) cache.put(req, res.clone());
       return res;
     })());
     return;

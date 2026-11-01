@@ -1,12 +1,12 @@
 {
-  "name": "JC Heights Candy Path",
-  "short_name": "Candy Path",
+  "name": "Candy Trail",
+  "short_name": "Candy Trail",
   "description": "Live trick-or-treat map: routes, crowd-sourced treat spots, and party mode.",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
-  "background_color": "#0d0a14",
-  "theme_color": "#0d0a14",
+  "background_color": "#0E0A16",
+  "theme_color": "#0E0A16",
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
