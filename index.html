@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0A16">
-<meta name="version" content="7.4">
+<meta name="version" content="7.5">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -863,10 +863,30 @@ body.is-recording #voiceChip{bottom:calc(var(--sab) + 268px)}
 .me-wrap .me{position:relative;width:64px;height:64px}
 .me-wrap .me-cone{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from -28deg,rgba(232,93,38,.7) 0deg 56deg,transparent 56deg);-webkit-mask:radial-gradient(circle,#000 0 62%,transparent 63%);mask:radial-gradient(circle,#000 0 62%,transparent 63%);opacity:0;transition:opacity .3s}
 .me-wrap .me.has-heading .me-cone{opacity:1}
-.me-wrap .me-pulse{position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:rgba(139,123,184,.55);animation:pulse 2s ease-out infinite}
-.me-wrap .me-dot{position:absolute;left:50%;top:50%;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:#7C5CE0;border:3px solid #fff;box-shadow:0 0 12px rgba(124,92,224,.9)}
-.me-wrap .me.stale .me-dot{background:#777;box-shadow:none}
+.me-wrap .me-pulse{position:absolute;left:50%;top:50%;width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;border:2px solid #a78bfa;background:transparent;animation:mePulse 2.4s ease-out infinite}
+@keyframes mePulse{0%{transform:scale(.72);opacity:.85}100%{transform:scale(1.9);opacity:0}}
+.me-wrap .me-badge{position:absolute;left:50%;top:50%;width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;background:#16101E;--av-stage:#16101E;border:1.5px solid #0B0A0E;box-shadow:inset 0 0 0 2.5px var(--pc,#a78bfa),0 2px 6px rgba(0,0,0,.55);color:#F5EFE6;display:grid;place-items:center}
+.me-wrap .me-badge .avatar-glyph{width:21px;height:21px}
+.me-wrap .me-xl .me-badge{width:40px;height:40px;margin:-20px 0 0 -20px}
+.me-wrap .me-xl .me-badge .avatar-glyph{width:24px;height:24px}
+.me-wrap .me-mini .me-badge{width:18px;height:18px;margin:-9px 0 0 -9px;box-shadow:inset 0 0 0 2px var(--pc,#a78bfa),0 1px 3px rgba(0,0,0,.5)}
+.me-wrap .me-mini .me-badge .avatar-glyph{display:none}
+.me-wrap .me-mini .me-pulse,.me-wrap .me-mini .me-cone{display:none}
+.me-wrap .me-dot{display:none}
+.me-wrap .me.stale .me-badge{filter:grayscale(.85) brightness(.8)}
 .me-wrap .me.stale .me-pulse{animation:none;opacity:0}
+/* v7.5 Fix 17: Party-tab identity bar + identity sheet */
+.idbar{display:flex;align-items:center;gap:10px;padding:8px 10px;margin-bottom:10px;border:1px solid var(--line);border-radius:12px;background:#150F20}
+.idbar[hidden]{display:none}
+.idbar-puck{width:32px;height:32px;border-radius:50%;background:#16101E;--av-stage:#16101E;border:1.5px solid #0B0A0E;box-shadow:inset 0 0 0 2.5px var(--pc,#a78bfa);color:#F5EFE6;display:grid;place-items:center;flex:none}
+.idbar-puck .avatar-glyph{width:19px;height:19px}
+.idbar-name{font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.idbar-dot{width:12px;height:12px;border-radius:50%;flex:none;box-shadow:0 0 0 2px #0E0A16}
+.id-prev-puck{color:#F5EFE6}
+#idSheet .id-name-row{display:flex;gap:8px;align-items:stretch}
+#idSheet .id-name-row input{flex:1;min-width:0}
+#idSheet .id-reroll{flex:none}
+#idSheet .sheet-grab{width:44px;height:5px;border-radius:3px;background:rgba(245,239,230,.25);margin:0 auto 10px}
 @keyframes pulse{0%{transform:scale(1);opacity:.8}100%{transform:scale(3.2);opacity:0}}
 .pinicon,.crowdicon,.partyicon,.homeicon,.stopicon,.passdot,.me-wrap{background:transparent;border:none}
 .overlay{position:fixed;inset:0;z-index:1500;background:rgba(5,3,10,.6);display:flex;align-items:flex-end;justify-content:center;padding:12px calc(var(--sar) + 10px) calc(var(--sab) + 12px) calc(var(--sal) + 10px)}
@@ -1248,11 +1268,12 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
       </div>
       <div class="sheetfoot">
         <div class="wm">Candy Trail</div>
-        <div class="ver" id="appVer">Candy Trail v7.4</div>
+        <div class="ver" id="appVer">Candy Trail v7.5</div>
       </div>
     </div>
 
     <div id="tabParty" role="tabpanel" hidden>
+      <div id="idBar" class="idbar" hidden></div>
       <div id="partyMicRow" hidden><button id="btnMicParty" class="micbtn" type="button" hidden aria-label="Voice command: tap and speak"><svg class="ic" viewBox="0 0 24 24"><use href="#i-mic"/></svg><span>Voice command</span></button></div>
       <div id="partyBox"></div>
     </div>
@@ -1365,7 +1386,7 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
   <div class="prefs-foot">
     <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon-mono"/></svg>
     <div class="crest">Candy Trail</div>
-    <div class="ver">Version 7.4</div>
+    <div class="ver">Version 7.5</div>
   </div>
 </div>
 
@@ -1523,6 +1544,26 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
     <div id="zpWalkers" class="walker-grid"></div>
     <p class="zp-note">Neighbors see this walker name, never your real one. It lives only on this device; there is no account, and posts clear after 4 hours.</p>
     <button id="zpDone" class="btn btn-org" type="button" style="width:100%;margin-top:12px">Done</button>
+  </div>
+</div>
+
+<div id="idSheet" class="overlay" hidden>
+  <div class="ocard card" role="dialog" aria-modal="true" aria-labelledby="idTitle">
+    <div class="sheet-grab" aria-hidden="true"></div>
+    <h2 id="idTitle">Choose your walker</h2>
+    <p id="idSub" style="margin-top:2px">This is how friends in your party and neighbors in Local will see you. You can change it any time.</p>
+    <div id="idPreview" class="walker-preview"></div>
+    <div class="label" style="margin-top:10px">Your walker name</div>
+    <div class="id-name-row">
+      <input id="idName" type="text" autocomplete="off" maxlength="24" placeholder="Walker name" aria-label="Your walker name">
+      <button id="idReroll" class="btn btn-ghost id-reroll" type="button">New name</button>
+    </div>
+    <p id="idPartyNote" class="muted" hidden style="margin-top:6px">You are in a party: walker and color update right away. A new name applies next time you join a party.</p>
+    <div class="label" style="margin-top:12px">Your color</div>
+    <div id="idColors" class="party-colors" role="group" aria-label="Your color"></div>
+    <div class="label" style="margin-top:12px">Pick your walker</div>
+    <div id="idWalkers" class="walker-grid"></div>
+    <button id="idGo" class="btn btn-org" type="button" style="width:100%;margin-top:14px">Hit the Trail</button>
   </div>
 </div>
 
@@ -2272,24 +2313,78 @@ var pinLayer = L.layerGroup().addTo(map);
 var heightsLayer = L.layerGroup().addTo(map);
 var crowdLayer = L.layerGroup().addTo(map);
 
-/* my-location marker */
-var meIcon = L.divIcon({
-  className: 'me-wrap', iconSize: [64, 64], iconAnchor: [32, 32],
-  html: '<div class="me" id="meEl"><div class="me-cone"></div><div class="me-pulse"></div><div class="me-dot"></div></div>'
-});
-var meMarker = null, meCircle = null;
+/* my-location marker (v7.5 Fix 17): the profile avatar badge replaces the
+   plain GPS dot. 36px ink badge, 2.5px ring in the profile color, walker
+   glyph in bone, pulse ring in the profile color, heading cone tinted the
+   profile color behind it. The violet accuracy halo is unchanged in style
+   and shows only when the fix accuracy is worse than 15 m (and never in
+   Kid view). Collapses to an 18px dot below zoom 15; 40px core while
+   navigating or in Kid view. The marker is never interactive, so the own
+   puck is not tappable, and it carries no name label. While the identity
+   sheet is open, the live puck is the preview (it renders the draft). */
+var meMarker = null, meCircle = null, meIconSig = '', meHaloTier = null;
+function mePuckIdentity() {
+  var P = (typeof PROFILE !== 'undefined' && PROFILE) ? PROFILE : null;
+  if (P && P.draft) return P.draft;
+  /* In a party, the live party identity is what peers see, so the puck
+     matches it; out of a party, the profile rules. */
+  if (typeof PARTY !== 'undefined' && PARTY && PARTY.code && PARTY.name) return { name: PARTY.name, walker: PARTY.avatar || 'wisp', color: PARTY.color || '#a78bfa' };
+  if (P && P.v) return { name: P.v.name, walker: P.v.walker, color: P.v.color };
+  if (typeof PARTY !== 'undefined' && PARTY && PARTY.name) return { name: PARTY.name, walker: PARTY.avatar || 'wisp', color: PARTY.color || '#a78bfa' };
+  return { name: '', walker: 'wisp', color: '#a78bfa' };
+}
+function mePuckMode() {
+  var z = 16; try { z = map.getZoom(); } catch (e) {}
+  if (z < 15) return 'mini';
+  if (S.nav || (typeof KID !== 'undefined' && KID && KID.on)) return 'xl';
+  return '';
+}
+function meRgba(hex, a) {
+  var n = parseInt(String(hex || '#a78bfa').slice(1), 16);
+  if (isNaN(n)) n = 0xa78bfa;
+  return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
+}
+function meIconHtml() {
+  var id = mePuckIdentity(), mode = mePuckMode();
+  var cone = 'conic-gradient(from -22deg at 50% 50%, ' + meRgba(id.color, '.55') + ' 0deg, transparent 44deg)';
+  var cls = 'me' + (mode === 'xl' ? ' me-xl' : '') + (mode === 'mini' ? ' me-mini' : '');
+  return '<div class="' + cls + '" id="meEl"><div class="me-cone" style="background:' + cone + '"></div>' +
+    '<div class="me-pulse" style="border-color:' + id.color + '"></div>' +
+    '<div class="me-badge" style="--pc:' + id.color + '">' + avatarSvg(id.walker) + '</div>' +
+    '<div class="me-dot" aria-hidden="true"></div></div>';
+}
+function meMakeIcon() {
+  return L.divIcon({ className: 'me-wrap', iconSize: [64, 64], iconAnchor: [32, 32], html: meIconHtml() });
+}
+function meSig() { var id = mePuckIdentity(); return id.walker + '|' + id.color + '|' + mePuckMode(); }
 function renderMe() {
   if (!S.pos) return;
   var ll = [S.pos.lat, S.pos.lng];
+  var acc = (S.pos.acc == null ? 999 : S.pos.acc);
+  var kidOn = (typeof KID !== 'undefined' && KID && KID.on);
   if (!meMarker) {
-    meMarker = L.marker(ll, { icon: meIcon, interactive: false, zIndexOffset: 1000 }).addTo(map);
-    meCircle = L.circle(ll, { radius: S.pos.acc || 15, color: '#8b5cf6', weight: 1, opacity: 0.5, fillOpacity: 0.08 }).addTo(map);
+    meMarker = L.marker(ll, { icon: meMakeIcon(), interactive: false, zIndexOffset: 1000 }).addTo(map);
+    meIconSig = meSig();
   } else {
-    meMarker.setLatLng(ll); meCircle.setLatLng(ll); meCircle.setRadius(S.pos.acc || 15);
+    meMarker.setLatLng(ll);
+    var sig = meSig();
+    if (sig !== meIconSig) { meIconSig = sig; try { meMarker.setIcon(meMakeIcon()); } catch (e) {} }
   }
-  if (meCircle.setStyle) {
-    var dashed = S.locTier === 3 && !(bestTrustedFix && (Date.now() - bestTrustedFix.ts) < 60000);
-    try { meCircle.setStyle({ dashArray: dashed ? '5 7' : '' }); } catch (e) {}
+  /* accuracy halo: only for fixes coarser than 15 m; suppressed in Kid view */
+  var haloWant = acc > 15 && !kidOn;
+  if (haloWant) {
+    if (!meCircle) {
+      meCircle = L.circle(ll, { radius: acc, color: '#8b5cf6', weight: 1, opacity: 0.5, fillOpacity: 0.08 }).addTo(map);
+      meHaloTier = null;
+    } else { meCircle.setLatLng(ll); meCircle.setRadius(acc); }
+    if (meCircle.setStyle && meHaloTier !== S.locTier) {
+      meHaloTier = S.locTier;
+      var dashed = S.locTier === 3 && !(bestTrustedFix && (Date.now() - bestTrustedFix.ts) < 60000);
+      try { meCircle.setStyle({ dashArray: dashed ? '5 7' : '' }); } catch (e) {}
+    }
+  } else if (meCircle) {
+    try { map.removeLayer(meCircle); } catch (e) {}
+    meCircle = null; meHaloTier = null;
   }
   var el = document.getElementById('meEl');
   if (el) {
@@ -2300,6 +2395,8 @@ function renderMe() {
     if (cone && S.pos.heading != null) cone.style.transform = 'rotate(' + S.pos.heading + 'deg)';
   }
 }
+
+map.on('zoomend', function () { renderMe(); });
 
 /* ---------------- geolocation ---------------- */
 var watchId = null, lastPosTs = 0;
@@ -5435,6 +5532,164 @@ function partyDefaultAvatar(seed, taken) {
   for (var i = 0; i < 8; i++) { var id = AVATAR_ORDER[(start + i) % 8]; if (!taken || !taken[id]) return id; }
   return AVATAR_ORDER[start];
 }
+/* ============ PROFILE (v7.5 Fix 17) ============
+   One identity for the walker: {name, walker, color} in cr_profile.
+   Sources, in order: an explicit profile; a silent migration of the
+   stored party identity (sheet never shows); the first-open identity
+   sheet (generated defaults, dismiss commits). The profile drives the
+   self puck, party create/join prefill, and (per the Nov 1, 2026
+   amendment to identity-brief.md, which supersedes the old never-leak
+   rule for DISPLAY identity) the Local chat display identity. Privacy
+   is unchanged underneath: Local posts still carry only coarse corridor
+   tags and never coordinates. */
+var PROFILE = { v: null, draft: null, sheetOpen: false, shownThisSession: false, nameDirty: false, editing: false };
+function profileLoad() {
+  var p = store.get('profile', null);
+  if (p && p.name && AVATAR_ORDER.indexOf(p.walker) >= 0 && p.color) { PROFILE.v = { name: String(p.name), walker: p.walker, color: p.color }; return PROFILE.v; }
+  return null;
+}
+function profileSave(v) {
+  PROFILE.v = { name: String(v.name || '').slice(0, 24), walker: v.walker, color: v.color };
+  store.set('profile', PROFILE.v);
+  if (typeof zoneSyncIdentity === 'function') zoneSyncIdentity();
+  renderMe();
+  paintIdBar();
+  return PROFILE.v;
+}
+function profileMigrate() {
+  if (PROFILE.v) return PROFILE.v;
+  var p = store.get('party', null);
+  if (p && p.name && p.avatar) {
+    return profileSave({ name: p.name, walker: p.avatar, color: p.color || partyColor(p.name) });
+  }
+  return null;
+}
+function profileDefaultName(walker) {
+  var adj = ZONE_ADJ[Math.floor(Math.random() * ZONE_ADJ.length)];
+  return adj + ' ' + (ZONE_CREATURE[walker] || 'Ghost');
+}
+function identityDraftNew() {
+  var walker = partyDefaultAvatar('profile' + (ZONE.dev || 'x'), null);
+  var name = profileDefaultName(walker);
+  return { name: name, walker: walker, color: partyColor(name) || '#a78bfa' };
+}
+/* ---- identity sheet (first open + edit mode; one component) ---- */
+function identitySheetOpen(edit) {
+  var sh = $('idSheet'); if (!sh) return;
+  var base = edit && PROFILE.v ? { name: PROFILE.v.name, walker: PROFILE.v.walker, color: PROFILE.v.color } : (PROFILE.v ? { name: PROFILE.v.name, walker: PROFILE.v.walker, color: PROFILE.v.color } : identityDraftNew());
+  PROFILE.draft = { name: base.name, walker: base.walker, color: base.color };
+  /* First open: the name is a generated suggestion and follows the
+     walker until the user types. Edit mode: the existing name is the
+     walker's own and never regenerates. */
+  PROFILE.nameDirty = !!edit;
+  PROFILE.sheetOpen = true;
+  PROFILE.editing = !!edit;
+  PROFILE.shownThisSession = true;
+  $('idTitle').textContent = edit ? 'Your walker' : 'Choose your walker';
+  $('idSub').textContent = edit ? 'Your name, walker, and color. Friends in your party and neighbors in Local see this.' : 'This is how friends in your party and neighbors in Local will see you. You can change it any time.';
+  var pn = $('idPartyNote'); if (pn) pn.hidden = !(typeof partyOn === 'function' && partyOn());
+  sh.hidden = false;
+  paintIdentityDraft();
+  renderMe();
+}
+function identitySheetClose(commit) {
+  var sh = $('idSheet');
+  if (commit && PROFILE.draft) {
+    var d = PROFILE.draft;
+    var nm = String(d.name || '').trim().slice(0, 24) || profileDefaultName(d.walker);
+    profileSave({ name: nm, walker: d.walker, color: d.color });
+    /* Mid-party, the live identity syncs walker + color through the av1
+       tag, exactly like the roster walker editor: the name is the
+       presence-row key, so a rename applies at the next join (and in
+       Local immediately), never by orphaning this session's rows. */
+    if (PARTY.code && PARTY.name) {
+      PARTY.avatar = PROFILE.v.walker; PARTY.color = PROFILE.v.color;
+      PARTY.avatarDraft = PROFILE.v.walker; PARTY.colorDraft = PROFILE.v.color; PARTY.avatarExplicit = true;
+      store.set('party', PARTY);
+      try {
+        if (S.pos) partyPost({ kind: 'pos', lat: S.pos.lat, lng: S.pos.lng });
+        partyPost({ kind: 'count', houses: S.counts.houses, candy: S.counts.candy });
+      } catch (e) {}
+      try { partyRefreshMarkers(true); } catch (e) {}
+      try { renderPartyBox(); } catch (e) {}
+    }
+  }
+  PROFILE.draft = null;
+  PROFILE.sheetOpen = false;
+  if (sh) sh.hidden = true;
+  renderMe();
+}
+function paintIdentityDraft() {
+  var d = PROFILE.draft; if (!d) return;
+  var nm = $('idName'); if (nm && document.activeElement !== nm) nm.value = d.name;
+  var prev = $('idPreview');
+  if (prev) prev.innerHTML = '<div class="puck puck-lg id-prev-puck" style="--pc:' + d.color + '">' + avatarSvg(d.walker) + '</div>';
+  var wg = $('idWalkers');
+  if (wg) wg.innerHTML = walkerTilesHtml(d.walker, {}, d.color);
+  var cr = $('idColors');
+  if (cr) cr.innerHTML = colorsHtml(d.color);
+  var btn = $('idGo'); if (btn) btn.textContent = PROFILE.editing ? 'Save' : 'Hit the Trail';
+}
+/* First-open gate: only with no profile, never during onboarding, never
+   over the place-entry sheet, and only once a location anchor exists. */
+function identityMaybePrompt() {
+  if (PROFILE.v || PROFILE.shownThisSession || PROFILE.sheetOpen) return;
+  if (typeof ZRES !== 'undefined' && ZRES && ZRES.onboarding) return;
+  var ps = $('placeSheet'); if (ps && !ps.hidden) return;
+  if (!S.pos && !S.start) return;
+  identitySheetOpen(false);
+}
+function identityInit() {
+  profileLoad();
+  profileMigrate();
+  var sh = $('idSheet'); if (!sh) return;
+  /* drag-down on the handle dismisses and commits the defaults/draft */
+  var card = sh.querySelector('.ocard'), startY = null;
+  if (card) {
+    card.addEventListener('touchstart', function (e) { startY = e.touches[0].clientY; }, { passive: true });
+    card.addEventListener('touchmove', function (e) {
+      if (startY == null) return;
+      if (e.touches[0].clientY - startY > 70) { startY = null; identitySheetClose(true); }
+    }, { passive: true });
+  }
+  sh.addEventListener('click', function (e) { if (e.target === sh) identitySheetClose(true); });
+  $('idGo').addEventListener('click', function () { identitySheetClose(true); });
+  $('idName').addEventListener('input', function () {
+    if (!PROFILE.draft) return;
+    PROFILE.draft.name = this.value; PROFILE.nameDirty = true; paintIdentityDraft();
+  });
+  $('idReroll').addEventListener('click', function () {
+    if (!PROFILE.draft) return;
+    PROFILE.draft.name = profileDefaultName(PROFILE.draft.walker); PROFILE.nameDirty = false; paintIdentityDraft(); renderMe();
+  });
+  $('idWalkers').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-avatar]'); if (!b || !PROFILE.draft) return;
+    PROFILE.draft.walker = b.getAttribute('data-avatar');
+    if (!PROFILE.nameDirty) PROFILE.draft.name = profileDefaultName(PROFILE.draft.walker);
+    paintIdentityDraft(); renderMe();
+  });
+  $('idColors').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-color]'); if (!b || !PROFILE.draft) return;
+    PROFILE.draft.color = b.getAttribute('data-color');
+    paintIdentityDraft(); renderMe();
+  });
+  setTimeout(identityMaybePrompt, 500);
+  setInterval(identityMaybePrompt, 1500);
+}
+/* Party-tab identity bar: own avatar + name + color dot + Edit */
+function paintIdBar() {
+  var bar = $('idBar'); if (!bar) return;
+  var id = PROFILE.v || (PARTY.name ? { name: PARTY.name, walker: PARTY.avatar || 'wisp', color: PARTY.color || '#a78bfa' } : null);
+  if (!id) { bar.hidden = true; return; }
+  bar.hidden = false;
+  bar.innerHTML = '<span class="idbar-puck" style="--pc:' + id.color + '">' + avatarSvg(id.walker) + '</span>' +
+    '<span class="idbar-name">' + esc(id.name) + '</span>' +
+    '<span class="idbar-dot" style="background:' + id.color + '"></span>' +
+    '<button type="button" class="btn btn-ghost btn-sm" id="idBarEdit">Edit</button>';
+  var eb = $('idBarEdit');
+  if (eb) eb.addEventListener('click', function () { identitySheetOpen(true); });
+}
+
 function partyTakenMap(exceptName) {
   var t = {};
   Object.keys(PARTY.meta || {}).forEach(function (n) { if (n !== exceptName && PARTY.meta[n] && PARTY.meta[n].avatar) t[PARTY.meta[n].avatar] = n; });
@@ -5474,6 +5729,11 @@ function partyRefreshMarkers(force) {
   if (!partyOn()) return;
   var seen = {};
   Object.keys(PARTY.posRows).forEach(function (name) {
+    /* v7.5 Fix 17: the local member is never drawn by the party layer;
+       the profile self puck is the only self marker (the sweep below
+       removes any stale self marker). Presence posting is unchanged,
+       so peers still see this walker. */
+    if (name === PARTY.name) return;
     if (PARTY.dockHidden && PARTY.dockHidden[name]) {
       var hm = PARTY.markers[name];
       if (hm) { try { if (partyMarkLayer.removeLayer) partyMarkLayer.removeLayer(hm); } catch (e) {} delete PARTY.markers[name]; delete PARTY.iconSigs[name]; }
@@ -5873,6 +6133,13 @@ function colorsHtml(selected) {
 function paintPartyDraft() {
   var pv = $('partyPreview'), gr = $('walkerGrid'), cr = $('partyColors');
   if (!pv || !gr || !cr) return;
+  if (PROFILE.v) {
+    /* v7.5 Fix 17: the profile prefills the party form */
+    var pnm2 = $('partyName');
+    if (pnm2 && !pnm2.value && !PARTY.name) pnm2.value = PROFILE.v.name;
+    if (!PARTY.avatarDraft && !PARTY.avatar) PARTY.avatarDraft = PROFILE.v.walker;
+    if (!PARTY.colorDraft) PARTY.colorDraft = PROFILE.v.color;
+  }
   var nameEl = $('partyName');
   var nm = (nameEl && nameEl.value.trim()) || PARTY.name || 'You';
   if (!PARTY.avatarDraft) PARTY.avatarDraft = PARTY.avatar || partyDefaultAvatar(nm, {});
@@ -5911,6 +6178,7 @@ function paintIdentity() {
 function openIdentity() { if (!partyOn()) return; $('identityPop').hidden = false; paintIdentity(); }
 function closeIdentity() { var p = $('identityPop'); if (p) p.hidden = true; }
 function renderPartyBox() {
+  paintIdBar();
   var box = $('partyBox'); if (!box) return;
   if (!partyOn()) {
     box.innerHTML = '<div id="partyInvite" class="warn" hidden style="margin-bottom:8px"></div>' +
@@ -5986,8 +6254,8 @@ function partyJoin(code, name) {
   tmResetParty();
   PARTY.code = code; PARTY.name = cleanName(name); PARTY.lastCountJson = '';
   PARTY.joinTs = Date.now();
-  PARTY.avatar = (PARTY.avatarExplicit && PARTY.avatarDraft) ? PARTY.avatarDraft : partyDefaultAvatar(code + PARTY.name, {});
-  PARTY.color = PARTY.colorDraft || partyColor(PARTY.name);
+  PARTY.avatar = (PARTY.avatarExplicit && PARTY.avatarDraft) ? PARTY.avatarDraft : (PROFILE.v ? PROFILE.v.walker : partyDefaultAvatar(code + PARTY.name, {}));
+  PARTY.color = PARTY.colorDraft || (PROFILE.v ? PROFILE.v.color : partyColor(PARTY.name));
   try { store.set('party', { code: code, name: PARTY.name, avatar: PARTY.avatar, color: PARTY.color, joinTs: PARTY.joinTs }); } catch (e) {}
   document.body.classList.add('in-party');
   paintChromeState();
@@ -7426,9 +7694,21 @@ function zoneLoadIdentity() {
       ZONE.persona = zonePersonaFor(dev);
     }
   }
+  zoneSyncIdentity();
   var hid = [];
   try { hid = store.get('zoneHidden', []); } catch (e) {}
   if (Array.isArray(hid)) hid.forEach(function (id) { ZONE.hidden[String(id)] = 1; });
+}
+/* v7.5 Fix 17 (Nov 1, 2026 amendment): when a profile exists, Local
+   displays the profile identity. With no profile, the generated zone
+   persona rules and the zone-scoped editor edits it. A profile created
+   later wins; the stored zone persona is kept, unused. Posts keep the
+   persona they were posted with. */
+function zoneSyncIdentity() {
+  if (typeof PROFILE !== 'undefined' && PROFILE && PROFILE.v) {
+    ZONE.persona = { name: PROFILE.v.name, color: PROFILE.v.color, avatar: PROFILE.v.walker };
+  }
+  if (typeof zoneHeadPaint === 'function') zoneHeadPaint();
 }
 function zoneMintDev() {
   var raw = 'ct-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1e9).toString(36) + '-' + Math.floor(Math.random() * 1e9).toString(36);
@@ -7443,6 +7723,7 @@ function zoneSeed() {
   ZONE.ready = true;
   if (!ZONE.dev) zoneMintDev();
   if (!ZONE.persona) ZONE.persona = zonePersonaFor(ZONE.dev);
+  zoneSyncIdentity();
 }
 /* ---------- zone geometry ---------- */
 /* v7.0 Phase 4D: the point-in-polygon and distance math is parameterized
@@ -7654,7 +7935,7 @@ function zoneCountNeighbors() {
   (ZONE.presDevs || []).forEach(function (h) { if (h) set[h] = 1; });
   var cut = Date.now() - ZONE_PRES_MS;
   ZONE.posts.forEach(function (r) { if (r.devhash && new Date(r.created_at).getTime() > cut) set[String(r.devhash)] = 1; });
-  if (ZONE.inside && ZONE.dev) set[ZONE.dev] = 1;
+  /* v7.5 Fix 17 (amendment): presence copy counts neighbors, not self */
   ZONE.neighbors = Object.keys(set).length;
 }
 function zonePresence(force) {
@@ -7945,7 +8226,9 @@ function zonePopDone() {
   if (zoneVisible()) zoneRender();
 }
 /* ---------- zone wiring ---------- */
-$('chatPersonaBtn').addEventListener('click', zonePopOpen);
+$('chatPersonaBtn').addEventListener('click', function () {
+  if (typeof PROFILE !== 'undefined' && PROFILE && PROFILE.v) identitySheetOpen(true); else zonePopOpen();
+});
 $('zpDone').addEventListener('click', zonePopDone);
 $('zonePop').addEventListener('click', function (e) { if (e.target === this) this.hidden = true; });
 $('zpName').addEventListener('input', function (e) { if (ZONE_DRAFT) ZONE_DRAFT.name = e.target.value; });
@@ -9806,6 +10089,7 @@ function onboardGps() {
     if (e && (e.code === 1 || e.code === 3)) placeShow();
   });
 }
+identityInit();
 (function onboardBoot() {
   try { ensureWatch(); } catch (e) {}
   if (S.start) { zoneResolveAt(S.start.lat, S.start.lng); ZRES.ready = true; return; }
@@ -9893,7 +10177,7 @@ paintChromeState();
 /* v6.4.1 boot self-check marker: the shell's checker script verifies this
    was set. If boot died anywhere above, the repair overlay appears instead
    of a silently half-dead app. */
-window.__ctBootOK = '7.4';
+window.__ctBootOK = '7.5';
 
 </script>
 <script>
