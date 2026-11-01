@@ -354,6 +354,21 @@ dialog .row .btn{flex:1;min-width:130px}
 #chatPhotoBtn svg{width:21px;height:21px}
 #chatSend{flex:none;min-width:76px}
 
+/* ---------- Heights Live (v6.5 Phase 3B) ---------- */
+.cb-sub{display:flex;align-items:center;gap:6px;color:#9E93A8;font-size:11.5px;margin-top:2px;max-width:100%}
+.cb-sub .nm{font-weight:600;white-space:nowrap}
+.cb-mod{margin-left:auto;flex:none;width:32px;height:32px;border-radius:50%;border:1px solid var(--line2);background:var(--bg2);color:var(--mut);font-size:15px;line-height:1;display:grid;place-items:center;cursor:pointer;padding:0}
+#chatPersonaBtn{flex:none;display:grid;place-items:center;width:50px;min-height:50px;border-radius:14px;border:1.5px solid var(--line2);background:#16101E;--av-stage:#16101E;padding:0;cursor:pointer}
+#chatPersonaBtn[hidden]{display:none}
+#chatPersonaBtn .avatar-glyph{width:26px;height:26px}
+#chatCount{flex:none;align-self:center;color:var(--mut);font-size:12px;font-variant-numeric:tabular-nums;min-width:26px;text-align:center}
+#chatCount[hidden]{display:none}
+#zonePop input[type=text]{width:100%;min-height:48px;border-radius:12px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:0 12px;font-size:16px;margin-top:10px}
+#zonePop .zp-note{color:var(--mut);font-size:12.5px;line-height:1.45;margin:12px 0 0}
+#zoneModPop{position:fixed;z-index:1500;left:12px;right:12px;bottom:calc(var(--sab) + 12px);background:#1D1526;border:1px solid var(--line2);border-radius:16px;padding:10px;box-shadow:0 18px 40px rgba(0,0,0,.6)}
+#zoneModPop .zm-t{color:var(--mut);font-size:12.5px;text-align:center;padding:2px 6px 4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#zoneModPop button{width:100%;margin-top:6px}
+
 /* ---------- nav mode ---------- */
 #navTop{position:fixed;z-index:1100;top:calc(var(--sat) + 10px);left:calc(var(--sal) + 10px);right:calc(var(--sar) + 10px);padding:14px 16px;display:none}
 body.mode-nav #navTop{display:block}
@@ -915,9 +930,11 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
       <div id="zoneBar" hidden>In Jersey City Heights &middot; Visible to nearby walkers &middot; Clears in 4h</div>
       <div id="chatScroll"><div id="chatLog"></div></div>
       <div id="chatComposer">
+        <button id="chatPersonaBtn" type="button" hidden aria-label="Your Heights Live walker"></button>
         <label id="chatPhotoBtn" for="chatPhoto" aria-label="Send a photo"><svg class="ic" viewBox="0 0 24 24"><use href="#i-camera"/></svg></label>
         <input id="chatPhoto" type="file" accept="image/*" hidden>
         <input id="chatInput" type="text" autocomplete="off" placeholder="Message your party" maxlength="140">
+        <span id="chatCount" hidden></span>
         <button id="chatSend" class="btn btn-org" type="button">Send</button>
       </div>
     </div>
@@ -1132,6 +1149,26 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
     <div id="identityGrid" class="walker-grid"></div>
     <button id="identityDone" class="btn btn-org" type="button" style="width:100%;margin-top:12px">Done</button>
   </div>
+</div>
+
+<div id="zonePop" class="overlay center" hidden>
+  <div class="ocard card" role="dialog" aria-modal="true" aria-labelledby="zonePopTitle">
+    <h2 id="zonePopTitle">Your Heights Live walker</h2>
+    <div id="zpPreview" class="walker-preview"></div>
+    <input id="zpName" type="text" autocomplete="off" maxlength="24" placeholder="Walker name" aria-label="Walker name">
+    <div id="zpColors" class="party-colors" role="group" aria-label="Your color"></div>
+    <div class="label" style="margin-top:12px">Pick your walker</div>
+    <div id="zpWalkers" class="walker-grid"></div>
+    <p class="zp-note">Neighbors see this walker name, never your real one. It lives only on this device; there is no account, and posts clear after 4 hours.</p>
+    <button id="zpDone" class="btn btn-org" type="button" style="width:100%;margin-top:12px">Done</button>
+  </div>
+</div>
+
+<div id="zoneModPop" hidden role="dialog" aria-label="Post options">
+  <div class="zm-t" id="zmTitle"></div>
+  <button id="zmHide" class="btn btn-ghost" type="button">Hide this post</button>
+  <button id="zmReport" class="btn btn-ghost" type="button">Report post</button>
+  <button id="zmCancel" class="btn" type="button">Cancel</button>
 </div>
 
 <div id="dlg" class="overlay center" hidden>
@@ -5260,13 +5297,12 @@ setInterval(function () { if (KID.on) kidRender(); }, 3000);
 
 /* ---------- Chat surface (v6.5 Phase 2) ----------
    Chat lives in its own sheet tab now. Two channels: Party (real,
-   private to the room, bubbles below) and Heights Live, the zone feed.
-   The zone UI ships in this phase; the feed itself lands in Phase 3,
-   so the zone channel renders an honest empty state, never fake posts.
-   Photos are Party-channel only (owner-approved): a canvas re-encode
-   strips EXIF/GPS and caps the payload, and the image rides the post's
-   msg field with an img1|<w>x<h>| prefix, so no new backend columns
-   are needed. The zone channel has no composer in this phase. */
+   private to the room, bubbles below) and Heights Live, the zone feed
+   (Stage B wires the real feed into this surface; see the Heights
+   Live section below). Photos are Party-channel only (owner-approved):
+   a canvas re-encode strips EXIF/GPS and caps the payload, and the
+   image rides the post's msg field with an img1|<w>x<h>| prefix, so
+   no new backend columns are needed. The zone channel is text-only. */
 var CHAT = { channel: 'party' };
 var CHAT_IMG_CAP = 120 * 1024; /* data-URL chars, roughly 90 KB of image */
 function fmtChatTime(ts, full) {
@@ -5348,12 +5384,9 @@ function renderChat() {
   var zone = !partyOn() || CHAT.channel === 'zone';
   $('zoneBar').hidden = !zone;
   var comp = $('chatComposer');
-  if (zone) {
-    log.innerHTML = '<div class="chat-empty"><b>Heights Live opens soon.</b><br>The neighborhood feed arrives with the next update (Phase 3). ' + (partyOn() ? 'Party chat is live now, one tap over.' : 'Party chat works today once you start or join a party.') + '</div>';
-    if (comp) comp.style.display = 'none';
-    return;
-  }
+  if (zone) { zoneRender(); return; }
   if (comp) comp.style.display = '';
+  chatComposerMode('party');
   log.innerHTML = chatBubblesHtml();
   log.querySelectorAll('.cb-img').forEach(function (im) {
     im.addEventListener('click', function () { openPhotoView(im.getAttribute('src')); });
@@ -5361,6 +5394,7 @@ function renderChat() {
 }
 function scrollChatBottom() { var sc = $('chatScroll'); if (sc) sc.scrollTop = sc.scrollHeight; }
 function chatSend() {
+  if (typeof zoneVisible === 'function' && zoneVisible()) { zoneSend(); return; }
   var inp = $('chatInput'); if (!inp || !partyOn()) return;
   var text = inp.value.trim(); if (!text) return;
   inp.value = '';
@@ -5412,6 +5446,522 @@ $('chatPhoto').addEventListener('change', function () {
   };
   rd.readAsDataURL(f);
 });
+/* ---------- Heights Live zone chat (v6.5 Phase 3 Stage B) ----------
+   The neighborhood channel, wired into the Phase 2 chat surface.
+   Identity is a pseudonymous walker persona seeded deterministically
+   from a per-device secret: the secret is hashed once, on this
+   device, and only the hash (devhash) ever leaves it, riding zone
+   posts as the posting identity. The raw token is never stored or
+   sent. There are no accounts and no real names, and the persona is
+   stored separately from any party identity (a party name or walker
+   never leaks into the zone channel).
+   Presence inside the Jersey City Heights zone (declarative polygon
+   + 500 m grace buffer, 2 h sticky session) unlocks reading and
+   posting. Every post carries ONE coarse corridor tag computed on
+   this device from the poster's position; raw coordinates are never
+   sent or stored. The feed is ephemeral (4 h display TTL) and
+   text-only (owner-approved pushback: no photos in a public channel).
+   Moderation is client-enforced v1: Hide is per-device and permanent
+   for that post; Report files a zone_reports row, and a post with
+   reports from 3+ distinct devices hides for everyone.
+   Fail-soft: if the zone tables are missing or the API errors, the
+   channel shows an honest unavailable state. Never a crash, never a
+   fake feed. Backend: zone-setup.sql (zone_posts, zone_reports). */
+var ZONE_ID = 'heights';
+var ZONE_TTL_MS = 4 * 3600 * 1000;
+var ZONE_STICKY_MS = 2 * 3600 * 1000;
+var ZONE_PRES_MS = 30 * 60000;        /* neighbor-count window */
+var ZONE_PRES_POST_MS = 10 * 60000;   /* presence ping cadence */
+var ZONE_SEND_MS = 10000;             /* one post per 10 s per device */
+var ZONE_MAXLEN = 200;
+var ZONE_BUFFER_M = 500;
+/* The Heights (plan section 7D): Rt 139 north to the Union City
+   border, the Palisade cliff on the east, Kennedy Blvd on the west.
+   Verified to contain the full embedded stop extent. */
+var ZONE_POLY = [[40.7308, -74.0558], [40.7312, -74.0445], [40.7385, -74.0412], [40.7480, -74.0399], [40.7560, -74.0402], [40.7592, -74.0425], [40.7594, -74.0520], [40.7520, -74.0580], [40.7420, -74.0582], [40.7350, -74.0575]];
+/* ~15 coarse corridor bands (>= 300 m grain). A post takes the
+   nearest band center within 500 m, else the whole-zone tag. */
+var ZONE_BANDS = [
+  { t: 'near Central & Bowers', lat: 40.7486, lng: -74.0497 },
+  { t: 'near Central & Griffith', lat: 40.7516, lng: -74.0490 },
+  { t: 'near Central & Congress', lat: 40.7433, lng: -74.0509 },
+  { t: 'near Central & South', lat: 40.7388, lng: -74.0520 },
+  { t: 'near Central & Hutton', lat: 40.7547, lng: -74.0483 },
+  { t: 'near Summit & Bowers', lat: 40.7485, lng: -74.0466 },
+  { t: 'near Summit & Congress', lat: 40.7432, lng: -74.0477 },
+  { t: 'near Palisade & Bowers', lat: 40.7483, lng: -74.0426 },
+  { t: 'near Palisade & Griffith', lat: 40.7517, lng: -74.0420 },
+  { t: 'near Palisade & Congress', lat: 40.7435, lng: -74.0435 },
+  { t: 'Riverview Park area', lat: 40.7558, lng: -74.0438 },
+  { t: 'near Kennedy & Bowers', lat: 40.7488, lng: -74.0568 },
+  { t: 'near Kennedy & Congress', lat: 40.7431, lng: -74.0574 },
+  { t: 'near Pershing Field', lat: 40.7406, lng: -74.0474 },
+  { t: 'Washington Park area', lat: 40.7578, lng: -74.0508 }
+];
+var ZONE_ADJ = ['Ember', 'Cinder', 'Velvet', 'Hollow', 'Amber', 'Bramble', 'Garnet', 'Misty', 'Onyx', 'Pumpkin', 'Cobweb', 'Midnight'];
+var ZONE_CREATURE = { wisp: 'Ghost', gourd: 'Pumpkin', jinx: 'Cat', vesper: 'Bat', marrow: 'Skeleton', volt: 'Bolt', hex: 'Witch', lazlo: 'Vampire' };
+var ZONE = { ready: false, dev: '', persona: null, inside: false, stickyUntil: 0, posts: [], presDevs: [], init: false, fetching: false, cursor: '', down: false, downAt: 0, neighbors: null, hidden: {}, repCounts: {}, repMine: {}, lastSend: 0, lastPresence: 0, timer: null, modId: null };
+var ZONE_DRAFT = null;
+
+function zoneHash53(str, seed) {
+  var h1 = 0xdeadbeef ^ (seed || 0), h2 = 0x41c6ce57 ^ (seed || 0);
+  var s = String(str == null ? '' : str);
+  for (var i = 0; i < s.length; i++) {
+    var ch = s.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  function h8(n) { var t = (n >>> 0).toString(16); return ('00000000' + t).slice(-8); }
+  return h8(h2) + h8(h1);
+}
+function zonePersonaFor(dev) {
+  var a = parseInt(dev.slice(0, 6), 16) || 0, b = parseInt(dev.slice(6, 12), 16) || 0, c = parseInt(dev.slice(12, 16), 16) || 0;
+  var avatar = AVATAR_ORDER[a % AVATAR_ORDER.length];
+  return {
+    name: ZONE_ADJ[b % ZONE_ADJ.length] + ' ' + (ZONE_CREATURE[avatar] || 'Ghost'),
+    color: PARTY_COLORS[c % PARTY_COLORS.length],
+    avatar: avatar
+  };
+}
+function zoneSeed() {
+  if (ZONE.ready) return;
+  ZONE.ready = true;
+  var dev = '';
+  try { dev = String(store.get('zoneDev', '') || ''); } catch (e) {}
+  if (!dev) {
+    var raw = 'ct-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1e9).toString(36) + '-' + Math.floor(Math.random() * 1e9).toString(36);
+    dev = zoneHash53(raw, 7);
+    try { store.set('zoneDev', dev); } catch (e) {}
+  }
+  ZONE.dev = dev;
+  var saved = null;
+  try { saved = store.get('zonePersona', null); } catch (e) {}
+  if (saved && saved.name && saved.color && saved.avatar && AVATAR_BODY[saved.avatar]) {
+    ZONE.persona = { name: String(saved.name), color: String(saved.color), avatar: String(saved.avatar) };
+  } else {
+    ZONE.persona = zonePersonaFor(dev);
+  }
+  var hid = [];
+  try { hid = store.get('zoneHidden', []); } catch (e) {}
+  if (Array.isArray(hid)) hid.forEach(function (id) { ZONE.hidden[String(id)] = 1; });
+}
+/* ---------- zone geometry ---------- */
+function zoneInPoly(lat, lng) {
+  var inside = false, poly = ZONE_POLY;
+  for (var i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    var xi = poly[i][1], yi = poly[i][0], xj = poly[j][1], yj = poly[j][0];
+    if ((yi > lat) !== (yj > lat) && lng < (xj - xi) * (lat - yi) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+function zoneSegDistM(lat, lng, a, b) {
+  var kLat = 111320, kLng = 111320 * Math.cos(lat * Math.PI / 180);
+  var px = lng * kLng, py = lat * kLat, ax = a[1] * kLng, ay = a[0] * kLat, bx = b[1] * kLng, by = b[0] * kLat;
+  var dx = bx - ax, dy = by - ay, L2 = dx * dx + dy * dy;
+  var t = L2 ? Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / L2)) : 0;
+  var ex = ax + t * dx - px, ey = ay + t * dy - py;
+  return Math.sqrt(ex * ex + ey * ey);
+}
+function zoneDistToPoly(lat, lng) {
+  var best = Infinity;
+  for (var i = 0; i < ZONE_POLY.length; i++) {
+    var d = zoneSegDistM(lat, lng, ZONE_POLY[i], ZONE_POLY[(i + 1) % ZONE_POLY.length]);
+    if (d < best) best = d;
+  }
+  return best;
+}
+function zoneInside(lat, lng) { return zoneInPoly(lat, lng) || zoneDistToPoly(lat, lng) <= ZONE_BUFFER_M; }
+/* Session state from the latest fix: a usable fix (<= 65 m, or a
+   trusted tier-1 fix) inside the zone (re)starts the 2 h sticky
+   session; the session then survives GPS drift until it lapses. */
+function zoneEval() {
+  zoneSeed();
+  var now = Date.now();
+  var fix = (typeof S !== 'undefined' && S.pos && isFinite(S.pos.lat) && isFinite(S.pos.lng)) ? S.pos : null;
+  var usable = !!fix && (fix.acc == null || fix.acc <= 65 || S.posTrusted);
+  if (usable && zoneInside(fix.lat, fix.lng)) { ZONE.inside = true; ZONE.stickyUntil = now + ZONE_STICKY_MS; return true; }
+  if (now < ZONE.stickyUntil) { ZONE.inside = true; return true; }
+  ZONE.inside = false;
+  return false;
+}
+function zoneBand(lat, lng) {
+  var best = null, bd = 500;
+  for (var i = 0; i < ZONE_BANDS.length; i++) {
+    var d = haversine({ lat: lat, lng: lng }, ZONE_BANDS[i]);
+    if (d < bd) { bd = d; best = ZONE_BANDS[i]; }
+  }
+  return best ? best.t : 'in the Heights';
+}
+function zoneVisible() { return S.sheetTab === 'chat' && (!partyOn() || CHAT.channel === 'zone'); }
+/* ---------- composer modes ---------- */
+function zonePaintPersonaBtn() {
+  var b = $('chatPersonaBtn');
+  if (!b || !ZONE.persona) return;
+  b.style.color = ZONE.persona.color;
+  b.style.borderColor = ZONE.persona.color;
+  b.innerHTML = avatarSvg(ZONE.persona.avatar);
+  b.title = ZONE.persona.name;
+}
+function zoneCountPaint() {
+  var cnt = $('chatCount'), inp = $('chatInput');
+  if (!cnt || !inp) return;
+  if (!zoneVisible()) { cnt.hidden = true; return; }
+  var left = ZONE_MAXLEN - String(inp.value || '').length;
+  cnt.hidden = left > 40;
+  cnt.textContent = left;
+}
+function chatComposerMode(mode) {
+  var photo = $('chatPhotoBtn'), per = $('chatPersonaBtn'), cnt = $('chatCount'), inp = $('chatInput');
+  if (mode === 'zone') {
+    if (photo) photo.style.display = 'none';
+    if (per) { per.hidden = false; zonePaintPersonaBtn(); }
+    if (inp) { inp.placeholder = 'Message the Heights'; inp.maxLength = ZONE_MAXLEN; }
+    zoneCountPaint();
+  } else {
+    if (photo) photo.style.display = '';
+    if (per) per.hidden = true;
+    if (cnt) cnt.hidden = true;
+    if (inp) { inp.placeholder = 'Message your party'; inp.maxLength = 140; }
+  }
+}
+/* ---------- transport (zone_posts / zone_reports) ---------- */
+function zoneKey(r) {
+  if (r && r.id) return 'id:' + r.id;
+  return 'k:' + String((r && r.created_at) || '') + '|' + String((r && r.devhash) || '') + '|' + String((r && r.msg) || '').slice(0, 48);
+}
+function zoneFetch(initial) {
+  if (!crowdOn()) { ZONE.down = true; ZONE.downAt = Date.now(); if (zoneVisible()) zoneRender(); return; }
+  ZONE.fetching = true;
+  var base = CROWD.url + '/rest/v1/zone_posts?zone=eq.' + encodeURIComponent(ZONE_ID) + '&kind=eq.chat&select=*';
+  var url = initial
+    ? base + '&order=created_at.desc&limit=40'
+    : base + '&created_at=gt.' + encodeURIComponent(ZONE.cursor || new Date(0).toISOString()) + '&order=created_at.asc&limit=100';
+  fetch(url, { headers: crowdHeaders() })
+    .then(function (r) { if (!r.ok) throw new Error('zone fetch ' + r.status); return r.json(); })
+    .then(function (rows) { ZONE.fetching = false; if (Array.isArray(rows)) zoneIngest(rows, initial); })
+    .catch(function () {
+      ZONE.fetching = false;
+      ZONE.down = true; ZONE.downAt = Date.now();
+      if (!ZONE.init && zoneVisible()) zoneRender();
+    });
+}
+function zoneIngest(rows, initial) {
+  ZONE.down = false;
+  var seen = {};
+  ZONE.posts.forEach(function (r) { seen[zoneKey(r)] = 1; });
+  var fresh = [], maxTs = String(ZONE.cursor || '');
+  rows.forEach(function (r) {
+    if (!r) return;
+    if (String(r.created_at || '') > maxTs) maxTs = String(r.created_at);
+    if (r.kind !== 'chat') return;
+    var k = zoneKey(r);
+    if (seen[k]) return;
+    seen[k] = 1; fresh.push(r);
+  });
+  if (maxTs > String(ZONE.cursor || '')) ZONE.cursor = maxTs;
+  if (initial && !rows.length && !ZONE.cursor) ZONE.cursor = new Date(Date.now() - 60000).toISOString();
+  if (fresh.length || initial) {
+    var cut = Date.now() - ZONE_TTL_MS;
+    ZONE.posts = ZONE.posts.concat(fresh)
+      .filter(function (r) { return new Date(r.created_at).getTime() > cut; })
+      .sort(function (a, b) { return String(a.created_at) < String(b.created_at) ? -1 : 1; })
+      .slice(-120);
+  }
+  ZONE.init = true;
+  zoneCountNeighbors();
+  if (zoneVisible() && (fresh.length || initial)) { zoneRender(); scrollChatBottom(); }
+}
+function zoneFetchMeta() {
+  if (!crowdOn()) return;
+  var since = new Date(Date.now() - ZONE_PRES_MS).toISOString();
+  fetch(CROWD.url + '/rest/v1/zone_posts?zone=eq.' + encodeURIComponent(ZONE_ID) + '&kind=eq.presence&select=devhash,created_at&created_at=gt.' + encodeURIComponent(since) + '&order=created_at.desc&limit=300', { headers: crowdHeaders() })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (rows) {
+      if (!Array.isArray(rows)) return;
+      ZONE.presDevs = rows.map(function (r) { return String((r && r.devhash) || ''); }).filter(function (h) { return !!h; });
+      zoneCountNeighbors();
+      if (zoneVisible()) zoneBarPaint();
+    })
+    .catch(function () {});
+  fetch(CROWD.url + '/rest/v1/zone_reports?select=post_id,reporter&limit=1000', { headers: crowdHeaders() })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (rows) {
+      if (!Array.isArray(rows)) return;
+      var by = {};
+      rows.forEach(function (r) {
+        if (!r || !r.post_id) return;
+        var id = String(r.post_id);
+        (by[id] = by[id] || {})[String(r.reporter || '')] = 1;
+      });
+      var counts = {}, changed = false;
+      Object.keys(by).forEach(function (id) {
+        counts[id] = Object.keys(by[id]).length;
+        if (ZONE.repCounts[id] !== counts[id]) changed = true;
+      });
+      ZONE.repCounts = counts;
+      if (changed && zoneVisible()) zoneRender();
+    })
+    .catch(function () {});
+}
+function zoneCountNeighbors() {
+  var set = {};
+  (ZONE.presDevs || []).forEach(function (h) { if (h) set[h] = 1; });
+  var cut = Date.now() - ZONE_PRES_MS;
+  ZONE.posts.forEach(function (r) { if (r.devhash && new Date(r.created_at).getTime() > cut) set[String(r.devhash)] = 1; });
+  if (ZONE.inside && ZONE.dev) set[ZONE.dev] = 1;
+  ZONE.neighbors = Object.keys(set).length;
+}
+function zonePresence(force) {
+  if (!crowdOn() || !ZONE.inside || !ZONE.persona) return;
+  var now = Date.now();
+  if (!force && now - ZONE.lastPresence < ZONE_PRES_POST_MS) return;
+  ZONE.lastPresence = now;
+  var fix = S.pos;
+  fetch(CROWD.url + '/rest/v1/zone_posts', {
+    method: 'POST', headers: crowdHeaders(),
+    body: JSON.stringify({ zone: ZONE_ID, persona: ZONE.persona.name, color: ZONE.persona.color, avatar: ZONE.persona.avatar, devhash: ZONE.dev, kind: 'presence', corridor: fix ? zoneBand(fix.lat, fix.lng) : 'in the Heights', msg: null })
+  }).catch(function () {});
+}
+/* Same word filter as party chat (BAD_WORDS), held to the zone
+   channel's own 200-character cap instead of cleanText's 140. */
+function zoneClean(t) {
+  var out = String(t == null ? '' : t).slice(0, ZONE_MAXLEN);
+  BAD_WORDS.forEach(function (w) { out = out.replace(new RegExp(w, 'gi'), '***'); });
+  return out.trim();
+}
+function zoneSend() {
+  var inp = $('chatInput'); if (!inp) return;
+  zoneSeed();
+  if (!zoneEval()) { toast('Heights Live unlocks when you are in the Heights.', 'warn'); return; }
+  var text = String(inp.value || '').trim();
+  if (!text) return;
+  var now = Date.now();
+  if (now - ZONE.lastSend < ZONE_SEND_MS) { toast('One message every 10 seconds in Heights Live.', 'warn'); return; }
+  var clean = zoneClean(text);
+  if (!clean) return;
+  inp.value = '';
+  zoneCountPaint();
+  ZONE.lastSend = now;
+  var fix = S.pos;
+  fetch(CROWD.url + '/rest/v1/zone_posts', {
+    method: 'POST', headers: crowdHeaders(),
+    body: JSON.stringify({ zone: ZONE_ID, persona: ZONE.persona.name, color: ZONE.persona.color, avatar: ZONE.persona.avatar, devhash: ZONE.dev, kind: 'chat', corridor: fix ? zoneBand(fix.lat, fix.lng) : 'in the Heights', msg: clean })
+  }).then(function (r) {
+    if (!r.ok) { ZONE.down = true; ZONE.downAt = Date.now(); if (zoneVisible()) zoneRender(); }
+  }).catch(function () {
+    ZONE.down = true; ZONE.downAt = Date.now(); if (zoneVisible()) zoneRender();
+  });
+  setTimeout(function () { if (ZONE.init) zoneFetch(false); }, 500);
+}
+/* ---------- rendering ---------- */
+function zoneRelTime(ts) {
+  var m = Math.max(0, Math.round((Date.now() - ts) / 60000));
+  return m < 1 ? 'just now' : m < 60 ? m + 'm ago' : Math.round(m / 60) + 'h ago';
+}
+function zoneShown() {
+  var cut = Date.now() - ZONE_TTL_MS;
+  return ZONE.posts.filter(function (r) {
+    if (new Date(r.created_at).getTime() <= cut) return false;
+    if (r.id && ZONE.hidden[String(r.id)]) return false;
+    if (r.id && (ZONE.repCounts[String(r.id)] || 0) >= 3) return false;
+    return true;
+  });
+}
+function zoneBubblesHtml() {
+  var rows = zoneShown();
+  if (!rows.length) return '<div class="chat-empty"><b>Heights Live is quiet right now.</b><br>No posts in the last 4 hours. Say the first word.</div>';
+  var out = '', i = 0, prevTs = 0;
+  while (i < rows.length) {
+    var first = rows[i], fts = new Date(first.created_at).getTime();
+    if (prevTs && isFinite(fts) && fts - prevTs > 10 * 60000) out += '<div class="cb-div">' + esc(fmtChatTime(fts, true)) + '</div>';
+    var grp = [first], j = i + 1;
+    while (j < rows.length) {
+      var nx = rows[j];
+      var nts = new Date(nx.created_at).getTime(), pv = new Date(rows[j - 1].created_at).getTime();
+      if (String(nx.devhash || '') !== String(first.devhash || '') || nts - pv > 3 * 60000) break;
+      grp.push(nx); j++;
+    }
+    var mine = String(first.devhash || '') === ZONE.dev;
+    var col = first.color || partyColor(first.persona || '');
+    var colHtml = '';
+    grp.forEach(function (r, gi) {
+      var last = gi === grp.length - 1;
+      var body = emojiOnly(r.msg) ? '<span class="cb-jumbo">' + esc(r.msg) + '</span>' : esc(r.msg || '');
+      var ts = last ? '<span class="cb-ts">' + esc(fmtChatTime(new Date(r.created_at).getTime(), false)) + '</span>' : '';
+      var zid = (!mine && r.id) ? ' data-zid="' + esc(String(r.id)) + '"' : '';
+      colHtml += '<div class="cb-b' + (last ? ' last' : '') + '" style="border-color:' + col + '"' + zid + '>' + body + ts + '</div>';
+    });
+    var av = mine ? '' : '<span class="cb-av" style="--pc:' + col + '">' + (first.avatar && AVATAR_BODY[first.avatar] ? avatarSvg(first.avatar) : '<span class="puck-ini">' + esc(partyInitials(first.persona || '?')) + '</span>') + '</span>';
+    var lastR = grp[grp.length - 1];
+    var sub = '<div class="cb-sub">' +
+      (mine ? '' : '<span class="nm" style="color:' + col + '">' + esc(first.persona || 'Walker') + '</span><span>&middot;</span>') +
+      '<span>' + esc(lastR.corridor || 'in the Heights') + '</span><span>&middot;</span><span>' + esc(zoneRelTime(new Date(lastR.created_at).getTime())) + '</span>' +
+      (!mine && lastR.id ? '<button type="button" class="cb-mod" data-mod="' + esc(String(lastR.id)) + '" aria-label="Post options">&middot;&middot;&middot;</button>' : '') +
+      '</div>';
+    out += '<div class="cb-row ' + (mine ? 'me' : 'other') + '">' + av + '<div class="cb-col">' + colHtml + sub + '</div></div>';
+    prevTs = new Date(grp[grp.length - 1].created_at).getTime();
+    i = j;
+  }
+  return out;
+}
+function zoneBarPaint() {
+  var bar = $('zoneBar'); if (!bar) return;
+  if (!ZONE.inside) { bar.textContent = 'Heights Live · Jersey City Heights neighborhood feed'; return; }
+  bar.textContent = 'Heights Live' + (ZONE.neighbors != null ? ' · ' + ZONE.neighbors + (ZONE.neighbors === 1 ? ' neighbor' : ' neighbors') + ' here' : '') + ' · Visible to nearby walkers · Clears in 4h';
+}
+function zoneRender() {
+  var log = $('chatLog'); if (!log) return;
+  var comp = $('chatComposer');
+  try { zoneSeed(); } catch (e) {}
+  var inside = false;
+  try { inside = zoneEval(); } catch (e) {}
+  zoneBarPaint();
+  if (!inside) {
+    if (comp) comp.style.display = 'none';
+    log.innerHTML = '<div class="chat-empty"><b>You are outside the Heights.</b><br>Heights Live is the live neighborhood feed for the Jersey City Heights. It unlocks when you arrive, and stays with you for a couple of hours after.</div>';
+    return;
+  }
+  zoneEnsure();
+  if (ZONE.down && !ZONE.init) {
+    if (comp) comp.style.display = 'none';
+    log.innerHTML = '<div class="chat-empty"><b>Heights Live is not reachable right now.</b><br>The neighborhood feed did not answer. Your party, spots, and haul are fine; try again in a little while.</div>';
+    return;
+  }
+  if (comp) comp.style.display = '';
+  chatComposerMode('zone');
+  log.innerHTML = ZONE.init ? zoneBubblesHtml() : '<div class="chat-empty">Finding the neighborhood…</div>';
+  log.querySelectorAll('.cb-mod').forEach(function (b) {
+    b.addEventListener('click', function () { zoneModOpen(b.getAttribute('data-mod')); });
+  });
+}
+function zoneEnsure() {
+  zoneSeed();
+  if (!ZONE.timer) ZONE.timer = setInterval(zoneTick, 30000);
+  if (!ZONE.inside || !crowdOn() || ZONE.init || ZONE.fetching) return;
+  if (ZONE.down && Date.now() - (ZONE.downAt || 0) < 30000) return;
+  zoneFetch(true);
+  zoneFetchMeta();
+  zonePresence(true);
+}
+function zoneTick() {
+  if (!zoneVisible()) return;
+  var was = ZONE.inside;
+  zoneEval();
+  if (!ZONE.inside) { if (was) zoneRender(); return; }
+  if (!was) { zoneEnsure(); zoneRender(); return; }
+  if (!ZONE.init) { zoneEnsure(); return; }
+  zoneFetch(false);
+  zoneFetchMeta();
+  zonePresence(false);
+}
+/* ---------- moderation (client-enforced v1) ---------- */
+function zoneModOpen(id) {
+  if (!id) return;
+  ZONE.modId = String(id);
+  var r = null;
+  ZONE.posts.forEach(function (p) { if (p.id && String(p.id) === ZONE.modId) r = p; });
+  var t = $('zmTitle');
+  if (t) t.textContent = r ? ('Post by ' + (r.persona || 'a neighbor') + ' · ' + (r.corridor || 'in the Heights')) : 'Post options';
+  var pop = $('zoneModPop');
+  if (pop) pop.hidden = false;
+}
+function zoneModClose() {
+  var pop = $('zoneModPop');
+  if (pop) pop.hidden = true;
+  ZONE.modId = null;
+}
+function zoneHidePost() {
+  if (!ZONE.modId) return;
+  ZONE.hidden[ZONE.modId] = 1;
+  try { store.set('zoneHidden', Object.keys(ZONE.hidden)); } catch (e) {}
+  zoneModClose();
+  zoneRender();
+  toast('Post hidden on this device.', 'ok');
+}
+function zoneReportPost() {
+  if (!ZONE.modId || !ZONE.dev) { zoneModClose(); return; }
+  var id = ZONE.modId;
+  if (!ZONE.repMine[id]) {
+    ZONE.repMine[id] = 1;
+    ZONE.repCounts[id] = (ZONE.repCounts[id] || 0) + 1;
+    fetch(CROWD.url + '/rest/v1/zone_reports', {
+      method: 'POST', headers: crowdHeaders(),
+      body: JSON.stringify({ post_id: id, reporter: ZONE.dev })
+    }).catch(function () {});
+  }
+  zoneModClose();
+  zoneRender();
+  toast('Reported. A post reported by 3 neighbors hides for everyone.', 'ok');
+}
+/* ---------- persona popover ---------- */
+function zonePopOpen() {
+  zoneSeed();
+  ZONE_DRAFT = { name: ZONE.persona.name, color: ZONE.persona.color, avatar: ZONE.persona.avatar };
+  var pop = $('zonePop');
+  if (!pop) return;
+  pop.hidden = false;
+  zonePopPaint();
+}
+function zonePopPaint() {
+  var pv = $('zpPreview'), gr = $('zpWalkers'), cr = $('zpColors'), nm = $('zpName');
+  if (!pv || !gr || !cr || !ZONE_DRAFT) return;
+  pv.innerHTML = '<div class="puck puck-lg" style="--pc:' + ZONE_DRAFT.color + '">' + avatarSvg(ZONE_DRAFT.avatar) + '</div>';
+  if (nm && document.activeElement !== nm) nm.value = ZONE_DRAFT.name;
+  cr.innerHTML = colorsHtml(ZONE_DRAFT.color);
+  gr.innerHTML = walkerTilesHtml(ZONE_DRAFT.avatar, {}, ZONE_DRAFT.color);
+  cr.querySelectorAll('.cdot').forEach(function (b) {
+    b.addEventListener('click', function () { ZONE_DRAFT.color = b.getAttribute('data-color'); zonePopPaint(); });
+  });
+  gr.querySelectorAll('.walker-tile').forEach(function (b) {
+    b.addEventListener('click', function () {
+      ZONE_DRAFT.avatar = b.getAttribute('data-avatar');
+      var adj = String(ZONE_DRAFT.name || '').split(' ')[0];
+      if (ZONE_ADJ.indexOf(adj) >= 0 && nm && nm.value === ZONE_DRAFT.name) {
+        ZONE_DRAFT.name = adj + ' ' + (ZONE_CREATURE[ZONE_DRAFT.avatar] || 'Ghost');
+      }
+      zonePopPaint();
+    });
+  });
+}
+function zonePopDone() {
+  if (!ZONE_DRAFT) return;
+  var nm = $('zpName');
+  var typed = nm ? String(nm.value || '').trim() : '';
+  var name = typed ? cleanName(typed) : ZONE.persona.name;
+  ZONE.persona = { name: name, color: ZONE_DRAFT.color, avatar: ZONE_DRAFT.avatar };
+  try { store.set('zonePersona', ZONE.persona); } catch (e) {}
+  ZONE_DRAFT = null;
+  var pop = $('zonePop');
+  if (pop) pop.hidden = true;
+  zonePaintPersonaBtn();
+  if (zoneVisible()) zoneRender();
+}
+/* ---------- zone wiring ---------- */
+$('chatPersonaBtn').addEventListener('click', zonePopOpen);
+$('zpDone').addEventListener('click', zonePopDone);
+$('zonePop').addEventListener('click', function (e) { if (e.target === this) this.hidden = true; });
+$('zpName').addEventListener('input', function (e) { if (ZONE_DRAFT) ZONE_DRAFT.name = e.target.value; });
+$('chatInput').addEventListener('input', zoneCountPaint);
+$('zmHide').addEventListener('click', zoneHidePost);
+$('zmReport').addEventListener('click', zoneReportPost);
+$('zmCancel').addEventListener('click', zoneModClose);
+(function () {
+  var log = $('chatLog');
+  if (!log) return;
+  var t = null;
+  function clear() { if (t) { clearTimeout(t); t = null; } }
+  log.addEventListener('pointerdown', function (e) {
+    if (!zoneVisible()) return;
+    var el = e.target && e.target.closest ? e.target.closest('[data-zid]') : null;
+    if (!el) return;
+    clear();
+    t = setTimeout(function () { zoneModOpen(el.getAttribute('data-zid')); }, 550);
+  });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) { log.addEventListener(ev, clear); });
+})();
+
 renderChatHead();
 renderChat();
 /* Keep the sheet (and with it the chat composer) above the soft
