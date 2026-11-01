@@ -669,6 +669,20 @@ body.has-route #routeEmpty{display:none}
 #navBottom .haul{margin-top:8px}
 .navtools{display:flex;gap:8px;margin-top:8px}
 .navtools .btn{flex:1;font-size:13px;padding:9px 4px;min-height:48px}
+
+/* ---------- Voice commands (v6.5 Phase 3C) ---------- */
+#partyMicRow{display:flex;justify-content:flex-end;margin-bottom:8px}
+#partyMicRow[hidden]{display:none}
+#btnMicParty{display:inline-flex;align-items:center;gap:7px;min-height:48px;padding:9px 16px;border-radius:999px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);font-size:14px;font-weight:600;cursor:pointer}
+#btnMicParty[hidden]{display:none}
+#btnMicNav[hidden]{display:none}
+.micbtn.listening{background:var(--org)!important;color:#16101E!important;border-color:var(--org)!important;animation:micpulse 1.1s ease-in-out infinite}
+@keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(232,93,38,.55)}50%{box-shadow:0 0 0 9px rgba(232,93,38,0)}}
+#voiceChip{position:fixed;z-index:1300;left:50%;transform:translateX(-50%);bottom:calc(var(--sab) + 236px);display:flex;align-items:center;gap:8px;max-width:88vw;padding:10px 16px;border-radius:999px;background:rgba(20,14,28,.94);border:1px solid var(--line2);color:var(--txt);font-size:14.5px;box-shadow:0 10px 30px rgba(0,0,0,.5);white-space:nowrap;overflow:hidden}
+body.mode-nav #voiceChip{bottom:calc(var(--sab) + 262px)}
+#voiceChip[hidden]{display:none}
+#voiceChip .vc-dot{flex:none;width:9px;height:9px;border-radius:50%;background:var(--org);animation:micpulse 1.1s ease-in-out infinite}
+#voiceChipTxt{overflow:hidden;text-overflow:ellipsis}
 #map.headup{width:150%;height:150%;left:-25%;top:-25%;right:auto;bottom:auto;transition:none;will-change:transform}
 .me{position:relative;width:64px;height:64px}
 .me-cone{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from -28deg,rgba(232,93,38,.7) 0deg 56deg,transparent 56deg);-webkit-mask:radial-gradient(circle,#000 0 62%,transparent 63%);mask:radial-gradient(circle,#000 0 62%,transparent 63%);opacity:0;transition:opacity .3s}
@@ -774,6 +788,7 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
 <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5.5 21.5v-17"/><path d="M5.5 4.8c4-2.4 6.5 2 12.5 0v8c-6 2-8.5-2.4-12.5 0"/></symbol>
 <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.8"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></symbol>
 <symbol id="i-volume" viewBox="0 0 24 24"><path d="M4 9.5v5h3.5L13 19V5L7.5 9.5z"/><path d="M16 9.2a4 4 0 0 1 0 5.6M18.4 6.8a7.4 7.4 0 0 1 0 10.4"/></symbol>
+<symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3M8.8 21h6.4"/></symbol>
 <symbol id="i-draw" viewBox="0 0 24 24"><path d="M4 20l1-4.2L16.6 4.2a2.1 2.1 0 0 1 3 3L8 18.8z"/><path d="m14.8 6 3 3"/></symbol>
 <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8.5h3l2-2.5h6l2 2.5h3V19a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19z"/><circle cx="12" cy="13.5" r="3.4"/></symbol>
 <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 6.5h15M9.5 6V4.5A1.5 1.5 0 0 1 11 3h2a1.5 1.5 0 0 1 1.5 1.5V6M6.5 6.5l1 13a1.5 1.5 0 0 0 1.5 1.4h6a1.5 1.5 0 0 0 1.5-1.4l1-13"/></symbol>
@@ -922,6 +937,7 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
     </div>
 
     <div id="tabParty" role="tabpanel" hidden>
+      <div id="partyMicRow" hidden><button id="btnMicParty" class="micbtn" type="button" hidden aria-label="Voice command: tap and speak"><svg class="ic" viewBox="0 0 24 24"><use href="#i-mic"/></svg><span>Voice command</span></button></div>
       <div id="partyBox"></div>
     </div>
 
@@ -1046,8 +1062,11 @@ body.is-recording #fabSpot{transform:scale(.7);opacity:0;pointer-events:none}
     <button id="btnSkipStop" class="btn btn-ghost" type="button">Skip stop</button>
     <button id="btnReroute" class="btn btn-pur" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-route"/></svg>New route</button>
     <button id="btnHeadUp" class="btn btn-ghost" type="button" aria-pressed="true">Heading-up</button>
+    <button id="btnMicNav" class="btn btn-ghost micbtn" type="button" hidden aria-label="Voice command: tap and speak"><svg class="ic" viewBox="0 0 24 24"><use href="#i-mic"/></svg>Voice</button>
   </div>
 </div>
+
+<div id="voiceChip" hidden role="status"><span class="vc-dot" aria-hidden="true"></span><span id="voiceChipTxt">Listening&hellip;</span></div>
 
 <div id="spotSheet" class="card" hidden>
   <div class="spot-head">
@@ -1433,20 +1452,309 @@ $('busyCancel').addEventListener('click', function () {
   toast('Cancelled.', 'warn');
 });
 
-/* ---------------- voice ---------------- */
-function speak(text) {
+/* ---------------- voice (v6.5 Phase 3C) ----------------
+   TTS: free tier only, no network voices. The picker scores the
+   device's installed voices instead of trusting the platform default:
+   en-US first, named high-quality voices boosted (Google US English,
+   Microsoft *Natural*, Samantha, anything labeled premium / enhanced
+   / neural), and the macOS novelty set hard-excluded unless nothing
+   else exists. Rate 1.03, pitch 1.0. The synthesizer is re-scored on
+   voiceschanged, because Chrome and iOS both populate the list async.
+   Announcement discipline: speak() never re-announces the same
+   announcement band within 75 seconds (the per-step early/close
+   heads-ups pass a band key, so a reroute resetting nav.announced
+   cannot make the app repeat itself). speakNow() is for discrete
+   events (arrival, reroute, confirmations) and cancels first.
+   Commands: push-to-talk only, never always-listening. Recognition
+   runs only after an explicit mic tap, one utterance at a time.
+   Silence contract: nothing speaks on boot, tab switches, or chat
+   events; speech is nav prompts plus explicit command confirmations. */
+var VOICE = {
+  picked: null, lastGuidance: '', lastAnn: {}, warmed: false,
+  listening: false, recog: null, stopTimer: null,
+  denied: false, fromCmd: false, force: false, supported: false
+};
+var VOICE_NOVELTY = /zarvox|trinoids|bubbles|cellos|bells|organ|hysterical|pipe organ|bad news|good news|bahh|whisper|deranged|jester|wobble|boing|ralph|fred|junior|kathy|albert|bruce|vicki|victoria/i;
+function voiceCtor() { return window.SpeechRecognition || window.webkitSpeechRecognition || null; }
+VOICE.supported = !!voiceCtor();
+function voiceScore(v) {
+  var name = String(v.name || ''), lang = String(v.lang || '').replace(/_/g, '-');
+  var s = 0;
+  if (/^en-US$/i.test(lang)) s += 100;
+  else if (/^en/i.test(lang)) s += 40;
+  else s -= 120;
+  if (/google us english/i.test(name)) s += 60;
+  if (/microsoft/i.test(name) && /natural/i.test(name)) s += 55;
+  if (/samantha/i.test(name)) s += 50;
+  if (/premium|enhanced|neural/i.test(name)) s += 30;
+  if (v.localService) s += 5;
+  if (v.default) s += 3;
+  return s;
+}
+function pickVoice() {
+  if (!('speechSynthesis' in window)) return null;
+  var vs = [];
+  try { vs = window.speechSynthesis.getVoices() || []; } catch (e) {}
+  if (!vs.length) return null;
+  var clean = vs.filter(function (v) { return !VOICE_NOVELTY.test(String(v.name || '')); });
+  var pool = clean.length ? clean : vs.slice();
+  var hasEn = function (list) { return list.some(function (v) { return /^en/i.test(String(v.lang || '').replace(/_/g, '-')); }); };
+  if (!hasEn(pool) && hasEn(vs)) pool = vs.slice();
+  var best = null, bs = -Infinity;
+  pool.forEach(function (v) { var sc = voiceScore(v); if (sc > bs) { bs = sc; best = v; } });
+  return best;
+}
+function voiceRefresh() { var v = pickVoice(); if (v) VOICE.picked = v; return VOICE.picked; }
+if ('speechSynthesis' in window) {
+  try {
+    if (window.speechSynthesis.addEventListener) window.speechSynthesis.addEventListener('voiceschanged', function () { voiceRefresh(); });
+    else if ('onvoiceschanged' in window.speechSynthesis) window.speechSynthesis.onvoiceschanged = function () { voiceRefresh(); };
+  } catch (e) {}
+  voiceRefresh();
+}
+function voiceBandKey(text, band) { return band ? ('b:' + band + '|' + text) : ('t:' + text); }
+function voiceBandBlocked(text, band) {
+  var t = VOICE.lastAnn[voiceBandKey(text, band)];
+  return t != null && (Date.now() - t) < 75000;
+}
+function speak(text, band) {
   if (S.muted || !('speechSynthesis' in window)) return;
+  if (!VOICE.force && voiceBandBlocked(text, band)) return;
   try {
     var u = new SpeechSynthesisUtterance(text);
-    u.rate = 1.02; u.volume = 1;
+    var v = VOICE.picked || voiceRefresh();
+    if (v) { u.voice = v; if (v.lang) u.lang = String(v.lang).replace(/_/g, '-'); }
+    u.rate = 1.03; u.pitch = 1.0; u.volume = 1;
+    window.speechSynthesis.speak(u);
+    VOICE.lastAnn[voiceBandKey(text, band)] = Date.now();
+    if (!VOICE.fromCmd) VOICE.lastGuidance = text;
+  } catch (e) {}
+}
+function speakNow(text, band) {
+  if (S.muted || !('speechSynthesis' in window)) return;
+  try { window.speechSynthesis.cancel(); } catch (e) {}
+  speak(text, band);
+}
+/* iOS unlock: a 0-volume empty utterance inside the Start gesture, so
+   the first real prompt is not swallowed by Safari's audio policy. */
+function voiceWarmup() {
+  if (VOICE.warmed) return;
+  VOICE.warmed = true;
+  if (!('speechSynthesis' in window)) return;
+  try {
+    var u = new SpeechSynthesisUtterance('');
+    var v = VOICE.picked || voiceRefresh();
+    if (v) u.voice = v;
+    u.rate = 1.03; u.pitch = 1.0; u.volume = 0;
     window.speechSynthesis.speak(u);
   } catch (e) {}
 }
-function speakNow(text) {
-  if (S.muted || !('speechSynthesis' in window)) return;
-  try { window.speechSynthesis.cancel(); } catch (e) {}
-  speak(text);
+
+/* ---------------- push-to-talk commands ---------------- */
+function paintVoiceChrome() {
+  var show = VOICE.supported && !VOICE.denied;
+  var bn = $('btnMicNav'), bp = $('btnMicParty'), row = $('partyMicRow');
+  if (bn) bn.hidden = !show;
+  if (bp) bp.hidden = !show;
+  if (row) row.hidden = !show;
+  [bn, bp].forEach(function (b) { if (b) b.classList.toggle('listening', VOICE.listening); });
 }
+function voiceChipShow(txt) {
+  var c = $('voiceChip'); if (!c) return;
+  $('voiceChipTxt').textContent = txt;
+  c.hidden = false;
+}
+function voiceChipHide() { var c = $('voiceChip'); if (c) c.hidden = true; }
+function voiceDenied() {
+  if (VOICE.denied) return;
+  VOICE.denied = true;
+  paintVoiceChrome();
+  toast('Mic access blocked in browser settings', 'warn');
+}
+function voiceStopListen() {
+  if (VOICE.stopTimer) { clearTimeout(VOICE.stopTimer); VOICE.stopTimer = null; }
+  var r = VOICE.recog; VOICE.recog = null;
+  if (r) {
+    try { r.onresult = null; r.onerror = null; r.onend = null; r.stop(); } catch (e) {}
+  }
+  if (VOICE.listening) { VOICE.listening = false; paintVoiceChrome(); }
+  voiceChipHide();
+}
+function voiceListen() {
+  if (!VOICE.supported || VOICE.denied || VOICE.listening) return;
+  var Ctor = voiceCtor(); if (!Ctor) return;
+  var rec = null;
+  try { rec = new Ctor(); } catch (e) { return; }
+  VOICE.recog = rec; VOICE.listening = true; paintVoiceChrome();
+  rec.lang = 'en-US'; rec.continuous = false; rec.interimResults = true;
+  try { rec.maxAlternatives = 1; } catch (e) {}
+  rec.onresult = function (ev) {
+    if (VOICE.recog !== rec) return;
+    var interim = '', finalTxt = '', finalConf = null;
+    for (var i = ev.resultIndex || 0; i < ev.results.length; i++) {
+      var res = ev.results[i], alt = res && res[0];
+      if (!alt) continue;
+      if (res.isFinal) { finalTxt = alt.transcript || ''; finalConf = alt.confidence; }
+      else interim += alt.transcript || '';
+    }
+    if (finalTxt) {
+      var conf = (typeof finalConf === 'number') ? finalConf : null;
+      voiceStopListen();
+      voiceHeard(finalTxt, conf);
+    } else if (interim) {
+      voiceChipShow('Heard: ' + interim);
+    }
+  };
+  rec.onerror = function (ev) {
+    if (VOICE.recog !== rec) return;
+    var err = ev && ev.error;
+    voiceStopListen();
+    if (err === 'not-allowed' || err === 'service-not-allowed') voiceDenied();
+  };
+  rec.onend = function () {
+    if (VOICE.recog !== rec) return;
+    VOICE.recog = null;
+    if (VOICE.stopTimer) { clearTimeout(VOICE.stopTimer); VOICE.stopTimer = null; }
+    VOICE.listening = false; paintVoiceChrome(); voiceChipHide();
+  };
+  voiceChipShow('Listening\u2026');
+  try { rec.start(); } catch (e) {
+    VOICE.recog = null; VOICE.listening = false; paintVoiceChrome(); voiceChipHide();
+    return;
+  }
+  VOICE.stopTimer = setTimeout(function () { voiceStopListen(); }, 6000);
+}
+function voiceHeard(text, conf) {
+  var t = String(text || '').trim();
+  if (!t) { toast("Didn't catch that", 'warn'); return; }
+  if (typeof conf === 'number' && conf > 0 && conf < 0.3) { toast("Didn't catch that", 'warn'); return; }
+  var intent = voiceParseIntent(t);
+  if (!intent) { toast("Didn't catch that", 'warn'); return; }
+  voiceExec(intent);
+}
+function voiceParseIntent(raw) {
+  var t = String(raw || '').toLowerCase();
+  if (/party status|party check|where is everyone|where's everyone|how'?s the party/.test(t)) return 'party';
+  if (/out of candy|ran out|no more candy|no candy|lights off|lights are off|\bempty\b/.test(t)) return 'out';
+  if (/full[ -]?size|king[ -]?size|great stop/.test(t)) return 'fullsize';
+  if (/next stop|what'?s next|what is next|where next|\bnext\b/.test(t)) return 'next';
+  if (/\bvisited\b|got it|done here|\bdone\b|got candy|been there/.test(t)) return 'visited';
+  if (/repeat|say again|say that again|what was that|which way|where to/.test(t)) return 'repeat';
+  return null;
+}
+function voiceConfirm(text) { toast(text, 'ok'); speakNow(text); }
+function voiceExec(intent) {
+  VOICE.fromCmd = true; VOICE.force = true;
+  try {
+    if (intent === 'next') voiceCmdNext();
+    else if (intent === 'visited') voiceCmdVisited();
+    else if (intent === 'out') voiceCmdOut();
+    else if (intent === 'fullsize') voiceCmdFull();
+    else if (intent === 'repeat') voiceCmdRepeat();
+    else if (intent === 'party') voiceCmdParty();
+  } catch (e) {}
+  VOICE.fromCmd = false; VOICE.force = false;
+}
+function stopNameOf(st) {
+  if (!st) return 'treat stop';
+  if (st.stop && st.stop.name) return st.stop.name;
+  if (st.name) return st.name;
+  return 'treat stop';
+}
+function voiceCmdNext() {
+  var nav = S.nav;
+  if (!nav || nav.done) { voiceConfirm('No route is running.'); return; }
+  if (nav.stopIdx >= nav.stops.length) { voiceConfirm('No more stops. The route leads home.'); return; }
+  var st = nav.stops[nav.stopIdx];
+  var line = 'Next stop: ' + stopNameOf(st);
+  if (S.pos) {
+    var d = haversine(S.pos, st);
+    var mins = Math.max(1, Math.round(d / KID_PACE_MPS / 60));
+    line += ', ' + fmtDist(d) + ' away, about ' + mins + (mins === 1 ? ' minute' : ' minutes');
+  }
+  voiceConfirm(line + '.');
+}
+function voiceCmdVisited() {
+  var nav = S.nav;
+  if (!nav || nav.done) { voiceConfirm('No route is running.'); return; }
+  if (nav.stopIdx >= nav.stops.length) { voiceConfirm('That was the last stop. The route leads home.'); return; }
+  var idx = -1;
+  if (S.pos) {
+    var bd = 60;
+    for (var i = nav.stopIdx; i < nav.stops.length; i++) {
+      var dd = haversine(S.pos, nav.stops[i]);
+      if (dd <= bd) { idx = i; bd = dd; }
+    }
+  }
+  if (idx < 0) idx = nav.stopIdx;
+  var st = nav.stops[idx];
+  nav.stopIdx = idx + 1;
+  if (!nav.visited) nav.visited = new Set();
+  for (var vi = 0; vi <= idx; vi++) nav.visited.add(vi);
+  S.counts.houses++; S.counts.hist.push('houses');
+  store.set('counts', S.counts); renderCounts();
+  if (navigator.vibrate) navigator.vibrate(60);
+  updateStopMarkers();
+  var msg = 'Visited: ' + stopNameOf(st) + '. ';
+  if (nav.stopIdx < nav.stops.length) {
+    var nx = nav.stops[nav.stopIdx];
+    msg += 'Next: ' + stopNameOf(nx) + (S.pos ? ', ' + fmtDist(haversine(S.pos, nx)) + ' away' : '') + '.';
+  } else msg += 'That was the last stop. The route leads home.';
+  voiceConfirm(msg);
+}
+function voiceNearestPoint(maxD) {
+  if (!S.pos) return null;
+  var best = null, bd = maxD || 200;
+  function consider(lat, lng) {
+    var d = haversine(S.pos, { lat: lat, lng: lng });
+    if (d <= bd) { bd = d; best = { lat: lat, lng: lng }; }
+  }
+  if (S.nav && S.nav.stops) S.nav.stops.forEach(function (s) { consider(s.lat, s.lng); });
+  S.pins.forEach(function (p) { consider(p.lat, p.lng); });
+  if (typeof HEIGHTS_STOPS !== 'undefined') HEIGHTS_STOPS.forEach(function (s) { consider(s.lat, s.lon); });
+  return best;
+}
+function voiceCmdOut() {
+  var pt = voiceNearestPoint(200);
+  if (!pt && S.pos) pt = { lat: S.pos.lat, lng: S.pos.lng };
+  if (!pt) { voiceConfirm('Waiting for a GPS fix first.'); return; }
+  crowdPost({ lat: pt.lat, lng: pt.lng, status: 'out', note: '', photo: null });
+  voiceConfirm('Posted: that stop is out of candy.');
+}
+function voiceCmdFull() {
+  if (!S.pos) { voiceConfirm('Waiting for a GPS fix first.'); return; }
+  var pin = null, bd = 25;
+  S.pins.forEach(function (p) { var d = haversine(S.pos, p); if (d <= bd) { bd = d; pin = p; } });
+  if (!pin) {
+    var pt = voiceNearestPoint(60) || { lat: S.pos.lat, lng: S.pos.lng };
+    pin = { lat: pt.lat, lng: pt.lng, type: 'candy', full: true, kind: 'house', shared: true, ts: Date.now() };
+    S.pins.push(pin);
+  } else {
+    pin.type = 'candy'; pin.full = true;
+  }
+  store.set('pins', S.pins);
+  renderPins();
+  if (spotSharedOf(pin)) crowdSyncPin(pin);
+  voiceConfirm('Marked full-size. Great stop!');
+}
+function voiceCmdRepeat() {
+  var line = VOICE.lastGuidance || '';
+  if (!line && S.nav) { var ni = $('navInstr'); if (ni && ni.textContent && ni.textContent.indexOf('Waiting') !== 0) line = ni.textContent; }
+  if (line) { toast(line, 'ok'); speakNow(line); }
+  else voiceConfirm('Nothing to repeat yet.');
+}
+function voiceCmdParty() {
+  if (partyOn()) {
+    var t = partyTotals();
+    voiceConfirm('Party of ' + t.people + '. ' + t.houses + (t.houses === 1 ? ' house' : ' houses') + ' pooled.');
+  } else voiceConfirm('You are not in a party.');
+}
+['btnMicNav', 'btnMicParty'].forEach(function (id) {
+  var b = $(id); if (!b) return;
+  b.addEventListener('pointerdown', function (e) { e.preventDefault(); voiceListen(); });
+  b.addEventListener('click', function () { voiceListen(); });
+});
+paintVoiceChrome();
 
 /* ---------------- map ---------------- */
 var map = L.map('map', { zoomControl: false, attributionControl: true });
@@ -3438,6 +3746,7 @@ document.addEventListener('visibilitychange', function () {
 $('busyCancel').addEventListener('click', function () { BUILD_SEQ++; });
 
 function startNav() {
+  voiceWarmup();
   if (!S.route) { toast('Build a route first.', 'warn'); return; }
   if (S.explore) setExplore(false);
   askCompassPermission();
@@ -3541,12 +3850,12 @@ function navOnPos() {
   var keyE = 'e' + nav.stepIdx;
   if (d < 170 && d >= 75 && !nav.announced[keyE]) {
     nav.announced[keyE] = true;
-    speak('In ' + fmtDist(d) + ', ' + target.text);
+    speak('In ' + fmtDist(d) + ', ' + target.text, keyE);
   }
   var key = 's' + nav.stepIdx;
   if (d < 75 && d >= 25 && !nav.announced[key]) {
     nav.announced[key] = true;
-    speak('In ' + fmtDist(d) + ', ' + target.text);
+    speak('In ' + fmtDist(d) + ', ' + target.text, key);
   }
   /* stop arrival: auto check-off, count it, buzz, announce the place */
   if (S.posTrusted && nav.stopIdx < nav.stops.length) {
