@@ -379,15 +379,22 @@ body.snap-full #topChrome,body.snap-full #partyPill,body.snap-full #partyCard,bo
 #chatScroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:2px 2px 6px}
 .chat-empty{color:var(--mut);font-size:13.5px;text-align:center;padding:26px 18px;line-height:1.5}
 .cb-div{text-align:center;color:#8A7F96;font-size:11px;margin:12px 0 8px}
-.cb-row{display:flex;align-items:flex-end;margin-top:8px;width:100%}
+.cb-row{display:flex;align-items:flex-end;margin-top:12px;width:100%}
 .cb-row.me{justify-content:flex-end}
-.cb-col{display:flex;flex-direction:column;gap:4px;flex:0 1 auto;min-width:0;max-width:82%;width:100%}
-.cb-row.me .cb-col{align-items:flex-end}
-.cb-b{width:fit-content;max-width:100%;border:1px solid rgba(244,239,234,.14);border-radius:14px;padding:7px 10px;font-size:15px;line-height:1.4;color:#F4EFEA;word-break:break-word;overflow-wrap:break-word}
-.cb-row.other .cb-b{background:rgba(255,255,255,.05)}
-.cb-row.me .cb-b{background:rgba(232,93,4,.16);border-color:rgba(232,93,4,.45)}
-.cb-h{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;margin-bottom:2px}
-.cb-dot{flex:none;width:8px;height:8px;border-radius:50%}
+.cb-col{display:flex;flex-direction:column;gap:3px;flex:0 1 auto;min-width:0;max-width:82%;width:100%}
+.cb-row.me .cb-col{align-items:flex-end;max-width:78%}
+.cb-b{width:fit-content;max-width:100%;font-size:15px;line-height:1.4;color:#F4EFEA;word-break:break-word;overflow-wrap:break-word}
+.cb-row.party.other .cb-b{background:rgba(245,238,230,.07);border-radius:4px 14px 14px 4px;padding:10px 14px}
+.cb-row.party.other .cb-b.fst{border-radius:4px 14px 14px 14px}
+.cb-row.zone.other .cb-b{background:rgba(18,13,21,.55);border:1px solid rgba(245,238,230,.12);border-left:3px solid var(--zc,#888);border-radius:4px 12px 12px 4px;padding:8px 12px}
+.cb-row.me .cb-b{background:rgba(232,93,4,.16);border:1px solid rgba(232,93,4,.45);border-radius:14px;padding:7px 10px}
+.cb-row.me .cb-b:not(.fst){border-radius:14px 4px 4px 14px}
+.cb-hd{display:flex;align-items:center;gap:6px;height:24px;margin-bottom:1px}
+.cb-puck{flex:none;width:24px;height:24px;border-radius:50%;background:#16111A;--av-stage:#16111A;border:1.5px solid var(--pc,#888);color:#F5EEE6;display:grid;place-items:center}
+.cb-puck .avatar-glyph{width:14px;height:14px}
+.cb-puck .puck-ini{font-size:9px}
+.cb-nm{font-size:12px;font-weight:600;line-height:1;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cb-zh{font-size:12px;font-weight:500;letter-spacing:.02em;line-height:1;margin-bottom:1px}
 .cb-ts{font-size:11px;color:#8A7F96;margin-top:1px}
 .cb-jumbo{font-size:32px;line-height:1.25}
 .cb-img{display:block;max-width:210px;max-height:230px;width:100%;border-radius:10px;object-fit:cover;cursor:pointer;background:#16101E}
@@ -399,7 +406,6 @@ body.snap-full #topChrome,body.snap-full #partyPill,body.snap-full #partyCard,bo
 
 /* ---------- Heights Live (v6.5 Phase 3B) ---------- */
 .cb-sub{display:flex;align-items:center;gap:6px;color:#9E93A8;font-size:11.5px;margin-top:2px;max-width:100%}
-.cb-sub .nm{font-weight:600;white-space:nowrap}
 .cb-mod{margin-left:auto;flex:none;width:32px;height:32px;border-radius:50%;border:1px solid var(--line2);background:var(--bg2);color:var(--mut);font-size:15px;line-height:1;display:grid;place-items:center;cursor:pointer;padding:0}
 #chatPersonaBtn{flex:none;display:grid;place-items:center;width:50px;min-height:50px;border-radius:14px;border:1.5px solid var(--line2);background:#16101E;--av-stage:#16101E;padding:0;cursor:pointer}
 #chatPersonaBtn[hidden]{display:none}
@@ -5936,18 +5942,26 @@ function chatBubblesHtml() {
     }
     var mine = first.name === PARTY.name;
     var meta = partyMetaFor(first.name), col = meta.color, colHtml = '';
+    /* v6.6 fix 12 (Argon r6): identity leaves the bubble. An incoming
+       group gets ONE header badge above its first bubble: a 24px
+       mini-puck (dark disc, ring in the member color, their walker
+       glyph in bone, the same glyph system as the map pucks and the
+       roster; initials in the member color when no walker is set)
+       plus the member's name in their color. Own groups: no header. */
+    if (!mine) {
+      var glyph = meta.avatar ? avatarSvg(meta.avatar) : '<span class="puck-ini" style="color:' + col + '">' + esc(partyInitials(first.name)) + '</span>';
+      colHtml += '<div class="cb-hd"><span class="cb-puck" style="--pc:' + col + '">' + glyph + '</span><span class="cb-nm" style="color:' + col + '">' + esc(first.name) + '</span></div>';
+    }
     grp.forEach(function (r, gi) {
       var last = gi === grp.length - 1;
       var img = chatImgParse(r.msg), body;
       if (img) body = '<img class="cb-img" src="' + img.src + '" style="aspect-ratio:' + img.w + '/' + img.h + '" alt="Photo shared in party chat">';
       else if (emojiOnly(r.msg)) body = '<span class="cb-jumbo">' + esc(r.msg) + '</span>';
       else body = esc(r.msg || '');
-      var head = (!mine && gi === 0) ? '<div class="cb-h"><span class="cb-dot" style="background:' + col + '"></span><span style="color:' + col + '">' + esc(r.name) + '</span></div>' : '';
-      colHtml += '<div class="cb-b' + (last ? ' last' : '') + '">' + head + body + '</div>';
+      colHtml += '<div class="cb-b' + (gi === 0 ? ' fst' : '') + (last ? ' last' : '') + '">' + body + '</div>';
       if (last) colHtml += '<div class="cb-ts">' + esc(fmtChatTime(new Date(r.created_at).getTime(), false)) + '</div>';
     });
-    var av = '';
-    out += '<div class="cb-row ' + (mine ? 'me' : 'other') + '">' + av + '<div class="cb-col">' + colHtml + '</div></div>';
+    out += '<div class="cb-row party ' + (mine ? 'me' : 'other') + '"><div class="cb-col">' + colHtml + '</div></div>';
     prevTs = new Date(grp[grp.length - 1].created_at).getTime();
     i = j;
   }
@@ -6437,20 +6451,23 @@ function zoneBubblesHtml() {
     var mine = String(first.devhash || '') === ZONE.dev;
     var col = first.color || partyColor(first.persona || '');
     var colHtml = '';
+    /* v6.6 fix 12 (Argon r6): Local gets NO avatar, by design. An
+       incoming group is headed by the persona title alone in its
+       assigned color; the .cb-sub footer keeps corridor + time +
+       report and no longer repeats the persona name. */
+    if (!mine) colHtml += '<div class="cb-zh" style="color:' + col + '">' + esc(first.persona || 'Walker') + '</div>';
     grp.forEach(function (r, gi) {
       var last = gi === grp.length - 1;
       var body = emojiOnly(r.msg) ? '<span class="cb-jumbo">' + esc(r.msg) + '</span>' : esc(r.msg || '');
       var zid = (!mine && r.id) ? ' data-zid="' + esc(String(r.id)) + '"' : '';
-      colHtml += '<div class="cb-b' + (last ? ' last' : '') + '"' + zid + '>' + body + '</div>';
+      colHtml += '<div class="cb-b' + (gi === 0 ? ' fst' : '') + (last ? ' last' : '') + '"' + zid + '>' + body + '</div>';
     });
-    var av = '';
     var lastR = grp[grp.length - 1];
     var sub = '<div class="cb-sub">' +
-      (mine ? '' : '<span class="nm" style="color:' + col + '">' + esc(first.persona || 'Walker') + '</span><span>&middot;</span>') +
       '<span>' + esc(lastR.corridor || 'in the Heights') + '</span><span>&middot;</span><span>' + esc(zoneRelTime(new Date(lastR.created_at).getTime())) + '</span>' +
       (!mine && lastR.id ? '<button type="button" class="cb-mod" data-mod="' + esc(String(lastR.id)) + '" aria-label="Post options">&middot;&middot;&middot;</button>' : '') +
       '</div>';
-    out += '<div class="cb-row ' + (mine ? 'me' : 'other') + '">' + av + '<div class="cb-col">' + colHtml + sub + '</div></div>';
+    out += '<div class="cb-row zone ' + (mine ? 'me' : 'other') + '"' + (mine ? '' : ' style="--zc:' + col + '"') + '><div class="cb-col">' + colHtml + sub + '</div></div>';
     prevTs = new Date(grp[grp.length - 1].created_at).getTime();
     i = j;
   }
