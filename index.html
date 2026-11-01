@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0A16">
-<meta name="version" content="7.2">
+<meta name="version" content="7.3">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -435,6 +435,14 @@ body.snap-full #fabSpot,body.snap-full #exploreCard,body.snap-full #drawPill,bod
 .cmp-plusmenu[hidden]{display:none}
 .cmp-pill{display:inline-flex;align-items:center;gap:6px;height:48px;padding:0 14px;border-radius:999px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);font-size:14px;font-weight:600;cursor:pointer}
 .cmp-pill svg{width:16px;height:16px}
+/* v7.3 Fix 18: chat mic listening state + Tenor GIF picker */
+#chatMic.listening .disc{background:var(--org);color:#16101E;animation:micpulse 1.1s ease-in-out infinite}
+#gifSearch{width:100%;font-size:16px;padding:12px 14px;border-radius:12px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt)}
+.gif-status{color:var(--mut);font-size:14px;margin:12px 2px}
+.gif-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;overflow-y:auto;max-height:52vh;margin-top:4px}
+.gif-cell{padding:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg2);cursor:pointer;min-height:48px}
+.gif-cell img{display:block;width:100%;height:110px;object-fit:cover}
+.gif-credit{color:var(--mut);font-size:12px;margin:10px 2px 0}
 #chatSend{width:48px;height:48px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer;padding:0;flex:none}
 #chatSend .disc{width:32px;height:32px;border-radius:50%;background:#2E2338;color:rgba(245,239,230,.25);display:grid;place-items:center}
 #chatSend svg{width:16px;height:16px}
@@ -1219,7 +1227,7 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
       </div>
       <div class="sheetfoot">
         <div class="wm">Candy Trail</div>
-        <div class="ver" id="appVer">Candy Trail v7.2</div>
+        <div class="ver" id="appVer">Candy Trail v7.3</div>
       </div>
     </div>
 
@@ -1241,6 +1249,7 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
             <span class="cmp-plusmenu" id="chatPlusMenu" hidden>
               <label class="cmp-pill" id="chatPhotoBtn" for="chatPhoto"><svg class="ic" viewBox="0 0 24 24"><use href="#i-camera"/></svg>Camera</label>
               <label class="cmp-pill" id="chatPhotosBtn" for="chatPhotoLib"><svg class="ic" viewBox="0 0 24 24"><use href="#i-img"/></svg>Photos</label>
+              <button class="cmp-pill" id="chatGifBtn" type="button" hidden><svg class="ic" viewBox="0 0 24 24"><use href="#i-img"/></svg>GIF library</button>
             </span>
             <button class="cmp-btn" id="chatMic" type="button" aria-label="Voice command: tap and speak"><span class="disc"><svg class="ic" viewBox="0 0 24 24"><use href="#i-mic"/></svg></span></button>
             <button id="chatPersonaBtn" type="button" hidden aria-label="Your Local walker"></button>
@@ -1335,7 +1344,7 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
   <div class="prefs-foot">
     <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon-mono"/></svg>
     <div class="crest">Candy Trail</div>
-    <div class="ver">Version 7.2</div>
+    <div class="ver">Version 7.3</div>
   </div>
 </div>
 
@@ -1619,6 +1628,16 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
   </div>
 </div>
 
+<div id="gifSheet" class="overlay" hidden>
+  <div class="ocard card" role="dialog" aria-modal="true" aria-labelledby="gifTitle">
+    <div class="ss-head"><h2 id="gifTitle">GIF library</h2><button id="gifClose" class="btn-close" type="button" aria-label="Close GIF library"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button></div>
+    <input id="gifSearch" type="search" autocomplete="off" placeholder="Search GIFs" aria-label="Search GIFs">
+    <p id="gifStatus" class="gif-status">Loading GIFs…</p>
+    <div id="gifGrid" class="gif-grid" role="list"></div>
+    <p class="gif-credit">GIFs by Tenor</p>
+  </div>
+</div>
+
 <div id="bootRepair" hidden style="position:fixed;inset:0;z-index:4000;background:rgba(10,7,18,.93);display:flex;align-items:center;justify-content:center;padding:24px">
   <div style="max-width:340px;text-align:center;color:#F5EFE6;font-family:system-ui,sans-serif">
     <h2 style="font-size:21px;margin:0 0 10px">Candy Trail did not start cleanly</h2>
@@ -1648,6 +1667,10 @@ var $ = function (id) { return document.getElementById(id); };
 var $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
 var M_PER_MI = 1609.344;
 var KID_PACE_MPS = 2600 / 3600; /* 2.6 km/h including door stops */
+/* Tenor GIF library key (v7.3 Fix 18). Empty means the library is fully
+   hidden: no menu item, no picker, no fetches. A key is a client key by
+   design (Tenor keys ship in apps); it is loaded at runtime only. */
+var CT_TENOR_KEY = '';
 function haversine(a, b) {
   var R = 6371000, rad = Math.PI / 180;
   var dLat = (b.lat - a.lat) * rad, dLng = (b.lng - a.lng) * rad;
@@ -1974,12 +1997,16 @@ function voiceWarmup() {
 
 /* ---------------- push-to-talk commands ---------------- */
 function paintVoiceChrome() {
-  var show = VOICE.supported && !VOICE.denied;
-  var bn = $('btnMicNav'), bp = $('btnMicParty'), row = $('partyMicRow');
-  if (bn) bn.hidden = !show;
-  if (bp) bp.hidden = !show;
-  if (row) row.hidden = !show;
-  [bn, bp].forEach(function (b) { if (b) b.classList.toggle('listening', VOICE.listening); });
+  /* v7.3 Fix 18: mic buttons never hide. An unsupported or blocked mic
+     stays visible and explains itself when tapped (voiceListen toasts
+     the reason); hiding them was half of the Nov 1 field bug, "the mic
+     button in the chat doesn't work," where a tap met silence. Only
+     the listening state paints here now. */
+  var bn = $('btnMicNav'), bp = $('btnMicParty'), row = $('partyMicRow'), cm = $('chatMic');
+  if (bn) bn.hidden = false;
+  if (bp) bp.hidden = false;
+  if (row) row.hidden = false;
+  [bn, bp, cm].forEach(function (b) { if (b) b.classList.toggle('listening', VOICE.listening); });
 }
 function voiceChipShow(txt) {
   var c = $('voiceChip'); if (!c) return;
@@ -2003,10 +2030,16 @@ function voiceStopListen() {
   voiceChipHide();
 }
 function voiceListen() {
-  if (!VOICE.supported || VOICE.denied || VOICE.listening) return;
-  var Ctor = voiceCtor(); if (!Ctor) return;
+  /* v7.3 Fix 18: a mic tap ALWAYS answers. Unsupported and blocked
+     states explain themselves instead of returning silently (the Nov 1
+     field bug: tapping the chat mic did nothing at all). A second
+     start while already listening stays a no-op. */
+  if (VOICE.listening) return;
+  if (!VOICE.supported) { toast('Voice commands are not supported in this browser.', 'warn'); return; }
+  if (VOICE.denied) { toast('Mic access blocked in browser settings', 'warn'); return; }
+  var Ctor = voiceCtor(); if (!Ctor) { toast('Voice commands are not supported in this browser.', 'warn'); return; }
   var rec = null;
-  try { rec = new Ctor(); } catch (e) { return; }
+  try { rec = new Ctor(); } catch (e) { toast('Voice did not work here (start).', 'err'); return; }
   VOICE.recog = rec; VOICE.listening = true; paintVoiceChrome();
   rec.lang = 'en-US'; rec.continuous = false; rec.interimResults = true;
   try { rec.maxAlternatives = 1; } catch (e) {}
@@ -2031,7 +2064,13 @@ function voiceListen() {
     if (VOICE.recog !== rec) return;
     var err = ev && ev.error;
     voiceStopListen();
+    /* v7.3: every recognition error surfaces in plain language. */
     if (err === 'not-allowed' || err === 'service-not-allowed') voiceDenied();
+    else if (err === 'network') toast('Voice needs a connection for recognition.', 'warn');
+    else if (err === 'audio-capture') toast('No microphone found.', 'warn');
+    else if (err === 'no-speech') toast("Didn't hear anything.", 'warn');
+    else if (err) toast('Voice did not work here (' + err + ').', 'err');
+    else toast('Voice did not work here.', 'err');
   };
   rec.onend = function () {
     if (VOICE.recog !== rec) return;
@@ -2042,6 +2081,7 @@ function voiceListen() {
   voiceChipShow('Listening\u2026');
   try { rec.start(); } catch (e) {
     VOICE.recog = null; VOICE.listening = false; paintVoiceChrome(); voiceChipHide();
+    toast('Voice did not work here (start).', 'err'); /* v7.3: never silent */
     return;
   }
   VOICE.stopTimer = setTimeout(function () { voiceStopListen(); }, 6000);
@@ -2172,9 +2212,11 @@ function voiceCmdParty() {
     voiceConfirm('Party of ' + t.people + '. ' + t.houses + (t.houses === 1 ? ' house' : ' houses') + ' pooled.');
   } else voiceConfirm('You are not in a party.');
 }
+/* v7.3: ONE handler per mic. The old pointerdown+click pair could fire
+   voiceListen twice per tap; a single click handler plus the listening
+   guard inside voiceListen makes each tap exactly one start attempt. */
 ['btnMicNav', 'btnMicParty'].forEach(function (id) {
   var b = $(id); if (!b) return;
-  b.addEventListener('pointerdown', function (e) { e.preventDefault(); voiceListen(); });
   b.addEventListener('click', function () { voiceListen(); });
 });
 paintVoiceChrome();
@@ -6492,7 +6534,41 @@ function haulTrailData() {
     }
   }
   var home = S.start || (pts.length ? pts[0] : null);
-  return { pts: pts, segs: splitSegObjs(rawPts), dots: dots, home: home, src: src };
+  /* v7.3: timestamped stops, the fallback geometry when the recorded
+     track is degenerate (see cardLineFor). Pins carry ts; nothing else
+     in the card data does, so stops come from pins alone. */
+  var stops = [];
+  S.pins.forEach(function (p) { if (p.ts != null) stops.push({ lat: p.lat, lng: p.lng, ts: p.ts }); });
+  return { pts: pts, segs: splitSegObjs(rawPts), dots: dots, home: home, src: src, stops: stops };
+}
+/* v7.3 Fix 18: pick the line a share card draws. Priority stays
+   recorded track, then planned route, BUT a line whose total span is
+   under 100 m counts as degenerate (the phone sat in a pocket and the
+   browser throttled fixes): when the effective line is degenerate or
+   absent and the card has 2+ timestamped stops, the card draws a DASHED
+   connector through the stops in timestamp order instead. Pure and
+   unit-testable: cardLineFor(data) returns {pts, segs, dashed}. */
+function cardLineSpanM(pts) {
+  var minLat = Infinity, maxLat = -Infinity, minLng = Infinity, maxLng = -Infinity;
+  pts.forEach(function (p) {
+    if (p.lat < minLat) minLat = p.lat; if (p.lat > maxLat) maxLat = p.lat;
+    if (p.lng < minLng) minLng = p.lng; if (p.lng > maxLng) maxLng = p.lng;
+  });
+  var cosL = Math.cos(((minLat + maxLat) / 2) * Math.PI / 180);
+  var dx = (maxLng - minLng) * 111320 * cosL, dy = (maxLat - minLat) * 111320;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+function cardLineFor(data) {
+  var segs = (data.segs && data.segs.length) ? data.segs : (data.pts && data.pts.length >= 2 ? [data.pts] : []);
+  var flat = [];
+  segs.forEach(function (sg) { sg.forEach(function (p) { flat.push(p); }); });
+  if (flat.length >= 2 && cardLineSpanM(flat) >= 100) return { pts: flat, segs: segs, dashed: false };
+  var stops = (data.stops || []).filter(function (p) { return p && p.ts != null && p.lat != null && p.lng != null; })
+    .slice().sort(function (a, b) { return a.ts - b.ts; })
+    .map(function (p) { return { lat: p.lat, lng: p.lng }; });
+  if (stops.length >= 2) return { pts: stops, segs: [stops], dashed: true };
+  if (flat.length >= 2) return { pts: flat, segs: segs, dashed: false };
+  return { pts: [], segs: [], dashed: false };
 }
 function makeProjector(items, rect) {
   var minLat = Infinity, maxLat = -Infinity, minLng = Infinity, maxLng = -Infinity;
@@ -6511,7 +6587,17 @@ function makeProjector(items, rect) {
   var y0 = minLat - padY, y1 = maxLat + padY;
   var sc = Math.min(rect.w / (x1 - x0), rect.h / (y1 - y0));
   var ox = rect.x + (rect.w - (x1 - x0) * sc) / 2, oy = rect.y + (rect.h - (y1 - y0) * sc) / 2;
-  return function (lat, lng) { return [ox + (lng * cosL - x0) * sc, oy + (y1 - lat) * sc]; };
+  var project = function (lat, lng) { return [ox + (lng * cosL - x0) * sc, oy + (y1 - lat) * sc]; };
+  /* v7.3: the card map underlay needs the inverse (canvas point back to
+     lat/lng) to find the bounds the rect actually shows; the projector
+     letterboxes, so the visible bounds exceed the item bounds on one
+     axis. Attached to the returned function; callers keep using it as a
+     plain projector. */
+  project.unproject = function (px, py) {
+    return { lat: y1 - (py - oy) / sc, lng: ((px - ox) / sc + x0) / cosL };
+  };
+  project.bounds = { minLat: minLat, maxLat: maxLat, minLng: minLng, maxLng: maxLng };
+  return project;
 }
 function rrPath(g, x, y, w, h, r) {
   g.beginPath();
@@ -6522,28 +6608,114 @@ function rrPath(g, x, y, w, h, r) {
   g.arcTo(x, y, x + w, y, r);
   g.closePath();
 }
-function drawTrailScene(g, rect, data) {
-  var items = data.pts.concat(data.dots);
+/* ---------- v7.3 Fix 18: real street map under the card trail ----------
+   The card scene composites OpenStreetMap raster tiles (the same source
+   the live map uses) under the ember path, darkened into the Ember &
+   Ink look. Tiles load with crossOrigin anonymous; ANY tile error or a
+   global 2.5 s timeout falls back to the stylized scene (no map), so a
+   card always renders, offline included. Tiles are cached per render
+   only (a fresh load per card), never bundled or persisted. */
+var CARD_TILE_TIMEOUT_MS = 2500;
+function cardTileZ(bounds, rectW) {
+  var lngSpan = Math.max(0.0004, bounds.maxLng - bounds.minLng);
+  var z = Math.floor(Math.log2(rectW * 360 / (256 * lngSpan)));
+  return Math.max(3, Math.min(19, z));
+}
+function cardTileXY(lat, lng, z) {
+  var n = Math.pow(2, z);
+  var x = Math.floor((lng + 180) / 360 * n);
+  var latR = lat * Math.PI / 180;
+  var y = Math.floor((1 - Math.log(Math.tan(latR) + 1 / Math.cos(latR)) / Math.PI) / 2 * n);
+  return { x: Math.max(0, Math.min(n - 1, x)), y: Math.max(0, Math.min(n - 1, y)) };
+}
+function cardTileNW(x, y, z) {
+  var n = Math.pow(2, z);
+  return { lng: x / n * 360 - 180, lat: Math.atan(Math.sinh(Math.PI * (1 - 2 * y / n))) * 180 / Math.PI };
+}
+/* loadCardTiles(data, rect, cb): cb(prep) where prep is {tiles:[{img,
+   lat, lng, lat2, lng2}]} on success or null on any failure. */
+function loadCardTiles(data, rect, cb) {
+  var line = cardLineFor(data);
+  var items = line.pts.concat(data.dots || []);
+  if (data.home) items.push(data.home);
+  if (!items.length) { cb(null); return; }
+  var proj = makeProjector(items, rect);
+  var nw = proj.unproject(rect.x, rect.y), se = proj.unproject(rect.x + rect.w, rect.y + rect.h);
+  var bounds = { minLat: se.lat, maxLat: nw.lat, minLng: nw.lng, maxLng: se.lng };
+  var z = cardTileZ(bounds, rect.w);
+  var list = [], guard = 0;
+  while (guard++ < 6) {
+    list = [];
+    var t0 = cardTileXY(bounds.maxLat, bounds.minLng, z), t1 = cardTileXY(bounds.minLat, bounds.maxLng, z);
+    for (var tx = t0.x; tx <= t1.x; tx++) for (var ty = t0.y; ty <= t1.y; ty++) {
+      var a = cardTileNW(tx, ty, z), b = cardTileNW(tx + 1, ty + 1, z);
+      list.push({ url: 'https://tile.openstreetmap.org/' + z + '/' + tx + '/' + ty + '.png', lat: a.lat, lng: a.lng, lat2: b.lat, lng2: b.lng });
+    }
+    if (list.length <= 36 || z <= 3) break;
+    z--;
+  }
+  if (!list.length) { cb(null); return; }
+  var done = false, loaded = 0, tiles = [];
+  var timer = setTimeout(function () { if (!done) { done = true; cb(null); } }, CARD_TILE_TIMEOUT_MS);
+  list.forEach(function (t) {
+    var img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function () {
+      if (done) return;
+      tiles.push({ img: img, lat: t.lat, lng: t.lng, lat2: t.lat2, lng2: t.lng2 });
+      if (++loaded === list.length) { done = true; clearTimeout(timer); cb({ tiles: tiles }); }
+    };
+    img.onerror = function () { if (!done) { done = true; clearTimeout(timer); cb(null); } };
+    img.src = t.url;
+  });
+}
+/* drawTrailScene(g, rect, data, prep): prep is a loadCardTiles result.
+   With prep, real tiles paint first (darkened) and the dashed grid
+   decoration is retired; without it, the stylized scene renders as
+   before. Returns true when the map underlay rendered (the caller then
+   owes the OSM attribution line). The drawn line comes from
+   cardLineFor: solid for a real track or route, DASHED through the
+   timestamped stops when the recorded track is degenerate. */
+function drawTrailScene(g, rect, data, prep) {
+  var line = cardLineFor(data);
+  var items = line.pts.concat(data.dots);
   if (data.home) items.push(data.home);
   var proj = makeProjector(items, rect);
   var s = rect.w / 968;
+  var usedMap = false;
   g.save();
-  g.strokeStyle = 'rgba(255,245,235,0.06)'; g.lineWidth = 1; g.setLineDash([4, 5]);
-  var cx = rect.x + rect.w / 2, cy = rect.y + rect.h / 2, maxR = Math.max(rect.w, rect.h) / 2;
-  for (var r = maxR / 3; r < maxR * 1.1; r += maxR / 3) { g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.stroke(); }
-  g.beginPath(); g.moveTo(rect.x, cy); g.lineTo(rect.x + rect.w, cy); g.moveTo(cx, rect.y); g.lineTo(cx, rect.y + rect.h); g.stroke();
-  g.setLineDash([]);
-  if (data.segs && data.segs.length) {
+  if (prep && prep.tiles && prep.tiles.length) {
+    usedMap = true;
+    g.save();
+    g.beginPath(); g.rect(rect.x, rect.y, rect.w, rect.h); g.clip();
+    try { if ('filter' in g) g.filter = 'brightness(0.62) saturate(0.55)'; } catch (e) {}
+    prep.tiles.forEach(function (t) {
+      var p1 = proj(t.lat, t.lng), p2 = proj(t.lat2, t.lng2);
+      try { g.drawImage(t.img, p1[0], p1[1], (p2[0] - p1[0]) + 1, (p2[1] - p1[1]) + 1); } catch (e) {}
+    });
+    try { if ('filter' in g) g.filter = 'none'; } catch (e) {}
+    g.fillStyle = 'rgba(14,10,22,0.35)'; g.fillRect(rect.x, rect.y, rect.w, rect.h);
+    g.restore();
+  } else {
+    g.strokeStyle = 'rgba(255,245,235,0.06)'; g.lineWidth = 1; g.setLineDash([4, 5]);
+    var cx = rect.x + rect.w / 2, cy = rect.y + rect.h / 2, maxR = Math.max(rect.w, rect.h) / 2;
+    for (var r = maxR / 3; r < maxR * 1.1; r += maxR / 3) { g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.stroke(); }
+    g.beginPath(); g.moveTo(rect.x, cy); g.lineTo(rect.x + rect.w, cy); g.moveTo(cx, rect.y); g.lineTo(cx, rect.y + rect.h); g.stroke();
+    g.setLineDash([]);
+  }
+  if (line.segs && line.segs.length) {
     g.lineCap = 'round'; g.lineJoin = 'round';
-    data.segs.forEach(function (seg) {
+    line.segs.forEach(function (seg) {
       if (seg.length < 2) return;
       function pass(wd, style) {
         g.beginPath();
         seg.forEach(function (p, i) { var q = proj(p.lat, p.lng); if (i === 0) g.moveTo(q[0], q[1]); else g.lineTo(q[0], q[1]); });
         g.lineWidth = wd; g.strokeStyle = style; g.stroke();
       }
+      if (line.dashed) g.setLineDash([14, 10]);
       pass(Math.max(3, 12 * s), 'rgba(232,93,38,0.24)');
       pass(Math.max(2, 4.5 * s), '#E85D26');
+      if (line.dashed) g.setLineDash([]);
     });
   }
   g.fillStyle = '#F5EFE6'; g.strokeStyle = '#0E0A16'; g.lineWidth = Math.max(1.2, 2.5 * s);
@@ -6564,6 +6736,7 @@ function drawTrailScene(g, rect, data) {
     g.restore();
   }
   g.restore();
+  return usedMap;
 }
 function drawHaulCard(cb) {
   function go() {
@@ -6961,9 +7134,11 @@ $('chatPlus').addEventListener('click', function () {
   m.hidden = !m.hidden;
   $('chatPlus').setAttribute('aria-expanded', String(!m.hidden));
 });
-$('chatMic').addEventListener('pointerdown', function (e) { e.preventDefault(); voiceListen(); });
+/* v7.3: single click handler (was pointerdown+click, which could
+   double-start recognition per tap). voiceListen always answers. */
 $('chatMic').addEventListener('click', function () { voiceListen(); });
 $('chatPhotoX').addEventListener('click', function () { CHAT.pendingPhoto = null; paintPhotoPrev(); });
+var CHAT_GIF_CAP = 1024 * 1024; /* v7.3: GIF byte cap (1 MB) */
 function chatPhotoPicked(input) {
   var f = input.files && input.files[0];
   input.value = '';
@@ -6971,6 +7146,26 @@ function chatPhotoPicked(input) {
   $('chatPlus').setAttribute('aria-expanded', 'false');
   if (!f || !partyOn()) return;
   if (Date.now() - (PARTY.lastImgTs || 0) < 30000) { toast('One photo every 30 seconds in party chat.', 'warn'); return; }
+  /* v7.3 Fix 18: a GIF bypasses the canvas re-encode entirely (a
+     re-encode would freeze it on its first frame). It is read as-is
+     under a 1 MB cap and staged like a photo; the preview is a native
+     img, so it animates, and bubbles/viewer render it unchanged. */
+  if (f.type === 'image/gif' || /\.gif$/i.test(f.name || '')) {
+    if (f.size > CHAT_GIF_CAP) { toast('That GIF is over 1 MB. Pick a smaller one.', 'warn'); return; }
+    var grd = new FileReader();
+    grd.onload = function () {
+      var gim = new Image();
+      gim.onload = function () {
+        CHAT.pendingPhoto = { url: grd.result, w: gim.width || 4, h: gim.height || 3 };
+        paintPhotoPrev();
+      };
+      gim.onerror = function () { toast('That GIF could not be read.', 'warn'); };
+      gim.src = grd.result;
+    };
+    grd.onerror = function () { toast('That GIF could not be read.', 'warn'); };
+    grd.readAsDataURL(f);
+    return;
+  }
   var rd = new FileReader();
   rd.onload = function () {
     var img = new Image();
@@ -6987,6 +7182,88 @@ function chatPhotoPicked(input) {
 }
 $('chatPhoto').addEventListener('change', function () { chatPhotoPicked($('chatPhoto')); });
 $('chatPhotoLib').addEventListener('change', function () { chatPhotoPicked($('chatPhotoLib')); });
+
+/* ---------- GIF library (v7.3 Fix 18, Tenor, key-gated) ----------
+   Built but dark until CT_TENOR_KEY is set: with an empty key the menu
+   item stays hidden and nothing about the library appears anywhere.
+   With a key, the party chat + menu gains "GIF library", opening a
+   picker fed by Tenor v2 (featured on open, search on typing). Tapping
+   a result sends its mediumgif URL as a media post through the SAME
+   send + 30 s rate-limit path as photos (chatSendPhoto). The payload
+   rides the existing img1|<w>x<h>| prefix; the renderer distinguishes
+   remote media by its https: src (data URLs are local media). GIF
+   media is loaded at runtime from Tenor, never bundled. All fetches
+   fail soft: a toast, and the sheet stays usable for another try. */
+var GIFP = { items: [], timer: null };
+function paintGifChrome() { var b = $('chatGifBtn'); if (b) b.hidden = !CT_TENOR_KEY; }
+function tenorFetch(path, q, cb) {
+  var url = 'https://tenor.googleapis.com/v2/' + path + '?key=' + encodeURIComponent(CT_TENOR_KEY) +
+    '&client_key=candy_trail&contentfilter=high&media_filter=minimal&limit=24' +
+    (q ? '&q=' + encodeURIComponent(q) : '');
+  fetch(url).then(function (r) { return r.json(); }).then(function (j) { cb(j || {}); }, function () { cb(null); });
+}
+function gifStatus(txt) { var s = $('gifStatus'); if (s) { s.textContent = txt; s.hidden = !txt; } }
+function gifRender() {
+  var grid = $('gifGrid'); if (!grid) return;
+  grid.innerHTML = '';
+  GIFP.items.forEach(function (it, i) {
+    var mf = (it && it.media_formats) || {};
+    var prev = mf.tinygif || mf.nanogif || mf.mediumgif;
+    if (!prev || !prev.url) return;
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'gif-cell'; b.setAttribute('role', 'listitem');
+    b.setAttribute('aria-label', 'Send GIF: ' + (it.content_description || 'GIF'));
+    var im = document.createElement('img');
+    im.src = prev.url; im.alt = ''; im.loading = 'lazy';
+    b.appendChild(im);
+    b.addEventListener('click', function () { gifPick(i); });
+    grid.appendChild(b);
+  });
+}
+function gifLoad(q) {
+  gifStatus('Loading GIFs…');
+  var grid = $('gifGrid'); if (grid) grid.innerHTML = '';
+  tenorFetch(q ? 'search' : 'featured', q, function (j) {
+    if (!j) { GIFP.items = []; gifStatus('Could not load GIFs. Check your connection and try again.'); toast('GIF search failed. Try again.', 'warn'); return; }
+    GIFP.items = j.results || [];
+    if (!GIFP.items.length) { gifStatus(q ? 'No GIFs found for that search.' : 'No GIFs to show right now.'); return; }
+    gifStatus('');
+    gifRender();
+  });
+}
+function gifPick(i) {
+  var it = GIFP.items[i];
+  var mf = it && it.media_formats && it.media_formats.mediumgif;
+  if (!mf || !mf.url) { toast('That GIF is unavailable.', 'warn'); return; }
+  var url = String(mf.url);
+  if (!/^https:\/\/[^\s"']+$/.test(url)) { toast('That GIF is unavailable.', 'warn'); return; }
+  var dims = mf.dims || [];
+  if (chatSendPhoto(url, dims[0] || 4, dims[1] || 3)) {
+    closeGifSheet();
+    var m = $('chatPlusMenu'); if (m) m.hidden = true;
+    $('chatPlus').setAttribute('aria-expanded', 'false');
+  }
+}
+function openGifSheet() {
+  if (!CT_TENOR_KEY) return;
+  $('gifSheet').hidden = false;
+  var inp = $('gifSearch'); if (inp) inp.value = '';
+  gifLoad('');
+}
+function closeGifSheet() { var s = $('gifSheet'); if (s) s.hidden = true; }
+$('chatGifBtn').addEventListener('click', function () {
+  var m = $('chatPlusMenu'); if (m) m.hidden = true;
+  $('chatPlus').setAttribute('aria-expanded', 'false');
+  openGifSheet();
+});
+$('gifClose').addEventListener('click', closeGifSheet);
+$('gifSheet').addEventListener('click', function (e) { if (e.target === this) closeGifSheet(); });
+$('gifSearch').addEventListener('input', function () {
+  if (GIFP.timer) clearTimeout(GIFP.timer);
+  var v = this.value;
+  GIFP.timer = setTimeout(function () { gifLoad(v.trim()); }, 350);
+});
+paintGifChrome();
 /* ---------- Heights Live zone chat (v6.5 Phase 3 Stage B) ----------
    The neighborhood channel, wired into the Phase 2 chat surface.
    Identity is a pseudonymous walker persona seeded deterministically
@@ -7952,7 +8229,7 @@ function haulCardData() {
   return {
     kind: 'haul', title: 'What a night!', houses: S.counts.houses,
     trackDist: nw.trackDist, elapsedMs: nw.elapsedMs,
-    pts: td.pts, segs: td.segs, dots: td.dots, home: td.home, src: td.src,
+    pts: td.pts, segs: td.segs, dots: td.dots, home: td.home, src: td.src, stops: td.stops,
     hasTrail: td.pts.length >= 2 || td.dots.length > 0, photo: !!haulPhotoImg, place: cardPlace()
   };
 }
@@ -8020,21 +8297,28 @@ function drawPhotoFrame(g, rect) {
   g.restore();
   g.strokeStyle = 'rgba(245,239,230,0.25)'; g.lineWidth = 1.5; rrPath(g, rect.x, rect.y, rect.w, rect.h, 16); g.stroke();
 }
-function drawSceneFrame(g, data, rect) {
+function drawSceneFrame(g, data, rect, jobs) {
   g.save(); rrPath(g, rect.x, rect.y, rect.w, rect.h, 20); g.clip();
   g.fillStyle = 'rgba(14,10,22,0.55)'; g.fillRect(rect.x, rect.y, rect.w, rect.h);
-  drawTrailScene(g, { x: rect.x + 14, y: rect.y + 14, w: rect.w - 28, h: rect.h - 28 }, data);
   g.restore();
   g.strokeStyle = 'rgba(232,93,38,0.5)'; g.lineWidth = 1.5; rrPath(g, rect.x, rect.y, rect.w, rect.h, 20); g.stroke();
+  /* v7.3: the scene itself is a deferred job. Its map tiles load async,
+     so the frame paints now and the scene lands when the tiles resolve
+     (or the stylized fallback fires); paintShareCard runs the jobs
+     before it snapshots the blob. The job keeps the frame rect so the
+     scene still clips to the rounded frame. */
+  var inner = { x: rect.x + 14, y: rect.y + 14, w: rect.w - 28, h: rect.h - 28 };
+  if (jobs) jobs.push({ data: data, frame: rect, rect: inner });
+  else drawTrailScene(g, inner, data, null);
 }
-function paintTrailArt(g, data, rect, u, kind) {
+function paintTrailArt(g, data, rect, u, kind, jobs) {
   var hasTrail = (data.pts && data.pts.length >= 2) || (data.dots && data.dots.length > 0);
   if (kind === 'haul' && haulPhotoImg) {
     if (rect.w > rect.h * 1.4) {
       if (hasTrail) {
         var pw = Math.round(rect.w * 0.52);
         drawPhotoFrame(g, { x: rect.x, y: rect.y, w: pw, h: rect.h });
-        drawSceneFrame(g, data, { x: rect.x + pw + Math.round(18 * u), y: rect.y, w: rect.w - pw - Math.round(18 * u), h: rect.h });
+        drawSceneFrame(g, data, { x: rect.x + pw + Math.round(18 * u), y: rect.y, w: rect.w - pw - Math.round(18 * u), h: rect.h }, jobs);
       } else {
         drawPhotoFrame(g, rect);
       }
@@ -8042,12 +8326,12 @@ function paintTrailArt(g, data, rect, u, kind) {
       drawPhotoFrame(g, rect);
       if (hasTrail) {
         var bw = Math.round(rect.w * 0.3);
-        drawSceneFrame(g, data, { x: rect.x + rect.w - bw - Math.round(16 * u), y: rect.y + rect.h - bw - Math.round(16 * u), w: bw, h: bw });
+        drawSceneFrame(g, data, { x: rect.x + rect.w - bw - Math.round(16 * u), y: rect.y + rect.h - bw - Math.round(16 * u), w: bw, h: bw }, jobs);
       }
     }
     return;
   }
-  if (hasTrail) { drawSceneFrame(g, data, rect); return; }
+  if (hasTrail) { drawSceneFrame(g, data, rect, jobs); return; }
   /* brand hero: the Night Badge lockup, centered in the frame */
   var cx = rect.x + rect.w / 2;
   var markSize = Math.min(300 * u, rect.h * 0.5);
@@ -8130,6 +8414,7 @@ function paintShareCard(kind, dims, data, imgs, cb) {
   var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
   var g = cv.getContext('2d');
   if (!g) { cb(null); return; }
+  var sceneJobs = [], cardFlags = { map: false }; /* v7.3 deferred scenes + OSM credit flag */
   var grad = g.createLinearGradient(0, 0, 0, H);
   grad.addColorStop(0, '#2A2140'); grad.addColorStop(1, '#0E0A16');
   g.fillStyle = grad; g.fillRect(0, 0, W, H);
@@ -8186,7 +8471,7 @@ function paintShareCard(kind, dims, data, imgs, cb) {
       { v: String(data.people), l: 'WALKERS' }
     ], m, statsY, artW, u);
   } else {
-    paintTrailArt(g, data, { x: m, y: artY, w: artW, h: artH }, u, kind);
+    paintTrailArt(g, data, { x: m, y: artY, w: artW, h: artH }, u, kind, sceneJobs);
     var stats;
     if (kind === 'route') {
       stats = [
@@ -8203,7 +8488,27 @@ function paintShareCard(kind, dims, data, imgs, cb) {
     drawCardStats(g, stats, m, statsY, artW, u);
   }
   drawCardFooter(g, W, H, u, m, cardStamp(kind, data.src));
-  if (cv.toBlob) cv.toBlob(cb, 'image/png'); else cb(null);
+  /* v7.3: run the deferred scenes (their tiles load async), draw the
+     OpenStreetMap credit when any scene rendered the real map, then
+     snapshot. With no scenes this finishes synchronously as before. */
+  function finish() {
+    if (cardFlags.map) {
+      g.textAlign = 'right'; g.fillStyle = '#6E6390';
+      g.font = '500 ' + Math.max(14, Math.round(20 * u)) + 'px Inter, system-ui, sans-serif';
+      g.fillText('© OpenStreetMap contributors', W - m, H - Math.round(22 * u));
+    }
+    if (cv.toBlob) cv.toBlob(cb, 'image/png'); else cb(null);
+  }
+  (function runJob(i) {
+    if (i >= sceneJobs.length) { finish(); return; }
+    var job = sceneJobs[i];
+    loadCardTiles(job.data, job.rect, function (prep) {
+      g.save(); rrPath(g, job.frame.x, job.frame.y, job.frame.w, job.frame.h, 20); g.clip();
+      if (drawTrailScene(g, job.rect, job.data, prep)) cardFlags.map = true;
+      g.restore();
+      runJob(i + 1);
+    });
+  })(0);
 }
 function cardWrapLines(g, text, px, weight, family, maxW, maxLines) {
   g.font = weight + ' ' + px + 'px ' + family;
@@ -8234,7 +8539,7 @@ function drawShareCard(kind, crop, cb) {
 }
 
 /* --- share sheet --- */
-var SHARE = { kind: 'haul', crop: 'portrait', blob: null, spotReg: null };
+var SHARE = { kind: 'haul', crop: 'portrait', blob: null, blobCrop: null, spotReg: null };
 function shareTitleFor(kind) { return kind === 'party' ? 'Share the party' : kind === 'route' ? 'Share the route' : kind === 'spot' ? 'Share your spot' : 'Share your haul'; }
 function shareTextFor(kind, data) {
   if (!data) return 'Candy Trail: the live trick-or-treat map.';
@@ -8262,7 +8567,7 @@ function openShareSheet(kind) {
     toast(kind === 'route' ? 'Build a route first, then share its card.' : kind === 'party' ? 'Join a party first, then share its card.' : 'Nothing to share yet.', 'warn');
     return false;
   }
-  SHARE.kind = kind; SHARE.crop = 'portrait'; SHARE.blob = null;
+  SHARE.kind = kind; SHARE.crop = 'portrait'; SHARE.blob = null; SHARE.blobCrop = null;
   $('shareTitle').textContent = shareTitleFor(kind);
   $('shareLinkTxt').textContent = shareLinkFor(kind);
   paintShareCrops();
@@ -8275,8 +8580,10 @@ function paintShareCrops() {
   $$('#shareCrops button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-crop') === SHARE.crop)); });
 }
 function renderSharePreview() {
+  var cropAtRender = SHARE.crop;
   drawShareCard(SHARE.kind, SHARE.crop, function (blob) {
     SHARE.blob = blob;
+    SHARE.blobCrop = blob ? cropAtRender : null; /* v7.3: which crop this blob belongs to */
     var img = $('sharePreview'); if (!img) return;
     var shown = false;
     if (blob && window.URL && typeof URL.createObjectURL === 'function') {
@@ -8304,23 +8611,61 @@ function copyShareLink(link, okMsg) {
     toast('The link is shown under the card.', 'ok');
   }
 }
+/* v7.3 Fix 18: sharing must actually send the picture. Rules:
+   - The blob must belong to the CURRENT crop; a stale or missing blob
+     is re-rendered first (this makes the tap handler async; the File
+     construction and navigator.share call are the first things that
+     happen once the blob is ready, but a re-render CAN cost the tap's
+     transient activation on strict browsers, which is why the preview
+     keeps the blob fresh per crop in the first place).
+   - The file payload carries NO separate url field: files+url combos
+     are the flakiest across Android share targets, and the Nov 1 field
+     bug (recipient got only the link) came from that shape. The link
+     rides inside the text instead.
+   - No silent catches. A file-share rejection that is not the user
+     cancelling (AbortError) falls back IN THE SAME TAP: link share if
+     available, the image downloads, and an honest toast says what
+     happened. AbortError means the user backed out: say nothing. */
+function shareFallbackSaved(blob, fname) {
+  if (blob && downloadCardBlob(blob, fname)) {
+    toast('Your browser would not attach the picture, so I saved it instead. Attach it from your downloads.', 'warn');
+  }
+}
 function shareSheetGo() {
   var kind = SHARE.kind;
   var link = shareLinkFor(kind);
   var text = shareTextFor(kind, cardDataFor(kind));
-  var blob = SHARE.blob, fname = shareFileName(kind);
-  var file = null;
-  try { if (blob) file = new File([blob], fname, { type: 'image/png' }); } catch (e) {}
-  if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-    navigator.share({ files: [file], title: 'Candy Trail', text: text, url: link }).catch(function () {});
-  } else if (navigator.share) {
-    navigator.share({ title: 'Candy Trail', text: text, url: link }).catch(function () {});
-    if (blob) downloadCardBlob(blob, fname);
-  } else if (blob) {
-    if (downloadCardBlob(blob, fname)) copyShareLink(link, 'Image saved. Link copied, send it with the picture.');
-  } else {
-    copyShareLink(link);
+  var fname = shareFileName(kind);
+  function proceed(blob) {
+    var file = null;
+    try { if (blob) file = new File([blob], fname, { type: 'image/png' }); } catch (e) {}
+    if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], title: 'Candy Trail', text: text + '\n' + link }).then(function () {}, function (err) {
+        if (err && err.name === 'AbortError') return; /* user cancelled: silence is correct */
+        if (navigator.share) {
+          navigator.share({ title: 'Candy Trail', text: text, url: link }).then(function () { shareFallbackSaved(blob, fname); }, function (err2) {
+            if (err2 && err2.name === 'AbortError') return;
+            shareFallbackSaved(blob, fname);
+          });
+        } else shareFallbackSaved(blob, fname);
+      });
+    } else if (navigator.share) {
+      navigator.share({ title: 'Candy Trail', text: text, url: link }).then(function () {}, function (err) {
+        if (err && err.name === 'AbortError') return;
+        shareFallbackSaved(blob, fname);
+      });
+      if (blob) downloadCardBlob(blob, fname);
+    } else if (blob) {
+      if (downloadCardBlob(blob, fname)) copyShareLink(link, 'Image saved. Link copied, send it with the picture.');
+    } else {
+      copyShareLink(link);
+    }
   }
+  if (SHARE.blob && SHARE.blobCrop === SHARE.crop) proceed(SHARE.blob);
+  else drawShareCard(kind, SHARE.crop, function (blob) {
+    SHARE.blob = blob; SHARE.blobCrop = blob ? SHARE.crop : null;
+    proceed(blob);
+  });
 }
 $$('#shareCrops button').forEach(function (b) {
   b.addEventListener('click', function () { SHARE.crop = b.getAttribute('data-crop') || 'portrait'; paintShareCrops(); renderSharePreview(); });
@@ -9479,7 +9824,7 @@ paintChromeState();
 /* v6.4.1 boot self-check marker: the shell's checker script verifies this
    was set. If boot died anywhere above, the repair overlay appears instead
    of a silently half-dead app. */
-window.__ctBootOK = '7.2';
+window.__ctBootOK = '7.3';
 
 </script>
 <script>
