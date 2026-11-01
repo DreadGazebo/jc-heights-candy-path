@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0A16">
-<meta name="version" content="6.4">
+<meta name="version" content="6.4.1">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -835,7 +835,7 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
       </div>
       <div class="sheetfoot">
         <div class="wm">Candy Trail</div>
-        <div class="ver" id="appVer">Candy Trail v6.4</div>
+        <div class="ver" id="appVer">Candy Trail v6.4.1</div>
       </div>
     </div>
 
@@ -921,7 +921,7 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
   <div class="prefs-foot">
     <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon-mono"/></svg>
     <div class="crest">Candy Trail</div>
-    <div class="ver">Version 6.4</div>
+    <div class="ver">Version 6.4.1</div>
   </div>
 </div>
 
@@ -1096,6 +1096,14 @@ body.is-recording #fabLog{transform:scale(.7);opacity:0;pointer-events:none}
     <h2 id="dlgTitle"></h2>
     <p id="dlgText"></p>
     <div id="dlgBtns" class="btns"></div>
+  </div>
+</div>
+
+<div id="bootRepair" hidden style="position:fixed;inset:0;z-index:4000;background:rgba(10,7,18,.93);display:flex;align-items:center;justify-content:center;padding:24px">
+  <div style="max-width:340px;text-align:center;color:#F5EFE6;font-family:system-ui,sans-serif">
+    <h2 style="font-size:21px;margin:0 0 10px">Candy Trail did not start cleanly</h2>
+    <p style="font-size:15px;line-height:1.45;opacity:.85;margin:0 0 18px">Something went wrong while the app was loading, so some buttons may not work. A repair clears the app's saved copy and downloads a fresh one. Your pins, counts and party are kept.</p>
+    <button id="bootRepairBtn" type="button" style="min-height:52px;padding:12px 26px;font-size:16px;font-weight:700;border:none;border-radius:14px;background:#E85D26;color:#fff;width:100%">Repair and reload</button>
   </div>
 </div>
 
@@ -1309,7 +1317,7 @@ function showDlg(title, text, buttons) {
   });
   $('dlg').hidden = false;
 }
-var busyCtl = null, busyTimer = null, busyT0 = 0;
+var busyCtl = null, busyTimer = null, busyT0 = 0, busyFailTimer = null;
 function showBusy(text, sub) {
   $('busyText').textContent = text || 'Working…';
   $('busySub').textContent = sub || '';
@@ -1322,11 +1330,21 @@ function showBusy(text, sub) {
     var s = Math.round((Date.now() - busyT0) / 1000);
     if (s >= 5) $('busyElapsed').textContent = s + 's on this step… still working';
   }, 1000);
+  /* v6.4.1 failsafe: no busy step may trap the app. If whatever is behind
+     this dialog has not finished in 60 s, cancel and free the screen. */
+  if (busyFailTimer) clearTimeout(busyFailTimer);
+  busyFailTimer = setTimeout(function () {
+    if ($('busy').hidden) return;
+    if (busyCtl) busyCtl.abort();
+    hideBusy();
+    toast('That step took too long and was cancelled. Try again.', 'warn');
+  }, 60000);
   return busyCtl;
 }
 function hideBusy() {
   $('busy').hidden = true; busyCtl = null;
   if (busyTimer) { clearInterval(busyTimer); busyTimer = null; }
+  if (busyFailTimer) { clearTimeout(busyFailTimer); busyFailTimer = null; }
 }
 $('busyCancel').addEventListener('click', function () {
   if (busyCtl) busyCtl.abort();
@@ -1408,7 +1426,7 @@ function renderMe() {
 var watchId = null, lastPosTs = 0;
 function ensureWatch() {
   if (watchId != null || !('geolocation' in navigator)) return;
-  watchId = navigator.geolocation.watchPosition(onPos, onPosErr,
+  watchId = navigator.geolocation.watchPosition(function (p) { try { onPos(p); } catch (e) { console.error('onPos failed', e); } }, onPosErr,
     { enableHighAccuracy: true, maximumAge: 3000, timeout: 20000 });
 }
 function onPos(p) {
@@ -1433,19 +1451,39 @@ function onPosErr(e) {
   if (e.code === 1) toast('Location is off for this site. You can still drop a start pin or search an address.', 'warn');
   else toast('GPS is having trouble. Move near a window or street if you can.', 'warn');
 }
+/* v6.4.1: settlement is guaranteed. A throwing onPos can no longer strand
+   the promise (resolve runs from the callback's own coords), and a
+   watchdog rejects if the browser never calls either callback (seen on
+   Android Chrome when the permission prompt is deferred or the tab was
+   frozen: the timeout options are not always honored there). */
+var POS_ONCE_WATCHDOG_MS = 25000;
 function getPosOnce() {
   return new Promise(function (resolve, reject) {
     if (!('geolocation' in navigator)) { reject({ code: 0, message: 'no geolocation' }); return; }
     if (S.pos && Date.now() - S.pos.ts < 15000) { resolve(S.pos); return; }
-    navigator.geolocation.getCurrentPosition(function (p) {
-      onPos(p); resolve(S.pos);
-    }, function (e) {
-      if (e.code === 3) { /* timeout: one retry on coarse location */
-        navigator.geolocation.getCurrentPosition(function (p) {
-          onPos(p); resolve(S.pos);
-        }, function (e2) { reject(e2); },
+    var settled = false;
+    var wdMs = (typeof window !== 'undefined' && window.__POS_WATCHDOG_MS) || POS_ONCE_WATCHDOG_MS;
+    var wd = setTimeout(function () {
+      if (settled) return; settled = true;
+      reject({ code: 3, message: 'location timed out' });
+    }, wdMs);
+    function done(p) {
+      if (settled) return; settled = true; clearTimeout(wd);
+      try { onPos(p); } catch (e) { console.error('onPos failed', e); }
+      if (S.pos) { resolve(S.pos); return; }
+      var c = (p && p.coords) || {};
+      resolve({ lat: c.latitude, lng: c.longitude, acc: c.accuracy || 30, heading: null, ts: Date.now() });
+    }
+    function fail(e) {
+      if (settled) return; settled = true; clearTimeout(wd);
+      reject(e);
+    }
+    navigator.geolocation.getCurrentPosition(done, function (e) {
+      if (settled) return;
+      if (e && e.code === 3) { /* timeout: one retry on coarse location */
+        navigator.geolocation.getCurrentPosition(done, fail,
           { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 });
-      } else reject(e);
+      } else fail(e);
     }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 5000 });
   });
 }
@@ -1872,6 +1910,11 @@ function pinIconHtml(type, kind) {
   if (type === 'decor') return markerHtml('mk-decor', SVG_DECOR);
   return markerHtml('mk-candy', SVG_CANDY);
 }
+/* v6.4.1: pinAddrCache is initialized HERE, before the first renderPins()
+   call at boot, which reaches pinAddrText via renderPinsList. It used to
+   be initialized next to pinAddrText at the end of the file; boot died
+   there for any saved pin not near an addressed community stop. */
+var pinAddrCache = {};
 function trimPinPhotos() {
   var withPhotos = S.pins.filter(function (p) { return p.photo; });
   if (withPhotos.length <= 40) return;
@@ -1887,7 +1930,7 @@ function renderPins() {
     });
     var pop = document.createElement('div');
     pop.className = 'pop';
-    var popHead = (p.kind === 'shop' && p.type === 'candy') ? 'Shop with treats' : (p.kind === 'trunk' && p.type === 'candy') ? 'Trunk stop' : esc(PIN_TYPES[p.type].label);
+    var popHead = (p.kind === 'shop' && p.type === 'candy') ? 'Shop with treats' : (p.kind === 'trunk' && p.type === 'candy') ? 'Trunk stop' : esc(PIN_TYPES[p.type] ? PIN_TYPES[p.type].label : 'Pin');
     pop.innerHTML = '<b>' + popHead + '</b>' + (p.via === 'house' ? '<br><span class="muted" style="font-size:12px">Logged from your GPS when you tapped House visited</span>' : '') + (p.note ? '<br><i>' + esc(p.note) + '</i>' : '') + (p.photo ? '<br><img src="' + p.photo + '" style="max-width:150px;border-radius:10px;margin-top:4px" alt="Stop photo">' : '');
     var del = document.createElement('button');
     del.className = 'btn btn-ghost btn-sm'; del.textContent = 'Remove pin';
@@ -1902,8 +1945,10 @@ function renderPins() {
     m.bindPopup(pop);
     m.addTo(pinLayer);
   });
-  if (typeof renderHeightsStops === 'function') renderHeightsStops();
-  if (typeof renderPinsList === 'function') renderPinsList();
+  /* v6.4.1: the cross-renders below can never take renderPins (or boot,
+     which calls it early) down with them. */
+  try { if (typeof renderHeightsStops === 'function') renderHeightsStops(); } catch (e) { console.error('renderHeightsStops failed', e); }
+  try { if (typeof renderPinsList === 'function') renderPinsList(); } catch (e) { console.error('renderPinsList failed', e); }
 }
 function addPin(lat, lng, type, via) {
   var pin = { lat: lat, lng: lng, type: type, ts: Date.now() };
@@ -1911,7 +1956,7 @@ function addPin(lat, lng, type, via) {
   S.pins.push(pin);
   store.set('pins', S.pins);
   renderPins();
-  toast(PIN_TYPES[type].label + ' pinned. Pins make future routes smarter.', 'ok');
+  toast((PIN_TYPES[type] ? PIN_TYPES[type].label : 'Pin') + ' pinned. Pins make future routes smarter.', 'ok');
   return pin.ts;
 }
 renderPins();
@@ -4401,7 +4446,7 @@ var APP_LINK = 'https://dreadgazebo.github.io/jc-heights-candy-path/';
 /* ---------- Service worker (v5.3 PWA) ---------- */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
-    navigator.serviceWorker.register('sw.js').catch(function () {});
+    navigator.serviceWorker.register('sw.js').then(function (reg) { try { reg.update(); } catch (e) {} }).catch(function () {});
   });
 }
 
@@ -5068,9 +5113,13 @@ function switchTab(name) {
   $('tabRoute').hidden = name !== 'route';
   $('tabParty').hidden = name !== 'party';
   $('tabHaul').hidden = name !== 'haul';
-  if (name === 'party') renderPartyBox();
-  if (name === 'haul') { renderCounts(); if (typeof renderPinsList === 'function') renderPinsList(); showHaulTrail(); }
-  else hideHaulTrail();
+  /* v6.4.1 seatbelt: a tab render may fail loudly in the console, never
+     silently kill the tab switch itself. */
+  try {
+    if (name === 'party') renderPartyBox();
+    if (name === 'haul') { renderCounts(); if (typeof renderPinsList === 'function') renderPinsList(); showHaulTrail(); }
+    else hideHaulTrail();
+  } catch (e) { console.error('tab render failed', e); }
   updatePeek();
 }
 $$('#sheetTabs button').forEach(function (b) {
@@ -5090,8 +5139,8 @@ function openPhotoView(src) {
 function closePhotoView() { var v = $('photoView'); if (v) v.hidden = true; }
 /* My Pins addresses (v6.4 phase 2): prefer the address of the community
    stop the pin sits on (within 40 m, data the app already has); else a
-   cached Nominatim reverse lookup; never an invented address. */
-var pinAddrCache = {};
+   cached Nominatim reverse lookup; never an invented address.
+   (pinAddrCache itself is declared next to renderPins: see the v6.4.1 note.) */
 function pinAddrKey(p) { return p.lat.toFixed(4) + ',' + p.lng.toFixed(4); }
 function pinAddrText(p) {
   var best = null, bd = 40;
@@ -5187,6 +5236,42 @@ $('lcTagNonfood').addEventListener('click', function () { lcQuickTag('nonfood');
 renderPinsList();
 updatePeek();
 
+/* v6.4.1 boot self-check marker: the shell's checker script verifies this
+   was set. If boot died anywhere above, the repair overlay appears instead
+   of a silently half-dead app. */
+window.__ctBootOK = '6.4.1';
+
+</script>
+<script>
+/* v6.4.1 boot self-check: runs in its own script tag so it survives a dead
+   main script. If the app did not finish booting, offer a one-tap repair
+   (unregister service workers, drop caches, hard reload). Guarded to run
+   the repair at most once per session; a second failure just reports. */
+(function () {
+  function check() {
+    if (window.__ctBootOK) return;
+    var el = document.getElementById('bootRepair');
+    if (!el) return;
+    el.hidden = false;
+    var btn = document.getElementById('bootRepairBtn');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      btn.disabled = true; btn.textContent = 'Repairing…';
+      var go = function () { location.replace(location.pathname + '?ctrepair=' + Date.now()); };
+      try {
+        if (sessionStorage.getItem('ct_repair_tried')) { go(); return; }
+        sessionStorage.setItem('ct_repair_tried', '1');
+      } catch (e) {}
+      var jobs = [];
+      if ('serviceWorker' in navigator) jobs.push(navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister().catch(function () {}); })); }).catch(function () {}));
+      if ('caches' in window) jobs.push(caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k).catch(function () {}); })); }).catch(function () {}));
+      Promise.all(jobs).then(go, go);
+      setTimeout(go, 3500);
+    });
+  }
+  if (document.readyState === 'complete') setTimeout(check, 2500);
+  else window.addEventListener('load', function () { setTimeout(check, 2500); });
+})();
 </script>
 </body>
 </html>
