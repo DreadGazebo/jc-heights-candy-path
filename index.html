@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0A16">
-<meta name="version" content="7.9">
+<meta name="version" content="7.10">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1264,7 +1264,7 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
       </div>
       <div class="sheetfoot">
         <div class="wm">Candy Trail</div>
-        <div class="ver" id="appVer">Candy Trail v7.9</div>
+        <div class="ver" id="appVer">Candy Trail v7.10</div>
       </div>
     </div>
 
@@ -1381,7 +1381,7 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
   <div class="prefs-foot">
     <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon-mono"/></svg>
     <div class="crest">Candy Trail</div>
-    <div class="ver">Version 7.9</div>
+    <div class="ver">Version 7.10</div>
   </div>
 </div>
 
@@ -1647,9 +1647,9 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
 <div id="placeSheet" class="overlay" hidden>
   <div class="ocard card" role="dialog" aria-modal="true" aria-labelledby="placeTitle">
     <div class="ss-head"><h2 id="placeTitle">Where are you trick-or-treating?</h2><button id="placeClose" class="btn-close" type="button" aria-label="Close place finder"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button></div>
-    <p>Candy Trail works anywhere in the US. Name your town or ZIP and we will set up your neighborhood: its own Local feed, search, and routes. No account needed.</p>
+    <p>We set up the neighborhood you are in. No account needed.</p>
     <form id="placeForm">
-      <input id="placeInput" type="search" placeholder="Town or ZIP, e.g. Brooklyn Park or 55443" autocomplete="off" enterkeyhint="search" aria-label="Your town or ZIP code">
+      <input id="placeInput" type="search" placeholder="Town or ZIP" autocomplete="off" enterkeyhint="search" aria-label="Your town or ZIP code">
       <div class="btns" style="margin-top:12px">
         <button id="placeGo" class="btn btn-ember" type="submit">Find my neighborhood</button>
       </div>
@@ -9585,7 +9585,7 @@ var ZONE_HEIGHTS_BANDS = ZONE_BANDS;
    anchor. Big enough to hold a walkable neighborhood's Halloween,
    small enough that two ends of a large city are different zones. */
 var ZONE_HALF_M = 2100;
-var ZRES = { ready: false, onboarding: false, revSeq: 0, revCache: {}, offeredKey: '' };
+var ZRES = { ready: false, onboarding: false, revSeq: 0, revCache: {}, offeredKey: '', placeSubmitted: false, bootGpsChecked: false };
 
 function zoneSlug(s) {
   var out = String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
@@ -9907,6 +9907,14 @@ function paintWpNote(def) {
 }
 
 /* ---------- place entry (city / ZIP fallback) ---------- */
+/* v7.10 Fix 24: the pinned-neighborhood flag. A neighborhood the
+   walker chose on purpose (typed place entry, or Not now accepting a
+   saved zone) is PINNED: boot GPS never overrides it. A neighborhood
+   GPS derived is not pinned, and activating one from GPS clears the
+   flag, so a stale pin cannot follow the walker to a new town. */
+function zonePinned() { try { return !!store.get('zonePinned', false); } catch (e) { return false; } }
+function zonePinSet() { try { store.set('zonePinned', true); } catch (e) {} }
+function zonePinClear() { try { store.set('zonePinned', false); } catch (e) {} }
 function placeShow() {
   var sh = $('placeSheet');
   if (!sh) return;
@@ -9920,6 +9928,10 @@ function placeSubmit(q) {
   var err = $('placeErr');
   function fail(msg) { if (err) { err.textContent = msg; err.hidden = false; } }
   if (!q) { fail('Type a town name or a ZIP code.'); return; }
+  /* A real submission is the walker's word: it pins the neighborhood
+     (Fix 24) and bars any still-pending onboarding GPS fix from
+     yanking the sheet mid-answer. */
+  ZRES.placeSubmitted = true;
   if (err) err.hidden = true;
   var url = 'https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&countrycodes=us&limit=5&q=' + encodeURIComponent(q);
   fetchT(url, { headers: { 'Accept': 'application/json' } }, 12000).then(function (r) { return r.json(); }).then(function (arr) {
@@ -9942,6 +9954,7 @@ function placeSubmit(q) {
     setStart(lat, lng, label, false);
     ZRES.onboarding = false;
     if (typeof map !== 'undefined' && map && map.setView) map.setView([lat, lng], 15);
+    zonePinSet();
     placeHide();
     toast('Neighborhood set: ' + (ZONE.zoneDef ? ZONE.zoneDef.place : label) + '.', 'ok');
   }).catch(function () { fail('Place search failed. Check your connection and try again.'); });
@@ -9958,6 +9971,9 @@ function placeSubmit(q) {
   var ps = $('placeSkip');
   if (ps) ps.addEventListener('click', function () {
     placeHide();
+    /* Accepting the saved (or seeded) zone as-is is a deliberate
+       choice: pin it, so boot GPS leaves it alone (Fix 24). */
+    zonePinSet();
     var def = null;
     try { def = store.get('zoneDef', null); } catch (e) {}
     var target = zoneDefOk(def) ? zoneActivate(def) : zoneActivate(zoneDefaultDef());
@@ -9970,36 +9986,101 @@ function placeSubmit(q) {
 })();
 
 /* ---------- GPS-first onboarding + boot kickoff ---------- */
+/* v7.10 Fix 24: the watchdog no longer cancels GPS. At 15 s of silence
+   (slow fix, permission prompt still up) the place sheet opens, but
+   the request stays alive: a fix that lands afterward APPLIES (start,
+   zone, sheet closes, toast) instead of being discarded the way the
+   old 9 s done-flag discarded it. The only things that bar a late fix
+   are the walker's own input: anything typed in the place field, or a
+   submission already made. A window override shortens the wait in
+   tests, the same pattern as __POS_WATCHDOG_MS. */
+var ONBOARD_WD_MS = 15000;
 function onboardGps() {
   ZRES.onboarding = true;
-  var done = false;
+  var settled = false;
+  var sheetFromWatchdog = false;
+  var wdMs = (typeof window !== 'undefined' && window.__ONBOARD_WD_MS) || ONBOARD_WD_MS;
   var timer = setTimeout(function () {
-    if (done) return; done = true;
+    if (settled) return;
+    sheetFromWatchdog = true;
     ZRES.onboarding = false;
     placeShow();
-  }, 9000);
+  }, wdMs);
   getPosOnce().then(function (pos) {
-    if (done) return; done = true; clearTimeout(timer);
-    if (S.start || !pos || !isFinite(pos.lat) || !isFinite(pos.lng)) { ZRES.onboarding = false; return; }
+    if (settled) return; settled = true; clearTimeout(timer);
+    if (!pos || !isFinite(pos.lat) || !isFinite(pos.lng)) { ZRES.onboarding = false; return; }
+    if (sheetFromWatchdog) {
+      var sh = $('placeSheet');
+      var inp = $('placeInput');
+      var typed = !!(inp && String(inp.value || '').trim());
+      if (!sh || sh.hidden || typed || ZRES.placeSubmitted) { ZRES.onboarding = false; return; }
+      /* Onboarding stays raised through the anchor, so the setStart
+         below cannot raise the zone-switch offer for its own fix. */
+      if (!S.start) setStart(pos.lat, pos.lng, 'My location', false);
+      if (typeof map !== 'undefined' && map && map.setView) map.setView([pos.lat, pos.lng], 16);
+      zoneResolveAt(pos.lat, pos.lng);
+      ZRES.onboarding = false;
+      zonePinClear();
+      placeHide();
+      toast('Neighborhood set: ' + (ZONE.zoneDef ? ZONE.zoneDef.place : 'your area') + '.', 'ok');
+      return;
+    }
+    if (S.start) { ZRES.onboarding = false; return; }
     setStart(pos.lat, pos.lng, 'My location', false);
     if (typeof map !== 'undefined' && map && map.setView) map.setView([pos.lat, pos.lng], 16);
     zoneResolveAt(pos.lat, pos.lng);
     ZRES.onboarding = false;
+    zonePinClear();
     toast('Anchored to your location. Happy haunting!', 'ok');
   }).catch(function (e) {
-    if (done) return; done = true; clearTimeout(timer);
+    if (settled) return; settled = true; clearTimeout(timer);
     ZRES.onboarding = false;
     /* Code 0 means no geolocation API at all (embedded webviews, the
        jsdom test harness): stay silent and keep the seeded fallback,
        place entry one tap away. Codes 1 (denied) and 3 (timeout) are
-       real answers from a real device: offer the place entry. */
+       real answers from a real device: offer the place entry. A
+       rejection also settles the request, so no fix can apply late
+       after a denial. */
     if (e && (e.code === 1 || e.code === 3)) placeShow();
   });
+}
+/* v7.10 Fix 24: boot trusts GPS over a stale saved zone. A returning
+   device anchors to its saved start without a network call; this
+   check runs once alongside that anchor. When the session's first
+   CONFIDENT fix (accuracy <= 100 m) lands more than 1 km OUTSIDE the
+   active zone's boundary, the walker is plainly somewhere else (the
+   saved Jersey City start, opened in another town), so the zone
+   follows the fix. It never fires when the neighborhood was pinned
+   by the walker, never during a live party, a recording walk, or
+   guided navigation, never with a saved walk on the table, and never
+   in a session resumed from a share link. A silent or declined GPS
+   leaves the saved zone exactly as it was. */
+function zoneBootGpsCheck() {
+  if (ZRES.bootGpsChecked) return;
+  ZRES.bootGpsChecked = true;
+  if (zonePinned()) return;
+  var hashShared = false;
+  try { hashShared = /#r=/.test(location.hash || ''); } catch (e) {}
+  if (hashShared) return;
+  getPosOnce().then(function (pos) {
+    if (!pos || !isFinite(pos.lat) || !isFinite(pos.lng)) return;
+    if (!((pos.acc || 999) <= 100)) return;
+    if (zonePinned()) return;
+    if (partyOn() || (typeof REC !== 'undefined' && REC && REC.on) || S.nav) return;
+    if (typeof walkPresent === 'function' && walkPresent()) return;
+    var def = ZONE.zoneDef;
+    if (!def) return;
+    if (zoneDefContains(def, pos.lat, pos.lng)) return;
+    if (zonePolyDist(def.poly, pos.lat, pos.lng) <= 1000) return;
+    zoneResolveAt(pos.lat, pos.lng);
+    zonePinClear();
+    toast('Neighborhood set from your location: ' + (ZONE.zoneDef ? ZONE.zoneDef.place : 'your area') + '.', 'ok');
+  }).catch(function () { /* GPS declined or silent: the saved zone stands */ });
 }
 identityInit();
 (function onboardBoot() {
   try { ensureWatch(); } catch (e) {}
-  if (S.start) { zoneResolveAt(S.start.lat, S.start.lng); ZRES.ready = true; return; }
+  if (S.start) { zoneResolveAt(S.start.lat, S.start.lng); ZRES.ready = true; zoneBootGpsCheck(); return; }
   var hashShared = false;
   try { hashShared = /#r=/.test(location.hash || ''); } catch (e) {}
   var resumed = hashShared ||
@@ -10084,7 +10165,7 @@ paintChromeState();
 /* v6.4.1 boot self-check marker: the shell's checker script verifies this
    was set. If boot died anywhere above, the repair overlay appears instead
    of a silently half-dead app. */
-window.__ctBootOK = '7.9';
+window.__ctBootOK = '7.10';
 
 </script>
 <script>
