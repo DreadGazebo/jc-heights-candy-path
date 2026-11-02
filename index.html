@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0A16">
-<meta name="version" content="7.10">
+<meta name="version" content="7.11">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -394,11 +394,31 @@ body.snap-full #fabSpot,body.snap-full #exploreCard,body.snap-full #drawPill,bod
 .roster-puck .puck-ini{font-size:12px;font-weight:800;color:var(--pc,#888)}
 .roster-main{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
 .roster-name{display:block;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.roster-name .youtag{color:var(--org2);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-left:6px}
+.roster-name .roster-tags{color:var(--mut);font-weight:600}
 .roster-sub{display:block;color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.roster-right{flex:none;text-align:right;font-size:12.5px}
-.roster-right .muted{display:block;font-size:11.5px}
-#partyOpenChat{width:100%;margin-top:10px;min-height:48px}
+.roster-right{flex:none;display:flex;align-items:center;gap:8px;font-size:12.5px}
+.roster-count{display:inline-flex;align-items:center;gap:4px;color:var(--txt)}
+.roster-count svg{width:15px;height:15px;color:var(--org2)}
+.roster-num{font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums}
+.roster-chev{color:var(--mut);font-size:18px;line-height:1}
+/* v7.11 Fix 25: invite switch strip at the top of the party pane */
+.party-switchstrip{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--org);border-radius:12px;padding:6px 6px 6px 12px;margin-bottom:10px;min-height:48px}
+.party-switchstrip .pss-q{flex:1;font-size:13.5px;font-weight:600}
+.party-switchstrip .btn{min-height:40px}
+/* v7.11 Fix 25: one 48px split footer row (Party chat | Share card) */
+.party-splitfoot{display:flex;margin-top:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);overflow:hidden}
+.party-splitfoot .split-cell{flex:1;min-height:48px;display:flex;align-items:center;justify-content:center;background:transparent;border:0;color:var(--txt);font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.party-splitfoot .split-cell + .split-cell{border-left:1px solid var(--line)}
+/* v7.11 Fix 25: collapsed identity card (not-in-party, profile exists) */
+.idcard{display:flex;align-items:center;gap:11px;width:100%;min-height:56px;padding:6px 12px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;color:var(--txt);font:inherit;text-align:left;cursor:pointer}
+.idcard-main{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
+.idcard-nm{display:block;font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.idcard-sub{display:block;color:var(--mut);font-size:12.5px;margin-top:1px}
+.idcard-edit{flex:none;color:var(--pur2);font-size:14px;font-weight:600}
+/* v7.11 Fix 25: the Join swap's back-out button */
+.party-joinx{flex:none;width:48px;min-height:48px;border-radius:14px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);display:grid;place-items:center;cursor:pointer;padding:0}
+.party-joinx svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.party-actions .joinrow{margin-top:0}
 #tabChat{display:flex;flex-direction:column;height:100%;min-height:0}
 #chatHead{flex:none;padding:2px 0 8px}
 .chat-seg{display:flex;gap:4px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:4px}
@@ -870,17 +890,16 @@ body.has-route #tagline{display:none}
 .me-wrap .me-dot{display:none}
 .me-wrap .me.stale .me-badge{filter:grayscale(.85) brightness(.8)}
 .me-wrap .me.stale .me-pulse{animation:none;opacity:0}
-/* v7.5 Fix 17: Party-tab identity bar + identity sheet */
-.idbar{display:flex;align-items:center;gap:10px;padding:8px 10px;margin-bottom:10px;border:1px solid var(--line);border-radius:12px;background:#150F20}
-.idbar[hidden]{display:none}
-.idbar-puck{width:32px;height:32px;border-radius:50%;background:#16101E;--av-stage:#16101E;border:1.5px solid #0B0A0E;box-shadow:inset 0 0 0 2.5px var(--pc,#a78bfa);color:#F5EFE6;display:grid;place-items:center;flex:none}
-.idbar-puck .avatar-glyph{width:19px;height:19px}
-.idbar-name{font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.idbar-dot{width:12px;height:12px;border-radius:50%;flex:none;box-shadow:0 0 0 2px #0E0A16}
+/* v7.5 Fix 17 identity sheet. v7.11 Fix 25: the Party-tab identity bar
+   is retired (the roster self row is the pane's identity surface) and
+   the sheet restacks: name + live preview, color row, walker grid. */
 .id-prev-puck{color:#F5EFE6}
-#idSheet .id-name-row{display:flex;gap:8px;align-items:stretch}
-#idSheet .id-name-row input{flex:1;min-width:0}
-#idSheet .id-reroll{flex:none}
+#idSheet .id-mainrow{display:flex;gap:10px;align-items:center}
+#idSheet .id-mainrow #idPreview{flex:none;display:grid;place-items:center}
+#idSheet .id-mainrow #idPreview .puck{width:36px;height:36px}
+#idSheet .id-mainrow #idPreview .puck .avatar-glyph{width:22px;height:22px}
+#idSheet .id-mainrow input{flex:1;min-width:0;min-height:48px;border-radius:12px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);padding:0 12px;font-size:16px}
+#idSheet .id-reroll{flex:none;min-height:48px}
 #idSheet .sheet-grab{width:44px;height:5px;border-radius:3px;background:rgba(245,239,230,.25);margin:0 auto 10px}
 @keyframes pulse{0%{transform:scale(1);opacity:.8}100%{transform:scale(3.2);opacity:0}}
 .pinicon,.crowdicon,.partyicon,.homeicon,.stopicon,.passdot,.me-wrap{background:transparent;border:none}
@@ -1264,12 +1283,11 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
       </div>
       <div class="sheetfoot">
         <div class="wm">Candy Trail</div>
-        <div class="ver" id="appVer">Candy Trail v7.10</div>
+        <div class="ver" id="appVer">Candy Trail v7.11</div>
       </div>
     </div>
 
     <div id="tabParty" role="tabpanel" hidden>
-      <div id="idBar" class="idbar" hidden></div>
       <div id="partyBox"></div>
     </div>
 
@@ -1381,7 +1399,7 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
   <div class="prefs-foot">
     <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon-mono"/></svg>
     <div class="crest">Candy Trail</div>
-    <div class="ver">Version 7.10</div>
+    <div class="ver">Version 7.11</div>
   </div>
 </div>
 
@@ -1515,17 +1533,6 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
   <button id="photoViewClose" class="btn-close overlay" type="button" aria-label="Close photo"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button>
 </div>
 
-<div id="identityPop" class="overlay center" hidden>
-  <div class="ocard card" role="dialog" aria-modal="true" aria-labelledby="identityTitle">
-    <h2 id="identityTitle">Your walker</h2>
-    <div id="identityPreview" class="walker-preview"></div>
-    <div id="identityColors" class="party-colors" role="group" aria-label="Your color"></div>
-    <div class="label" style="margin-top:12px">Pick your walker</div>
-    <div id="identityGrid" class="walker-grid"></div>
-    <button id="identityDone" class="btn btn-org" type="button" style="width:100%;margin-top:12px">Done</button>
-  </div>
-</div>
-
 <div id="zonePop" class="overlay center" hidden>
   <div class="ocard card" role="dialog" aria-modal="true" aria-labelledby="zonePopTitle">
     <h2 id="zonePopTitle">Your Local walker</h2>
@@ -1544,13 +1551,13 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
     <div class="sheet-grab" aria-hidden="true"></div>
     <h2 id="idTitle">Choose your walker</h2>
     <p id="idSub" style="margin-top:2px">This is how friends in your party and neighbors in Local will see you. You can change it any time.</p>
-    <div id="idPreview" class="walker-preview"></div>
     <div class="label" style="margin-top:10px">Your walker name</div>
-    <div class="id-name-row">
+    <div class="id-mainrow">
+      <div id="idPreview"></div>
       <input id="idName" type="text" autocomplete="off" maxlength="24" placeholder="Walker name" aria-label="Your walker name">
       <button id="idReroll" class="btn btn-ghost id-reroll" type="button">New name</button>
     </div>
-    <p id="idPartyNote" class="muted" hidden style="margin-top:6px">You are in a party: walker and color update right away. A new name applies next time you join a party.</p>
+    <p id="idPartyNote" class="muted" hidden style="margin-top:6px">Walker and color update live. Name changes apply to your next party.</p>
     <div class="label" style="margin-top:12px">Your color</div>
     <div id="idColors" class="party-colors" role="group" aria-label="Your color"></div>
     <div class="label" style="margin-top:12px">Pick your walker</div>
@@ -5175,7 +5182,7 @@ $('fabSpot').addEventListener('click', function () {
    ~20 s while moving), pins (mirrored from crowdSyncPin), and haul counts.
    Backed by the Supabase party_posts table (public read/insert, rows simply
    age out client-side: positions 45 min, pins 6 h). */
-var PARTY = { code: '', name: '', timer: null, lastPosPost: 0, lastPosLL: null, lastCountJson: '', members: {}, counts: {}, joinTs: 0, kicked: {}, kickedLocal: {}, lastRows: [], chat: [], chatInit: false, chatCursor: '', unread: 0, lastImgTs: 0, leaveConfirm: false, trails: {}, avatar: '', color: '', avatarDraft: '', avatarExplicit: false, colorDraft: '', meta: {}, markers: {}, iconSigs: {}, posRows: {}, trailRows: {}, states: {}, dock: {}, dockHidden: {}, dockOverflow: null, dockPill: null, labelUntil: {}, pinSeen: {}, pinSeenInit: false, compact: false, _avatarYielded: false };
+var PARTY = { code: '', name: '', timer: null, lastPosPost: 0, lastPosLL: null, lastCountJson: '', members: {}, counts: {}, joinTs: 0, kicked: {}, kickedLocal: {}, lastRows: [], chat: [], chatInit: false, chatCursor: '', unread: 0, lastImgTs: 0, leaveConfirm: false, joinOpen: false, trails: {}, avatar: '', color: '', avatarDraft: '', avatarExplicit: false, colorDraft: '', meta: {}, markers: {}, iconSigs: {}, posRows: {}, trailRows: {}, states: {}, dock: {}, dockHidden: {}, dockOverflow: null, dockPill: null, labelUntil: {}, pinSeen: {}, pinSeenInit: false, compact: false, _avatarYielded: false };
 var partyLayer = L.layerGroup().addTo(map);
 var partyMarkLayer = L.layerGroup().addTo(map);
 try { var savedParty = store.get('party', null); if (savedParty && savedParty.code) { PARTY.code = String(savedParty.code); PARTY.name = String(savedParty.name || ''); PARTY.joinTs = savedParty.joinTs || Date.now(); PARTY.avatar = String(savedParty.avatar || ''); PARTY.color = String(savedParty.color || ''); } } catch (e) {}
@@ -5326,7 +5333,6 @@ function profileSave(v) {
   store.set('profile', PROFILE.v);
   if (typeof zoneSyncIdentity === 'function') zoneSyncIdentity();
   renderMe();
-  paintIdBar();
   return PROFILE.v;
 }
 function profileMigrate() {
@@ -5449,20 +5455,6 @@ function identityInit() {
   setTimeout(identityMaybePrompt, 500);
   setInterval(identityMaybePrompt, 1500);
 }
-/* Party-tab identity bar: own avatar + name + color dot + Edit */
-function paintIdBar() {
-  var bar = $('idBar'); if (!bar) return;
-  var id = PROFILE.v || (PARTY.name ? { name: PARTY.name, walker: PARTY.avatar || 'wisp', color: PARTY.color || '#a78bfa' } : null);
-  if (!id) { bar.hidden = true; return; }
-  bar.hidden = false;
-  bar.innerHTML = '<span class="idbar-puck" style="--pc:' + id.color + '">' + avatarSvg(id.walker) + '</span>' +
-    '<span class="idbar-name">' + esc(id.name) + '</span>' +
-    '<span class="idbar-dot" style="background:' + id.color + '"></span>' +
-    '<button type="button" class="btn btn-ghost btn-sm" id="idBarEdit">Edit</button>';
-  var eb = $('idBarEdit');
-  if (eb) eb.addEventListener('click', function () { identitySheetOpen(true); });
-}
-
 function partyTakenMap(exceptName) {
   var t = {};
   Object.keys(PARTY.meta || {}).forEach(function (n) { if (n !== exceptName && PARTY.meta[n] && PARTY.meta[n].avatar) t[PARTY.meta[n].avatar] = n; });
@@ -5869,13 +5861,17 @@ function renderPartyInfo() {
 }
 function rosterHtml() {
   var isAdmin = (typeof partyIsAdmin === 'function') && partyIsAdmin();
-  return partyRosterNames().map(function (n) {
+  /* v7.11 Fix 25: the self row is row 1 (it is the pane's identity
+     surface now), the same self-first order the party drawer uses. */
+  var names = partyRosterNames();
+  names.sort(function (a, b) { return (a === PARTY.name ? 0 : 1) - (b === PARTY.name ? 0 : 1); });
+  return names.map(function (n) {
+    var self = n === PARTY.name;
     var c = PARTY.counts[n];
-    var haul = c ? ((c.houses || 0) + ' houses') : 'on the map';
     var meta = partyMetaFor(n);
     var pos = PARTY.posRows[n];
     var fresh = '';
-    if (n !== PARTY.name && pos && pos.created_at) {
+    if (!self && pos && pos.created_at) {
       var ts = new Date(pos.created_at).getTime();
       if (isFinite(ts)) {
         if (S.pos && pos.lat != null) { var dd = haversine(S.pos, { lat: pos.lat, lng: pos.lng }); if (isFinite(dd)) fresh = fmtDist(dd) + ' away · '; }
@@ -5883,14 +5879,27 @@ function rosterHtml() {
       }
     }
     var av = '<span class="roster-puck" style="--pc:' + meta.color + '">' + (meta.avatar ? avatarSvg(meta.avatar) : '<span class="puck-ini">' + esc(partyInitials(n)) + '</span>') + '</span>';
-    var kick = (isAdmin && n !== PARTY.name) ? ' <span class="btn btn-ghost btn-sm partyKick" role="button" data-name="' + esc(n) + '">Kick</span>' : '';
-    return '<div class="roster-row" data-name="' + esc(n) + '" role="button" aria-label="' + (n === PARTY.name ? 'Change your walker' : 'Find ' + esc(n) + ' on the map') + '">' + av +
-      '<span class="roster-main"><span class="roster-name">' + esc(n) + (n === PARTY.name ? '<span class="youtag">You</span>' : '') + (n === PARTY.name && isAdmin ? ' <span class="muted" style="font-size:11px">(host)</span>' : '') + '</span>' +
-      '<span class="roster-sub">' + (n === PARTY.name ? 'Tap to change your walker' : (fresh || 'Party member')) + '</span></span>' +
-      '<span class="roster-right">' + haul + kick + '</span></div>';
+    /* v7.11 Fix 25: the count is the #i-home glyph + a tabular numeral
+       (owner decision: the glyph carries the unit, the word "houses"
+       leaves the rows). No count posted yet keeps "on the map". */
+    var count = c
+      ? '<span class="roster-count"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-home"/></svg><span class="roster-num">' + (c.houses || 0) + '</span></span>'
+      : '<span class="muted">on the map</span>';
+    var kick = (isAdmin && !self) ? ' <span class="btn btn-ghost btn-sm partyKick" role="button" data-name="' + esc(n) + '">Kick</span>' : '';
+    /* v7.11 Fix 25: You / Host are quiet inline text tags after the
+       name, not pill badges. The self row is the pane's only identity
+       surface and opens the Unified Identity Sheet. */
+    var tags = self ? '<span class="roster-tags"> &middot; You' + (isAdmin ? ' &middot; Host' : '') + '</span>' : '';
+    return '<div class="roster-row' + (self ? ' roster-self' : '') + '" data-name="' + esc(n) + '" role="button" aria-label="' + (self ? 'Edit your walker and name' : 'Find ' + esc(n) + ' on the map') + '">' + av +
+      '<span class="roster-main"><span class="roster-name">' + esc(n) + tags + '</span>' +
+      '<span class="roster-sub">' + (self ? 'Edit walker &amp; name' : (fresh || 'Party member')) + '</span></span>' +
+      '<span class="roster-right">' + count + kick + (self ? '<span class="roster-chev" aria-hidden="true">&rsaquo;</span>' : '') + '</span></div>';
   }).join('');
 }
-/* Walker picker (join sheet) + identity popover (mid-party changes). */
+/* Walker picker tiles + color dots, shared by the Party pane's
+   first-run form, the Unified Identity Sheet, and the zone persona
+   editor. (The mid-party identity popover that also used these was
+   retired in v7.11 Fix 25; the sheet is the one editor now.) */
 function walkerTilesHtml(selected, taken, colorCss) {
   return AVATAR_ORDER.map(function (id) {
     var by = taken && taken[id];
@@ -5923,68 +5932,73 @@ function paintPartyDraft() {
   cr.querySelectorAll('.cdot').forEach(function (b) { b.addEventListener('click', function () { PARTY.colorDraft = b.getAttribute('data-color'); paintPartyDraft(); }); });
   gr.querySelectorAll('.walker-tile').forEach(function (b) { b.addEventListener('click', function () { PARTY.avatarDraft = b.getAttribute('data-avatar'); PARTY.avatarExplicit = true; paintPartyDraft(); }); });
 }
-function partyIdentitySaved() {
-  try { store.set('party', { code: PARTY.code, name: PARTY.name, avatar: PARTY.avatar, color: PARTY.color, joinTs: PARTY.joinTs }); } catch (e) {}
-  partyRefreshMarkers(true);
-  if (S.pos) partyPost({ kind: 'pos', lat: S.pos.lat, lng: S.pos.lng });
-  partyPost({ kind: 'count', houses: S.counts.houses, candy: S.counts.candy });
-  renderPartyBox();
-}
-function paintIdentity() {
-  var pv = $('identityPreview'), gr = $('identityGrid'), cr = $('identityColors');
-  if (!pv || !gr || !cr) return;
-  var col = PARTY.color || partyColor(PARTY.name);
-  pv.innerHTML = '<div class="puck puck-lg" style="--pc:' + col + '">' + (PARTY.avatar ? avatarSvg(PARTY.avatar) : '<span class="puck-ini">' + esc(partyInitials(PARTY.name)) + '</span>') + '</div>';
-  cr.innerHTML = colorsHtml(col);
-  gr.innerHTML = walkerTilesHtml(PARTY.avatar, partyTakenMap(PARTY.name), col);
-  cr.querySelectorAll('.cdot').forEach(function (b) { b.addEventListener('click', function () { PARTY.color = b.getAttribute('data-color'); partyIdentitySaved(); paintIdentity(); }); });
-  gr.querySelectorAll('.walker-tile').forEach(function (b) {
-    b.addEventListener('click', function () {
-      if (b.classList.contains('taken')) {
-        if (b.animate) b.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-2px)' }, { transform: 'translateX(2px)' }, { transform: 'translateX(0)' }], { duration: 120 });
-        return;
-      }
-      PARTY.avatar = b.getAttribute('data-avatar'); partyIdentitySaved(); paintIdentity();
-    });
-  });
-}
-function openIdentity() { if (!partyOn()) return; $('identityPop').hidden = false; paintIdentity(); }
-function closeIdentity() { var p = $('identityPop'); if (p) p.hidden = true; }
+/* v7.11 Fix 25 (party-pane-streamline-brief.md, all questions resolved
+   by the owner Nov 1, 2026): the pane is three blocks plus one
+   conditional. In a party: the invite switch strip (conditional) at
+   the very top, the header card exactly as before, the roster (row 1
+   is the self row, the pane's only identity surface), and one 48px
+   split footer row. The identity bar and the walker/color popover are
+   gone; the Unified Identity Sheet is the one editor. Not in a party:
+   a profile collapses the form into a 56px identity card above Start
+   and a Join that swaps in place; with no profile, the identity editor
+   renders inline, once. An invite link promotes the primary CTA
+   ("Join party CODE") instead of raising a banner. */
 function renderPartyBox() {
-  paintIdBar();
   var box = $('partyBox'); if (!box) return;
   if (!partyOn()) {
-    box.innerHTML = '<div id="partyInvite" class="warn" hidden style="margin-bottom:8px"></div>' +
-      '<div class="label">Party mode</div>' +
-      '<p class="muted" style="margin:2px 0 8px;font-size:13px">Trick-or-treat together: see each other live on the map, share the spots you log, and pool your haul.</p>' +
-      '<input id="partyName" type="text" autocomplete="off" placeholder="Your name, e.g. Steve" value="' + esc(PARTY.name || '') + '">' +
-      '<div class="walker-preview" id="partyPreview"></div>' +
-      '<div class="party-colors" id="partyColors" role="group" aria-label="Your color"></div>' +
-      '<div class="label" style="margin-top:12px">Pick your walker</div>' +
-      '<div class="walker-grid" id="walkerGrid"></div>' +
-      '<div class="party-actions"><button id="partyStart" class="btn btn-pur">Start a party</button><button id="partyJoinBtn" class="btn btn-ghost">Join with a code</button></div>' +
-      '<div id="partyJoinRow" class="joinrow" hidden><input id="partyCode" type="text" autocomplete="off" placeholder="Party code, e.g. TREAT123" style="text-transform:uppercase" aria-label="Party code"><button id="partyJoinGo" class="btn btn-org" type="button">Join</button></div>';
-    $('partyStart').addEventListener('click', function () {
-      var name = $('partyName').value.trim(); if (!name) { toast('Add your name first, so your party can see who is who.', 'warn'); return; }
+    var prof = PROFILE.v || profileLoad();
+    var inv = (typeof INVITE_CODE !== 'undefined' && INVITE_CODE) ? INVITE_CODE : '';
+    var joinRow = '<div class="joinrow" id="partyJoinRow"><input id="partyCode" type="text" autocomplete="off" placeholder="Party code, e.g. TREAT123" style="text-transform:uppercase" aria-label="Party code"><button id="partyJoinGo" class="btn btn-org" type="button">Join</button><button id="partyJoinX" class="party-joinx" type="button" aria-label="Back"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></button></div>';
+    var actions;
+    if (inv) {
+      actions = '<div class="party-actions"><button id="partyJoinInvite" class="btn btn-pur" type="button">Join party ' + esc(inv) + '</button>' +
+        '<button id="partyStart" class="btn btn-ghost" type="button">Start a new party instead</button></div>';
+    } else if (PARTY.joinOpen) {
+      actions = '<div class="party-actions"><button id="partyStart" class="btn btn-pur" type="button">Start a party</button>' + joinRow + '</div>';
+    } else {
+      actions = '<div class="party-actions"><button id="partyStart" class="btn btn-pur" type="button">Start a party</button><button id="partyJoinBtn" class="btn btn-ghost" type="button">Join with a code</button></div>';
+    }
+    if (prof) {
+      box.innerHTML = '<div class="label">Party mode</div>' +
+        '<p class="muted" style="margin:2px 0 8px;font-size:13px">Walk together and pool your house count.</p>' +
+        '<button type="button" class="idcard" id="partyIdCard"><span class="roster-puck" style="--pc:' + prof.color + '">' + avatarSvg(prof.walker) + '</span>' +
+        '<span class="idcard-main"><span class="idcard-nm">Walking as ' + esc(prof.name) + '</span><span class="idcard-sub">Edit walker &amp; name</span></span>' +
+        '<span class="idcard-edit">Edit &rsaquo;</span></button>' + actions;
+      $('partyIdCard').addEventListener('click', function () { identitySheetOpen(true); });
+    } else {
+      box.innerHTML = '<div class="label">Party mode</div>' +
+        '<p class="muted" style="margin:2px 0 8px;font-size:13px">Trick-or-treat together: see each other live on the map, share the spots you log, and pool your haul.</p>' +
+        '<input id="partyName" type="text" autocomplete="off" placeholder="Your name, e.g. Steve" value="' + esc(PARTY.name || '') + '">' +
+        '<div class="walker-preview" id="partyPreview"></div>' +
+        '<div class="party-colors" id="partyColors" role="group" aria-label="Your color"></div>' +
+        '<div class="label" style="margin-top:12px">Pick your walker</div>' +
+        '<div class="walker-grid" id="walkerGrid"></div>' + actions;
+      $('partyName').addEventListener('input', paintPartyDraft);
+      paintPartyDraft();
+    }
+    var myName = function () { return prof ? prof.name : (($('partyName') && $('partyName').value) || '').trim(); };
+    var pst = $('partyStart');
+    if (pst) pst.addEventListener('click', function () {
+      var name = myName(); if (!name) { toast('Add your name first, so your party can see who is who.', 'warn'); return; }
       var newCode = partyGenCode();
       try { store.set('partyAdmin', newCode); } catch (e) {}
       partyJoin(newCode, name);
     });
-    $('partyJoinBtn').addEventListener('click', function () { $('partyJoinRow').hidden = false; $('partyCode').focus(); });
-    $('partyJoinGo').addEventListener('click', function () {
-      var name = $('partyName').value.trim(); if (!name) { toast('Add your name first, so your party can see who is who.', 'warn'); return; }
+    var pji = $('partyJoinInvite');
+    if (pji) pji.addEventListener('click', function () {
+      var name = myName(); if (!name) { toast('Add your name first, so your party can see who is who.', 'warn'); return; }
+      partyJoin(inv, name);
+    });
+    var pjb = $('partyJoinBtn');
+    if (pjb) pjb.addEventListener('click', function () { PARTY.joinOpen = true; renderPartyBox(); var pc = $('partyCode'); if (pc) pc.focus(); });
+    var pjx = $('partyJoinX');
+    if (pjx) pjx.addEventListener('click', function () { PARTY.joinOpen = false; renderPartyBox(); });
+    var pjg = $('partyJoinGo');
+    if (pjg) pjg.addEventListener('click', function () {
+      var name = myName(); if (!name) { toast('Add your name first, so your party can see who is who.', 'warn'); return; }
       var code = $('partyCode').value.trim().toUpperCase(); if (!code) { toast('Type the party code first.', 'warn'); return; }
       partyJoin(code, name);
     });
-    $('partyName').addEventListener('input', paintPartyDraft);
-    paintPartyDraft();
-    if (typeof INVITE_CODE !== 'undefined' && INVITE_CODE) {
-      var inv = $('partyInvite');
-      inv.hidden = false;
-      inv.innerHTML = '<b>You are invited to party ' + esc(INVITE_CODE) + '.</b> Add your name above, then tap Join party.';
-      $('partyJoinRow').hidden = false;
-      $('partyCode').value = INVITE_CODE;
-    }
     return;
   }
   var t = partyTotals();
@@ -5992,11 +6006,13 @@ function renderPartyBox() {
   var leaveZone = PARTY.leaveConfirm
     ? '<span class="party-leave-confirm">Leave party?<button id="partyLeaveYes" class="btn btn-org" type="button">Leave</button><button id="partyLeaveNo" class="btn btn-ghost" type="button">Cancel</button></span>'
     : '<button id="partyInviteBtn" class="btn btn-pur" type="button">Invite</button><button id="partyLeaveBtn" class="btn btn-ghost" type="button">Leave</button>';
-  box.innerHTML = '<div class="party-hd"><span class="pcode">' + esc(PARTY.code) + '</span><span class="ppool">Pooled: ' + t.houses + ' houses</span>' + leaveZone + '</div>' +
+  var strip = (typeof INVITE_CODE !== 'undefined' && INVITE_CODE && INVITE_CODE !== PARTY.code)
+    ? '<div class="party-switchstrip"><span class="pss-q">Switch to party ' + esc(INVITE_CODE) + '?</span><button id="partySwitchGo" class="btn btn-pur btn-sm" type="button">Switch</button><button id="partySwitchStay" class="btn btn-ghost btn-sm" type="button">Stay</button></div>'
+    : '';
+  box.innerHTML = strip +
+    '<div class="party-hd"><span class="pcode">' + esc(PARTY.code) + '</span><span class="ppool">Pooled: ' + t.houses + ' houses</span>' + leaveZone + '</div>' +
     '<div id="partyRoster">' + (list || '<p class="muted" style="font-size:13px;margin-top:8px">Counts appear as everyone logs.</p>') + '</div>' +
-    ((typeof INVITE_CODE !== 'undefined' && INVITE_CODE && INVITE_CODE !== PARTY.code) ? '<button id="partySwitch" class="btn btn-ghost" style="width:100%;margin-top:8px">Switch to invited party ' + esc(INVITE_CODE) + '</button>' : '') +
-    '<button id="partyOpenChat" class="btn btn-ghost" type="button">Open Party Chat &rarr;</button>' +
-    '<button id="partyCardShare" class="btn btn-ghost" type="button" style="width:100%;margin-top:8px">Share party card</button>';
+    '<div class="party-splitfoot"><button id="partyOpenChat" class="split-cell" type="button">Party chat &rarr;</button><button id="partyCardShare" class="split-cell" type="button">Share card</button></div>';
   var piv = $('partyInviteBtn');
   if (piv) piv.addEventListener('click', partyInviteShare);
   var plb = $('partyLeaveBtn');
@@ -6005,8 +6021,10 @@ function renderPartyBox() {
   if (ply) ply.addEventListener('click', partyLeave);
   var pln = $('partyLeaveNo');
   if (pln) pln.addEventListener('click', function () { PARTY.leaveConfirm = false; renderPartyBox(); });
-  var psw = $('partySwitch');
-  if (psw) psw.addEventListener('click', function () { var c = INVITE_CODE; INVITE_CODE = ''; partyJoin(c, PARTY.name); });
+  var psg = $('partySwitchGo');
+  if (psg) psg.addEventListener('click', function () { var c = INVITE_CODE; INVITE_CODE = ''; partyJoin(c, PARTY.name); });
+  var pss = $('partySwitchStay');
+  if (pss) pss.addEventListener('click', function () { INVITE_CODE = ''; try { history.replaceState(null, '', location.pathname); } catch (e) {} renderPartyBox(); });
   var poc = $('partyOpenChat');
   if (poc) poc.addEventListener('click', function () { setChatChannel('party'); switchTab('chat'); });
   var pcs = $('partyCardShare');
@@ -6017,12 +6035,13 @@ function renderPartyBox() {
   box.querySelectorAll('.roster-row').forEach(function (row) {
     row.addEventListener('click', function () {
       var n = row.getAttribute('data-name');
-      if (n === PARTY.name) { openIdentity(); return; }
+      if (n === PARTY.name) { identitySheetOpen(true); return; }
       var pos = PARTY.posRows[n];
       if (pos && pos.lat != null) { try { map.flyTo([pos.lat, pos.lng], Math.max(map.getZoom ? map.getZoom() : 16, 16), { duration: 0.5 }); } catch (e) {} applySnap('peek'); }
     });
   });
 }
+
 function partyJoin(code, name) {
   tmResetParty();
   PARTY.code = code; PARTY.name = cleanName(name); PARTY.lastCountJson = '';
@@ -6033,6 +6052,7 @@ function partyJoin(code, name) {
   document.body.classList.add('in-party');
   paintChromeState();
   PARTY.leaveConfirm = false;
+  PARTY.joinOpen = false;
   partyChatReset();
   if (typeof CHAT !== 'undefined') CHAT.channel = 'party';
   paintPartyPill();
@@ -6048,7 +6068,7 @@ function partyJoin(code, name) {
 }
 function partyLeave() {
   tmResetParty();
-  PARTY.code = ''; PARTY.lastCountJson = '';
+  PARTY.code = ''; PARTY.lastCountJson = ''; PARTY.joinOpen = false;
   try { store.set('party', { code: '', name: PARTY.name }); } catch (e) {}
   if (PARTY.timer) { clearInterval(PARTY.timer); PARTY.timer = null; }
   partyLayer.clearLayers(); partyMarkClear();
@@ -6170,8 +6190,6 @@ $('barNavX').addEventListener('click', function () { endNav(false); if (typeof p
   ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) { dr.addEventListener(ev, function () { dy0 = null; }); });
 })();
 map.on('zoomend', function () { var c = map.getZoom() < 15; if (c !== PARTY.compact) { PARTY.compact = c; if (partyOn()) partyRefreshMarkers(true); } });
-$('identityDone').addEventListener('click', closeIdentity);
-$('identityPop').addEventListener('click', function (e) { if (e.target === this) closeIdentity(); });
 var INVITE_CODE = '';
 try { INVITE_CODE = (new URLSearchParams(location.search).get('party') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 16); } catch (e) {}
 renderPartyBox();
@@ -10165,7 +10183,7 @@ paintChromeState();
 /* v6.4.1 boot self-check marker: the shell's checker script verifies this
    was set. If boot died anywhere above, the repair overlay appears instead
    of a silently half-dead app. */
-window.__ctBootOK = '7.10';
+window.__ctBootOK = '7.11';
 
 </script>
 <script>
