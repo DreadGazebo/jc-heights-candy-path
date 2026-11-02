@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0A16">
-<meta name="version" content="7.12">
+<meta name="version" content="7.13">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -494,6 +494,71 @@ body.snap-full #fabSpot,body.snap-full #exploreCard,body.snap-full #drawPill,bod
 .wv-cm-lab{display:block;font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--mut)}
 .wv-cm-big{display:block;font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:34px;letter-spacing:.14em;color:var(--bone);margin-top:2px}
 .wv-cm-sub{display:block;font-size:11.5px;color:var(--dim);margin-top:2px}
+/* v7.13 Fix 27 Night Ribbons (spot-awards-brief-v2.md; mock spot-awards-v2-mock.html).
+   The tray lives inside the Spot Sheet under Visited; the counter is one line in
+   the Local chrome; the board is an overlay. No counts render anywhere before
+   the 9 PM reveal: the only pre-reveal signals are the ember shimmer, the badge
+   on your own pins, and the zone-wide total in the counter line. */
+#ribBar{flex:none;margin-bottom:8px}
+#ribBar[hidden]{display:none}
+#ribCount{display:flex;align-items:center;gap:8px;width:100%;min-height:48px;background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--org);border-radius:12px;padding:9px 12px;color:var(--txt);font-size:13.5px;font-weight:600;text-align:left}
+#ribCount svg{width:16px;height:16px;flex:none}
+#ribCount .wv-chev{margin-left:auto;color:var(--mut);display:flex}
+#ribCount .wv-chev svg{width:14px;height:14px;stroke:var(--mut);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.rib-tray{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+.rib-tray-hd{font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--mut);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.rib-tray-hd svg{width:13px;height:13px}
+.rib-pills{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rib-pill{min-height:56px;border-radius:12px;background:var(--card2);border:1px solid var(--line);color:var(--txt);text-align:left;padding:8px 11px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;gap:1px}
+.rib-pill .rp-name{font-family:"Fraunces",Georgia,serif;font-size:15px;font-weight:600;line-height:1.15}
+.rib-pill .rp-sub{font-size:12px;color:var(--mut)}
+.rib-pill[aria-pressed="true"]{border-color:var(--org);background:#2A1B12}
+.rib-pill[aria-pressed="true"] .rp-sub{color:var(--org2)}
+.rib-note{font-size:12.5px;color:var(--mut);line-height:1.45;margin-top:9px}
+.rib-move-row{display:flex;align-items:center;gap:8px;min-height:48px;padding:6px 6px 6px 13px;border-radius:10px;background:var(--card2);border:1px solid var(--line);margin-top:7px;width:100%;text-align:left;color:var(--txt)}
+.rib-move-row .rm-lab{flex:1;min-width:0;font-size:14px;font-weight:500}
+.rib-move-row .rm-cat{display:block;font-size:12px;color:var(--mut);font-weight:400}
+.rib-move-row .rm-go{flex:none;min-height:40px;padding:0 13px;border-radius:9px;background:var(--org);color:var(--ink);font-size:13.5px;font-weight:700;border:0;display:flex;align-items:center}
+.rib-announce{background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--org);border-radius:14px;padding:12px 13px;margin-top:12px;width:100%}
+.rib-announce .ra-k{font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--org2)}
+.rib-announce .ra-h{font-family:"Fraunces",Georgia,serif;font-size:17px;font-weight:600;margin-top:2px}
+.rib-announce .ra-w{font-size:13px;color:var(--mut);margin-top:3px;line-height:1.45}
+.rib-announce .btn{margin-top:10px}
+.mk-shimmer{position:absolute;inset:-3px;border-radius:50%;border:2px solid rgba(255,122,26,.55);box-shadow:0 0 10px 2px rgba(255,122,26,.35);pointer-events:none}
+.mk-ribbadge{position:absolute;top:-7px;right:-7px;width:15px;height:15px;pointer-events:none}
+.mk-ribbadge svg{width:15px;height:15px;display:block}
+.mk-archring{position:absolute;inset:-3px;border-radius:50%;border:2px dashed #C9A227;pointer-events:none}
+.mk-archyr{position:absolute;bottom:-6px;right:-8px;background:#C9A227;color:#14100A;font-size:9px;font-weight:800;border-radius:99px;padding:1px 5px;pointer-events:none}
+.rib-dot{display:inline-block;width:8px;height:8px;border-radius:99px;background:var(--org);margin-left:7px;vertical-align:2px}
+#ribBoard .ocard{max-width:520px}
+.rib-win{display:flex;align-items:center;gap:10px;padding:11px 2px;border-bottom:1px solid var(--line)}
+.rib-win:last-of-type{border-bottom:0}
+.rib-win .rw-ic{width:34px;height:34px;flex:none;display:flex;align-items:center;justify-content:center}
+.rib-win .rw-ic svg{width:30px;height:30px}
+.rib-win .rw-main{flex:1;min-width:0}
+.rib-win .rw-cat{font-family:"Fraunces",Georgia,serif;font-size:16px;font-weight:600}
+.rib-win .rw-sub{font-size:12.5px;color:var(--mut)}
+.rib-win .rw-n{font-size:12px;color:var(--org2);font-weight:700;white-space:nowrap}
+.rib-win .rw-pass{flex:none;min-height:40px;padding:0 12px;border-radius:9px;background:transparent;border:1px solid var(--line2);color:var(--txt);font-size:13px;font-weight:600}
+.rib-take{border:1px solid var(--org);border-radius:14px;padding:14px;background:#241610;margin-bottom:12px}
+.rib-take .rt-k{font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--org2)}
+.rib-take .rt-h{font-family:"Fraunces",Georgia,serif;font-size:21px;font-weight:600;line-height:1.2;margin-top:3px}
+.rib-take .rt-s{font-size:13.5px;color:var(--mut);margin-top:5px;line-height:1.45}
+.rib-take .btns{margin-top:11px}
+.rib-block{border:1px dashed rgba(255,122,26,.5);border-radius:12px;padding:11px 13px;margin-top:12px;font-size:13.5px}
+.rib-block b{font-family:"Fraunces",Georgia,serif;font-size:15px}
+.rib-stats{display:flex;gap:8px;margin-top:12px}
+.rib-stats .rs{flex:1;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:9px 6px;text-align:center}
+.rib-stats .rs b{display:block;font-size:17px;font-family:"Fraunces",Georgia,serif}
+.rib-stats .rs span{font-size:11px;color:var(--mut)}
+#ribList{z-index:1300}
+#ribList .ocard{margin-top:auto}
+.rib-sl-row{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px;background:var(--bg2)}
+.rib-sl-row .rs-head{display:flex;align-items:baseline;gap:8px;width:100%;background:none;border:0;color:var(--txt);text-align:left;padding:0;min-height:32px;cursor:pointer}
+.rib-sl-row .rs-name{flex:1;min-width:0;font-size:14.5px;font-weight:600}
+.rib-sl-row .rs-when{font-size:12px;color:var(--mut);white-space:nowrap}
+.rib-sl-row .rs-pinned{font-size:13px;color:var(--org2);font-weight:700}
+.rib-sl-row .rib-pills{margin-top:9px}
 #chatScroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:2px 2px 6px}
 .chat-empty{color:var(--mut);font-size:13.5px;text-align:center;padding:26px 18px;line-height:1.5}
 .cb-div{text-align:center;color:#8A7F96;font-size:11px;margin:12px 0 8px}
@@ -1349,7 +1414,7 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
       </div>
       <div class="sheetfoot">
         <div class="wm">Candy Trail</div>
-        <div class="ver" id="appVer">Candy Trail v7.12</div>
+        <div class="ver" id="appVer">Candy Trail v7.13</div>
       </div>
     </div>
 
@@ -1364,6 +1429,7 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
         <button id="waveStrip" type="button" hidden></button>
         <div id="waveCtl"></div>
       </div>
+      <div id="ribBar" hidden><button id="ribCount" type="button"></button></div>
       <div id="chatScroll"><div id="chatLog"></div></div>
       <div id="chatComposer">
         <div class="cmp-photo" id="chatPhotoPrev" hidden><span class="thumb"><img id="chatPhotoImg" alt="Photo to send"><button id="chatPhotoX" type="button" aria-label="Remove photo"><svg class="ic" viewBox="0 0 24 24"><use href="#i-x"/></svg></button></span></div>
@@ -1469,7 +1535,7 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
   <div class="prefs-foot">
     <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon-mono"/></svg>
     <div class="crest">Candy Trail</div>
-    <div class="ver">Version 7.12</div>
+    <div class="ver">Version 7.13</div>
   </div>
 </div>
 
@@ -1516,6 +1582,7 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
     <button data-kind="shop" type="button" aria-pressed="false">Shop</button>
   </div>
   <button id="spotVisited" type="button" aria-pressed="false">Not visited yet</button>
+  <div id="ribTray" hidden></div>
   <div class="spot-photorow">
     <label id="spotPhotoBtn" for="spotPhoto"><svg class="ic" viewBox="0 0 24 24"><use href="#i-camera"/></svg><span id="spotPhotoLbl">Add Photo</span></label>
     <input id="spotPhoto" type="file" accept="image/*" hidden>
@@ -1736,6 +1803,21 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
       <button id="placeGps" class="btn btn-ghost" type="button">Use my location instead</button>
       <button id="placeSkip" class="btn btn-ghost" type="button">Not now</button>
     </div>
+  </div>
+</div>
+
+<div id="ribBoard" class="overlay" hidden>
+  <div class="ocard card" role="dialog" aria-modal="true" aria-labelledby="ribBoardTitle">
+    <div class="ss-head"><h2 id="ribBoardTitle">Tonight's Best</h2><button id="ribBoardClose" class="btn-close" type="button" aria-label="Close winners board"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button></div>
+    <div id="ribBoardBody"></div>
+  </div>
+</div>
+
+<div id="ribList" class="overlay" hidden>
+  <div class="ocard card" role="dialog" aria-modal="true" aria-labelledby="ribListTitle">
+    <div class="ss-head"><h2 id="ribListTitle">Ribbons left</h2><button id="ribListSkip" class="btn btn-ghost btn-sm" type="button">Skip</button></div>
+    <p class="muted" style="margin:0">Tap a porch you visited to honor it:</p>
+    <div id="ribListBody"></div>
   </div>
 </div>
 
@@ -2302,6 +2384,7 @@ function onPos(p) {
   var tier = accTier(fix.acc);
   S.locTier = tier;
   S.lastPos = p;
+  try { if (typeof ribFixHook === 'function') ribFixHook(fix); } catch (e) {}
   if (tier === 1) {
     bestTrustedFix = fix;
     S.posTrusted = true;
@@ -2851,7 +2934,7 @@ function renderPins() {
   pinLayer.clearLayers();
   S.pins.forEach(function (p, idx) {
     var m = L.marker([p.lat, p.lng], {
-      icon: L.divIcon({ className: 'pinicon', iconSize: [34, 34], iconAnchor: [17, 30], html: pinIconHtml(p.type, p.kind) })
+      icon: L.divIcon({ className: 'pinicon', iconSize: [34, 34], iconAnchor: [17, 30], html: ribMarkWrap(pinIconHtml(p.type, p.kind), p.lat, p.lng) })
     });
     m.on('click', function () { openSpotEdit(p); });
     m.addTo(pinLayer);
@@ -2970,6 +3053,7 @@ function paintSpotSheet() {
   /* v6.9 Phase 4C: a registered place at this spot shows its flags and
      Registered treatment on the sheet; an unclaimed spot offers claim. */
   try { if (typeof regPaintSpotInfo === 'function') regPaintSpotInfo(); } catch (e) {}
+  try { if (typeof ribPaintTray === 'function') ribPaintTray(); } catch (e) {}
 }
 function showSpotSheet() {
   var sh = $('spotSheet');
@@ -2994,6 +3078,7 @@ function spotSetCounted(pin, on) {
     if (S.counts.hist[ix] === 'houses') S.counts.hist.splice(ix, 1);
     S.counts.houses = Math.max(0, S.counts.houses - 1);
   }
+  try { if (typeof ribVisitHook === 'function') ribVisitHook(pin, on); } catch (e) {}
 }
 function removeSpotWithUndo(pin) {
   var ix = S.pins.indexOf(pin);
@@ -3112,6 +3197,7 @@ function stopVisited(lat, lng) {
   return false;
 }
 function heightsIconFor(s, lat, lng) {
+  if (s.archWin) return L.divIcon({ className: 'pinicon', iconSize: [34, 34], iconAnchor: [17, 30], html: '<div style="position:relative">' + pinIconHtml('candy', s.t === 'biz' ? 'shop' : 'house') + '<span class="mk-archring"></span><span class="mk-archyr">&rsquo;' + String(s.seed || '').slice(2) + '</span></div>' });
   if (S.ghostMode) return L.divIcon({ className: 'pinicon', iconSize: [28, 28], iconAnchor: [14, 24], html: '<div class="mk mk-ghost"><div class="td">' + SVG_CANDY + '</div></div>' });
   if (stopVisited(lat, lng)) return L.divIcon({ className: 'pinicon', iconSize: [28, 28], iconAnchor: [14, 24], html: '<div class="mk mk-visited"><div class="td">' + SVG_CHECK + '</div></div>' });
   var inner = s.t === 'biz' ? SVG_BAG : SVG_CANDY;
@@ -3132,7 +3218,7 @@ function renderHeightsStops() {
   if (typeof zoneSeededActive === 'function' && !zoneSeededActive()) return;
   /* fan out co-located stops (same address/block) so they don't stack */
   var groups = {};
-  (typeof SEED_STOPS !== 'undefined' ? HEIGHTS_STOPS.concat(SEED_STOPS) : HEIGHTS_STOPS).forEach(function (s) {
+  (typeof SEED_STOPS !== 'undefined' ? HEIGHTS_STOPS.concat(SEED_STOPS) : HEIGHTS_STOPS).concat(typeof ribArchiveStops === 'function' ? ribArchiveStops() : []).forEach(function (s) {
     var k = s.lat.toFixed(4) + ',' + s.lon.toFixed(4);
     (groups[k] = groups[k] || []).push(s);
   });
@@ -3150,7 +3236,7 @@ function renderHeightsStops() {
     var s = pl.s;
     if (typeof MAP_FILTERS !== 'undefined' && !catsVisible(stopCatsOf(s.acts, s.full))) return;
     var m = L.marker([pl.lat, pl.lon], {
-      icon: heightsIconFor(s, pl.lat, pl.lon)
+      icon: ribMarkWrap(heightsIconFor(s, pl.lat, pl.lon), pl.lat, pl.lon)
     });
     var acts = (s.acts || []).map(function (a) {
       return { candy: 'candy', decor: 'decorations', costume: 'costumes', pumpkin: 'pumpkin' }[a] || a;
@@ -3162,6 +3248,7 @@ function renderHeightsStops() {
       (s.allergy ? '<br>Allergy-safe: ' + esc(s.allergy) : '') +
       ((s.notes && s.notes.length) ? '<br>' + esc(s.notes.join(' ')) : '') +
       ((s.extras && s.extras.length) ? '<br>' + esc(s.extras.join(' ')) : '') +
+      (typeof ribArchPopupHtml === 'function' ? ribArchPopupHtml(s, pl) : '') +
       '<br><span class="muted" style="font-size:12px">From the Heights Halloween Trails community map</span>' +
       '<br><button class="btn-org goHere" data-lat="' + pl.lat + '" data-lng="' + pl.lon + '" data-name="' + esc(s.name || 'Treat stop') + '" style="margin-top:8px;min-height:38px;padding:6px 14px;font-size:14px">Go here</button> <button class="btn-ghost crowdOut" data-lat="' + pl.lat + '" data-lng="' + pl.lon + '" style="margin-top:8px;min-height:38px;padding:6px 12px;font-size:14px">Ran out</button> <button class=\"btn-ghost crowdStill\" data-lat=\"' + pl.lat + '\" data-lng=\"' + pl.lon + '\" data-status=\"candy\" style=\"margin-top:8px;min-height:38px;padding:6px 12px;font-size:14px\">Still giving</button></div>';
     m.bindPopup(html);
@@ -4724,6 +4811,7 @@ function openSummary() {
   maybeSpotSharePrompt();
   $('summary').hidden = false;
   candyBurst();
+  try { if (typeof ribMaybeShortlist === 'function') ribMaybeShortlist('end'); } catch (e) {}
 }
 $('btnSummary').addEventListener('click', openSummary);
 function freshStart(collapseSheet) {
@@ -7285,8 +7373,9 @@ function renderChat() {
   var zone = !partyOn() || CHAT.channel === 'zone';
   $('zoneBar').hidden = !zone;
   var wb = $('waveBar'); if (wb) wb.hidden = !zone;
+  var rb9 = $('ribBar'); if (rb9) rb9.hidden = !zone;
   var comp = $('chatComposer');
-  if (zone) { zoneRender(); return; }
+  if (zone) { zoneRender(); try { if (typeof ribAfterZoneRender === 'function') ribAfterZoneRender(); } catch (e) {} return; }
   if (comp) comp.style.display = '';
   var lk = $('zoneLockBar'); if (lk) lk.hidden = true;
   chatComposerMode('party');
@@ -8851,6 +8940,1374 @@ document.addEventListener('visibilitychange', function () {
   if (!document.hidden && typeof partyOn === 'function' && partyOn()) partyPoll();
 });
 
+
+/* ================= v7.13 Fix 27: Night Ribbons (Spot Awards v2) =================
+   spot-awards-brief-v2.md is the governing spec; Argon's tightening pass
+   is spot-awards-v2-argon-raw.md. One new verb, Pin a Ribbon, inside the
+   Spot Sheet: marking a spot Visited expands a ribbon tray inline (no
+   modal, no disabled control, no ribbon UI anywhere else). Four
+   categories, 3 ribbons per device per night, one per house, movable
+   until the reveal. The tally is deterministic client-side math over
+   PUBLIC ribbon_pins rows only: every phone that loads the same rows
+   computes the same winners. Anti-gaming is the brief's section 5:
+   a win floor of 4 counted ribbons across at least 2 walking parties
+   (connected components over party_hash / visit_bucket / co-pinning,
+   section 5.2) plus K=2 in the winning category (Argon's recorded lean
+   on the brief's open question 1); home-turf pins are local shadow
+   pins that never write a public row (5.3); warmup is proven from
+   public spot coordinates on the device's first pin row (5.4); a
+   claimed homeowner's device cannot count for its own house because
+   ribbon_pins.device_hash IS the zone device hash registrations use
+   (5.5); one win per house resolves by the strict greedy tuple (5.6).
+   The reveal is one atomic beat: rows with created_at at or before
+   21:00:00 local on Oct 31 count, and the announcement card, the Local
+   counter flip, and Tonight's Best all render from that same tally.
+   After 9 PM, unspent ribbons become Encore (Thank-You) Ribbons: they
+   light a spot and feed the homeowner total and Pass the Ribbon, and
+   can never change a winner. Backend: ribbon-pins-setup.sql (run once
+   in the Supabase SQL editor); if the table is absent every ribbon
+   surface hides and the rest of the app is untouched. */
+var RIB_CATS = [
+  { id: 'showstopper', name: 'The Showstopper', sub: 'Best decor', rank: 'Best Decor', houses: true },
+  { id: 'legend', name: 'Legend of the Bowl', sub: 'Best treats', rank: 'Best Treats', houses: true },
+  { id: 'kindest', name: 'Kindest Porch', sub: 'Best hosts', rank: 'Best Hosts' },
+  { id: 'teal', name: 'The Teal Ribbon', sub: 'Allergy-safe', rank: 'Allergy-Safe' }
+];
+var RIB_K = 2;                 /* winning-category threshold (brief 5.1; Argon lean) */
+var RIB_FLOOR_TOTAL = 4;       /* counted ribbons across all categories (brief 5.1) */
+var RIB_FLOOR_PARTIES = 2;     /* distinct walking parties (brief 5.1/5.2) */
+var RIB_PER_NIGHT = 3;         /* ribbons per device per night (brief section 1) */
+var RIB_WARM_SPOTS = 3, RIB_WARM_SPAN_M = 100, RIB_WARM_SPAN_SEC = 480;
+var RIB = {
+  ok: false, loaded: false, rows: [], fetchSeq: 0,
+  local: null, claim: null, archive: null,
+  moveCat: null, listOpenKey: '', listOpen: false, listShownAt: 0,
+  phaseCache: '', uiStamp: '', uiCache: {}, tallyCache: null, claimToastShown: false
+};
+function ribNow() {
+  try {
+    var o = window.__RIB_NOW;
+    if (typeof o === 'function') return o();
+    if (typeof o === 'number' && isFinite(o)) return o;
+  } catch (e) {}
+  return Date.now();
+}
+function ribCat(id) { for (var i = 0; i < RIB_CATS.length; i++) if (RIB_CATS[i].id === id) return RIB_CATS[i]; return null; }
+function ribCatPrio(id) { for (var i = 0; i < RIB_CATS.length; i++) if (RIB_CATS[i].id === id) return i; return 9; }
+/* The season of record: from Oct 1 the current year's night governs
+   (live, then its recap); Jan-Sep belongs to last year's archive. */
+function ribSeasonYear(now) {
+  var d = new Date(now), y = d.getFullYear();
+  return now >= new Date(y, 9, 1).getTime() ? y : y - 1;
+}
+function ribSeason(now) {
+  var y = ribSeasonYear(now);
+  return {
+    year: y,
+    nightStart: new Date(y, 9, 31, 0, 0, 0).getTime(),
+    reveal: new Date(y, 9, 31, 21, 0, 0).getTime(),
+    claimOpen: new Date(y, 9, 31, 21, 30, 0).getTime(),
+    claimClose: new Date(y, 10, 7, 23, 59, 59).getTime(),
+    recapEnd: new Date(y, 10, 14, 23, 59, 59).getTime()
+  };
+}
+function ribPhase(now) {
+  var s = ribSeason(now);
+  if (now < s.nightStart) return 'pre';
+  if (now < s.reveal) return 'night';
+  if (now <= s.claimClose) return 'encore';
+  if (now <= s.recapEnd) return 'recap';
+  return 'post';
+}
+/* ---------- place identity ----------
+   A ribbon place key is its anchor's public coordinates at 5 decimals,
+   so every device derives the same key from the same public data and
+   the warmup proof verifies from the key alone. Anchoring snaps to a
+   registration within 25 m first (its stored coordinates are the
+   canonical porch), then to a seeded stop within 25 m, else the spot
+   itself: two devices visiting the same porch land on the same key. */
+function ribKey(lat, lng) { return 'g' + Number(lat).toFixed(5) + ',' + Number(lng).toFixed(5); }
+function ribKeyCoords(key) {
+  var m = /^g(-?\d+\.\d+),(-?\d+\.\d+)$/.exec(String(key || ''));
+  return m ? { lat: parseFloat(m[1]), lng: parseFloat(m[2]) } : null;
+}
+function ribAnchor(lat, lng) {
+  var reg = null;
+  try { if (typeof regAt === 'function') reg = regAt(lat, lng, 25); } catch (e) {}
+  if (reg) return { key: ribKey(reg.lat, reg.lng), lat: reg.lat, lng: reg.lng, kind: reg.place_type === 'shop' ? 'shop' : 'house', reg: reg, stop: null };
+  var stops = (typeof HEIGHTS_STOPS !== 'undefined' && HEIGHTS_STOPS) ? HEIGHTS_STOPS : [];
+  var best = null, bd = 25;
+  for (var i = 0; i < stops.length; i++) {
+    var dd = haversine({ lat: lat, lng: lng }, { lat: stops[i].lat, lng: stops[i].lon });
+    if (dd < bd) { bd = dd; best = stops[i]; }
+  }
+  if (best) return { key: ribKey(best.lat, best.lon), lat: best.lat, lng: best.lon, kind: best.t === 'biz' ? 'shop' : 'house', reg: null, stop: best };
+  return { key: ribKey(lat, lng), lat: lat, lng: lng, kind: 'house', reg: null, stop: null };
+}
+function ribSpotLabel(key, anchor) {
+  var a = anchor || null;
+  if (!a) { var c = ribKeyCoords(key); if (c) a = ribAnchor(c.lat, c.lng); }
+  if (a && a.reg) return regName(a.reg);
+  if (a && a.stop && a.stop.name) return a.stop.name;
+  for (var i = 0; i < S.pins.length; i++) {
+    if (ribAnchor(S.pins[i].lat, S.pins[i].lng).key === key) {
+      var at = (typeof pinAddrText === 'function') ? pinAddrText(S.pins[i]) : '';
+      return at || pinLabel(S.pins[i]);
+    }
+  }
+  var cc = ribKeyCoords(key);
+  var corr = cc ? zoneBand(cc.lat, cc.lng) : zoneWholeTag();
+  return (a && a.kind === 'shop' ? 'A shop on ' : 'A porch on ') + corr;
+}
+/* ---------- local state (this device only; shadow pins live here) ---------- */
+function ribLoadLocal() {
+  if (RIB.local) return RIB.local;
+  var d = { pins: {}, encores: {}, warm: [], turf: {}, fixes: [], firstPin: false, lastActiveTs: 0, lastActivePos: null };
+  try {
+    var s = store.get('ribbonsV1', null);
+    if (s && typeof s === 'object') {
+      ['pins', 'encores', 'turf'].forEach(function (k) { if (s[k] && typeof s[k] === 'object') d[k] = s[k]; });
+      if (Array.isArray(s.warm)) d.warm = s.warm;
+      if (Array.isArray(s.fixes)) d.fixes = s.fixes;
+      d.firstPin = !!s.firstPin;
+      d.lastActiveTs = Number(s.lastActiveTs || 0);
+      d.lastActivePos = s.lastActivePos || null;
+    }
+  } catch (e) {}
+  RIB.local = d;
+  return d;
+}
+function ribSave() { try { store.set('ribbonsV1', RIB.local); } catch (e) {} }
+function ribTouchActivity(pos) {
+  var L = ribLoadLocal(), now = ribNow();
+  if (pos && isFinite(pos.lat)) {
+    if (!L.lastActivePos || haversine(L.lastActivePos, pos) >= 25) {
+      L.lastActivePos = { lat: pos.lat, lng: pos.lng };
+      L.lastActiveTs = now;
+      ribSave();
+    }
+  } else { L.lastActiveTs = now; ribSave(); }
+}
+/* GPS fixes feed the home-turf evaluation (brief 5.3) and the
+   stationary test for the shortlist. Sampled from the app's single fix
+   entry point; kept on-device only, capped, never uploaded. */
+function ribFixHook(fix) {
+  if (!fix || !isFinite(fix.lat)) return;
+  var L = ribLoadLocal();
+  L.fixes.push({ lat: fix.lat, lng: fix.lng, acc: fix.acc || 99, ts: ribNow() });
+  if (L.fixes.length > 60) L.fixes = L.fixes.slice(L.fixes.length - 60);
+  ribSave();
+  ribTouchActivity(fix);
+  ribClaimCheck();
+}
+/* A spot becoming counted is this device's Visited mark: it stamps the
+   pin's visited time (the visit_bucket source) and a warmup mark. */
+function ribVisitHook(pin, on) {
+  if (!pin || !on) return;
+  if (!pin.vts) pin.vts = ribNow();
+  var L = ribLoadLocal();
+  var a = ribAnchor(pin.lat, pin.lng);
+  var seen = false;
+  L.warm.forEach(function (w) { if (w.key === a.key) seen = true; });
+  if (!seen) {
+    var f = (typeof regFix === 'function') ? regFix() : null;
+    var gpsOk = !!(f && haversine(f, { lat: pin.lat, lng: pin.lng }) <= 50);
+    L.warm.push({ key: a.key, lat: a.lat, lng: a.lng, ts: ribNow(), gps: gpsOk });
+    ribSave();
+  }
+  ribTouchActivity({ lat: pin.lat, lng: pin.lng });
+}
+/* Warmup (brief 5.4): 3 distinct Visited spots, live-GPS proved,
+   spanning at least 100 m and at least 8 minutes. The proof this
+   device claims on its first pin row is the earliest triple that
+   satisfies the span rules; tallying clients re-verify the span from
+   the claimed ids' public coordinates. */
+function ribWarmupProof() {
+  var L = ribLoadLocal();
+  var marks = L.warm.filter(function (w) { return w.gps; }).slice().sort(function (a, b) { return a.ts - b.ts; });
+  var picked = [];
+  for (var i = 0; i < marks.length; i++) {
+    picked.push(marks[i]);
+    if (picked.length < RIB_WARM_SPOTS) continue;
+    var span = 0;
+    for (var x = 0; x < picked.length; x++) for (var y2 = x + 1; y2 < picked.length; y2++) {
+      span = Math.max(span, haversine(picked[x], picked[y2]));
+    }
+    var secs = Math.round((picked[picked.length - 1].ts - picked[0].ts) / 1000);
+    if (span >= RIB_WARM_SPAN_M && secs >= RIB_WARM_SPAN_SEC) {
+      return { ids: picked.slice(0, RIB_WARM_SPOTS).map(function (w) { return w.key; }), spanSec: secs };
+    }
+    picked.shift();
+  }
+  return null;
+}
+function ribWarmupOk() { return !!ribWarmupProof(); }
+/* Home turf (brief 5.3), evaluated on this device at pin time: a
+   flagged spot's ribbon is a shadow pin, saved locally only. */
+function ribHomeTurf(lat, lng) {
+  var L = ribLoadLocal(), spot = { lat: lat, lng: lng }, i, f;
+  for (i = 0; i < L.fixes.length; i++) {
+    f = L.fixes[i];
+    if (f.acc <= 25 && haversine(f, spot) <= 30) {
+      var first = null;
+      for (var j = i + 1; j < L.fixes.length; j++) {
+        if (haversine(L.fixes[j], spot) <= 30 && L.fixes[j].ts - f.ts >= 15 * 60000) { first = true; break; }
+      }
+      if (first) return true;
+    }
+  }
+  var farTs = Infinity;
+  L.warm.forEach(function (w) { if (haversine(w, spot) > 50 && w.ts < farTs) farTs = w.ts; });
+  for (i = 0; i < L.fixes.length; i++) {
+    f = L.fixes[i];
+    if (f.acc <= 25 && haversine(f, spot) <= 35 && f.ts < farTs) return true;
+  }
+  return false;
+}
+function ribOwnPin(key) {
+  var L = ribLoadLocal();
+  if (L.pins[key]) return { cat: L.pins[key].cat, shadow: !!L.pins[key].shadow, encore: false };
+  if (L.encores[key]) return { cat: L.encores[key].cat, shadow: false, encore: true };
+  /* Fall back to the public rows (storage loss, second season): the
+     latest own-device state per place is what every client computes. */
+  var dev = '';
+  try { dev = regDevHash(); } catch (e) {}
+  if (!dev) return null;
+  var best = null;
+  RIB.rows.forEach(function (r) {
+    if (String(r.device_hash || '') !== dev || String(r.place_id || '') !== key) return;
+    if (!best || String(r.created_at) >= String(best.created_at)) best = r;
+  });
+  if (!best) return null;
+  if (best.kind === 'pin' && best.category) return { cat: best.category, shadow: false, encore: false };
+  if (best.kind === 'encore' && best.category) return { cat: best.category, shadow: false, encore: true };
+  return null;
+}
+function ribSpent() {
+  var L = ribLoadLocal(), n = 0, seen = {};
+  Object.keys(L.pins).forEach(function (k) { seen[k] = 1; n++; });
+  var dev = '';
+  try { dev = regDevHash(); } catch (e) {}
+  if (dev) {
+    var latest = {};
+    RIB.rows.forEach(function (r) {
+      if (String(r.device_hash || '') !== dev) return;
+      var k = String(r.place_id || '');
+      if (!latest[k] || String(r.created_at) >= String(latest[k].created_at)) latest[k] = r;
+    });
+    Object.keys(latest).forEach(function (k) {
+      if (!seen[k] && latest[k].kind === 'pin' && latest[k].category) { seen[k] = 1; n++; }
+    });
+  }
+  return n;
+}
+function ribLeft() { return Math.max(0, RIB_PER_NIGHT - ribSpent()); }
+function ribEncoreLeft() {
+  var L = ribLoadLocal();
+  return Math.max(0, RIB_PER_NIGHT - ribSpent() - Object.keys(L.encores).length);
+}
+
+/* ---------- transport (registrations pattern: fail soft, hide) ---------- */
+function ribFetch() {
+  if (!crowdOn() || typeof fetch !== 'function') return;
+  var seq = ++RIB.fetchSeq;
+  fetch(CROWD.url + '/rest/v1/ribbon_pins?zone_id=eq.' + encodeURIComponent(ZONE_ID) + '&select=*&order=created_at.desc&limit=1000', { headers: crowdHeaders() })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (rows) {
+      if (seq !== RIB.fetchSeq) return;
+      if (!Array.isArray(rows)) { RIB.ok = false; RIB.loaded = true; ribPaintBar(); ribPaintTray(); return; }
+      RIB.ok = true; RIB.loaded = true; RIB.rows = rows; RIB.tallyCache = null;
+      ribPaintBar(); ribPaintTray();
+      try { renderPins(); } catch (e) {}
+      try { renderHeightsStops(); } catch (e) {}
+      try { renderRegs(); } catch (e) {}
+    })
+    .catch(function () {
+      if (seq !== RIB.fetchSeq) return;
+      RIB.ok = false; RIB.loaded = true; ribPaintBar(); ribPaintTray();
+    });
+}
+function ribPostRow(row) {
+  if (!crowdOn() || typeof fetch !== 'function') return Promise.resolve(false);
+  return fetch(CROWD.url + '/rest/v1/ribbon_pins', { method: 'POST', headers: crowdHeaders(), body: JSON.stringify(row) })
+    .then(function (r) { return !!r.ok; })
+    .catch(function () { return false; });
+}
+function ribPartyHash() {
+  try {
+    if (typeof partyOn === 'function' && partyOn() && typeof PARTY !== 'undefined' && PARTY.code) {
+      return zoneHash53('rib|' + PARTY.code, 29);
+    }
+  } catch (e) {}
+  return null;
+}
+/* ---------- the deterministic tally (brief section 5) ----------
+   Pure over its inputs: rows + the registration device map + the spot
+   kind map. Every client that loads the same public data resolves the
+   same winners, the same Best Block, and the same warm porches. */
+function ribRegDevByKey() {
+  var map = {};
+  try {
+    (REG.all || []).forEach(function (reg) { map[ribKey(reg.lat, reg.lng)] = String(reg.devhash || ''); });
+  } catch (e) {}
+  return map;
+}
+function ribKindByKey() {
+  var map = {};
+  try {
+    (REG.all || []).forEach(function (reg) { map[ribKey(reg.lat, reg.lng)] = reg.place_type === 'shop' ? 'shop' : 'house'; });
+  } catch (e) {}
+  var stops = (typeof HEIGHTS_STOPS !== 'undefined' && HEIGHTS_STOPS) ? HEIGHTS_STOPS : [];
+  stops.forEach(function (sx) { var k = ribKey(sx.lat, sx.lon); if (!map[k]) map[k] = sx.t === 'biz' ? 'shop' : 'house'; });
+  return map;
+}
+function ribRowTs(r) { return Date.parse(r && r.created_at) || 0; }
+function ribTally(rows, opts) {
+  opts = opts || {};
+  var season = ribSeason(ribNow());
+  var nightStart = opts.nightStart != null ? opts.nightStart : season.nightStart;
+  var freeze = opts.freeze != null ? opts.freeze : season.reveal;
+  var regDev = opts.regDevByKey || {};
+  var kindBy = opts.kindByKey || {};
+  var K = opts.k != null ? opts.k : RIB_K;
+  var sorted = (rows || []).slice().sort(function (a, b) {
+    var d = ribRowTs(a) - ribRowTs(b);
+    if (d) return d;
+    var x = String(a.id || ''), y = String(b.id || '');
+    return x < y ? -1 : x > y ? 1 : 0;
+  });
+  /* Latest state per (device, place) inside the frozen window. */
+  var state = {};
+  sorted.forEach(function (r) {
+    var ts = ribRowTs(r);
+    if (ts < nightStart || ts > freeze) return;
+    if (r.kind !== 'pin' && r.kind !== 'unpin') return;
+    state[String(r.device_hash || '') + '|' + String(r.place_id || '')] = r;
+  });
+  /* Warmup (5.4): a device counts only if its FIRST pin row of the
+     night carries a verifiable proof. */
+  var firstPin = {}, devOk = {};
+  sorted.forEach(function (r) {
+    if (r.kind !== 'pin') return;
+    var ts = ribRowTs(r);
+    if (ts < nightStart || ts > freeze) return;
+    var dev = String(r.device_hash || '');
+    if (!dev || firstPin[dev]) return;
+    firstPin[dev] = r;
+    devOk[dev] = ribProofOk(r);
+  });
+  function ribProofOk(r) {
+    var ids = r.warmup_place_ids;
+    if (typeof ids === 'string') { try { ids = JSON.parse(ids); } catch (e) { ids = null; } }
+    if (!Array.isArray(ids) || ids.length !== RIB_WARM_SPOTS) return false;
+    var pts = [], seen = {};
+    for (var i = 0; i < ids.length; i++) {
+      var c = ribKeyCoords(ids[i]);
+      if (!c || seen[ids[i]]) return false;
+      seen[ids[i]] = 1; pts.push(c);
+    }
+    var span = 0;
+    for (var x = 0; x < pts.length; x++) for (var y = x + 1; y < pts.length; y++) span = Math.max(span, haversine(pts[x], pts[y]));
+    return span >= RIB_WARM_SPAN_M && Number(r.warmup_span_sec || 0) >= RIB_WARM_SPAN_SEC;
+  }
+  /* Counted pins: active pin state, warm device, not the homeowner's
+     own device for that place (5.5), category allowed for the spot
+     kind (section 7), and the 3-places-per-device cap (section 1). */
+  var pins = [];
+  Object.keys(state).forEach(function (k) {
+    var r = state[k];
+    if (r.kind !== 'pin' || !r.category || !ribCat(r.category)) return;
+    var dev = String(r.device_hash || ''), place = String(r.place_id || '');
+    if (!dev || !devOk[dev]) return;
+    if (regDev[place] && regDev[place] === dev) return;
+    var kind = kindBy[place] || 'house';
+    var cat = ribCat(r.category);
+    if (kind === 'shop' && cat.houses) return;
+    pins.push({ dev: dev, place: place, cat: r.category, ts: ribRowTs(r), party: r.party_hash ? String(r.party_hash) : '', bucket: (r.visit_bucket == null ? null : Number(r.visit_bucket)), corridor: String(r.corridor || '') });
+  });
+  var devPlaces = {};
+  pins.forEach(function (p) { (devPlaces[p.dev] = devPlaces[p.dev] || {})[p.place] = 1; });
+  Object.keys(devPlaces).forEach(function (dev) {
+    var places = Object.keys(devPlaces[dev]);
+    if (places.length <= RIB_PER_NIGHT) return;
+    var firstTs = {};
+    pins.forEach(function (p) { if (p.dev === dev && (firstTs[p.place] == null || p.ts < firstTs[p.place])) firstTs[p.place] = p.ts; });
+    places.sort(function (a, b) { return (firstTs[a] - firstTs[b]) || (a < b ? -1 : 1); });
+    var keep = {};
+    places.slice(0, RIB_PER_NIGHT).forEach(function (pl) { keep[pl] = 1; });
+    pins = pins.filter(function (p) { return p.dev !== dev || keep[p.place]; });
+  });
+  /* Per-place aggregation. */
+  var places = {};
+  pins.forEach(function (p) {
+    var P = places[p.place] || (places[p.place] = { key: p.place, total: 0, cats: {}, voters: [], corridor: '', floorTs: 0 });
+    P.total++;
+    P.cats[p.cat] = (P.cats[p.cat] || 0) + 1;
+    P.voters.push(p);
+    if (!P.corridor && p.corridor) P.corridor = p.corridor;
+  });
+  var devPins = {};
+  pins.forEach(function (p) { (devPins[p.dev] = devPins[p.dev] || []).push(p); });
+  Object.keys(places).forEach(function (k) {
+    var P = places[k];
+    var byTs = P.voters.slice().sort(function (a, b) { return a.ts - b.ts; });
+    P.floorTs = byTs.length >= RIB_FLOOR_TOTAL ? byTs[RIB_FLOOR_TOTAL - 1].ts : 0;
+    P.parties = ribPartyCount(P, devPins);
+    var cc = ribKeyCoords(k);
+    if (!P.corridor) P.corridor = cc ? zoneBand(cc.lat, cc.lng) : '';
+  });
+  function ribPartyCount(P, devPinsMap) {
+    var vs = P.voters, parent = vs.map(function (_, i) { return i; });
+    function find(i) { return parent[i] === i ? i : (parent[i] = find(parent[i])); }
+    function link(a, b) { var x = find(a), y = find(b); if (x !== y) parent[x] = y; }
+    for (var i = 0; i < vs.length; i++) for (var j = i + 1; j < vs.length; j++) {
+      var A = vs[i], B = vs[j];
+      if (A.party && A.party === B.party) { link(i, j); continue; }
+      if (A.bucket != null && B.bucket != null && Math.abs(A.bucket - B.bucket) <= 1) { link(i, j); continue; }
+      var shared = 0;
+      var pa = devPinsMap[A.dev] || [], pb = {};
+      (devPinsMap[B.dev] || []).forEach(function (q) { pb[q.place] = q.ts; });
+      for (var t = 0; t < pa.length; t++) if (pb[pa[t].place] != null && Math.abs(pa[t].ts - pb[pa[t].place]) <= 300000) shared++;
+      if (shared >= 2) link(i, j);
+    }
+    var roots = {};
+    vs.forEach(function (_, i) { roots[find(i)] = 1; });
+    return Object.keys(roots).length;
+  }
+  function eligible(P, catId) {
+    return P.total >= RIB_FLOOR_TOTAL && P.parties >= RIB_FLOOR_PARTIES && (P.cats[catId] || 0) >= K;
+  }
+  /* One win per house (5.6): greedy over the strict tuple. */
+  var winners = {}, takenHouse = {}, takenCat = {};
+  for (var pass = 0; pass < RIB_CATS.length; pass++) {
+    var best = null;
+    Object.keys(places).forEach(function (k) {
+      if (takenHouse[k]) return;
+      var P = places[k];
+      RIB_CATS.forEach(function (c) {
+        if (takenCat[c.id] || !eligible(P, c.id)) return;
+        var rival = 0;
+        Object.keys(places).forEach(function (k2) {
+          if (k2 === k || takenHouse[k2]) return;
+          var Q = places[k2];
+          if (eligible(Q, c.id)) rival = Math.max(rival, Q.cats[c.id] || 0);
+        });
+        var cand = { key: k, cat: c.id, margin: (P.cats[c.id] || 0) - rival, count: P.cats[c.id] || 0, parties: P.parties, total: P.total, floorTs: P.floorTs };
+        if (!best || ribTupleGt(cand, best)) best = cand;
+      });
+    });
+    if (!best) break;
+    winners[best.cat] = { key: best.key, count: best.count, total: places[best.key].total, parties: places[best.key].parties, floorTs: best.floorTs, corridor: places[best.key].corridor };
+    takenHouse[best.key] = 1; takenCat[best.cat] = 1;
+  }
+  function ribTupleGt(a, b) {
+    if (a.margin !== b.margin) return a.margin > b.margin;
+    if (a.count !== b.count) return a.count > b.count;
+    if (a.parties !== b.parties) return a.parties > b.parties;
+    if (a.total !== b.total) return a.total > b.total;
+    if (a.floorTs !== b.floorTs) return a.floorTs < b.floorTs;
+    var pa = ribCatPrio(a.cat), pb = ribCatPrio(b.cat);
+    if (pa !== pb) return pa < pb;
+    return a.key < b.key;
+  }
+  /* Best Block (section 6): corridor grain, at least 3 active spots. */
+  var corr = {};
+  pins.forEach(function (p) {
+    var name = p.corridor || places[p.place].corridor || '';
+    if (!name) return;
+    var C = corr[name] || (corr[name] = { corridor: name, spots: {}, ribbons: 0, devices: {} });
+    C.spots[p.place] = 1; C.ribbons++; C.devices[p.dev] = 1;
+  });
+  var bestBlock = null;
+  Object.keys(corr).forEach(function (name) {
+    var C = corr[name], nSpots = Object.keys(C.spots).length;
+    if (nSpots < 3) return;
+    var cand = { corridor: name, spots: nSpots, ribbons: C.ribbons, devices: Object.keys(C.devices).length };
+    if (!bestBlock || cand.ribbons > bestBlock.ribbons ||
+        (cand.ribbons === bestBlock.ribbons && (cand.spots > bestBlock.spots ||
+         (cand.spots === bestBlock.spots && (cand.devices > bestBlock.devices ||
+          (cand.devices === bestBlock.devices && cand.corridor < bestBlock.corridor)))))) bestBlock = cand;
+  });
+  /* Encore state: latest encore row per (device, place) after the
+     freeze. Encore feeds homeowner totals and warm porches only. */
+  var encState = {};
+  sorted.forEach(function (r) {
+    if (r.kind !== 'encore') return;
+    var ts = ribRowTs(r);
+    if (ts <= freeze) return;
+    encState[String(r.device_hash || '') + '|' + String(r.place_id || '')] = r;
+  });
+  var encoreByPlace = {};
+  Object.keys(encState).forEach(function (k) {
+    var r = encState[k];
+    if (!r.category) return;
+    var place = String(r.place_id || '');
+    (encoreByPlace[place] = encoreByPlace[place] || []).push(String(r.category));
+  });
+  /* Warm porches (section 8): 2+ ribbons, frozen or encore. */
+  var warmPorches = [];
+  var warmKeys = {};
+  Object.keys(places).forEach(function (k) { warmKeys[k] = 1; });
+  Object.keys(encoreByPlace).forEach(function (k) { warmKeys[k] = 1; });
+  Object.keys(warmKeys).forEach(function (k) {
+    var cats = {};
+    if (places[k]) Object.keys(places[k].cats).forEach(function (c) { cats[c] = 1; });
+    (encoreByPlace[k] || []).forEach(function (c) { cats[c] = 1; });
+    var total = (places[k] ? places[k].total : 0) + (encoreByPlace[k] ? encoreByPlace[k].length : 0);
+    if (total >= 2) warmPorches.push({ key: k, total: total, cats: Object.keys(cats).sort(function (a, b) { return ribCatPrio(a) - ribCatPrio(b); }) });
+  });
+  warmPorches.sort(function (a, b) { return (b.total - a.total) || (a.key < b.key ? -1 : 1); });
+  var devSet = {};
+  pins.forEach(function (p) { devSet[p.dev] = 1; });
+  return {
+    winners: winners, bestBlock: bestBlock, warmPorches: warmPorches,
+    places: places, encoreByPlace: encoreByPlace, pins: pins,
+    totals: { ribbons: pins.length, spots: Object.keys(places).length, devices: Object.keys(devSet).length },
+    freeze: freeze, nightStart: nightStart
+  };
+}
+function ribLiveTally() {
+  if (RIB.tallyCache) return RIB.tallyCache;
+  RIB.tallyCache = ribTally(RIB.rows, { regDevByKey: ribRegDevByKey(), kindByKey: ribKindByKey() });
+  return RIB.tallyCache;
+}
+/* Public spot state for map treatments: shimmer on any spot holding a
+   live ribbon (frozen tally + encore after the reveal), a badge on
+   this device's own pins. Nothing here distinguishes a spot that has
+   cleared the win floor (brief section 3). */
+function ribSpotUi(lat, lng) {
+  var a = ribAnchor(lat, lng), key = a.key;
+  var stamp = RIB.rows.length + '|' + (typeof REG !== 'undefined' && REG.all ? REG.all.length : 0) + '|' + ribPhase(ribNow());
+  if (stamp !== RIB.uiStamp) { RIB.uiStamp = stamp; RIB.uiCache = {}; }
+  if (RIB.uiCache[key]) return RIB.uiCache[key];
+  var ui = { shimmer: false, mine: false };
+  var L = ribLoadLocal();
+  if (L.pins[key] || L.encores[key]) ui.mine = true;
+  var phase = ribPhase(ribNow());
+  if (RIB.ok && phase !== 'pre') {
+    if (phase === 'night') {
+      var latest = {};
+      RIB.rows.forEach(function (r) {
+        if (String(r.place_id || '') !== key) return;
+        var k2 = String(r.device_hash || '');
+        if (!latest[k2] || String(r.created_at) >= String(latest[k2].created_at)) latest[k2] = r;
+      });
+      Object.keys(latest).forEach(function (d) { if (latest[d].kind === 'pin' && latest[d].category) ui.shimmer = true; });
+    } else {
+      var T = ribLiveTally();
+      if ((T.places[key] && T.places[key].total > 0) || (T.encoreByPlace[key] && T.encoreByPlace[key].length)) ui.shimmer = true;
+    }
+  }
+  RIB.uiCache[key] = ui;
+  return ui;
+}
+function ribHaulDot(p) {
+  if (typeof RIB === 'undefined' || !RIB.local || !p) return '';
+  var phase = ribPhase(ribNow());
+  if (phase !== 'night' && phase !== 'encore') return '';
+  return ribOwnPin(ribAnchor(p.lat, p.lng).key) ? '<span class="rib-dot" title="Ribbon pinned here"></span>' : '';
+}
+function ribMarkWrap(html, lat, lng) {
+  if (typeof RIB === 'undefined' || !RIB.local) return html;
+  var ui = null;
+  try { ui = ribSpotUi(lat, lng); } catch (e) {}
+  if (!ui || (!ui.shimmer && !ui.mine)) return html;
+  return '<div style="position:relative">' + html +
+    (ui.shimmer ? '<span class="mk-shimmer"></span>' : '') +
+    (ui.mine ? '<span class="mk-ribbadge"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon-ui"/></svg></span>' : '') + '</div>';
+}
+
+/* ---------- pin actions ---------- */
+function ribOwnPinMap() {
+  var L = ribLoadLocal(), map = {};
+  Object.keys(L.pins).forEach(function (k) { map[k] = { cat: L.pins[k].cat, shadow: !!L.pins[k].shadow }; });
+  var dev = '';
+  try { dev = regDevHash(); } catch (e) {}
+  if (dev) {
+    var latest = {};
+    RIB.rows.forEach(function (r) {
+      if (String(r.device_hash || '') !== dev) return;
+      var k = String(r.place_id || '');
+      if (!latest[k] || String(r.created_at) >= String(latest[k].created_at)) latest[k] = r;
+    });
+    Object.keys(latest).forEach(function (k) {
+      if (!map[k] && latest[k].kind === 'pin' && latest[k].category) map[k] = { cat: latest[k].category, shadow: false };
+    });
+  }
+  return map;
+}
+function ribHasPublicPin() {
+  var dev = '';
+  try { dev = regDevHash(); } catch (e) {}
+  if (!dev) return false;
+  return RIB.rows.some(function (r) { return String(r.device_hash || '') === dev && r.kind === 'pin'; });
+}
+function ribEnsureVisited(dr) {
+  if (!dr) return null;
+  if (dr.pin && spotCounted(dr.pin)) { dr.visited = true; return dr.pin; }
+  var pin = dr.pin;
+  if (!pin) {
+    pin = { lat: dr.lat, lng: dr.lng, type: dr.type, ts: Date.now() };
+    S.pins.push(pin); dr.pin = pin;
+    try { noteSpotMarked(); } catch (e) {}
+  }
+  pin.type = dr.type;
+  if (dr.full && dr.type === 'candy') pin.full = true; else delete pin.full;
+  pin.kind = dr.kind;
+  var note = cleanText(dr.note || '');
+  if (note) pin.note = note; else delete pin.note;
+  if (dr.photo) pin.photo = dr.photo; else delete pin.photo;
+  pin.shared = dr.shared;
+  spotSetCounted(pin, true);
+  dr.visited = true;
+  store.set('pins', S.pins); store.set('counts', S.counts);
+  try { renderPins(); } catch (e) {}
+  try { renderCounts(); } catch (e) {}
+  if (dr.shared && dr.type) { try { crowdSyncPin(pin); } catch (e) {} }
+  return pin;
+}
+function ribRowFor(kind, a, catId, pin) {
+  return {
+    place_id: a.key, category: catId || null, device_hash: regDevHash(), zone_id: ZONE_ID,
+    corridor: zoneBand(a.lat, a.lng), party_hash: ribPartyHash(),
+    visit_bucket: pin ? Math.floor(((pin.vts || pin.ts || ribNow())) / 120000) : null,
+    warmup_place_ids: null, warmup_span_sec: null, kind: kind
+  };
+}
+function ribAfterAction() {
+  ribPaintTray(); ribPaintBar();
+  if (RIB.listOpen) ribPaintList();
+  try { renderPins(); } catch (e) {}
+}
+function ribDoPin(catId, dr, a, encore) {
+  var L = ribLoadLocal();
+  if (a.reg && regMine(a.reg)) { toast('That is your own porch. Its ribbons come from your neighbors.', 'warn'); return; }
+  if (!encore) {
+    if (!L.firstPin && ribHasPublicPin()) { L.firstPin = true; ribSave(); }
+    var turf = ribHomeTurf(a.lat, a.lng);
+    if (!turf && !L.firstPin && !ribWarmupProof()) {
+      toast('Ribbons count once you have visited 3 spots across at least a block and 8 minutes of walking. Keep walking, then pin.', 'warn');
+      return;
+    }
+    var pin = ribEnsureVisited(dr);
+    if (turf) {
+      L.pins[a.key] = { cat: catId, lat: a.lat, lng: a.lng, kind: a.kind, shadow: true, ts: ribNow() };
+      ribSave(); ribAfterAction();
+      toast('Ribbon pinned.', 'ok');
+      return;
+    }
+    var row = ribRowFor('pin', a, catId, pin);
+    if (!L.firstPin) {
+      var proof = ribWarmupProof();
+      if (proof) { row.warmup_place_ids = proof.ids; row.warmup_span_sec = proof.spanSec; }
+    }
+    ribPostRow(row).then(function (ok) {
+      if (ok) {
+        L.pins[a.key] = { cat: catId, lat: a.lat, lng: a.lng, kind: a.kind, ts: ribNow() };
+        if (row.warmup_place_ids) L.firstPin = true;
+        ribSave(); ribFetch();
+        toast('Ribbon pinned.', 'ok');
+      } else toast('That ribbon did not save. Check your connection and try again.', 'err');
+      ribAfterAction();
+    });
+  } else {
+    var pin2 = ribEnsureVisited(dr);
+    ribPostRow(ribRowFor('encore', a, catId, pin2)).then(function (ok) {
+      if (ok) {
+        L.encores[a.key] = { cat: catId, lat: a.lat, lng: a.lng, kind: a.kind, ts: ribNow() };
+        ribSave(); ribFetch();
+        toast('Thank-You Ribbon sent.', 'ok');
+      } else toast('That ribbon did not save. Check your connection and try again.', 'err');
+      ribAfterAction();
+    });
+  }
+}
+function ribDoRecat(catId, dr, a, encore) {
+  var L = ribLoadLocal();
+  ribEnsureVisited(dr);
+  ribPostRow(ribRowFor(encore ? 'encore' : 'pin', a, catId, dr.pin)).then(function (ok) {
+    if (ok) {
+      if (encore) { if (L.encores[a.key]) L.encores[a.key].cat = catId; }
+      else if (L.pins[a.key]) L.pins[a.key].cat = catId;
+      ribSave(); ribFetch();
+    } else toast('That change did not save. Check your connection and try again.', 'err');
+    ribAfterAction();
+  });
+}
+function ribDoUnpin(key) {
+  var L = ribLoadLocal(), phase = ribPhase(ribNow());
+  var c = ribKeyCoords(key);
+  if (!c) return;
+  var a = ribAnchor(c.lat, c.lng);
+  if (phase === 'encore' && L.encores[key]) {
+    delete L.encores[key]; ribSave();
+    ribPostRow(ribRowFor('encore', a, null, null)).then(function () { ribFetch(); });
+  } else {
+    var wasShadow = !!(L.pins[key] && L.pins[key].shadow);
+    delete L.pins[key]; ribSave();
+    if (!wasShadow) ribPostRow(ribRowFor('unpin', a, null, null)).then(function () { ribFetch(); });
+  }
+  ribAfterAction();
+}
+function ribDoMove(fromKey, catId, dr, a) {
+  if (!catId || fromKey === a.key) { RIB.moveCat = null; ribPaintTray(); return; }
+  var L = ribLoadLocal();
+  var src = L.pins[fromKey] || ribOwnPinMap()[fromKey];
+  delete L.pins[fromKey]; ribSave();
+  if (src && !src.shadow) {
+    var c = ribKeyCoords(fromKey);
+    if (c) ribPostRow(ribRowFor('unpin', ribAnchor(c.lat, c.lng), null, null)).then(function () { ribFetch(); });
+  }
+  RIB.moveCat = null;
+  ribDoPin(catId, dr, a, false);
+}
+/* ---------- the Spot Sheet tray ---------- */
+function ribPaintSpotNote() {
+  var note = $('ribSpotNote');
+  var dr = (typeof spotDraft !== 'undefined') ? spotDraft : null;
+  if (!dr) { if (note) note.hidden = true; return; }
+  var a = ribAnchor(dr.lat, dr.lng);
+  var ent = ribArchiveEntryFor(a.key);
+  var show = !!(ent && ent.winCat);
+  if (!note && show) {
+    note = document.createElement('div');
+    note.id = 'ribSpotNote'; note.className = 'rib-note';
+    var tray = $('ribTray');
+    if (tray && tray.parentNode) tray.parentNode.insertBefore(note, tray);
+  }
+  if (!note) return;
+  note.hidden = !show;
+  if (show) note.textContent = ent.year + ' Winner: ' + ((ribCat(ent.winCat) || {}).name || '');
+}
+function ribPaintTray() {
+  var box = $('ribTray');
+  if (!box) return;
+  ribPaintSpotNote();
+  var dr = (typeof spotDraft !== 'undefined') ? spotDraft : null;
+  var phase = ribPhase(ribNow());
+  if (!RIB.ok || !dr || !dr.visited || (phase !== 'night' && phase !== 'encore')) {
+    box.hidden = true; box.innerHTML = ''; RIB.moveCat = null;
+    return;
+  }
+  var a = ribAnchor(dr.lat, dr.lng);
+  var L = ribLoadLocal();
+  if (a.reg && regMine(a.reg)) {
+    box.hidden = false;
+    box.innerHTML = '<div class="rib-tray"><div class="rib-note" style="margin-top:0">Your Claimed Porch · Eligible for Tonight\'s Ribbons</div></div>';
+    return;
+  }
+  var own = ribOwnPin(a.key);
+  var cats = RIB_CATS.filter(function (c) { return a.kind !== 'shop' || !c.houses; });
+  function pills(pressedCat) {
+    return '<div class="rib-pills">' + cats.map(function (c) {
+      return '<button type="button" class="rib-pill" data-rib="cat" data-cat="' + c.id + '" aria-pressed="' + String(pressedCat === c.id) + '"><span class="rp-name">' + esc(c.name) + '</span><span class="rp-sub">' + esc(c.sub) + '</span></button>';
+    }).join('') + '</div>';
+  }
+  var head = '<div class="rib-tray-hd"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon-ui"/></svg><span>';
+  var html = '';
+  if (phase === 'encore') {
+    if (own && own.encore) html = head + 'Tap your ribbon to unpin</span></div>' + pills(own.cat);
+    else if (ribEncoreLeft() > 0) html = head + 'Send a Thank-You Ribbon</span></div>' + pills(null) + '<div class="rib-note">Winners are locked. A Thank-You Ribbon still lights this porch and thanks its hosts.</div>';
+    else html = head + 'Thank-You Ribbons</span></div><div class="rib-note" style="margin-top:0">All 3 of your ribbons are pinned for tonight.</div>';
+  } else if (own && !own.encore) {
+    html = head + 'Tap your ribbon to unpin</span></div>' + pills(own.cat) + '<div class="rib-note">Tap a different ribbon to change this porch\'s category.</div>';
+  } else if (RIB.moveCat) {
+    var map = ribOwnPinMap();
+    var rows = Object.keys(map).map(function (k) {
+      return '<button type="button" class="rib-move-row" data-rib="move" data-from="' + esc(k) + '"><span class="rm-lab">' + esc(ribSpotLabel(k)) + '<span class="rm-cat">' + esc((ribCat(map[k].cat) || {}).name || '') + '</span></span><span class="rm-go">Move here</span></button>';
+    }).join('');
+    html = head + 'All 3 Ribbons pinned. Tap one to move it here:</span></div>' + rows +
+      '<button type="button" class="rib-move-row" data-rib="back"><span class="rm-lab">Back</span></button>';
+  } else if (ribLeft() > 0) {
+    html = head + 'Pin a Ribbon · ' + ribLeft() + ' of 3 left</span></div>' + pills(null) + '<div class="rib-note">Three ribbons a night, three different porches. You can move them until winners are announced at 9 PM.</div>';
+  } else {
+    html = head + 'Pin a Ribbon · 0 of 3 left</span></div>' + pills(null) + '<div class="rib-note">Tap a ribbon to choose one of your pins to move here.</div>';
+  }
+  box.hidden = false;
+  box.innerHTML = '<div class="rib-tray">' + html + '</div>';
+}
+function ribTrayClick(e) {
+  var b = e.target && e.target.closest ? e.target.closest('[data-rib]') : null;
+  if (!b) return;
+  var dr = (typeof spotDraft !== 'undefined') ? spotDraft : null;
+  if (!dr) return;
+  var act = b.getAttribute('data-rib');
+  var a = ribAnchor(dr.lat, dr.lng);
+  if (act === 'back') { RIB.moveCat = null; ribPaintTray(); return; }
+  if (act === 'move') { ribDoMove(b.getAttribute('data-from'), RIB.moveCat, dr, a); return; }
+  if (act !== 'cat') return;
+  var catId = b.getAttribute('data-cat');
+  var phase = ribPhase(ribNow());
+  var own = ribOwnPin(a.key);
+  if (phase === 'encore') {
+    if (own && own.encore) {
+      if (own.cat === catId) ribDoUnpin(a.key); else ribDoRecat(catId, dr, a, true);
+      return;
+    }
+    if (ribEncoreLeft() <= 0) { toast('All 3 of your ribbons are pinned for tonight.', 'warn'); return; }
+    ribDoPin(catId, dr, a, true);
+    return;
+  }
+  if (own && !own.encore) {
+    if (own.cat === catId) ribDoUnpin(a.key); else ribDoRecat(catId, dr, a, false);
+    return;
+  }
+  if (ribLeft() <= 0) { RIB.moveCat = catId; ribPaintTray(); return; }
+  ribDoPin(catId, dr, a, false);
+}
+/* ---------- the shortlist drawer (brief section 1.3) ---------- */
+function ribShortlistRows() {
+  var out = [], seen = {};
+  S.pins.forEach(function (p) {
+    if (!spotCounted(p)) return;
+    var a = ribAnchor(p.lat, p.lng);
+    if (seen[a.key]) return;
+    seen[a.key] = 1;
+    if (a.reg && regMine(a.reg)) return;
+    if (ribOwnPin(a.key)) return;
+    out.push({ pin: p, key: a.key, kind: a.kind, ts: p.vts || p.ts || 0 });
+  });
+  out.sort(function (x, y) { return y.ts - x.ts; });
+  return out.slice(0, 5);
+}
+function ribMaybeShortlist(src) {
+  if (!RIB.ok || RIB.listOpen) return false;
+  if (ribPhase(ribNow()) !== 'night' || ribLeft() <= 0) return false;
+  if (!ribShortlistRows().length) return false;
+  RIB.listOpen = true;
+  RIB.listShownAt = ribNow();
+  ribPaintList();
+  var el = $('ribList');
+  if (el) el.hidden = false;
+  return true;
+}
+function ribCloseList() {
+  RIB.listOpen = false;
+  RIB.listOpenKey = '';
+  var el = $('ribList');
+  if (el) el.hidden = true;
+}
+function ribPaintList() {
+  var title = $('ribListTitle'), body = $('ribListBody');
+  if (!title || !body) return;
+  var left = ribLeft();
+  title.textContent = left + (left === 1 ? ' Ribbon' : ' Ribbons') + ' left before 9:00 PM';
+  var rows = ribShortlistRows();
+  if (!rows.length || left <= 0) { ribCloseList(); return; }
+  body.innerHTML = rows.map(function (r) {
+    var when = new Date(r.ts).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    var open = RIB.listOpenKey === r.key;
+    var cats = RIB_CATS.filter(function (c) { return r.kind !== 'shop' || !c.houses; });
+    return '<div class="rib-sl-row"><button type="button" class="rs-head" data-list-head="' + esc(r.key) + '"><span class="rs-name">' + esc(ribSpotLabel(r.key)) + '</span><span class="rs-when">Visited ' + esc(when) + '</span></button>' +
+      (open ? '<div class="rib-pills">' + cats.map(function (c) {
+        return '<button type="button" class="rib-pill" data-list-cat="' + c.id + '" data-key="' + esc(r.key) + '"><span class="rp-name">' + esc(c.name) + '</span><span class="rp-sub">' + esc(c.sub) + '</span></button>';
+      }).join('') + '</div>' : '') + '</div>';
+  }).join('');
+}
+function ribListClick(e) {
+  var head = e.target && e.target.closest ? e.target.closest('[data-list-head]') : null;
+  if (head) {
+    var k = head.getAttribute('data-list-head');
+    RIB.listOpenKey = RIB.listOpenKey === k ? '' : k;
+    ribPaintList();
+    return;
+  }
+  var b = e.target && e.target.closest ? e.target.closest('[data-list-cat]') : null;
+  if (!b) return;
+  var key = b.getAttribute('data-key'), catId = b.getAttribute('data-list-cat');
+  var row = null;
+  ribShortlistRows().forEach(function (r) { if (r.key === key) row = r; });
+  if (!row) return;
+  var p = row.pin;
+  var dr = { pin: p, lat: p.lat, lng: p.lng, type: p.type, full: !!p.full, kind: p.kind || 'house', note: p.note || '', photo: p.photo || null, shared: spotSharedOf(p), visited: true };
+  ribDoPin(catId, dr, ribAnchor(p.lat, p.lng), false);
+}
+/* ---------- the Local counter + announcement card ---------- */
+function ribZoneTotal() {
+  var s = ribSeason(ribNow()), latest = {};
+  RIB.rows.forEach(function (r) {
+    var ts = ribRowTs(r);
+    if (ts < s.nightStart || ts > ribNow()) return;
+    if (r.kind !== 'pin' && r.kind !== 'unpin') return;
+    var k = String(r.device_hash || '') + '|' + String(r.place_id || '');
+    if (!latest[k] || ts >= ribRowTs(latest[k])) latest[k] = r;
+  });
+  var n = 0;
+  Object.keys(latest).forEach(function (k) { if (latest[k].kind === 'pin' && latest[k].category) n++; });
+  return n;
+}
+function ribPaintBar() {
+  var bar = $('ribBar'), btn = $('ribCount');
+  if (!bar || !btn) return;
+  var phase = ribPhase(ribNow());
+  if (!RIB.ok || (phase !== 'night' && phase !== 'encore' && phase !== 'recap')) { bar.hidden = true; return; }
+  bar.hidden = false;
+  if (phase === 'night') {
+    btn.innerHTML = '<svg viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon-ui"/></svg><span>' + ribZoneTotal() + ' Ribbons in ' + esc(zonePlace()) + ' · Winners at 9 PM</span>';
+  } else {
+    btn.innerHTML = '<svg viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon-ui"/></svg><span>' + esc(zonePlace()) + ' Winners are live · Tap to view</span><span class="wv-chev"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>';
+  }
+}
+function ribWinnerShort(key, corridor, kind) {
+  var reg = ribRegForKey(key);
+  if (reg) return regMine(reg) ? 'Your porch' : regName(reg);
+  return (kind === 'shop' ? 'A shop on ' : 'A porch on ') + (corridor || zoneWholeTag());
+}
+function ribAfterZoneRender() {
+  ribPaintBar();
+  var log = $('chatLog');
+  if (!log || !RIB.ok) return;
+  var phase = ribPhase(ribNow());
+  if (phase !== 'encore' && phase !== 'recap') return;
+  var T = ribLiveTally();
+  var cats = RIB_CATS.filter(function (c) { return !!T.winners[c.id]; });
+  if (!cats.length) return;
+  var lines = cats.map(function (c) {
+    var w = T.winners[c.id];
+    return c.name + ': ' + ribWinnerShort(w.key, w.corridor, (ribKindByKey()[w.key] || 'house'));
+  }).join(' · ');
+  var div = document.createElement('div');
+  div.className = 'rib-announce';
+  div.id = 'ribAnnounce';
+  div.innerHTML = '<div class="ra-k">' + esc(zonePlace()) + ' · ' + ribSeason(ribNow()).year + ' Winners</div>' +
+    '<div class="ra-h">Tonight\'s Best is live</div><div class="ra-w">' + esc(lines) + '</div>' +
+    '<button class="btn btn-org" type="button" id="ribAnnounceBtn">See Tonight\'s Best</button>';
+  log.insertBefore(div, log.firstChild);
+  var b = $('ribAnnounceBtn');
+  if (b) b.addEventListener('click', function () { ribOpenBoard(); });
+}
+/* ---------- Tonight's Best board ---------- */
+function ribRegForKey(key) {
+  var found = null;
+  try {
+    (REG.all || []).forEach(function (reg) { if (ribKey(reg.lat, reg.lng) === key) found = reg; });
+  } catch (e) {}
+  return found;
+}
+function ribBoardData() {
+  var phase = ribPhase(ribNow());
+  if (phase === 'encore' || phase === 'recap') {
+    var T = ribLiveTally();
+    if (Object.keys(T.winners).length || T.totals.ribbons) return { live: true, T: T, year: ribSeason(ribNow()).year };
+  }
+  var yr = String(ribSeasonYear(ribNow()));
+  var entry = RIB.archive && RIB.archive.years ? RIB.archive.years[yr] : null;
+  if (entry) return { live: false, entry: entry, year: Number(yr) };
+  return null;
+}
+function ribOpenBoard() {
+  var phase = ribPhase(ribNow());
+  if (phase === 'pre' || phase === 'night') { toast('Winners are announced at 9 PM.', 'warn'); return; }
+  if (!ribBoardData()) { toast('No ribbons were pinned in ' + zonePlace() + ' this year.', 'warn'); return; }
+  ribPaintBoard();
+  var el = $('ribBoard');
+  if (el) el.hidden = false;
+}
+function ribPaintBoard() {
+  var body = $('ribBoardBody'), title = $('ribBoardTitle');
+  if (!body) return;
+  var data = ribBoardData();
+  if (!data) { body.innerHTML = '<p class="muted">No winners to show.</p>'; return; }
+  if (title) title.textContent = 'Tonight\'s Best · ' + zonePlace();
+  var winners = {}, bestBlock = null, totals = { ribbons: 0, spots: 0, devices: 0 }, warmCount = 0;
+  var encoreByPlace = {}, places = {};
+  if (data.live) {
+    winners = data.T.winners; bestBlock = data.T.bestBlock; totals = data.T.totals;
+    warmCount = data.T.warmPorches.length; encoreByPlace = data.T.encoreByPlace; places = data.T.places;
+  } else {
+    (data.entry.winners || []).forEach(function (w) {
+      winners[w.category] = { key: w.place_id, count: w.ribbon_count, parties: w.party_count, corridor: w.corridor || '' };
+    });
+    if (data.entry.best_block) bestBlock = { corridor: data.entry.best_block.corridor, spots: data.entry.best_block.active_spots, ribbons: data.entry.best_block.total_ribbons, devices: data.entry.best_block.total_devices };
+    totals = data.entry.totals || totals;
+    warmCount = (data.entry.warm_porches || []).length;
+  }
+  var myDev = '';
+  try { myDev = regDevHash(); } catch (e) {}
+  var regDev = ribRegDevByKey();
+  var html = '';
+  /* Winner takeover: a claimed winner on this device gets one stat
+     line and one primary action (brief section 4). */
+  var takeCat = null;
+  RIB_CATS.forEach(function (c) {
+    if (!takeCat && winners[c.id] && myDev && regDev[winners[c.id].key] === myDev) takeCat = c;
+  });
+  if (takeCat) {
+    var tw = winners[takeCat.id];
+    html += '<div class="rib-take"><div class="rt-k">' + esc(zonePlace()) + ' · ' + data.year + ' Winner</div>' +
+      '<div class="rt-h">Your porch won ' + esc(takeCat.name) + '</div>' +
+      '<div class="rt-s">Visited by ' + tw.parties + (tw.parties === 1 ? ' group' : ' groups') + ' tonight · #1 for ' + esc(takeCat.rank) + '</div>' +
+      '<div class="btns"><button class="btn btn-org" type="button" data-rib-act="thankyou" data-key="' + esc(tw.key) + '" data-cat="' + takeCat.id + '">Share Thank You Card</button>' +
+      '<button class="btn btn-ghost" type="button" data-rib-act="medallion" data-key="' + esc(tw.key) + '" data-cat="' + takeCat.id + '">Save Winner Medallion (PDF)</button></div>' +
+      '<div class="rib-note">Keep in your photos or print for next year\'s Halloween bin.</div></div>';
+  }
+  html += RIB_CATS.map(function (c) {
+    var w = winners[c.id];
+    if (!w) {
+      return '<div class="rib-win"><span class="rw-ic"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon-ui"/></svg></span><span class="rw-main"><span class="rw-cat">' + esc(c.name) + '</span><span class="rw-sub" style="display:block">' + esc(c.sub) + ' · Not awarded tonight</span></span></div>';
+    }
+    var kind = (ribKindByKey()[w.key] || 'house');
+    var claimed = !!regDev[w.key];
+    return '<div class="rib-win"><span class="rw-ic"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon"/></svg></span>' +
+      '<span class="rw-main"><span class="rw-cat">' + esc(c.name) + '</span><span class="rw-sub" style="display:block">' + esc(ribWinnerShort(w.key, w.corridor, kind)) + '</span></span>' +
+      '<span class="rw-n">' + w.count + (w.count === 1 ? ' ribbon' : ' ribbons') + '</span>' +
+      (!claimed && data.live ? '<button type="button" class="rw-pass" data-rib-act="pass" data-key="' + esc(w.key) + '">Pass the Ribbon</button>' : '') + '</div>';
+  }).join('');
+  /* This device's claimed porches that did not win still hear their
+     total, encore included (brief section 4). */
+  if (data.live && myDev) {
+    Object.keys(regDev).forEach(function (key) {
+      if (regDev[key] !== myDev) return;
+      var isWinner = RIB_CATS.some(function (c) { return winners[c.id] && winners[c.id].key === key; });
+      if (isWinner) return;
+      var n = (places[key] ? places[key].total : 0) + (encoreByPlace[key] ? encoreByPlace[key].length : 0);
+      if (n > 0) html += '<div class="rib-note">Your porch: ' + n + (n === 1 ? ' neighbor' : ' neighbors') + ' ribboned it tonight.</div>';
+    });
+  }
+  if (bestBlock) {
+    html += '<div class="rib-block"><b>Best Block: ' + esc(bestBlock.corridor) + '</b><br>' + bestBlock.spots + ' porches lit · ' + bestBlock.ribbons + ' ribbons</div>';
+  }
+  html += '<div class="rib-stats"><div class="rs"><b>' + totals.ribbons + '</b><span>ribbons pinned</span></div>' +
+    '<div class="rs"><b>' + totals.spots + '</b><span>porches honored</span></div>' +
+    '<div class="rs"><b>' + totals.devices + '</b><span>groups out</span></div></div>';
+  if (warmCount) html += '<div class="rib-note">' + warmCount + (warmCount === 1 ? ' warm porch' : ' warm porches') + ' will seed next year\'s map.</div>';
+  html += '<div class="btns" style="margin-top:12px"><button class="btn btn-org" type="button" data-rib-act="recap">Share Recap Card</button>' +
+    (data.live && ribPhase(ribNow()) === 'recap' ? '<button class="btn btn-ghost" type="button" data-rib-act="archive">Download year archive</button>' : '') + '</div>';
+  body.innerHTML = html;
+}
+function ribBoardClick(e) {
+  var b = e.target && e.target.closest ? e.target.closest('[data-rib-act]') : null;
+  if (!b) return;
+  var act = b.getAttribute('data-rib-act'), key = b.getAttribute('data-key'), cat = b.getAttribute('data-cat');
+  if (act === 'pass') ribPassRibbon(key);
+  else if (act === 'recap') ribShareRecap();
+  else if (act === 'archive') ribDownloadArchive();
+  else if (act === 'thankyou') ribShareThankYou(key, cat);
+  else if (act === 'medallion') {
+    var reg = ribRegForKey(key);
+    var data = ribBoardData();
+    var w = data && data.live ? data.T.winners[cat] : null;
+    if (reg && w) ribOpenMedallion(reg, cat, w);
+  }
+}
+function ribPassRibbon(key) {
+  var s = ribSeason(ribNow());
+  var link = APP_LINK + '?claim=' + encodeURIComponent(key) + '&year=' + s.year;
+  var text = 'Your porch won a Candy Trail Night Ribbon tonight. Claim it to see your scorecard and Winner Medallion: ' + link;
+  if (navigator.share) {
+    navigator.share({ text: text }).catch(function (err) {
+      if (!err || err.name !== 'AbortError') copyShareLink(link, 'Claim link copied. Send it to your neighbor.');
+    });
+  } else copyShareLink(link, 'Claim link copied. Send it to your neighbor.');
+}
+/* ---------- cards + medallion ---------- */
+function ribShareCanvas(draw, fname, text) {
+  try {
+    var cv = document.createElement('canvas');
+    cv.width = 1080; cv.height = 1350;
+    var g = cv.getContext('2d');
+    if (!g) { toast('Could not make the card on this browser.', 'err'); return; }
+    draw(g);
+    var finish = function (blob) {
+      if (!blob) { toast('Could not make the card on this browser.', 'err'); return; }
+      var file = null;
+      try { if (typeof File !== 'undefined') file = new File([blob], fname, { type: 'image/png' }); } catch (e) {}
+      if (file && navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
+        navigator.share({ files: [file], text: text }).catch(function (err) {
+          if (!err || err.name !== 'AbortError') shareFallbackSaved(blob, fname);
+        });
+      } else if (downloadCardBlob(blob, fname)) toast('Card saved. Share it into your neighborhood chats.', 'ok');
+    };
+    if (cv.toBlob) cv.toBlob(finish, 'image/png'); else finish(null);
+  } catch (e) { toast('Could not make the card on this browser.', 'err'); }
+}
+function ribCardBase(g, kicker, headline) {
+  var grad = g.createLinearGradient(0, 0, 1080, 1350);
+  grad.addColorStop(0, '#2A2140'); grad.addColorStop(1, '#0E0A16');
+  g.fillStyle = grad; g.fillRect(0, 0, 1080, 1350);
+  drawRibbonMark(g, 540 - 90, 80, 180, true);
+  g.textAlign = 'center';
+  g.fillStyle = '#FF8A3D';
+  g.font = '800 30px Inter, system-ui, sans-serif';
+  g.fillText(String(kicker || '').toUpperCase(), 540, 360);
+  g.fillStyle = '#F5EFE6';
+  fitFont(g, headline, 76, '600', 'Fraunces, Georgia, serif', 940);
+  g.fillText(headline, 540, 460);
+}
+function ribCardFoot(g, line) {
+  g.textAlign = 'center';
+  g.fillStyle = '#8B7BB8';
+  g.font = '500 26px Inter, system-ui, sans-serif';
+  g.fillText(line, 540, 1350 - 90);
+  g.fillStyle = '#6E6390';
+  g.font = '500 24px Inter, system-ui, sans-serif';
+  g.fillText('Candy Trail · ' + APP_LINK, 540, 1350 - 48);
+}
+function ribShareThankYou(key, catId) {
+  var cat = ribCat(catId) || RIB_CATS[0];
+  var s = ribSeason(ribNow());
+  var c = ribKeyCoords(key);
+  var corr = c ? zoneBand(c.lat, c.lng) : zoneWholeTag();
+  ribShareCanvas(function (g) {
+    ribCardBase(g, zonePlace() + ' · ' + s.year + ' Winner', 'Thank You, Neighbors');
+    g.textAlign = 'center';
+    g.fillStyle = '#F5EFE6';
+    fitFont(g, 'Our porch won ' + cat.name, 54, '600', 'Fraunces, Georgia, serif', 940);
+    g.fillText('Our porch won ' + cat.name, 540, 640);
+    g.fillStyle = '#A79CC4';
+    g.font = '500 34px Inter, system-ui, sans-serif';
+    g.fillText(cat.sub + ' · ' + corr, 540, 710);
+    g.fillText('Thanks for stopping by on Halloween.', 540, 800);
+    ribCardFoot(g, 'Corridor grain only: no house numbers, ever.');
+  }, 'candy-trail-thank-you-' + s.year + '.png', 'Our porch won ' + cat.name + ' on Candy Trail. Thank you, neighbors!');
+}
+function ribShareRecap() {
+  var data = ribBoardData();
+  if (!data) return;
+  var winners = {}, bestBlock = null, totals = { ribbons: 0, spots: 0, devices: 0 };
+  if (data.live) { winners = data.T.winners; bestBlock = data.T.bestBlock; totals = data.T.totals; }
+  else {
+    (data.entry.winners || []).forEach(function (w) { winners[w.category] = { key: w.place_id, count: w.ribbon_count, parties: w.party_count, corridor: w.corridor || '' }; });
+    if (data.entry.best_block) bestBlock = { corridor: data.entry.best_block.corridor, spots: data.entry.best_block.active_spots, ribbons: data.entry.best_block.total_ribbons };
+    totals = data.entry.totals || totals;
+  }
+  ribShareCanvas(function (g) {
+    ribCardBase(g, zonePlace() + ' · ' + data.year, 'Tonight\'s Best');
+    g.textAlign = 'center';
+    var y = 600;
+    RIB_CATS.forEach(function (c) {
+      var w = winners[c.id];
+      g.fillStyle = '#FF8A3D';
+      g.font = '800 26px Inter, system-ui, sans-serif';
+      g.fillText(c.name.toUpperCase(), 540, y);
+      g.fillStyle = '#F5EFE6';
+      fitFont(g, w ? ribWinnerShort(w.key, w.corridor, (ribKindByKey()[w.key] || 'house')) : 'Not awarded', 44, '600', 'Fraunces, Georgia, serif', 940);
+      g.fillText(w ? ribWinnerShort(w.key, w.corridor, (ribKindByKey()[w.key] || 'house')) : 'Not awarded', 540, y + 52);
+      y += 118;
+    });
+    g.fillStyle = '#A79CC4';
+    g.font = '500 32px Inter, system-ui, sans-serif';
+    if (bestBlock) g.fillText('Best Block: ' + bestBlock.corridor, 540, y + 8);
+    g.fillText(totals.ribbons + ' ribbons · ' + totals.spots + ' porches · ' + totals.devices + ' groups out', 540, y + 58);
+    ribCardFoot(g, 'Winners named at corridor grain only.');
+  }, 'candy-trail-recap-' + data.year + '.png', 'Tonight\'s Best in ' + zonePlace() + ' on Candy Trail: the Night Ribbon winners are in.');
+}
+function ribOpenMedallion(reg, catId, win) {
+  var cat = ribCat(catId) || RIB_CATS[0];
+  var s = ribSeason(ribNow());
+  var html = '<div class="sign-card"><svg class="sign-mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon"/></svg>' +
+    '<div class="sign-on">' + esc(zonePlace()) + ' · ' + s.year + ' Winner</div>' +
+    '<div class="sign-name">' + esc(regName(reg)) + '</div>' +
+    '<div class="sign-flags">Won ' + esc(cat.name) + ' · ' + esc(cat.sub) + '</div>' +
+    '<div class="sign-flags">Visited by ' + win.parties + (win.parties === 1 ? ' group' : ' groups') + ' tonight · #1 for ' + esc(cat.rank) + '</div>' +
+    '<img class="sign-qr" src="' + regQrUrl(regLink(reg), 320) + '" alt="QR code to this spot">' +
+    '<div class="sign-link">' + esc(regLink(reg)) + '</div>' +
+    '<div class="sign-sub">Keep in your photos or print for next year\'s Halloween bin</div></div>';
+  try { PROMO.reg = reg; PROMO.signKind = 'medallion'; } catch (e) {}
+  $('signTitle').textContent = 'Winner Medallion';
+  $('signBody').innerHTML = html;
+  $('printArea').innerHTML = html;
+  $('signSheet').hidden = false;
+}
+/* ---------- the year archive + next-October seeds (brief section 8) ---------- */
+function ribBuildArchive() {
+  var T = ribLiveTally();
+  var s = ribSeason(ribNow());
+  var regDev = ribRegDevByKey(), kindBy = ribKindByKey();
+  var winners = RIB_CATS.filter(function (c) { return !!T.winners[c.id]; }).map(function (c) {
+    var w = T.winners[c.id], cc = ribKeyCoords(w.key);
+    return { place_id: w.key, category: c.id, ribbon_count: w.count, party_count: w.parties, claimed: !!regDev[w.key], kind: kindBy[w.key] || 'house', corridor: w.corridor || '', lat: cc ? cc.lat : null, lng: cc ? cc.lng : null };
+  });
+  var warm = T.warmPorches.map(function (wp) {
+    var cc = ribKeyCoords(wp.key);
+    return { place_id: wp.key, categories: wp.cats, total: wp.total, kind: kindBy[wp.key] || 'house', lat: cc ? cc.lat : null, lng: cc ? cc.lng : null };
+  });
+  return {
+    year: s.year, zone: ZONE_ID, winners: winners,
+    best_block: T.bestBlock ? { corridor: T.bestBlock.corridor, active_spots: T.bestBlock.spots, total_ribbons: T.bestBlock.ribbons, total_devices: T.bestBlock.devices } : null,
+    warm_porches: warm, totals: T.totals
+  };
+}
+function ribDownloadArchive() {
+  var entry = ribBuildArchive();
+  var years = {};
+  years[String(entry.year)] = entry;
+  var blob = null;
+  try { blob = new Blob([JSON.stringify({ version: 1, years: years }, null, 2)], { type: 'application/json' }); } catch (e) {}
+  if (!blob || !window.URL || typeof URL.createObjectURL !== 'function') { toast('Could not build the archive on this browser.', 'err'); return; }
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'awards-archive.json';
+  document.body.appendChild(a); a.click();
+  if (a.remove) a.remove();
+  setTimeout(function () { try { URL.revokeObjectURL(a.href); } catch (e) {} }, 4000);
+  toast('Year archive downloaded. It ships with the app as awards-archive.json.', 'ok');
+}
+function ribArchiveEntryFor(key) {
+  if (!RIB.archive || !RIB.archive.years) return null;
+  var years = Object.keys(RIB.archive.years).sort().reverse();
+  for (var i = 0; i < years.length; i++) {
+    var e = RIB.archive.years[years[i]];
+    var win = null;
+    (e.winners || []).forEach(function (w) { if (w.place_id === key) win = w; });
+    if (win) return { year: Number(years[i]), winCat: win.category, warm: true };
+    var warm = (e.warm_porches || []).some(function (w) { return w.place_id === key; });
+    if (warm) return { year: Number(years[i]), winCat: null, warm: true };
+  }
+  return null;
+}
+/* Last year's winners and warm porches return as seeds: winners as a
+   muted gold outline pin with a year badge (never a live candy spot),
+   warm porches as quiet seeds. Only in the pre-season of the year
+   after the archived night. */
+function ribArchiveStops() {
+  if (typeof RIB === 'undefined' || !RIB.archive || !RIB.archive.years) return [];
+  if (ribPhase(ribNow()) !== 'pre') return [];
+  var yr = String(ribSeasonYear(ribNow()) - 1);
+  var e = RIB.archive.years[yr];
+  if (!e) return [];
+  var out = [], seen = {};
+  (e.winners || []).forEach(function (w) {
+    if (w.lat == null || seen[w.place_id]) return;
+    seen[w.place_id] = 1;
+    out.push({ t: w.kind === 'shop' ? 'biz' : 'home', name: ((ribCat(w.category) || {}).name || 'Night Ribbon') + ' winner · ' + yr, lat: w.lat, lon: w.lng, seed: Number(yr), archWin: w.category, archKey: w.place_id });
+  });
+  (e.warm_porches || []).forEach(function (w) {
+    if (w.lat == null || seen[w.place_id]) return;
+    seen[w.place_id] = 1;
+    out.push({ t: w.kind === 'shop' ? 'biz' : 'home', name: 'Warm porch · ' + yr, lat: w.lat, lon: w.lng, seed: Number(yr), archKey: w.place_id });
+  });
+  return out;
+}
+/* ---------- winner claim links (brief section 6) ---------- */
+function ribParseClaim() {
+  try {
+    var q = new URLSearchParams(location.search);
+    var key = q.get('claim'), yr = q.get('year');
+    if (!key || !ribKeyCoords(key)) return;
+    if (Number(yr) !== ribSeasonYear(ribNow())) return;
+    var c = ribKeyCoords(key);
+    RIB.claim = { key: key, lat: c.lat, lng: c.lng, done: false };
+  } catch (e) {}
+}
+function ribClaimCheck() {
+  var cl = RIB.claim;
+  if (!cl || cl.done) return;
+  var now = ribNow(), s = ribSeason(now);
+  if (now < s.reveal) return;
+  if (now < s.claimOpen || now > s.claimClose) {
+    if (!RIB.claimToastShown && now >= s.reveal && now <= s.claimClose) {
+      RIB.claimToastShown = true;
+      toast('Winner claiming opens at 9:30 PM tonight.', 'warn');
+    }
+    return;
+  }
+  var f = (typeof regFix === 'function') ? regFix() : null;
+  if (!f) {
+    if (!RIB.claimToastShown) {
+      RIB.claimToastShown = true;
+      toast('To claim this winning porch, open Candy Trail at the porch so GPS can confirm you are home.', 'warn');
+    }
+    return;
+  }
+  if (haversine(f, cl) <= 35) {
+    cl.done = true;
+    toast('That is your porch. Claim it to see tonight\'s scorecard and your Winner Medallion.', 'ok');
+    try { regOpenNew(cl.lat, cl.lng, (ribKindByKey()[cl.key] === 'shop') ? 'shop' : 'house'); } catch (e) {}
+  }
+}
+/* ---------- phase tick ---------- */
+function ribTick() {
+  var phase = ribPhase(ribNow());
+  if (phase !== RIB.phaseCache) {
+    RIB.phaseCache = phase;
+    RIB.tallyCache = null;
+    ribPaintBar(); ribPaintTray();
+    if (phase === 'encore' && typeof zoneVisible === 'function' && zoneVisible()) {
+      try { zoneRender(); } catch (e) {}
+    }
+  }
+  if (phase === 'night' && RIB.ok && !RIB.listOpen) {
+    var L = ribLoadLocal();
+    if (L.lastActiveTs && ribLeft() > 0) {
+      var hr = new Date(ribNow()).getHours();
+      var idleMs = (hr >= 20 ? 10 : 20) * 60000;
+      if (ribNow() - L.lastActiveTs >= idleMs && ribNow() - RIB.listShownAt >= 10 * 60000) ribMaybeShortlist('idle');
+    }
+  }
+  ribClaimCheck();
+}
+/* ---------- boot ---------- */
+(function ribBoot() {
+  ribLoadLocal();
+  var tray = $('ribTray');
+  if (tray) tray.addEventListener('click', ribTrayClick);
+  var rc = $('ribCount');
+  if (rc) rc.addEventListener('click', function () {
+    var ph = ribPhase(ribNow());
+    if (ph === 'encore' || ph === 'recap' || ph === 'post') ribOpenBoard();
+    else toast('Winners are announced at 9 PM.', 'warn');
+  });
+  var bc = $('ribBoardClose');
+  if (bc) bc.addEventListener('click', function () { $('ribBoard').hidden = true; });
+  var bb = $('ribBoard');
+  if (bb) bb.addEventListener('click', function (e) { if (e.target === this) this.hidden = true; });
+  var bd = $('ribBoardBody');
+  if (bd) bd.addEventListener('click', ribBoardClick);
+  var sk = $('ribListSkip');
+  if (sk) sk.addEventListener('click', ribCloseList);
+  var lb = $('ribListBody');
+  if (lb) lb.addEventListener('click', ribListClick);
+  var rl = $('ribList');
+  if (rl) rl.addEventListener('click', function (e) { if (e.target === this) ribCloseList(); });
+  ribParseClaim();
+  document.addEventListener('click', function (e) {
+    var b = e.target && e.target.closest ? e.target.closest('.archClaim') : null;
+    if (!b) return;
+    ribArchiveConfirm(parseFloat(b.getAttribute('data-lat')), parseFloat(b.getAttribute('data-lng')));
+  });
+  ribFetch();
+  if (typeof setInterval === 'function') {
+    setInterval(ribFetch, 45000);
+    setInterval(ribTick, 30000);
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) { ribFetch(); ribClaimCheck(); }
+  });
+  if (typeof fetch === 'function') {
+    fetch('awards-archive.json', { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) {
+        if (j && j.years) { RIB.archive = j; try { renderHeightsStops(); } catch (e) {} }
+      })
+      .catch(function () {});
+  }
+  RIB.phaseCache = ribPhase(ribNow());
+})();
+
+/* Returning-winner popup segment + confirm (brief section 8): an
+   archived winner is not a live spot until its homeowner confirms,
+   by a GPS fix within 35 m or the medallion scan that brought them. */
+function ribArchPopupHtml(s, pl) {
+  if (typeof RIB === 'undefined' || !s || !s.archWin) return '';
+  var cat = ribCat(s.archWin);
+  return '<br><span style="font-size:12.5px">' + s.seed + ' Winner: ' + esc(cat ? cat.name : '') + ' · Unconfirmed for ' + (Number(s.seed) + 1) + '</span>' +
+    '<br><button class="btn-org archClaim" data-lat="' + pl.lat + '" data-lng="' + pl.lon + '" data-key="' + esc(s.archKey || '') + '" style="margin-top:8px;min-height:38px;padding:6px 14px;font-size:14px">This is my porch, light it up for ' + (Number(s.seed) + 1) + '</button>';
+}
+function ribArchiveConfirm(lat, lng) {
+  var viaScan = false;
+  try {
+    if (typeof REG !== 'undefined' && REG.scan && isFinite(REG.scan.lat) && haversine(REG.scan, { lat: lat, lng: lng }) <= 35) viaScan = true;
+  } catch (e) {}
+  var f = (typeof regFix === 'function') ? regFix() : null;
+  if (viaScan || (f && haversine(f, { lat: lat, lng: lng }) <= 35)) {
+    toast('Welcome back. Claim your porch to light it up for this year.', 'ok');
+    try { regOpenNew(lat, lng, 'house'); } catch (e) {}
+    return;
+  }
+  toast('Stand at your porch so GPS can confirm it is yours, then tap again. A medallion scan works too.', 'warn');
+}
+
 /* ================= Lantern chrome wiring (v6.0) ================= */
 S.sheetTab = 'route';
 function peekSetStart(mode) {
@@ -9038,7 +10495,7 @@ function renderPinsList() {
     var title = pinLabel(p);
     return '<div class="pinrow" data-i="' + i + '">' +
       '<span class="pinrow-ic">' + pinIconHtml(p.type, p.kind) + '</span>' +
-      '<span class="pinrow-main" data-act="go"><b>' + esc(title) + '</b>' +
+      '<span class="pinrow-main" data-act="go"><b>' + esc(title) + '</b>' + ribHaulDot(p) +
       '<span class="pinrow-addr" data-addrkey="' + pinAddrKey(p) + '">' + esc(pinAddrText(p) || 'Finding address\u2026') + '</span>' +
       (tags.length ? '<span class="pinrow-tags">' + tags.map(function (t) { return '<span class="tag">' + t + '</span>'; }).join('') + '</span>' : '') +
       '<span class="muted" style="display:block;font-size:12px">' + when + (p.note ? ' · ' + esc(p.note) : '') + '</span></span>' +
@@ -9926,7 +11383,7 @@ function renderRegs() {
     var html = crowdOutNear(reg.lat, reg.lng)
       ? '<div class="mk-regwrap">' + pinIconHtml('out', 'house') + '<span class="mk-regring"></span></div>'
       : regIconHtml(reg);
-    var m = L.marker([reg.lat, reg.lng], { icon: L.divIcon({ className: 'regicon', iconSize: [34, 34], iconAnchor: [17, 30], html: html }) });
+    var m = L.marker([reg.lat, reg.lng], { icon: L.divIcon({ className: 'regicon', iconSize: [34, 34], iconAnchor: [17, 30], html: ribMarkWrap(html, reg.lat, reg.lng) }) });
     m.bindPopup(regPopupHtml(reg));
     m.addTo(REG.layer);
   });
@@ -10910,7 +12367,7 @@ paintChromeState();
 /* v6.4.1 boot self-check marker: the shell's checker script verifies this
    was set. If boot died anywhere above, the repair overlay appears instead
    of a silently half-dead app. */
-window.__ctBootOK = '7.12';
+window.__ctBootOK = '7.13';
 
 </script>
 <script>
