@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0A16">
-<meta name="version" content="7.7">
+<meta name="version" content="7.8">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -431,6 +431,18 @@ body.snap-full #fabSpot,body.snap-full #exploreCard,body.snap-full #drawPill,bod
 .cb-ts{font-size:11px;color:#8A7F96;margin-top:1px}
 .cb-jumbo{font-size:32px;line-height:1.25}
 .cb-img{display:block;max-width:210px;max-height:230px;width:100%;border-radius:10px;object-fit:cover;cursor:pointer;background:#16101E}
+/* v7.8 Fix 22: GIF affordances, no button. The GIF tag marks a pausable
+   GIF; the centered play disc shows only while paused. Both overlays are
+   pointer-events:none: taps land on the image itself, which toggles. */
+.cb-gifw{position:relative;display:inline-block;max-width:100%}
+.gif-tag{position:absolute;left:6px;bottom:6px;padding:2px 6px;border-radius:5px;background:rgba(14,10,22,.78);border:1px solid rgba(245,240,235,.22);color:var(--bone);font-size:10px;font-weight:800;letter-spacing:.09em;line-height:1.4;pointer-events:none;z-index:2}
+.gif-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:999px;background:rgba(14,10,22,.78);border:1px solid rgba(245,240,235,.22);color:var(--bone);display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:2}
+.gif-play[hidden]{display:none}
+.gif-play svg.ic{width:22px;height:22px;fill:currentColor;stroke:none;margin-left:2px}
+#photoViewWrap{position:relative}
+#photoViewWrap .gif-tag{left:10px;bottom:10px;font-size:11px}
+#photoViewWrap .gif-play{width:64px;height:64px}
+#photoViewWrap .gif-play svg.ic{width:30px;height:30px}
 #chatComposer{flex:none;display:flex;flex-direction:column;margin-top:8px;background:#231A2B;border:1px solid rgba(245,239,230,.12);border-radius:16px;padding:0 6px 6px}
 #chatComposer:focus-within{border-color:rgba(232,93,38,.55)}
 #chatInput{width:100%;border:0;background:transparent;color:var(--txt);font-size:16px;line-height:22px;padding:10px 8px 8px;resize:none;outline:none;font-family:inherit;max-height:106px;overflow-y:auto;overscroll-behavior:contain}
@@ -443,8 +455,7 @@ body.snap-full #fabSpot,body.snap-full #exploreCard,body.snap-full #drawPill,bod
 .cmp-btn[hidden]{display:none}
 .cmp-plusmenu{display:flex;gap:6px;align-items:center}
 .cmp-plusmenu[hidden]{display:none}
-/* v7.3 Fix 18: chat mic listening state + Tenor GIF picker */
-#chatMic.listening .disc{background:var(--org);color:#16101E;animation:micpulse 1.1s ease-in-out infinite}
+/* v7.3 Fix 18: GIPHY GIF picker (v7.6) */
 #gifSearch{width:100%;font-size:16px;padding:12px 14px;border-radius:12px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt)}
 .gif-status{color:var(--mut);font-size:14px;margin:12px 2px}
 .gif-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;overflow-y:auto;max-height:52vh;margin-top:4px}
@@ -843,20 +854,6 @@ body.has-route #tagline{display:none}
 .navtools{display:flex;gap:8px;margin-top:8px}
 .navtools .btn{flex:1;font-size:13px;padding:9px 4px;min-height:48px}
 
-/* ---------- Voice commands (v6.5 Phase 3C) ---------- */
-#partyMicRow{display:flex;justify-content:flex-end;margin-bottom:8px}
-#partyMicRow[hidden]{display:none}
-#btnMicParty{display:inline-flex;align-items:center;gap:7px;min-height:48px;padding:9px 16px;border-radius:999px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);font-size:14px;font-weight:600;cursor:pointer}
-#btnMicParty[hidden]{display:none}
-#btnMicNav[hidden]{display:none}
-.micbtn.listening{background:var(--org)!important;color:#16101E!important;border-color:var(--org)!important;animation:micpulse 1.1s ease-in-out infinite}
-@keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(232,93,38,.55)}50%{box-shadow:0 0 0 9px rgba(232,93,38,0)}}
-#voiceChip{position:fixed;z-index:1300;left:50%;transform:translateX(-50%);bottom:calc(var(--sab) + 216px);display:flex;align-items:center;gap:8px;max-width:88vw;padding:10px 16px;border-radius:999px;background:rgba(20,14,28,.94);border:1px solid var(--line2);color:var(--txt);font-size:14.5px;box-shadow:0 10px 30px rgba(0,0,0,.5);white-space:nowrap;overflow:hidden}
-body.mode-nav #voiceChip{bottom:calc(var(--sab) + 262px)}
-body.is-recording #voiceChip{bottom:calc(var(--sab) + 268px)}
-#voiceChip[hidden]{display:none}
-#voiceChip .vc-dot{flex:none;width:9px;height:9px;border-radius:50%;background:var(--org);animation:micpulse 1.1s ease-in-out infinite}
-#voiceChipTxt{overflow:hidden;text-overflow:ellipsis}
 #map.headup{width:150%;height:150%;left:-25%;top:-25%;right:auto;bottom:auto;transition:none;will-change:transform}
 .me-wrap .me{position:relative;width:64px;height:64px}
 .me-wrap .me-cone{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from -28deg,rgba(232,93,38,.7) 0deg 56deg,transparent 56deg);-webkit-mask:radial-gradient(circle,#000 0 62%,transparent 63%);mask:radial-gradient(circle,#000 0 62%,transparent 63%);opacity:0;transition:opacity .3s}
@@ -1079,10 +1076,10 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
 <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5.5 21.5v-17"/><path d="M5.5 4.8c4-2.4 6.5 2 12.5 0v8c-6 2-8.5-2.4-12.5 0"/></symbol>
 <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.8"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></symbol>
 <symbol id="i-volume" viewBox="0 0 24 24"><path d="M4 9.5v5h3.5L13 19V5L7.5 9.5z"/><path d="M16 9.2a4 4 0 0 1 0 5.6M18.4 6.8a7.4 7.4 0 0 1 0 10.4"/></symbol>
-<symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3M8.8 21h6.4"/></symbol>
 <symbol id="i-draw" viewBox="0 0 24 24"><path d="M4 20l1-4.2L16.6 4.2a2.1 2.1 0 0 1 3 3L8 18.8z"/><path d="m14.8 6 3 3"/></symbol>
 <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8.5h3l2-2.5h6l2 2.5h3V19a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19z"/><circle cx="12" cy="13.5" r="3.4"/></symbol>
 <symbol id="i-gif" viewBox="0 0 24 24"><path d="M9.5 5.5H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9.5M5 8.5h3M3.5 12h4.5M5 15.5h3M12.5 9.5v5l4-2.5z"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
 <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 6.5h15M9.5 6V4.5A1.5 1.5 0 0 1 11 3h2a1.5 1.5 0 0 1 1.5 1.5V6M6.5 6.5l1 13a1.5 1.5 0 0 0 1.5 1.4h6a1.5 1.5 0 0 0 1.5-1.4l1-13"/></symbol>
 <symbol id="i-undo" viewBox="0 0 24 24"><path d="M8.5 5.5 4.8 9.2l3.7 3.7"/><path d="M5 9.2h8.6a5.4 5.4 0 0 1 0 10.8H10"/></symbol>
 <symbol id="i-send" viewBox="0 0 24 24"><path d="M20.5 3.5 10.5 13.5"/><path d="M20.5 3.5 14 20.5l-3.5-7-7-3.5z"/></symbol>
@@ -1267,13 +1264,12 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
       </div>
       <div class="sheetfoot">
         <div class="wm">Candy Trail</div>
-        <div class="ver" id="appVer">Candy Trail v7.7</div>
+        <div class="ver" id="appVer">Candy Trail v7.8</div>
       </div>
     </div>
 
     <div id="tabParty" role="tabpanel" hidden>
       <div id="idBar" class="idbar" hidden></div>
-      <div id="partyMicRow" hidden><button id="btnMicParty" class="micbtn" type="button" hidden aria-label="Voice command: tap and speak"><svg class="ic" viewBox="0 0 24 24"><use href="#i-mic"/></svg><span>Voice command</span></button></div>
       <div id="partyBox"></div>
     </div>
 
@@ -1292,7 +1288,6 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
               <label class="cmp-btn" id="chatPhotosBtn" for="chatPhotoLib" role="button" aria-label="Photos"><span class="disc"><svg class="ic" viewBox="0 0 24 24"><use href="#i-img"/></svg></span></label>
               <button class="cmp-btn" id="chatGifBtn" type="button" hidden aria-label="GIF library"><span class="disc"><svg class="ic" viewBox="0 0 24 24"><use href="#i-gif"/></svg></span></button>
             </span>
-            <button class="cmp-btn" id="chatMic" type="button" aria-label="Voice command: tap and speak"><span class="disc"><svg class="ic" viewBox="0 0 24 24"><use href="#i-mic"/></svg></span></button>
             <button id="chatPersonaBtn" type="button" hidden aria-label="Your Local walker"></button>
           </span>
           <span class="cmp-right">
@@ -1370,6 +1365,7 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
   <button id="tglCrowd" class="pref-row" type="button" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-users"/></svg><span class="pl">Crowd reports<small>Live candy spots from other families</small></span><span class="sw" aria-hidden="true"></span></button>
   <button id="prefTheme" class="pref-row" type="button" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-moon"/></svg><span class="pl">Dark mode<small>Dark map and panels</small></span><span class="sw" aria-hidden="true"></span></button>
   <button id="fabMute" class="pref-row" type="button" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-volume"/></svg><span class="pl">Voice prompts<small id="muteState">On</small></span><span class="sw" aria-hidden="true"></span></button>
+  <button id="tglGifAuto" class="pref-row" type="button" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-gif"/></svg><span class="pl">Autoplay GIFs<small>GIFs in party chat play on their own</small></span><span class="sw" aria-hidden="true"></span></button>
   <div class="grp">Family</div>
   <button id="prefKid" class="pref-row" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-smile"/></svg><span class="pl">Kid view<small>Big buttons for little trick-or-treaters</small></span><svg class="ic chev" viewBox="0 0 24 24"><use href="#i-chev"/></svg></button>
   <button id="prefShare" class="pref-row" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-share"/></svg><span class="pl">Share Candy Trail<small>Send the app to another family</small></span><svg class="ic chev" viewBox="0 0 24 24"><use href="#i-chev"/></svg></button>
@@ -1385,7 +1381,7 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
   <div class="prefs-foot">
     <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon-mono"/></svg>
     <div class="crest">Candy Trail</div>
-    <div class="ver">Version 7.7</div>
+    <div class="ver">Version 7.8</div>
   </div>
 </div>
 
@@ -1408,11 +1404,8 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
     <button id="btnSkipStop" class="btn btn-ghost" type="button">Skip stop</button>
     <button id="btnReroute" class="btn btn-pur" type="button"><svg class="ic" viewBox="0 0 24 24"><use href="#i-route"/></svg>New route</button>
     <button id="btnHeadUp" class="btn btn-ghost" type="button" aria-pressed="true">Heading-up</button>
-    <button id="btnMicNav" class="btn btn-ghost micbtn" type="button" hidden aria-label="Voice command: tap and speak"><svg class="ic" viewBox="0 0 24 24"><use href="#i-mic"/></svg>Voice</button>
   </div>
 </div>
-
-<div id="voiceChip" hidden role="status"><span class="vc-dot" aria-hidden="true"></span><span id="voiceChipTxt">Listening&hellip;</span></div>
 
 <div id="spotSheet" class="card" hidden>
   <div class="spot-head">
@@ -1518,7 +1511,7 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
 </div>
 
 <div id="photoView" hidden role="dialog" aria-modal="true" aria-label="Stop photo">
-  <img id="photoViewImg" alt="Stop photo">
+  <div id="photoViewWrap"><img id="photoViewImg" alt="Stop photo"><span class="gif-tag" id="photoViewTag" hidden aria-hidden="true">GIF</span><span class="gif-play" id="photoViewPlay" hidden aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-play"/></svg></span></div>
   <button id="photoViewClose" class="btn-close overlay" type="button" aria-label="Close photo"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></span></button>
 </div>
 
@@ -1973,18 +1966,12 @@ $('busyCancel').addEventListener('click', function () {
    heads-ups pass a band key, so a reroute resetting nav.announced
    cannot make the app repeat itself). speakNow() is for discrete
    events (arrival, reroute, confirmations) and cancels first.
-   Commands: push-to-talk only, never always-listening. Recognition
-   runs only after an explicit mic tap, one utterance at a time.
+   Commands: REMOVED in v7.8 (Fix 22b, owner decision). This section
+   is TTS only now; the app speaks but never listens.
    Silence contract: nothing speaks on boot, tab switches, or chat
-   events; speech is nav prompts plus explicit command confirmations. */
-var VOICE = {
-  picked: null, lastGuidance: '', lastAnn: {}, warmed: false,
-  listening: false, recog: null, stopTimer: null,
-  denied: false, fromCmd: false, force: false, supported: false
-};
+   events; speech is nav prompts only. */
+var VOICE = { picked: null, lastGuidance: '', lastAnn: {}, warmed: false };
 var VOICE_NOVELTY = /zarvox|trinoids|bubbles|cellos|bells|organ|hysterical|pipe organ|bad news|good news|bahh|whisper|deranged|jester|wobble|boing|ralph|fred|junior|kathy|albert|bruce|vicki|victoria/i;
-function voiceCtor() { return window.SpeechRecognition || window.webkitSpeechRecognition || null; }
-VOICE.supported = !!voiceCtor();
 function voiceScore(v) {
   var name = String(v.name || ''), lang = String(v.lang || '').replace(/_/g, '-');
   var s = 0;
@@ -2027,7 +2014,7 @@ function voiceBandBlocked(text, band) {
 }
 function speak(text, band) {
   if (S.muted || !('speechSynthesis' in window)) return;
-  if (!VOICE.force && voiceBandBlocked(text, band)) return;
+  if (voiceBandBlocked(text, band)) return;
   try {
     var u = new SpeechSynthesisUtterance(text);
     var v = VOICE.picked || voiceRefresh();
@@ -2035,7 +2022,7 @@ function speak(text, band) {
     u.rate = 1.03; u.pitch = 1.0; u.volume = 1;
     window.speechSynthesis.speak(u);
     VOICE.lastAnn[voiceBandKey(text, band)] = Date.now();
-    if (!VOICE.fromCmd) VOICE.lastGuidance = text;
+    VOICE.lastGuidance = text;
   } catch (e) {}
 }
 function speakNow(text, band) {
@@ -2058,231 +2045,11 @@ function voiceWarmup() {
   } catch (e) {}
 }
 
-/* ---------------- push-to-talk commands ---------------- */
-function paintVoiceChrome() {
-  /* v7.3 Fix 18: mic buttons never hide. An unsupported or blocked mic
-     stays visible and explains itself when tapped (voiceListen toasts
-     the reason); hiding them was half of the Nov 1 field bug, "the mic
-     button in the chat doesn't work," where a tap met silence. Only
-     the listening state paints here now. */
-  var bn = $('btnMicNav'), bp = $('btnMicParty'), row = $('partyMicRow'), cm = $('chatMic');
-  if (bn) bn.hidden = false;
-  if (bp) bp.hidden = false;
-  if (row) row.hidden = false;
-  [bn, bp, cm].forEach(function (b) { if (b) b.classList.toggle('listening', VOICE.listening); });
-}
-function voiceChipShow(txt) {
-  var c = $('voiceChip'); if (!c) return;
-  $('voiceChipTxt').textContent = txt;
-  c.hidden = false;
-}
-function voiceChipHide() { var c = $('voiceChip'); if (c) c.hidden = true; }
-function voiceDenied() {
-  if (VOICE.denied) return;
-  VOICE.denied = true;
-  paintVoiceChrome();
-  toast('Mic access blocked in browser settings', 'warn');
-}
-function voiceStopListen() {
-  if (VOICE.stopTimer) { clearTimeout(VOICE.stopTimer); VOICE.stopTimer = null; }
-  var r = VOICE.recog; VOICE.recog = null;
-  if (r) {
-    try { r.onresult = null; r.onerror = null; r.onend = null; r.stop(); } catch (e) {}
-  }
-  if (VOICE.listening) { VOICE.listening = false; paintVoiceChrome(); }
-  voiceChipHide();
-}
-function voiceListen() {
-  /* v7.3 Fix 18: a mic tap ALWAYS answers. Unsupported and blocked
-     states explain themselves instead of returning silently (the Nov 1
-     field bug: tapping the chat mic did nothing at all). A second
-     start while already listening stays a no-op. */
-  if (VOICE.listening) return;
-  if (!VOICE.supported) { toast('Voice commands are not supported in this browser.', 'warn'); return; }
-  if (VOICE.denied) { toast('Mic access blocked in browser settings', 'warn'); return; }
-  var Ctor = voiceCtor(); if (!Ctor) { toast('Voice commands are not supported in this browser.', 'warn'); return; }
-  var rec = null;
-  try { rec = new Ctor(); } catch (e) { toast('Voice did not work here (start).', 'err'); return; }
-  VOICE.recog = rec; VOICE.listening = true; paintVoiceChrome();
-  rec.lang = 'en-US'; rec.continuous = false; rec.interimResults = true;
-  try { rec.maxAlternatives = 1; } catch (e) {}
-  rec.onresult = function (ev) {
-    if (VOICE.recog !== rec) return;
-    var interim = '', finalTxt = '', finalConf = null;
-    for (var i = ev.resultIndex || 0; i < ev.results.length; i++) {
-      var res = ev.results[i], alt = res && res[0];
-      if (!alt) continue;
-      if (res.isFinal) { finalTxt = alt.transcript || ''; finalConf = alt.confidence; }
-      else interim += alt.transcript || '';
-    }
-    if (finalTxt) {
-      var conf = (typeof finalConf === 'number') ? finalConf : null;
-      voiceStopListen();
-      voiceHeard(finalTxt, conf);
-    } else if (interim) {
-      voiceChipShow('Heard: ' + interim);
-    }
-  };
-  rec.onerror = function (ev) {
-    if (VOICE.recog !== rec) return;
-    var err = ev && ev.error;
-    voiceStopListen();
-    /* v7.3: every recognition error surfaces in plain language. */
-    if (err === 'not-allowed' || err === 'service-not-allowed') voiceDenied();
-    else if (err === 'network') toast('Voice needs a connection for recognition.', 'warn');
-    else if (err === 'audio-capture') toast('No microphone found.', 'warn');
-    else if (err === 'no-speech') toast("Didn't hear anything.", 'warn');
-    else if (err) toast('Voice did not work here (' + err + ').', 'err');
-    else toast('Voice did not work here.', 'err');
-  };
-  rec.onend = function () {
-    if (VOICE.recog !== rec) return;
-    VOICE.recog = null;
-    if (VOICE.stopTimer) { clearTimeout(VOICE.stopTimer); VOICE.stopTimer = null; }
-    VOICE.listening = false; paintVoiceChrome(); voiceChipHide();
-  };
-  voiceChipShow('Listening\u2026');
-  try { rec.start(); } catch (e) {
-    VOICE.recog = null; VOICE.listening = false; paintVoiceChrome(); voiceChipHide();
-    toast('Voice did not work here (start).', 'err'); /* v7.3: never silent */
-    return;
-  }
-  VOICE.stopTimer = setTimeout(function () { voiceStopListen(); }, 6000);
-}
-function voiceHeard(text, conf) {
-  var t = String(text || '').trim();
-  if (!t) { toast("Didn't catch that", 'warn'); return; }
-  if (typeof conf === 'number' && conf > 0 && conf < 0.3) { toast("Didn't catch that", 'warn'); return; }
-  var intent = voiceParseIntent(t);
-  if (!intent) { toast("Didn't catch that", 'warn'); return; }
-  voiceExec(intent);
-}
-function voiceParseIntent(raw) {
-  var t = String(raw || '').toLowerCase();
-  if (/party status|party check|where is everyone|where's everyone|how'?s the party/.test(t)) return 'party';
-  if (/out of candy|ran out|no more candy|no candy|lights off|lights are off|\bempty\b/.test(t)) return 'out';
-  if (/full[ -]?size|king[ -]?size|great stop/.test(t)) return 'fullsize';
-  if (/next stop|what'?s next|what is next|where next|\bnext\b/.test(t)) return 'next';
-  if (/\bvisited\b|got it|done here|\bdone\b|got candy|been there/.test(t)) return 'visited';
-  if (/repeat|say again|say that again|what was that|which way|where to/.test(t)) return 'repeat';
-  return null;
-}
-function voiceConfirm(text) { toast(text, 'ok'); speakNow(text); }
-function voiceExec(intent) {
-  VOICE.fromCmd = true; VOICE.force = true;
-  try {
-    if (intent === 'next') voiceCmdNext();
-    else if (intent === 'visited') voiceCmdVisited();
-    else if (intent === 'out') voiceCmdOut();
-    else if (intent === 'fullsize') voiceCmdFull();
-    else if (intent === 'repeat') voiceCmdRepeat();
-    else if (intent === 'party') voiceCmdParty();
-  } catch (e) {}
-  VOICE.fromCmd = false; VOICE.force = false;
-}
-function stopNameOf(st) {
-  if (!st) return 'treat stop';
-  if (st.stop && st.stop.name) return st.stop.name;
-  if (st.name) return st.name;
-  return 'treat stop';
-}
-function voiceCmdNext() {
-  var nav = S.nav;
-  if (!nav || nav.done) { voiceConfirm('No route is running.'); return; }
-  if (nav.stopIdx >= nav.stops.length) { voiceConfirm('No more stops. The route leads home.'); return; }
-  var st = nav.stops[nav.stopIdx];
-  var line = 'Next stop: ' + stopNameOf(st);
-  if (S.pos) {
-    var d = haversine(S.pos, st);
-    var mins = Math.max(1, Math.round(d / KID_PACE_MPS / 60));
-    line += ', ' + fmtDist(d) + ' away, about ' + mins + (mins === 1 ? ' minute' : ' minutes');
-  }
-  voiceConfirm(line + '.');
-}
-function voiceCmdVisited() {
-  var nav = S.nav;
-  if (!nav || nav.done) { voiceConfirm('No route is running.'); return; }
-  if (nav.stopIdx >= nav.stops.length) { voiceConfirm('That was the last stop. The route leads home.'); return; }
-  var idx = -1;
-  if (S.pos) {
-    var bd = 60;
-    for (var i = nav.stopIdx; i < nav.stops.length; i++) {
-      var dd = haversine(S.pos, nav.stops[i]);
-      if (dd <= bd) { idx = i; bd = dd; }
-    }
-  }
-  if (idx < 0) idx = nav.stopIdx;
-  var st = nav.stops[idx];
-  var prevIdx = nav.stopIdx;
-  nav.stopIdx = idx + 1;
-  for (var vi = prevIdx; vi <= idx; vi++) navMarkVisited(vi);
-  S.counts.houses++; S.counts.hist.push('houses');
-  store.set('counts', S.counts); renderCounts();
-  if (navigator.vibrate) navigator.vibrate(60);
-  updateStopMarkers();
-  var msg = 'Visited: ' + stopNameOf(st) + '. ';
-  if (nav.stopIdx < nav.stops.length) {
-    var nx = nav.stops[nav.stopIdx];
-    msg += 'Next: ' + stopNameOf(nx) + (S.pos ? ', ' + fmtDist(haversine(S.pos, nx)) + ' away' : '') + '.';
-  } else msg += 'That was the last stop. The route leads home.';
-  voiceConfirm(msg);
-}
-function voiceNearestPoint(maxD) {
-  if (!S.pos) return null;
-  var best = null, bd = maxD || 200;
-  function consider(lat, lng) {
-    var d = haversine(S.pos, { lat: lat, lng: lng });
-    if (d <= bd) { bd = d; best = { lat: lat, lng: lng }; }
-  }
-  if (S.nav && S.nav.stops) S.nav.stops.forEach(function (s) { consider(s.lat, s.lng); });
-  S.pins.forEach(function (p) { consider(p.lat, p.lng); });
-  if (typeof HEIGHTS_STOPS !== 'undefined') HEIGHTS_STOPS.forEach(function (s) { consider(s.lat, s.lon); });
-  return best;
-}
-function voiceCmdOut() {
-  var pt = voiceNearestPoint(200);
-  if (!pt && S.pos) pt = { lat: S.pos.lat, lng: S.pos.lng };
-  if (!pt) { voiceConfirm('Waiting for a GPS fix first.'); return; }
-  crowdPost({ lat: pt.lat, lng: pt.lng, status: 'out', note: '', photo: null });
-  voiceConfirm('Posted: that stop is out of candy.');
-}
-function voiceCmdFull() {
-  if (!S.pos) { voiceConfirm('Waiting for a GPS fix first.'); return; }
-  var pin = null, bd = 25;
-  S.pins.forEach(function (p) { var d = haversine(S.pos, p); if (d <= bd) { bd = d; pin = p; } });
-  if (!pin) {
-    var pt = voiceNearestPoint(60) || { lat: S.pos.lat, lng: S.pos.lng };
-    pin = { lat: pt.lat, lng: pt.lng, type: 'candy', full: true, kind: 'house', shared: true, ts: Date.now() };
-    S.pins.push(pin);
-    noteSpotMarked();
-  } else {
-    pin.type = 'candy'; pin.full = true;
-  }
-  store.set('pins', S.pins);
-  renderPins();
-  if (spotSharedOf(pin)) crowdSyncPin(pin);
-  voiceConfirm('Marked full-size. Great stop!');
-}
-function voiceCmdRepeat() {
-  var line = VOICE.lastGuidance || '';
-  if (!line && S.nav) { var ni = $('navInstr'); if (ni && ni.textContent && ni.textContent.indexOf('Waiting') !== 0) line = ni.textContent; }
-  if (line) { toast(line, 'ok'); speakNow(line); }
-  else voiceConfirm('Nothing to repeat yet.');
-}
-function voiceCmdParty() {
-  if (partyOn()) {
-    var t = partyTotals();
-    voiceConfirm('Party of ' + t.people + '. ' + t.houses + (t.houses === 1 ? ' house' : ' houses') + ' pooled.');
-  } else voiceConfirm('You are not in a party.');
-}
-/* v7.3: ONE handler per mic. The old pointerdown+click pair could fire
-   voiceListen twice per tap; a single click handler plus the listening
-   guard inside voiceListen makes each tap exactly one start attempt. */
-['btnMicNav', 'btnMicParty'].forEach(function (id) {
-  var b = $(id); if (!b) return;
-  b.addEventListener('click', function () { voiceListen(); });
-});
-paintVoiceChrome();
+/* v7.8 Fix 22b: push-to-talk voice commands are REMOVED (owner
+   decision, Nov 1, 2026; the Firefox Android partial-support failure
+   was the last straw). No mic surfaces, no recognition session,
+   no intents, no Heard chip: the app no longer listens. TTS above is
+   untouched (picker, speak/speakNow, warmup, Voice prompts pref). */
 
 /* ---------------- map ---------------- */
 var map = L.map('map', { zoomControl: false, attributionControl: true });
@@ -4202,7 +3969,11 @@ function catsVisible(cats) {
   if (!cats.length) return true;
   return cats.some(function (c) { return MAP_FILTERS[c] !== false; });
 }
-function paintToggles() { $('tglAllergy').setAttribute('aria-pressed', String(!!S.allergy)); $('tglStroller').setAttribute('aria-pressed', String(!!S.stroller)); var tc = $('tglCrowd'); if (tc) tc.setAttribute('aria-pressed', String(!!CROWD_PREF)); paintTray(); paintPrefs(); }
+/* v7.8 Fix 22: GIF autoplay preference (party chat). Declared here,
+   ahead of paintToggles, so the boot-time paint reads a real value.
+   The pause machinery itself lives with the chat surface below. */
+var GIF_AUTOPLAY = store.get('gifAutoplay', true) !== false;
+function paintToggles() { $('tglAllergy').setAttribute('aria-pressed', String(!!S.allergy)); $('tglStroller').setAttribute('aria-pressed', String(!!S.stroller)); var tc = $('tglCrowd'); if (tc) tc.setAttribute('aria-pressed', String(!!CROWD_PREF)); var tg = $('tglGifAuto'); if (tg) tg.setAttribute('aria-pressed', String(!!GIF_AUTOPLAY)); paintTray(); paintPrefs(); }
 function paintPrefs() {
   var el = $('prefsState'); if (!el) return;
   var styleName = { best: 'Best houses', shuffle: 'Shuffle', fresh: 'Fresh streets', lastyear: 'Last year' }[S.variety] || 'Fresh streets';
@@ -4216,6 +3987,7 @@ function paintPrefs() {
 $('tglAllergy').addEventListener('click', function () { S.allergy = !S.allergy; store.set('allergy', S.allergy); paintToggles(); toast(S.allergy ? 'Allergy-safe stops will be prioritized in your routes.' : 'Allergy-safe priority off.', 'ok'); });
 $('tglCrowd').addEventListener('click', function () { CROWD_PREF = !CROWD_PREF; store.set('prefCrowd', CROWD_PREF); paintToggles(); applyCrowdVis(); toast(CROWD_PREF ? 'Crowd reports shown.' : 'Crowd reports hidden. Your own pins and party still show.', 'ok'); });
 $('tglStroller').addEventListener('click', function () { S.stroller = !S.stroller; store.set('stroller', S.stroller); paintToggles(); toast(S.stroller ? 'Stroller mode on: step-free streets preferred.' : 'Stroller mode off.', 'ok'); });
+$('tglGifAuto').addEventListener('click', function () { GIF_AUTOPLAY = !GIF_AUTOPLAY; store.set('gifAutoplay', GIF_AUTOPLAY); GIF_TOGGLE = {}; /* per-message overrides were made under the old default; the stream re-renders on the new one */ paintToggles(); if (typeof renderChat === 'function') renderChat(); toast(GIF_AUTOPLAY ? 'GIFs in party chat will play on their own.' : 'GIFs in party chat will start paused.', 'ok'); });
 paintToggles();
 
 /* draw your own route */
@@ -7297,6 +7069,56 @@ function emojiOnly(t) {
   if (!m || m.length < 1 || m.length > 3) return false;
   return /^[\p{Extended_Pictographic}\p{Emoji_Modifier}\p{Emoji_Component}\uFE0F\u200D]+$/u.test(s);
 }
+/* ---------------- GIF pause (v7.8 Fix 22) ----------------
+   A chat image is a pausable GIF when its img1| src is a GIPHY media
+   URL (the picker stores images.fixed_width, e.g.
+   https://media0.giphy.com/media/<id>/200w.gif). The still frame is
+   the same rendition with "_s" inserted before ".gif" (200w_s.gif),
+   GIPHY's still sibling: verified live Nov 1, 2026 (the API object's
+   images.fixed_width_still.url is exactly that derivation, and a HEAD
+   request on a derived URL returned 200), so posts already in the
+   wild, which carry only the animated URL, pause with no payload
+   change. Photos (data URLs, any other src) never match and keep
+   their tap-to-view behavior.
+   Interaction (owner, Nov 1, 2026): NO chip or button. Tapping the
+   GIF itself toggles pause/play in place by swapping the img src. A
+   small "GIF" tag in the corner marks a pausable GIF; while paused, a
+   centered play disc overlays it so the state reads as resumable. The
+   photo viewer follows the same rule when it is showing a GIF.
+   State: GIF_TOGGLE[key] is the per-message override, keyed by
+   chatKey; without an override a GIF starts per gifStartPaused():
+   paused when the OS reports prefers-reduced-motion, or when the
+   Autoplay GIFs preference is off. */
+function gifIsGiphy(src) { return /^https:\/\/media\d*\.giphy\.com\//i.test(String(src || '')); }
+function gifStillUrl(src) {
+  var s = String(src || ''), q = s.indexOf('?');
+  var base = q >= 0 ? s.slice(0, q) : s, tail = q >= 0 ? s.slice(q) : '';
+  if (!/\.gif$/i.test(base)) return s;
+  return base.replace(/\.gif$/i, '_s.gif') + tail;
+}
+function gifReducedMotion() {
+  try { return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) { return false; }
+}
+function gifStartPaused() { return gifReducedMotion() || !GIF_AUTOPLAY; }
+var GIF_TOGGLE = {};
+var PV_GIF = null; /* photo viewer GIF context: {key, anim, still} or null */
+function gifIsPaused(key) {
+  if (Object.prototype.hasOwnProperty.call(GIF_TOGGLE, key)) return !!GIF_TOGGLE[key];
+  return gifStartPaused();
+}
+function gifToggle(key) { GIF_TOGGLE[key] = !gifIsPaused(key); gifPaintKey(key); }
+function gifPaintKey(key) {
+  var paused = gifIsPaused(key);
+  document.querySelectorAll('[data-gifk]').forEach(function (im) {
+    if (im.getAttribute('data-gifk') !== key) return;
+    im.src = paused ? im.getAttribute('data-still') : im.getAttribute('data-anim');
+  });
+  document.querySelectorAll('[data-gifplay]').forEach(function (ov) {
+    if (ov.getAttribute('data-gifplay') !== key) return;
+    ov.hidden = !paused;
+  });
+  if (PV_GIF && PV_GIF.key === key) pvGifPaint();
+}
 function chatImgParse(msg) {
   if (!msg || String(msg).indexOf('img1|') !== 0) return null;
   var parts = String(msg).split('|');
@@ -7333,7 +7155,11 @@ function chatBubblesHtml() {
     grp.forEach(function (r, gi) {
       var last = gi === grp.length - 1;
       var img = chatImgParse(r.msg), body;
-      if (img) body = '<img class="cb-img" src="' + img.src + '" style="aspect-ratio:' + img.w + '/' + img.h + '" alt="Photo shared in party chat">';
+      if (img && gifIsGiphy(img.src)) {
+        var gk = chatKey(r), gp = gifIsPaused(gk), gstill = gifStillUrl(img.src);
+        body = '<span class="cb-gifw"><img class="cb-img cb-gif" data-gifk="' + esc(gk) + '" data-anim="' + img.src + '" data-still="' + gstill + '" src="' + (gp ? gstill : img.src) + '" style="aspect-ratio:' + img.w + '/' + img.h + '" alt="GIF shared in party chat"><span class="gif-tag" aria-hidden="true">GIF</span><span class="gif-play" data-gifplay="' + esc(gk) + '"' + (gp ? '' : ' hidden') + ' aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><use href="#i-play"/></svg></span></span>';
+      }
+      else if (img) body = '<img class="cb-img" src="' + img.src + '" style="aspect-ratio:' + img.w + '/' + img.h + '" alt="Photo shared in party chat">';
       else if (emojiOnly(r.msg)) body = '<span class="cb-jumbo">' + esc(r.msg) + '</span>';
       else body = esc(r.msg || '');
       colHtml += '<div class="cb-b' + (gi === 0 ? ' fst' : '') + (last ? ' last' : '') + '">' + body + '</div>';
@@ -7377,7 +7203,13 @@ function renderChat() {
   chatComposerMode('party');
   log.innerHTML = chatBubblesHtml();
   log.querySelectorAll('.cb-img').forEach(function (im) {
-    im.addEventListener('click', function () { openPhotoView(im.getAttribute('src')); });
+    im.addEventListener('click', function () {
+      /* v7.8 Fix 22: tapping a GIF toggles it in place; only photos
+         open the viewer. */
+      var k = im.getAttribute('data-gifk');
+      if (k) { gifToggle(k); return; }
+      openPhotoView(im.getAttribute('src'));
+    });
   });
 }
 function scrollChatBottom() { var sc = $('chatScroll'); if (sc) sc.scrollTop = sc.scrollHeight; }
@@ -7455,9 +7287,6 @@ $('chatPlus').addEventListener('click', function () {
   m.hidden = !m.hidden;
   $('chatPlus').setAttribute('aria-expanded', String(!m.hidden));
 });
-/* v7.3: single click handler (was pointerdown+click, which could
-   double-start recognition per tap). voiceListen always answers. */
-$('chatMic').addEventListener('click', function () { voiceListen(); });
 $('chatPhotoX').addEventListener('click', function () { CHAT.pendingPhoto = null; paintPhotoPrev(); });
 var CHAT_GIF_CAP = 1024 * 1024; /* v7.3: GIF byte cap (1 MB) */
 function chatPhotoPicked(input) {
@@ -7830,10 +7659,9 @@ function zoneCountPaint() {
 }
 function chatComposerMode(mode) {
   var per = $('chatPersonaBtn'), cnt = $('chatCount'), inp = $('chatInput');
-  var plus = $('chatPlus'), mic = $('chatMic'), menu = $('chatPlusMenu');
+  var plus = $('chatPlus'), menu = $('chatPlusMenu');
   if (mode === 'zone') {
     if (plus) plus.hidden = true;
-    if (mic) mic.hidden = true;
     if (menu) menu.hidden = true;
     if (per) { per.hidden = false; zonePaintPersonaBtn(); }
     /* No hard maxlength in Local: a paste may run over, and the counter
@@ -7842,7 +7670,6 @@ function chatComposerMode(mode) {
     zoneCountPaint();
   } else {
     if (plus) plus.hidden = false;
-    if (mic) mic.hidden = false;
     if (per) per.hidden = true;
     if (cnt) cnt.hidden = true;
     if (inp) { inp.placeholder = 'Message your party'; inp.maxLength = 140; }
@@ -8389,13 +8216,34 @@ $('partyBox').addEventListener('focusin', function (e) {
 });
 /* Photo viewer (v6.4 phase 2): one overlay surface, closed by the
    Argon overlay-mode close component, a backdrop tap, or swipe. */
-function openPhotoView(src) {
+function openPhotoView(src, gifCtx) {
   if (!src) return;
   var v = $('photoView'), im = $('photoViewImg');
   if (!v || !im) return;
-  im.src = src; v.hidden = false;
+  PV_GIF = gifCtx || null;
+  im.src = src;
+  pvGifPaint();
+  v.hidden = false;
 }
-function closePhotoView() { var v = $('photoView'); if (v) v.hidden = true; }
+/* v7.8 Fix 22: when the viewer is showing a GIF it carries the same
+   affordances as the bubble: the GIF tag, plus the centered play disc
+   while paused; tapping the image toggles (gifPaintKey repaints via
+   pvGifPaint), and dismissal stays on the close button / backdrop. */
+function pvGifPaint() {
+  var tag = $('photoViewTag'), play = $('photoViewPlay'), im = $('photoViewImg');
+  if (!PV_GIF) { if (tag) tag.hidden = true; if (play) play.hidden = true; return; }
+  var paused = gifIsPaused(PV_GIF.key);
+  if (tag) tag.hidden = false;
+  if (play) play.hidden = !paused;
+  if (im) im.src = paused ? PV_GIF.still : PV_GIF.anim;
+}
+function closePhotoView() {
+  var v = $('photoView'); if (v) v.hidden = true;
+  PV_GIF = null;
+  var tag = $('photoViewTag'), play = $('photoViewPlay');
+  if (tag) tag.hidden = true;
+  if (play) play.hidden = true;
+}
 /* My Pins addresses (v6.4 phase 2): prefer the address of the community
    stop the pin sits on (within 40 m, data the app already has); else a
    cached Nominatim reverse lookup; never an invented address.
@@ -8479,6 +8327,9 @@ $('prefsClose').addEventListener('click', closePrefs);
 $('prefsScrim').addEventListener('click', closePrefs);
 $('photoViewClose').addEventListener('click', closePhotoView);
 $('photoView').addEventListener('click', function (e) { if (e.target === this) closePhotoView(); });
+/* v7.8 Fix 22: in the viewer, tapping a GIF toggles it; tapping a
+   photo keeps doing nothing (dismissal is the close button/backdrop). */
+$('photoViewImg').addEventListener('click', function () { if (PV_GIF) gifToggle(PV_GIF.key); });
 $('prefKid').addEventListener('click', function () { closePrefs(); kidSet(true); });
 $('prefShare').addEventListener('click', function () { shareAppLink(); });
 $('prefExport').addEventListener('click', function () { exportSpots(); });
@@ -10176,7 +10027,7 @@ paintChromeState();
 /* v6.4.1 boot self-check marker: the shell's checker script verifies this
    was set. If boot died anywhere above, the repair overlay appears instead
    of a silently half-dead app. */
-window.__ctBootOK = '7.7';
+window.__ctBootOK = '7.8';
 
 </script>
 <script>
