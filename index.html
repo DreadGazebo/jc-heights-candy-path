@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0A16">
-<meta name="version" content="7.8">
+<meta name="version" content="7.9">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1264,7 +1264,7 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
       </div>
       <div class="sheetfoot">
         <div class="wm">Candy Trail</div>
-        <div class="ver" id="appVer">Candy Trail v7.8</div>
+        <div class="ver" id="appVer">Candy Trail v7.9</div>
       </div>
     </div>
 
@@ -1381,7 +1381,7 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
   <div class="prefs-foot">
     <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon-mono"/></svg>
     <div class="crest">Candy Trail</div>
-    <div class="ver">Version 7.8</div>
+    <div class="ver">Version 7.9</div>
   </div>
 </div>
 
@@ -8425,7 +8425,34 @@ function partyCardData() {
     return { name: n, color: meta.color, avatar: meta.avatar || null, houses: c.houses || 0, you: n === PARTY.name };
   });
   members.sort(function (a, b) { return (b.houses - a.houses) || (a.name < b.name ? -1 : 1); });
-  return { kind: 'party', title: 'Party ' + PARTY.code, code: PARTY.code, houses: t.houses, people: t.people, members: members, place: cardPlace() };
+  var data = { kind: 'party', title: 'Party ' + PARTY.code, code: PARTY.code, houses: t.houses, people: t.people, members: members, place: cardPlace() };
+  /* v7.9 Fix 23: the party card gains the walk map, under the same
+     truth rules as the haul card. The ONLY geometry it may draw is
+     this device's own recorded trail, read through the exact source
+     the haul card scenes use (haulTrailData: the recorded walk store,
+     then tonight's dots/home). Other members' trails are never
+     recorded anywhere (presence rows are positions, not paths), so
+     the card never stitches a synthetic party map. hasMap is the
+     gate: see partyCardMapOK. Without it the card renders exactly
+     as it did before v7.9 (roster + pooled houses, no map panel). */
+  var td = haulTrailData();
+  data.pts = td.pts; data.segs = td.segs; data.dots = td.dots; data.home = td.home; data.src = td.src; data.stops = td.stops;
+  data.hasMap = partyCardMapOK(td);
+  return data;
+}
+/* The Fix 23 map gate. Stricter than the haul card on purpose: the
+   haul card may fall back to a planned route or to the dashed stop
+   connector, but the owner's rule for the party card is that only a
+   real recorded walk earns the map. Qualifies: the trail source is
+   the recorded walk (src 'walk', not the planned-route fallback) AND
+   cardLineFor resolves a solid line (never the dashed connector,
+   which is the engine's degenerate-track treatment) spanning at
+   least 100 m (the engine's degenerate threshold). Anything else:
+   no map, the pre-v7.9 card. */
+function partyCardMapOK(td) {
+  if (!td || td.src !== 'walk') return false;
+  var line = cardLineFor(td);
+  return !line.dashed && line.pts.length >= 2 && cardLineSpanM(line.pts) >= 100;
 }
 function haulCardData() {
   var td = haulTrailData(), nw = nightWalk();
@@ -8610,6 +8637,36 @@ function paintPartyArt(g, data, imgs, rect, u) {
     g.fillText('+' + more + ' more ' + (more === 1 ? 'walker' : 'walkers'), rect.x + 4, y + Math.round(30 * u));
   }
 }
+/* v7.9 Fix 23: party card art layout. Without a qualifying map
+   (data.hasMap false) this is exactly the pre-v7.9 call: the roster
+   fills the whole art rect. With a map, the scene joins through the
+   same drawSceneFrame the haul card uses (deferred job; tiles,
+   darkening, fallback, and the OSM credit all ride the shared
+   machinery in paintShareCard):
+   - wide art (the 1200x630 crop): roster left, scene right, the
+     same side split as the haul photo layout;
+   - portrait/story: a scene band over the roster. The band takes
+     what the roster does not need (its rows at full height, plus
+     the "+N more" line when the roster truncates), capped at 45%
+     of the art height; if the remainder would shrink under 150u
+     the roster keeps the whole rect and the map yields. */
+function paintPartyCardArt(g, data, imgs, rect, u, jobs) {
+  if (!data.hasMap) { paintPartyArt(g, data, imgs, rect, u); return; }
+  var gap = Math.round(16 * u);
+  if (rect.w > rect.h * 1.4) {
+    var sceneW = Math.round((rect.w - gap) * 0.44);
+    paintPartyArt(g, data, imgs, { x: rect.x, y: rect.y, w: rect.w - sceneW - gap, h: rect.h }, u);
+    drawSceneFrame(g, data, { x: rect.x + rect.w - sceneW, y: rect.y, w: sceneW, h: rect.h }, jobs);
+    return;
+  }
+  var rowH = Math.round(88 * u), rowGap = Math.round(12 * u);
+  var shown = Math.min(6, data.members.length);
+  var need = shown * rowH + Math.max(0, shown - 1) * rowGap + (data.members.length > shown ? Math.round(42 * u) : 0);
+  var sceneH = Math.min(Math.round(rect.h * 0.45), rect.h - need - gap);
+  if (sceneH < Math.round(150 * u)) { paintPartyArt(g, data, imgs, rect, u); return; }
+  drawSceneFrame(g, data, { x: rect.x, y: rect.y, w: rect.w, h: sceneH }, jobs);
+  paintPartyArt(g, data, imgs, { x: rect.x, y: rect.y + sceneH + gap, w: rect.w, h: rect.h - sceneH - gap }, u);
+}
 function paintShareCard(kind, dims, data, imgs, cb) {
   var W = dims.w, H = dims.h;
   var u = W >= 1199 ? 0.66 : 1;
@@ -8668,7 +8725,7 @@ function paintShareCard(kind, dims, data, imgs, cb) {
       { v: data.typeLabel || 'House', l: 'REGISTERED' }
     ], m, statsY, artW, u);
   } else if (kind === 'party') {
-    paintPartyArt(g, data, imgs, { x: m, y: artY, w: artW, h: artH }, u);
+    paintPartyCardArt(g, data, imgs, { x: m, y: artY, w: artW, h: artH }, u, sceneJobs);
     drawCardStats(g, [
       { v: String(data.houses), l: 'HOUSES POOLED' },
       { v: String(data.people), l: 'WALKERS' }
@@ -10027,7 +10084,7 @@ paintChromeState();
 /* v6.4.1 boot self-check marker: the shell's checker script verifies this
    was set. If boot died anywhere above, the repair overlay appears instead
    of a silently half-dead app. */
-window.__ctBootOK = '7.8';
+window.__ctBootOK = '7.9';
 
 </script>
 <script>
