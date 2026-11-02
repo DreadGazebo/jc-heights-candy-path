@@ -1,7 +1,7 @@
 /* Candy Trail service worker (v7.2: shell cache bumped so the activate
    step purges the v11 shell cache; navigations bypass the HTTP cache so a
    fresh deploy is never masked by a stale cached page, as since v6.4.1). */
-var SHELL = 'ct-shell-v23';
+var SHELL = 'ct-shell-v24';
 var FONTS = 'ct-fonts-v6';
 var TILES = 'cp-tiles-v1';
 

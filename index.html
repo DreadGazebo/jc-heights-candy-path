@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0A16">
-<meta name="version" content="7.11">
+<meta name="version" content="7.12">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -429,6 +429,71 @@ body.snap-full #fabSpot,body.snap-full #exploreCard,body.snap-full #drawPill,bod
 .chat-solo .cs-title{flex:1;min-width:0;font-weight:800;font-size:14px;font-family:"Fraunces",Georgia,serif}
 .chat-solo .cs-title span{display:block;color:var(--mut);font-weight:600;font-size:12px}
 #zoneBar{flex:none;background:#1D1526;color:var(--mut);font-size:12px;border-radius:10px;padding:8px 12px;margin-bottom:8px;text-align:center}
+/* v7.12 Fix 26 Trail Wave (party-finder-brief-v2.md; mock party-finder-v2-mock.html).
+   Local chrome: strip + post pill live under the context bar; cards ride the
+   stream. All controls keep the 48px touch floor; no motion is introduced, so
+   reduced-motion needs nothing extra. */
+#waveBar{flex:none;display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
+#waveBar[hidden]{display:none}
+#waveStrip{display:flex;align-items:center;gap:8px;width:100%;min-height:48px;background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--org);border-radius:12px;padding:9px 12px;color:var(--txt);font-size:13.5px;font-weight:600;text-align:left}
+#waveStrip[hidden]{display:none}
+#waveStrip svg{width:16px;height:16px;fill:none;stroke:var(--org2);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+#waveStrip .wv-chev{margin-left:auto;color:var(--mut);display:flex}
+#waveStrip .wv-chev svg{width:14px;height:14px;stroke:var(--mut)}
+#waveStrip.on{border-color:var(--org);background:var(--card2)}
+#waveCtl{display:flex;align-items:center;gap:8px}
+#waveCtl:empty{display:none}
+.wv-pill{display:flex;align-items:center;gap:6px;min-height:48px;padding:0 14px;border-radius:999px;background:var(--card2);border:1px solid var(--line2);color:var(--txt);font-size:13.5px;font-weight:600;white-space:nowrap}
+.wv-pill svg{width:16px;height:16px;fill:none;stroke:var(--org2);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.wv-pill .wv-left{color:var(--cau2)}
+.wv-pill.quiet{border-color:var(--line);color:var(--mut);font-weight:500}
+.wv-pill.quiet svg{stroke:var(--mut)}
+.wv-sp{flex:1}
+.wv-card{background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--org);border-radius:14px;padding:12px 13px;margin-top:12px;width:100%}
+.wv-head{display:flex;align-items:center;gap:9px}
+.wv-puck{width:32px;height:32px;border-radius:99px;background:#141218;border:2px solid var(--pc,#8B7BB8);color:var(--pc,#8B7BB8);display:flex;align-items:center;justify-content:center;flex:none}
+.wv-puck svg{width:19px;height:19px}
+.wv-head .wv-nm{font-size:14.5px;font-weight:700;color:var(--txt);min-width:0}
+.wv-head .wv-corr{font-size:12.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wv-head .wv-left{margin-left:auto;font-size:12px;color:var(--cau2);font-weight:600;white-space:nowrap;flex:none}
+.wv-mod{flex:none;width:40px;height:40px;border-radius:99px;background:transparent;border:0;color:var(--dim);display:flex;align-items:center;justify-content:center}
+.wv-mod svg{width:16px;height:16px}
+.wv-foot{margin-top:9px;font-size:12.5px;color:var(--mut);line-height:1.45}
+.wv-act{display:flex;align-items:center;gap:10px;margin-top:11px;flex-wrap:wrap}
+.wv-btn{display:flex;align-items:center;gap:7px;min-height:48px;padding:0 16px;border-radius:11px;background:var(--org);color:var(--ink);font-size:14.5px;font-weight:700;border:0}
+.wv-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.wv-count{font-size:12.5px;color:var(--mut)}
+.wv-drawer{border-top:1px solid var(--line);margin-top:12px;padding-top:11px}
+.wv-rlabel{font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--mut);margin-bottom:8px}
+.wv-rchips{display:flex;flex-direction:column;gap:7px}
+.wv-rchip{display:flex;align-items:center;gap:8px;min-height:48px;padding:0 13px;border-radius:10px;background:var(--card2);border:1px solid var(--line);font-size:14px;font-weight:500;color:#E2DCF0;text-align:left;width:100%}
+.wv-rchip svg{width:16px;height:16px;fill:none;stroke:var(--pur2);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.wv-rchip.on{border:1.5px solid var(--org);box-shadow:inset 0 0 0 100px rgba(232,93,38,.12);color:#fff;font-weight:600}
+.wv-rrow{display:flex;align-items:center;gap:9px;padding:9px 0;border-top:1px solid var(--line)}
+.wv-rrow:first-of-type{border-top:none}
+.wv-rrow .wv-puck{width:28px;height:28px}
+.wv-rrow .wv-puck svg{width:16px;height:16px}
+.wv-rrow .wv-who{flex:1;min-width:0}
+.wv-rrow .wv-who .wv-nm{font-size:13.5px;font-weight:700;color:var(--txt)}
+.wv-rrow .wv-who .wv-tx{font-size:12.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wv-back{display:flex;align-items:center;gap:6px;min-height:48px;padding:0 12px;border-radius:999px;background:var(--card2);border:1px solid var(--line2);font-size:13px;font-weight:600;color:var(--txt);flex:none}
+.wv-back svg{width:14px;height:14px;fill:none;stroke:var(--org2);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.wv-back.done{background:transparent;border-color:var(--line);color:var(--grn);min-height:40px}
+.wv-back.done svg{stroke:var(--grn)}
+.wv-more{font-size:12.5px;color:var(--mut);padding:6px 0 2px}
+.wv-cm{margin-top:10px;background:#241A33;border:1px solid var(--line);border-left:3px solid var(--pur);border-radius:10px;padding:11px 12px}
+.wv-cm .wv-ctx{font-size:13px;line-height:1.45;color:var(--mut)}
+.wv-cm .wv-ctx b{color:var(--txt);font-weight:600}
+.wv-cm-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.wv-cbtn{display:flex;align-items:center;gap:6px;min-height:48px;padding:0 14px;border-radius:11px;font-size:14px;font-weight:700;white-space:nowrap;border:0}
+.wv-cbtn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.wv-cbtn.primary{background:var(--org);color:var(--ink)}
+.wv-cbtn.ghost{background:var(--card2);border:1px solid var(--line2);color:var(--txt);font-weight:600}
+.wv-cbtn.ghost svg{stroke:var(--pur2)}
+.wv-cm-code{margin-top:11px;background:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px 11px;text-align:center}
+.wv-cm-lab{display:block;font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--mut)}
+.wv-cm-big{display:block;font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:34px;letter-spacing:.14em;color:var(--bone);margin-top:2px}
+.wv-cm-sub{display:block;font-size:11.5px;color:var(--dim);margin-top:2px}
 #chatScroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:2px 2px 6px}
 .chat-empty{color:var(--mut);font-size:13.5px;text-align:center;padding:26px 18px;line-height:1.5}
 .cb-div{text-align:center;color:#8A7F96;font-size:11px;margin:12px 0 8px}
@@ -1065,6 +1130,7 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
 <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M17.5 7H20M4 17h3.5M12 17h8"/><circle cx="15" cy="7" r="2.4"/><circle cx="9.5" cy="17" r="2.4"/></symbol>
 <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11A6.5 6.5 0 0 1 12 3.5 6.5 6.5 0 0 1 18.5 10c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.4"/></symbol>
 <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.4"/><path d="M3.2 19.5c.7-3.2 3-4.8 5.8-4.8s5.1 1.6 5.8 4.8"/><path d="M16 5.6a3.4 3.4 0 0 1 0 5.9M17.8 15c1.7.7 2.7 2.1 3.1 4.2"/></symbol>
+<symbol id="i-wave" viewBox="0 0 24 24"><path d="M12 12h.01"/><path d="M8.6 8.9a4.6 4.6 0 0 0 0 6.2M15.4 8.9a4.6 4.6 0 0 1 0 6.2M6 6.2a9 9 0 0 0 0 11.6M18 6.2a9 9 0 0 1 0 11.6"/></symbol>
 <symbol id="i-users-sm" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.25"/><path d="M3 19.5c0-3 2.7-5.5 6-5.5s6 2.5 6 5.5"/><path d="M16 5.5a3.25 3.25 0 0 1 0 6"/><path d="M18.5 14.5c2 .7 3.5 2.5 3.5 5"/></symbol>
 <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
 <symbol id="i-chev-d" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></symbol>
@@ -1283,7 +1349,7 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
       </div>
       <div class="sheetfoot">
         <div class="wm">Candy Trail</div>
-        <div class="ver" id="appVer">Candy Trail v7.11</div>
+        <div class="ver" id="appVer">Candy Trail v7.12</div>
       </div>
     </div>
 
@@ -1294,6 +1360,10 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
     <div id="tabChat" role="tabpanel" hidden>
       <div id="chatHead"></div>
       <div id="zoneBar" hidden>In Jersey City Heights &middot; Visible to nearby walkers &middot; Clears in 4h</div>
+      <div id="waveBar" hidden>
+        <button id="waveStrip" type="button" hidden></button>
+        <div id="waveCtl"></div>
+      </div>
       <div id="chatScroll"><div id="chatLog"></div></div>
       <div id="chatComposer">
         <div class="cmp-photo" id="chatPhotoPrev" hidden><span class="thumb"><img id="chatPhotoImg" alt="Photo to send"><button id="chatPhotoX" type="button" aria-label="Remove photo"><svg class="ic" viewBox="0 0 24 24"><use href="#i-x"/></svg></button></span></div>
@@ -1399,7 +1469,7 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
   <div class="prefs-foot">
     <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon-mono"/></svg>
     <div class="crest">Candy Trail</div>
-    <div class="ver">Version 7.11</div>
+    <div class="ver">Version 7.12</div>
   </div>
 </div>
 
@@ -7214,6 +7284,7 @@ function renderChat() {
   var log = $('chatLog'); if (!log) return;
   var zone = !partyOn() || CHAT.channel === 'zone';
   $('zoneBar').hidden = !zone;
+  var wb = $('waveBar'); if (wb) wb.hidden = !zone;
   var comp = $('chatComposer');
   if (zone) { zoneRender(); return; }
   if (comp) comp.style.display = '';
@@ -7495,7 +7566,7 @@ var ZONE_BANDS = [
 ];
 var ZONE_ADJ = ['Ember', 'Cinder', 'Velvet', 'Hollow', 'Amber', 'Bramble', 'Garnet', 'Misty', 'Onyx', 'Pumpkin', 'Cobweb', 'Midnight'];
 var ZONE_CREATURE = { wisp: 'Ghost', gourd: 'Pumpkin', jinx: 'Cat', vesper: 'Bat', marrow: 'Skeleton', volt: 'Bolt', hex: 'Witch', lazlo: 'Vampire' };
-var ZONE = { ready: false, loaded: false, dev: '', persona: null, inside: false, viaPin: false, lockCoarse: false, downVis: false, stickyUntil: 0, posts: [], presDevs: [], init: false, fetching: false, cursor: '', down: false, downAt: 0, neighbors: null, hidden: {}, repCounts: {}, repMine: {}, lastSend: 0, lastPresence: 0, timer: null, modId: null };
+var ZONE = { ready: false, loaded: false, dev: '', persona: null, inside: false, viaPin: false, lockCoarse: false, downVis: false, stickyUntil: 0, posts: [], presDevs: [], init: false, fetching: false, cursor: '', down: false, downAt: 0, neighbors: null, hidden: {}, repCounts: {}, repMine: {}, lastSend: 0, lastPresence: 0, timer: null, modId: null, repBy: {}, blockedDevs: {} };
 var ZONE_DRAFT = null;
 
 function zoneHash53(str, seed) {
@@ -7532,6 +7603,14 @@ function zoneLoadIdentity() {
   try { dev = String(store.get('zoneDev', '') || ''); } catch (e) {}
   if (dev) {
     ZONE.dev = dev;
+    /* v7.12 Fix 26: a token minted before the warmup clock existed is a
+       long-lived token; treat it as long past the fresh-token warmup. */
+    var devAt = 0;
+    try { devAt = Number(store.get('zoneDevAt', 0) || 0); } catch (e) {}
+    if (!devAt) { try { store.set('zoneDevAt', Date.now() - 86400000); } catch (e) {} }
+    var blocked = null;
+    try { blocked = store.get('zoneBlockedDevs', null); } catch (e) {}
+    if (blocked && typeof blocked === 'object') { Object.keys(blocked).forEach(function (h) { if (blocked[h]) ZONE.blockedDevs[h] = 1; }); }
     var saved = null;
     try { saved = store.get('zonePersona', null); } catch (e) {}
     if (saved && saved.name && saved.color && saved.avatar && AVATAR_BODY[saved.avatar]) {
@@ -7559,7 +7638,7 @@ function zoneSyncIdentity() {
 function zoneMintDev() {
   var raw = 'ct-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1e9).toString(36) + '-' + Math.floor(Math.random() * 1e9).toString(36);
   var dev = zoneHash53(raw, 7);
-  try { store.set('zoneDev', dev); } catch (e) {}
+  try { store.set('zoneDev', dev); store.set('zoneDevAt', Date.now()); } catch (e) {}
   ZONE.dev = dev;
   return dev;
 }
@@ -7770,6 +7849,9 @@ function zoneFetchMeta() {
         if (ZONE.repCounts[id] !== counts[id]) changed = true;
       });
       ZONE.repCounts = counts;
+      /* v7.12 Fix 26: keep the reporter map too; wave mute inheritance
+         needs to know whether a wave author has ever reported THIS device. */
+      ZONE.repBy = by;
       if (changed && zoneVisible()) zoneRender();
     })
     .catch(function () {});
@@ -7840,21 +7922,32 @@ function zoneShown() {
 }
 function zoneBubblesHtml() {
   var rows = zoneShown();
-  if (!rows.length) {
+  /* v7.12 Fix 26: wave cards ride the same stream, interleaved in time
+     order; the strip's filter shows wave cards only. */
+  var waveList = (typeof waveModels === 'function') ? waveModels(true) : [];
+  if (typeof WAVE !== 'undefined' && WAVE.filter) rows = [];
+  if (!rows.length && !waveList.length) {
+    if (typeof WAVE !== 'undefined' && WAVE.filter) return '<div class="chat-empty">No crews are waving right now.</div>';
     /* v7.0 Phase 4D pioneer state: in a zone nobody has posted in yet,
        say so and hand the first walker the opener. The composer below
        (or the start-pin path when read-only) is the working action. */
     if (ZONE.zoneDef && ZONE.zoneDef.dynamic) return '<div class="chat-empty"><b>' + esc(ZONE.zoneDef.place) + ' is quiet.</b><br>No posts in the last 4 hours. The first walker here sets the tone: say where the candy is.</div>';
     return '<div class="chat-empty"><b>Local is quiet right now.</b><br>No posts in the last 4 hours.</div>';
   }
+  var items = [];
+  rows.forEach(function (r) { items.push({ chat: r, ts: new Date(r.created_at).getTime() || 0 }); });
+  waveList.forEach(function (m) { items.push({ wave: m, ts: m.ts }); });
+  items.sort(function (a, b) { return a.ts - b.ts; });
   var out = '', i = 0, prevTs = 0;
-  while (i < rows.length) {
-    var first = rows[i], fts = new Date(first.created_at).getTime();
-    if (prevTs && isFinite(fts) && fts - prevTs > 10 * 60000) out += '<div class="cb-div">' + esc(fmtChatTime(fts, true)) + '</div>';
+  while (i < items.length) {
+    var it0 = items[i];
+    if (prevTs && isFinite(it0.ts) && it0.ts - prevTs > 10 * 60000) out += '<div class="cb-div">' + esc(fmtChatTime(it0.ts, true)) + '</div>';
+    if (it0.wave) { out += waveCardHtml(it0.wave); prevTs = it0.ts; i++; continue; }
+    var first = it0.chat, fts = it0.ts;
     var grp = [first], j = i + 1;
-    while (j < rows.length) {
-      var nx = rows[j];
-      var nts = new Date(nx.created_at).getTime(), pv = new Date(rows[j - 1].created_at).getTime();
+    while (j < items.length && items[j].chat) {
+      var nx = items[j].chat;
+      var nts = items[j].ts, pv = items[j - 1].ts;
       if (String(nx.devhash || '') !== String(first.devhash || '') || nts - pv > 3 * 60000) break;
       grp.push(nx); j++;
     }
@@ -7933,8 +8026,10 @@ function zoneRender() {
   if (inside) { try { zoneSeed(); } catch (e) {} }
   zoneBarPaint();
   zoneHeadPaint();
+  waveBarPaint();
   zoneEnsure();
   if (ZONE.down && !ZONE.init) {
+    var wbd2 = $('waveBar'); if (wbd2) wbd2.hidden = true;
     if (comp) comp.style.display = 'none';
     if (lock) { lock.hidden = inside; if (!inside) zoneLockPaint(); }
     log.innerHTML = '<div class="chat-empty"><b>Local is not reachable right now.</b><br>The neighborhood feed did not answer. Your party, spots, and haul are fine; try again in a little while.</div>';
@@ -7954,6 +8049,7 @@ function zoneRender() {
     log.querySelectorAll('.cb-mod').forEach(function (b) {
       b.addEventListener('click', function () { zoneModOpen(b.getAttribute('data-mod')); });
     });
+    waveWire(log);
     return;
   }
   if (lock) lock.hidden = true;
@@ -7963,6 +8059,7 @@ function zoneRender() {
   log.querySelectorAll('.cb-mod').forEach(function (b) {
     b.addEventListener('click', function () { zoneModOpen(b.getAttribute('data-mod')); });
   });
+  waveWire(log);
 }
 function zoneEnsure() {
   zoneLoadIdentity();
@@ -7974,6 +8071,7 @@ function zoneEnsure() {
   if (ZONE.down && ZONE.downVis && Date.now() - (ZONE.downAt || 0) < 30000) return;
   zoneFetch(true);
   zoneFetchMeta();
+  waveFetch(true);
   if (ZONE.inside) zonePresence(true);
 }
 function zoneTick() {
@@ -7984,6 +8082,8 @@ function zoneTick() {
   if (!ZONE.init) { zoneEnsure(); return; }
   zoneFetch(false);
   zoneFetchMeta();
+  waveFetch(false);
+  waveAutoTick();
   if (ZONE.inside) zonePresence(false);
 }
 /* ---------- moderation (client-enforced v1) ---------- */
@@ -7992,6 +8092,8 @@ function zoneModOpen(id) {
   ZONE.modId = String(id);
   var r = null;
   ZONE.posts.forEach(function (p) { if (p.id && String(p.id) === ZONE.modId) r = p; });
+  /* v7.12 Fix 26: wave cards and reply rows moderate through the same menu. */
+  if (!r && typeof WAVE !== 'undefined') WAVE.rows.forEach(function (p) { if (p.id && String(p.id) === ZONE.modId) r = p; });
   var t = $('zmTitle');
   if (t) t.textContent = r ? ('Post by ' + (r.persona || 'a neighbor') + ' · ' + (r.corridor || zoneWholeTag())) : 'Post options';
   var pop = $('zoneModPop');
@@ -8002,9 +8104,22 @@ function zoneModClose() {
   if (pop) pop.hidden = true;
   ZONE.modId = null;
 }
+/* v7.12 Fix 26: hiding or reporting a device's content remembers the
+   device, silently: its waves stop reaching this device and this device's
+   waves stop reaching it (mute inheritance, both directions, no notice). */
+function zoneBlockAuthorOf(id) {
+  var r = null;
+  ZONE.posts.forEach(function (p) { if (p.id && String(p.id) === String(id)) r = p; });
+  if (!r && typeof WAVE !== 'undefined') WAVE.rows.forEach(function (p) { if (p.id && String(p.id) === String(id)) r = p; });
+  if (r && r.devhash && r.devhash !== ZONE.dev) {
+    ZONE.blockedDevs[String(r.devhash)] = 1;
+    try { store.set('zoneBlockedDevs', ZONE.blockedDevs); } catch (e) {}
+  }
+}
 function zoneHidePost() {
   if (!ZONE.modId) return;
   ZONE.hidden[ZONE.modId] = 1;
+  zoneBlockAuthorOf(ZONE.modId);
   try { store.set('zoneHidden', Object.keys(ZONE.hidden)); } catch (e) {}
   zoneModClose();
   zoneRender();
@@ -8014,6 +8129,7 @@ function zoneReportPost() {
   if (!ZONE.modId) { zoneModClose(); return; }
   if (!ZONE.dev) zoneMintDev(); /* a report needs a reporter hash: mint the device hash only, never a persona */
   var id = ZONE.modId;
+  zoneBlockAuthorOf(id);
   if (!ZONE.repMine[id]) {
     ZONE.repMine[id] = 1;
     ZONE.repCounts[id] = (ZONE.repCounts[id] || 0) + 1;
@@ -8069,6 +8185,608 @@ function zonePopDone() {
   zonePaintPersonaBtn();
   if (zoneVisible()) zoneRender();
 }
+/* ================= v7.12 Fix 26: Trail Wave =================
+   party-finder-brief-v2.md is the governing spec (Party Finder retired;
+   zero-choice by design: no cues, no pace, nothing to pick). A wave is a
+   zone_posts row family riding the Local channel:
+     wave       msg 'wv1'                          (corridor = the row's corridor)
+     wave_reply msg 'wr1|<wave row id>|<reply>'    reply in WAVE_REPLIES
+     wave_ack   msg 'wa1|<reply row id>'           honored only from the wave author
+     wave_extend msg 'we1|<wave row id>'           at most one per wave
+     wave_end   msg 'wx1|<wave or reply row id>'   author ends own wave / own reply
+   party_posts is untouched and NO wave-family row ever carries a party
+   code or party id: the completion moment renders from local state
+   only. Local stays text-only; waves add no media of any kind. */
+var WAVE_TTL_MS = 20 * 60000;
+var WAVE_EXT_MS = 15 * 60000;
+var WAVE_COOLDOWN_MS = 10 * 60000;
+var WAVE_FRESH_MS = 60000;
+var WAVE_WARM_MS = (typeof window !== 'undefined' && window.__WAVE_WARM_MS) || 5 * 60000;
+var WAVE_REPLIES = {
+  on_street_now: 'On this street now!',
+  heading_this_way: 'Heading this way',
+  great_houses: 'Great houses on this block'
+};
+var WAVE = {
+  rows: [], cursor: '', init: false, fetching: false,
+  filter: false, expanded: {}, shownCode: {},
+  anchor: null, samples: [], outSince: 0, recWas: false, ending: false,
+  pendingAnchor: null, timer: null, lastCount: -1
+};
+try { var _wa = store.get('waveAnchor', null); if (_wa && _wa.id) WAVE.anchor = _wa; } catch (e) {}
+function waveIc(id) { return '<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#' + id + '"/></svg>'; }
+function waveParse(r) {
+  var p = String((r && r.msg) || '').split('|');
+  return { tag: p[0] || '', a: p[1] || '', b: p[2] || '' };
+}
+function waveRowTs(r) { return Date.parse(r && r.created_at) || 0; }
+function waveDevAt() {
+  var at = 0;
+  try { at = Number(store.get('zoneDevAt', 0) || 0); } catch (e) {}
+  return at;
+}
+function waveWarmed() {
+  if (!ZONE.dev) return false;
+  var at = waveDevAt();
+  if (!at) return true; /* token predates the warmup clock: long past warm */
+  return Date.now() - at >= WAVE_WARM_MS;
+}
+function waveCurfew() {
+  var d = new Date(), mins = d.getHours() * 60 + d.getMinutes();
+  return mins >= 21 * 60 + 30 || mins < 5 * 60;
+}
+function waveFix() {
+  var p = S.pos;
+  if (!p || !isFinite(p.lat) || !isFinite(p.lng)) return null;
+  if (Date.now() - (p.ts || 0) > WAVE_FRESH_MS) return null;
+  if (!zoneInside(p.lat, p.lng)) return null;
+  return { lat: p.lat, lng: p.lng, band: zoneBand(p.lat, p.lng) };
+}
+function waveBandCenter(tag) {
+  var c = null;
+  ZONE_BANDS.forEach(function (bd) { if (bd.t === tag) c = bd; });
+  return c;
+}
+function waveBandMinGap() {
+  var min = Infinity;
+  for (var i = 0; i < ZONE_BANDS.length; i++) for (var j = i + 1; j < ZONE_BANDS.length; j++) {
+    var d = haversine(ZONE_BANDS[i], ZONE_BANDS[j]);
+    if (d > 0 && d < min) min = d;
+  }
+  return isFinite(min) ? min : 0;
+}
+function waveCorridorOk(waveCorr) {
+  /* The presence reply is presence-verified: the responder's own corridor
+     must be the wave's corridor or an adjacent one. Same tag is exact;
+     the whole-zone fallback tag matches anything in the zone; otherwise
+     a fix within one band radius (500 m) of the wave band's center is on
+     the same street grain, and band centers within 1.45x the grid step
+     are edge-neighbors (diagonals sit beyond that on the 3x3 grids). */
+  var f = waveFix();
+  if (!f) return false;
+  if (f.band === waveCorr) return true;
+  var whole = zoneWholeTag();
+  if (f.band === whole || waveCorr === whole) return true;
+  var c = waveBandCenter(waveCorr);
+  if (!c) return false;
+  if (haversine(f, c) <= 500) return true;
+  var mine = waveBandCenter(f.band);
+  if (!mine) return false;
+  var gap = waveBandMinGap();
+  return gap > 0 && haversine(mine, c) <= gap * 1.45;
+}
+function waveAuthorMuted(devhash) {
+  var h = String(devhash || '');
+  if (!h || !ZONE.dev || h === ZONE.dev) return false;
+  if (ZONE.blockedDevs[h]) return true;
+  /* Reverse direction: a device this device has been reported BY is also
+     cut off, silently, per the brief's two-way inheritance. repBy maps
+     post id -> reporters; my own posts are the ones authored by ZONE.dev. */
+  var mine = {};
+  ZONE.posts.forEach(function (p) { if (String(p.devhash || '') === ZONE.dev) mine[String(p.id)] = 1; });
+  WAVE.rows.forEach(function (p) { if (String(p.devhash || '') === ZONE.dev) mine[String(p.id)] = 1; });
+  var muted = false;
+  Object.keys(ZONE.repBy || {}).forEach(function (pid) {
+    if (mine[pid] && ZONE.repBy[pid] && ZONE.repBy[pid][h]) muted = true;
+  });
+  return muted;
+}
+function waveModelVisible(m) {
+  if (ZONE.dev && String(m.row.devhash || '') === ZONE.dev) return true;
+  if (ZONE.hidden[m.id]) return false;
+  if ((ZONE.repCounts[m.id] || 0) >= 3) return false;
+  if (waveAuthorMuted(m.row.devhash)) return false;
+  return true;
+}
+function waveReplyVisible(rp) {
+  if (ZONE.dev && String(rp.row.devhash || '') === ZONE.dev) return true;
+  if (ZONE.hidden[String(rp.row.id)]) return false;
+  if ((ZONE.repCounts[String(rp.row.id)] || 0) >= 3) return false;
+  if (waveAuthorMuted(rp.row.devhash)) return false;
+  return true;
+}
+function waveModels(visibleOnly) {
+  var now = Date.now(), byId = {};
+  WAVE.rows.forEach(function (r) {
+    if (r.kind === 'wave' && r.id) byId[String(r.id)] = { row: r, id: String(r.id), ts: waveRowTs(r), replies: [], extended: false, ended: false, expires: 0 };
+  });
+  var latest = {};
+  WAVE.rows.forEach(function (r) {
+    if (r.kind !== 'wave_reply') return;
+    var p = waveParse(r);
+    if (!byId[p.a] || !WAVE_REPLIES[p.b]) return;
+    var k = p.a + '|' + String(r.devhash || '');
+    if (!latest[k] || waveRowTs(r) >= waveRowTs(latest[k])) latest[k] = r;
+  });
+  Object.keys(latest).forEach(function (k) {
+    var r = latest[k], p = waveParse(r);
+    byId[p.a].replies.push({ row: r, id: String(r.id), ts: waveRowTs(r), key: p.b, acked: false, ended: false });
+  });
+  WAVE.rows.forEach(function (r) {
+    var p = waveParse(r);
+    if (r.kind === 'wave_extend') {
+      var m1 = byId[p.a];
+      if (m1 && String(r.devhash || '') === String(m1.row.devhash || '')) m1.extended = true;
+    } else if (r.kind === 'wave_ack') {
+      Object.keys(byId).forEach(function (wid) {
+        var m2 = byId[wid];
+        m2.replies.forEach(function (rp) {
+          if (rp.id === p.a && String(r.devhash || '') === String(m2.row.devhash || '')) rp.acked = true;
+        });
+      });
+    } else if (r.kind === 'wave_end') {
+      var m3 = byId[p.a];
+      if (m3 && String(r.devhash || '') === String(m3.row.devhash || '')) m3.ended = true;
+      Object.keys(byId).forEach(function (wid) {
+        byId[wid].replies.forEach(function (rp) {
+          if (rp.id === p.a && String(r.devhash || '') === String(rp.row.devhash || '')) rp.ended = true;
+        });
+      });
+    }
+  });
+  var out = [];
+  Object.keys(byId).forEach(function (id) {
+    var m = byId[id];
+    m.expires = m.ts + WAVE_TTL_MS + (m.extended ? WAVE_EXT_MS : 0);
+    m.replies.sort(function (a, b) { return a.ts - b.ts; });
+    m.replies = m.replies.filter(function (rp) { return !rp.ended; });
+    if (m.ended || now > m.expires) return;
+    if (visibleOnly && !waveModelVisible(m)) return;
+    out.push(m);
+  });
+  out.sort(function (a, b) { return a.ts - b.ts; });
+  return out;
+}
+function waveMine(models) {
+  if (!ZONE.dev) return null;
+  var ms = models || waveModels(false);
+  for (var i = 0; i < ms.length; i++) if (String(ms[i].row.devhash || '') === ZONE.dev) return ms[i];
+  return null;
+}
+function waveMyReply(m) {
+  if (!ZONE.dev) return null;
+  for (var i = 0; i < m.replies.length; i++) if (String(m.replies[i].row.devhash || '') === ZONE.dev) return m.replies[i];
+  return null;
+}
+function waveLeftMs(m) { return m.expires - Date.now(); }
+function waveLeftText(m) {
+  var ms = waveLeftMs(m);
+  if (ms <= 0) return 'Ended';
+  /* Server stamps can run a few seconds ahead of the device clock; a
+     wave never displays more than its full life (20m, 35m extended). */
+  var cap = (WAVE_TTL_MS + (m.extended ? WAVE_EXT_MS : 0)) / 60000;
+  return Math.min(Math.ceil(ms / 60000), cap) + 'm left';
+}
+function waveCooldownLeft() {
+  var until = 0;
+  try { until = Number(store.get('waveCooldownUntil', 0) || 0); } catch (e) {}
+  return Math.max(0, until - Date.now());
+}
+/* ---------- transport ---------- */
+function waveIngest(rows) {
+  var seen = {};
+  WAVE.rows.forEach(function (r) { seen[zoneKey(r)] = 1; });
+  var changed = false, maxTs = WAVE.cursor;
+  (rows || []).forEach(function (r) {
+    if (!r || !r.id) return;
+    if (['wave', 'wave_reply', 'wave_ack', 'wave_extend', 'wave_end'].indexOf(r.kind) < 0) return;
+    if (r.zone && String(r.zone) !== ZONE_ID) return;
+    if (r.created_at && (!maxTs || String(r.created_at) > maxTs)) maxTs = String(r.created_at);
+    var k = zoneKey(r);
+    if (seen[k]) return;
+    seen[k] = 1;
+    WAVE.rows.push(r);
+    changed = true;
+  });
+  if (maxTs) WAVE.cursor = maxTs;
+  var cutoff = Date.now() - 75 * 60000;
+  WAVE.rows = WAVE.rows.filter(function (r) { return waveRowTs(r) > cutoff; });
+  WAVE.rows.sort(function (a, b) { return waveRowTs(a) - waveRowTs(b); });
+  return changed;
+}
+function waveFetch(initial) {
+  if (!crowdOn() || WAVE.fetching) return;
+  WAVE.fetching = true;
+  var kinds = 'kind=in.(wave,wave_reply,wave_ack,wave_extend,wave_end)';
+  var url = CROWD.url + '/rest/v1/zone_posts?zone=eq.' + encodeURIComponent(ZONE_ID) + '&' + kinds + '&select=*';
+  url += (initial || !WAVE.cursor)
+    ? '&order=created_at.desc&limit=120'
+    : '&created_at=gt.' + encodeURIComponent(WAVE.cursor) + '&order=created_at.asc&limit=100';
+  var p;
+  try { p = fetch(url, { headers: crowdHeaders() }); } catch (e) { WAVE.fetching = false; return; }
+  p.then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (rows) {
+      WAVE.fetching = false;
+      if (!Array.isArray(rows)) return;
+      var changed = waveIngest(rows);
+      WAVE.init = true;
+      if (!zoneVisible()) return;
+      if (changed) zoneRender(); else waveBarPaint();
+    })
+    .catch(function () { WAVE.fetching = false; });
+}
+function wavePostRow(kind, msg, corridor, done) {
+  if (!ZONE.dev || !ZONE.persona) { try { zoneSeed(); } catch (e) {} }
+  if (!ZONE.dev || !ZONE.persona) { if (done) done(false); return; }
+  var body = { zone: ZONE_ID, persona: ZONE.persona.name, color: ZONE.persona.color, avatar: ZONE.persona.avatar, devhash: ZONE.dev, corridor: corridor || zoneWholeTag(), kind: kind, msg: msg };
+  var p;
+  try {
+    p = fetch(CROWD.url + '/rest/v1/zone_posts', { method: 'POST', headers: crowdHeaders(), body: JSON.stringify(body) });
+  } catch (e) { if (done) done(false); return; }
+  p.then(function (r) {
+    if (done) done(!!(r && r.ok));
+    setTimeout(function () { waveFetch(false); }, 500);
+  }).catch(function () { if (done) done(false); });
+}
+/* ---------- actions ---------- */
+function wavePost() {
+  if (ZONE.down) { toast('Local is unavailable right now.', 'warn'); return; }
+  if (waveCurfew()) { toast('Waves pause at 9:30 PM. See you out there tomorrow.', 'warn'); return; }
+  if (waveMine()) { toast('Your wave is already up.', 'ok'); return; }
+  var cd = waveCooldownLeft();
+  if (cd > 0) { toast('Waves reopen in ' + Math.ceil(cd / 60000) + 'm.', 'warn'); return; }
+  if (!waveWarmed()) { toast('New walkers can wave in a few minutes. Say hi in Local first.', 'warn'); return; }
+  var f = waveFix();
+  if (!f) { toast('Waves need a fresh location fix in the neighborhood.', 'warn'); return; }
+  wavePostRow('wave', 'wv1', f.band, function (ok) {
+    if (!ok) { toast('That wave did not post. Check your connection and try again.', 'warn'); return; }
+    toast('Waving ' + f.band + ' for 20 minutes.', 'ok');
+    WAVE.pendingAnchor = { lat: f.lat, lng: f.lng, corridor: f.band, ts: Date.now(), disp: 0 };
+    WAVE.anchor = { id: '', lat: f.lat, lng: f.lng, corridor: f.band, ts: Date.now(), disp: 0 };
+    WAVE.samples = [{ lat: f.lat, lng: f.lng, ts: Date.now() }];
+    WAVE.outSince = 0;
+    WAVE.recWas = !!(typeof REC !== 'undefined' && REC.on);
+    setTimeout(waveBindAnchor, 700);
+    setTimeout(waveBindAnchor, 2000);
+    waveBarPaint();
+  });
+}
+function waveBindAnchor() {
+  if (!WAVE.anchor || WAVE.anchor.id) return;
+  var m = waveMine();
+  if (!m) return;
+  WAVE.anchor.id = m.id;
+  WAVE.pendingAnchor = null;
+  try { store.set('waveAnchor', WAVE.anchor); } catch (e) {}
+}
+function waveCanExtend(m) {
+  if (!m || !ZONE.dev || String(m.row.devhash || '') !== ZONE.dev) return false;
+  if (m.extended) return false;
+  var left = waveLeftMs(m);
+  return left > 0 && left <= 5 * 60000;
+}
+function waveExtendMoved(m) {
+  /* The brief's extension gate: the poster must be out moving INSIDE the
+     same corridor the wave was posted from. A stationary phone on a
+     counter cannot keep a wave alive, and a poster who has left the
+     corridor is auto-ended instead of extended. (The build task's
+     one-line summary said "different corridor"; the governing brief's
+     rule is the coherent one, since leaving the corridor ends the wave,
+     and is what ships.) */
+  var a = WAVE.anchor;
+  if (!a || (a.id && a.id !== m.id)) return false;
+  var f = waveFix();
+  if (!f || f.band !== (m.row.corridor || '')) return false;
+  return (a.disp || 0) >= 25;
+}
+function waveExtend() {
+  var m = waveMine();
+  if (!m) return;
+  if (waveCurfew()) { toast('Waves pause at 9:30 PM.', 'warn'); return; }
+  if (m.extended) { toast('This wave already used its extension.', 'ok'); return; }
+  if (!waveCanExtend(m)) { toast('Extensions open in the last 5 minutes of a wave.', 'ok'); return; }
+  if (!waveExtendMoved(m)) { toast('Still here needs you out on the street.', 'warn'); return; }
+  wavePostRow('wave_extend', 'we1|' + m.id, m.row.corridor || zoneWholeTag(), function (ok) {
+    toast(ok ? 'Wave extended by 15 minutes.' : 'That did not go through. Try again.', ok ? 'ok' : 'warn');
+  });
+}
+function waveEndMine(auto) {
+  var m = waveMine();
+  if (!m || WAVE.ending) return;
+  WAVE.ending = true;
+  wavePostRow('wave_end', 'wx1|' + m.id, m.row.corridor || zoneWholeTag(), function () {
+    WAVE.ending = false;
+    WAVE.anchor = null;
+    WAVE.pendingAnchor = null;
+    try { store.set('waveAnchor', null); store.set('waveCooldownUntil', Date.now() + WAVE_COOLDOWN_MS); } catch (e) {}
+    if (!auto) toast('Wave ended.', 'ok');
+    if (zoneVisible()) zoneRender(); else waveBarPaint();
+  });
+}
+function waveReplySend(wid, key) {
+  var m = null;
+  waveModels(true).forEach(function (x) { if (x.id === String(wid)) m = x; });
+  if (!m) { toast('That wave has ended.', 'warn'); return; }
+  if (waveCurfew()) { toast('Waves pause at 9:30 PM.', 'warn'); return; }
+  if (ZONE.dev && String(m.row.devhash || '') === ZONE.dev) return;
+  if (waveMyReply(m)) { toast('You already answered this wave.', 'ok'); return; }
+  if (!waveWarmed()) { toast('New walkers can answer waves in a few minutes. Say hi in Local first.', 'warn'); return; }
+  var f = waveFix();
+  if (!f) { toast('Answering a wave needs a fresh location fix in the neighborhood.', 'warn'); return; }
+  if (key === 'on_street_now' && !waveCorridorOk(m.row.corridor || '')) { toast('That one is for walkers on the street itself.', 'warn'); return; }
+  wavePostRow('wave_reply', 'wr1|' + m.id + '|' + key, f.band, function (ok) {
+    if (ok) { WAVE.expanded[m.id] = true; toast('Answer sent.', 'ok'); }
+    else toast('That did not go through. Try again.', 'warn');
+  });
+}
+function waveWithdrawReply(rid) {
+  var corridor = zoneWholeTag();
+  WAVE.rows.forEach(function (r) { if (String(r.id) === String(rid)) corridor = r.corridor || corridor; });
+  wavePostRow('wave_end', 'wx1|' + String(rid), corridor, function (ok) {
+    if (ok) toast('Answer withdrawn.', 'ok');
+  });
+}
+function waveAck(rid) {
+  var m = waveMine();
+  if (!m) return;
+  if (waveCurfew()) { toast('Waves pause at 9:30 PM.', 'warn'); return; }
+  var rp = null;
+  m.replies.forEach(function (x) { if (x.id === String(rid)) rp = x; });
+  if (!rp || rp.acked) return;
+  wavePostRow('wave_ack', 'wa1|' + rp.id, m.row.corridor || zoneWholeTag(), function (ok) {
+    if (ok) toast('Waved back. Say hi in person.', 'ok');
+    else toast('That did not go through. Try again.', 'warn');
+  });
+}
+function wavePair(m) {
+  /* The completion pair for THIS device on wave m: an acked reply that
+     involves me (as the wave's poster, or as the replier). Third parties
+     see only the "Waved back" marker on the row, never the moment. */
+  if (!ZONE.dev) return null;
+  var isPoster = String(m.row.devhash || '') === ZONE.dev;
+  for (var i = 0; i < m.replies.length; i++) {
+    var rp = m.replies[i];
+    if (!rp.acked) continue;
+    if (isPoster || String(rp.row.devhash || '') === ZONE.dev) return rp;
+  }
+  return null;
+}
+function waveEnterCode() {
+  /* Pure navigation: jump to the Party tab with the join flow open and
+     the code field focused and EMPTY. Nothing is prefilled, nothing is
+     posted, no row anywhere records that this happened. */
+  switchTab('party');
+  if (!partyOn()) {
+    PARTY.joinOpen = true;
+    renderPartyBox();
+  }
+  setTimeout(function () {
+    var inp = $('partyCode');
+    if (inp) { try { inp.focus(); } catch (e) {} }
+  }, 60);
+}
+/* ---------- rendering ---------- */
+function waveDrawerHtml(m) {
+  var h = '<div class="wv-drawer"><div class="wv-rlabel">Answer the wave</div><div class="wv-rchips">';
+  if (waveCorridorOk(m.row.corridor || '')) h += '<button type="button" class="wv-rchip" data-wv-reply="' + esc(m.id) + '" data-wv-key="on_street_now">' + waveIc('i-pin') + ' On this street now!</button>';
+  h += '<button type="button" class="wv-rchip" data-wv-reply="' + esc(m.id) + '" data-wv-key="heading_this_way">' + waveIc('i-route') + ' Heading this way</button>';
+  h += '<button type="button" class="wv-rchip" data-wv-reply="' + esc(m.id) + '" data-wv-key="great_houses">' + waveIc('i-home') + ' Great houses on this block</button>';
+  h += '</div></div>';
+  return h;
+}
+function waveRepliesHtml(m) {
+  if (!m.replies.length) return '';
+  var isPoster = ZONE.dev && String(m.row.devhash || '') === ZONE.dev;
+  var vis = m.replies.filter(waveReplyVisible);
+  if (!vis.length) return '';
+  var show = isPoster ? vis : vis.slice(0, 5);
+  var ro = waveCurfew();
+  var h = '<div class="wv-replies">';
+  show.forEach(function (rp) {
+    var rr = rp.row;
+    var rcol = rr.color || partyColor(rr.persona || '');
+    var rMine = ZONE.dev && String(rr.devhash || '') === ZONE.dev;
+    h += '<div class="wv-rrow"><span class="wv-puck" style="--pc:' + rcol + ';border-color:' + rcol + ';color:' + rcol + '">' + avatarSvg(rr.avatar || 'wisp') + '</span>' +
+      '<div class="wv-who"><div class="wv-nm">' + esc(rr.persona || 'Walker') + (rMine ? ' &middot; You' : '') + '</div><div class="wv-tx">' + esc(WAVE_REPLIES[rp.key] || '') + '</div></div>';
+    if (rp.acked) h += '<span class="wv-back done">' + waveIc('i-check') + ' Waved back</span>';
+    else if (isPoster && !ro) h += '<button type="button" class="wv-back" data-wv-back="' + esc(rp.id) + '">' + waveIc('i-wave') + ' Wave back</button>';
+    if (!rMine && rr.id) h += '<button type="button" class="wv-mod cb-mod" data-mod="' + esc(String(rp.id)) + '" aria-label="Answer options">&middot;&middot;&middot;</button>';
+    h += '</div>';
+  });
+  if (!isPoster && vis.length > 5) h += '<div class="wv-more">+' + (vis.length - 5) + ' more</div>';
+  h += '</div>';
+  return h;
+}
+function waveMomentHtml(m) {
+  var rp = wavePair(m);
+  if (!rp) return '';
+  var h = '<div class="wv-cm"><div class="wv-ctx"><b>You found each other.</b> Say hi in person, then enter their party code to walk together.</div>';
+  if (!waveCurfew()) {
+    h += '<div class="wv-cm-actions"><button type="button" class="wv-cbtn primary" data-wv-enter="1">' + waveIc('i-users') + ' Enter party code</button>';
+    if (partyOn() && PARTY.code) {
+      if (WAVE.shownCode[rp.id]) {
+        h += '</div><div class="wv-cm-code"><span class="wv-cm-lab">Your party code &middot; read it aloud</span><span class="wv-cm-big">' + esc(PARTY.code) + '</span><span class="wv-cm-sub">They type it in. The app never sends it.</span></div></div>';
+        return h;
+      }
+      h += '<button type="button" class="wv-cbtn ghost" data-wv-show="' + esc(rp.id) + '">' + waveIc('i-qr') + ' Show my code</button>';
+    }
+    h += '</div>';
+  }
+  return h + '</div>';
+}
+function waveCardHtml(m) {
+  var r = m.row;
+  var mine = ZONE.dev && String(r.devhash || '') === ZONE.dev;
+  var col = r.color || partyColor(r.persona || '');
+  var ro = waveCurfew();
+  var h = '<div class="wv-card" data-wid="' + esc(m.id) + '">';
+  h += '<div class="wv-head"><span class="wv-puck" style="--pc:' + col + ';border-color:' + col + ';color:' + col + '">' + avatarSvg(r.avatar || 'wisp') + '</span>' +
+    '<span class="wv-nm">' + esc(r.persona || 'Walker') + (mine ? ' &middot; You' : '') + '</span>' +
+    '<span class="wv-corr">' + esc(r.corridor || zoneWholeTag()) + '</span>' +
+    '<span class="wv-left" data-wleft="' + esc(m.id) + '">' + esc(waveLeftText(m)) + '</span>' +
+    (!mine && r.id ? '<button type="button" class="wv-mod cb-mod" data-mod="' + esc(m.id) + '" aria-label="Wave options">&middot;&middot;&middot;</button>' : '') +
+    '</div>';
+  h += '<div class="wv-foot">Walking here now. Wave back if your crew is out on this street too.</div>';
+  var myRp = waveMyReply(m);
+  if (!mine && !ro) {
+    if (myRp) {
+      h += '<div class="wv-act"><span class="wv-count">You answered: ' + esc(WAVE_REPLIES[myRp.key] || '') + '</span><button type="button" class="wv-back" data-wv-withdraw="' + esc(myRp.id) + '">Withdraw</button></div>';
+    } else {
+      h += '<div class="wv-act"><button type="button" class="wv-btn" data-wv-open="' + esc(m.id) + '">' + waveIc('i-wave') + ' Walking here too</button>' +
+        (m.replies.length ? '<span class="wv-count">' + m.replies.length + (m.replies.length === 1 ? ' crew' : ' crews') + ' answered</span>' : '') + '</div>';
+      if (WAVE.expanded[m.id]) h += waveDrawerHtml(m);
+    }
+  } else if (!mine && m.replies.length) {
+    h += '<div class="wv-act"><span class="wv-count">' + m.replies.length + (m.replies.length === 1 ? ' crew' : ' crews') + ' answered</span></div>';
+  }
+  if (mine && waveCanExtend(m) && !ro) {
+    h += '<div class="wv-act"><button type="button" class="wv-btn" data-wv-extend="1">' + waveIc('i-plus') + ' Add 15 min</button><span class="wv-count">Extension: one per wave, while you are out walking this street.</span></div>';
+  }
+  h += waveRepliesHtml(m);
+  h += waveMomentHtml(m);
+  h += '</div>';
+  return h;
+}
+function waveWire(log) {
+  if (!log) return;
+  log.querySelectorAll('[data-wv-open]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var id = b.getAttribute('data-wv-open');
+      WAVE.expanded[id] = !WAVE.expanded[id];
+      zoneRender();
+    });
+  });
+  log.querySelectorAll('[data-wv-reply]').forEach(function (b) {
+    b.addEventListener('click', function () { waveReplySend(b.getAttribute('data-wv-reply'), b.getAttribute('data-wv-key')); });
+  });
+  log.querySelectorAll('[data-wv-back]').forEach(function (b) {
+    b.addEventListener('click', function () { waveAck(b.getAttribute('data-wv-back')); });
+  });
+  log.querySelectorAll('[data-wv-withdraw]').forEach(function (b) {
+    b.addEventListener('click', function () { waveWithdrawReply(b.getAttribute('data-wv-withdraw')); });
+  });
+  log.querySelectorAll('[data-wv-extend]').forEach(function (b) {
+    b.addEventListener('click', function () { waveExtend(); });
+  });
+  log.querySelectorAll('[data-wv-enter]').forEach(function (b) {
+    b.addEventListener('click', function () { waveEnterCode(); });
+  });
+  log.querySelectorAll('[data-wv-show]').forEach(function (b) {
+    b.addEventListener('click', function () { WAVE.shownCode[b.getAttribute('data-wv-show')] = 1; zoneRender(); });
+  });
+}
+function waveBarPaint() {
+  var bar = $('waveBar'), strip = $('waveStrip'), ctl = $('waveCtl');
+  if (!bar || !strip || !ctl) return;
+  var zoneCh = (typeof CHAT === 'undefined') || !partyOn() || CHAT.channel === 'zone';
+  if (!zoneCh || ZONE.down) { bar.hidden = true; return; }
+  bar.hidden = false;
+  var models = waveModels(true);
+  WAVE.lastCount = models.length;
+  var mine = waveMine(models);
+  if (models.length) {
+    strip.hidden = false;
+    strip.classList.toggle('on', !!WAVE.filter);
+    strip.innerHTML = waveIc('i-wave') + '<span>' + models.length + (models.length === 1 ? ' crew' : ' crews') + ' waving nearby</span><span class="wv-chev">' + waveIc('i-chev') + '</span>';
+  } else {
+    strip.hidden = true;
+    if (WAVE.filter) WAVE.filter = false;
+  }
+  var h = '';
+  if (mine) {
+    h = '<div class="wv-pill">' + waveIc('i-wave') + ' Your wave &middot; <span class="wv-left" data-wleft="' + esc(mine.id) + '">' + esc(waveLeftText(mine)) + '</span></div><span class="wv-sp"></span>' +
+      '<button type="button" class="wv-pill quiet" id="waveEndBtn">End wave</button>';
+  } else {
+    var cd = waveCooldownLeft();
+    if (cd > 0) h = '<span class="wv-sp"></span><button type="button" class="wv-pill quiet" id="wavePostBtn">' + waveIc('i-wave') + ' Waves reopen in ' + Math.ceil(cd / 60000) + 'm</button>';
+    else if (waveCurfew()) h = '<span class="wv-sp"></span><button type="button" class="wv-pill quiet" id="wavePostBtn">' + waveIc('i-wave') + ' Waves pause at 9:30 PM</button>';
+    else h = '<span class="wv-sp"></span><button type="button" class="wv-pill" id="wavePostBtn">' + waveIc('i-wave') + ' Wave on this street</button>';
+  }
+  ctl.innerHTML = h;
+  var pb = $('wavePostBtn'); if (pb) pb.addEventListener('click', wavePost);
+  var eb = $('waveEndBtn'); if (eb) eb.addEventListener('click', function () { waveEndMine(false); });
+}
+function wavePaintCountdowns() {
+  var models = waveModels(true), byId = {};
+  models.forEach(function (m) { byId[m.id] = m; });
+  document.querySelectorAll('[data-wleft]').forEach(function (el) {
+    var m = byId[el.getAttribute('data-wleft')];
+    if (m) el.textContent = waveLeftText(m);
+  });
+  return models.length;
+}
+function waveSecondTick() {
+  waveAutoTick();
+  if (!zoneVisible()) return;
+  var n = wavePaintCountdowns();
+  /* a card lapsed (or one arrived via an end row): repaint the stream */
+  if (WAVE.lastCount >= 0 && n !== WAVE.lastCount && WAVE.init) { zoneRender(); return; }
+  /* the extension window opening needs its button painted */
+  var m = waveMine();
+  if (m && waveCanExtend(m) && !document.querySelector('[data-wv-extend]')) { zoneRender(); return; }
+  waveBarPaint();
+}
+/* ---------- auto-end: still walking is the whole premise ---------- */
+function waveAutoTick() {
+  var m = waveMine();
+  if (!m) {
+    if (WAVE.anchor) { WAVE.anchor = null; try { store.set('waveAnchor', null); } catch (e) {} }
+    return;
+  }
+  if (WAVE.anchor && !WAVE.anchor.id) waveBindAnchor();
+  if (WAVE.anchor && WAVE.anchor.id && WAVE.anchor.id !== m.id) {
+    WAVE.anchor = null;
+    try { store.set('waveAnchor', null); } catch (e) {}
+  }
+  var p = S.pos;
+  if (p && isFinite(p.lat) && isFinite(p.lng) && p.ts && Date.now() - p.ts <= 120000) {
+    var s = { lat: p.lat, lng: p.lng, ts: Date.now() };
+    WAVE.samples.push(s);
+    var cut = Date.now() - 12 * 60000;
+    WAVE.samples = WAVE.samples.filter(function (x) { return x.ts > cut; });
+    if (WAVE.anchor) {
+      var d = haversine(WAVE.anchor, s);
+      if (d > (WAVE.anchor.disp || 0)) {
+        WAVE.anchor.disp = d;
+        try { store.set('waveAnchor', WAVE.anchor); } catch (e) {}
+      }
+    }
+    /* left the posted corridor for over 3 minutes: the wave ends itself */
+    var corr = m.row.corridor || '', whole = zoneWholeTag();
+    if (corr && corr !== whole && zoneBand(s.lat, s.lng) !== corr) {
+      if (!WAVE.outSince) WAVE.outSince = Date.now();
+      else if (Date.now() - WAVE.outSince > 3 * 60000) { waveEndMine(true); return; }
+    } else WAVE.outSince = 0;
+    /* under 15 m of movement across a full 10-minute window: the phone
+       is sitting somewhere, not walking */
+    var w0 = Date.now() - 10 * 60000;
+    var win = WAVE.samples.filter(function (x) { return x.ts >= w0; });
+    if (win.length >= 2 && win[0].ts <= Date.now() - 9 * 60000) {
+      var spread = 0;
+      for (var i = 0; i < win.length; i++) for (var j = i + 1; j < win.length; j++) {
+        var dd = haversine(win[i], win[j]);
+        if (dd > spread) spread = dd;
+      }
+      if (spread < 15) { waveEndMine(true); return; }
+    }
+  }
+  /* the walk or the session ended: the wave goes with it */
+  if (typeof REC !== 'undefined') {
+    if (WAVE.recWas && !REC.on) { WAVE.recWas = false; waveEndMine(true); return; }
+    WAVE.recWas = !!REC.on;
+  }
+}
+
 /* ---------- zone wiring ---------- */
 $('chatPersonaBtn').addEventListener('click', function () {
   if (typeof PROFILE !== 'undefined' && PROFILE && PROFILE.v) identitySheetOpen(true); else zonePopOpen();
@@ -8080,6 +8798,15 @@ $('chatInput').addEventListener('input', zoneCountPaint);
 $('zmHide').addEventListener('click', zoneHidePost);
 $('zmReport').addEventListener('click', zoneReportPost);
 $('zmCancel').addEventListener('click', zoneModClose);
+/* v7.12 Fix 26: the wave strip toggles the wave-only filter; a light 20 s
+   tick keeps countdowns honest, lapses cards, and runs the auto-end
+   checks even when Local is not the open pane. */
+$('waveStrip').addEventListener('click', function () {
+  WAVE.filter = !WAVE.filter;
+  zoneRender();
+  if (WAVE.filter) scrollChatBottom();
+});
+if (!WAVE.timer) WAVE.timer = setInterval(waveSecondTick, 20000);
 (function () {
   var log = $('chatLog');
   if (!log) return;
@@ -10183,7 +10910,7 @@ paintChromeState();
 /* v6.4.1 boot self-check marker: the shell's checker script verifies this
    was set. If boot died anywhere above, the repair overlay appears instead
    of a silently half-dead app. */
-window.__ctBootOK = '7.11';
+window.__ctBootOK = '7.12';
 
 </script>
 <script>
