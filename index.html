@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0A16">
-<meta name="version" content="7.13">
+<meta name="version" content="7.14">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1414,7 +1414,7 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
       </div>
       <div class="sheetfoot">
         <div class="wm">Candy Trail</div>
-        <div class="ver" id="appVer">Candy Trail v7.13</div>
+        <div class="ver" id="appVer">Candy Trail v7.14</div>
       </div>
     </div>
 
@@ -1535,7 +1535,7 @@ body.light .logrow .js-house{background:#6D5CA3;border-color:#6D5CA3;color:#FFFD
   <div class="prefs-foot">
     <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-ribbon-mono"/></svg>
     <div class="crest">Candy Trail</div>
-    <div class="ver">Version 7.13</div>
+    <div class="ver">Version 7.14</div>
   </div>
 </div>
 
@@ -5340,16 +5340,95 @@ $('fabSpot').addEventListener('click', function () {
    ~20 s while moving), pins (mirrored from crowdSyncPin), and haul counts.
    Backed by the Supabase party_posts table (public read/insert, rows simply
    age out client-side: positions 45 min, pins 6 h). */
-var PARTY = { code: '', name: '', timer: null, lastPosPost: 0, lastPosLL: null, lastCountJson: '', members: {}, counts: {}, joinTs: 0, kicked: {}, kickedLocal: {}, lastRows: [], chat: [], chatInit: false, chatCursor: '', unread: 0, lastImgTs: 0, leaveConfirm: false, joinOpen: false, trails: {}, avatar: '', color: '', avatarDraft: '', avatarExplicit: false, colorDraft: '', meta: {}, markers: {}, iconSigs: {}, posRows: {}, trailRows: {}, states: {}, dock: {}, dockHidden: {}, dockOverflow: null, dockPill: null, labelUntil: {}, pinSeen: {}, pinSeenInit: false, compact: false, _avatarYielded: false };
+var PARTY = { code: '', name: '', timer: null, lastPosPost: 0, lastPosLL: null, lastCountJson: '', members: {}, counts: {}, joinTs: 0, kicked: {}, kickedByKey: {}, kickedByName: {}, kickedLocal: {}, kickedLocalNames: {}, lastRows: [], chat: [], chatInit: false, chatCursor: '', unread: 0, lastImgTs: 0, leaveConfirm: false, joinOpen: false, trails: {}, avatar: '', color: '', avatarDraft: '', avatarExplicit: false, colorDraft: '', meta: {}, metaByName: {}, names: {}, markers: {}, iconSigs: {}, posRows: {}, trailRows: {}, states: {}, dock: {}, dockHidden: {}, dockOverflow: null, dockPill: null, labelUntil: {}, pinSeen: {}, pinSeenInit: false, compact: false, _avatarYielded: false };
 var partyLayer = L.layerGroup().addTo(map);
 var partyMarkLayer = L.layerGroup().addTo(map);
 try { var savedParty = store.get('party', null); if (savedParty && savedParty.code) { PARTY.code = String(savedParty.code); PARTY.name = String(savedParty.name || ''); PARTY.joinTs = savedParty.joinTs || Date.now(); PARTY.avatar = String(savedParty.avatar || ''); PARTY.color = String(savedParty.color || ''); } } catch (e) {}
 function partyOn() { return !!(PARTY.code && PARTY.name && crowdOn()); }
-function partyTag() { return PARTY.avatar ? ('av1|' + PARTY.avatar + '|' + (PARTY.color || partyColor(PARTY.name))) : ''; }
+/* ---------- Party member identity (v7.14 Fix 28) ----------
+   Presence used to key EVERYTHING by display name, so two members
+   sharing a name ("Mom", "Alex") collided on roster, counts, trails,
+   avatar meta, and kicks. v7.14 keys presence by a per-device MEMBER
+   ID instead: a party-scoped hash of the device secret (the same
+   zoneHash53 derivation the ribbons party hash uses at the party
+   scope). The raw device token and ZONE.dev itself NEVER leave the
+   device: only the derived mid rides posts, as the 4th segment of
+   the existing av1 tag (v7.13 readers parse parts[1..2] only and
+   ignore it). Rows without a mid (v7.13 clients, the TEST999
+   fixture) key as 'legacy:' + the exact display name, which
+   preserves v7.13 behavior byte-for-byte for legacy-only parties.
+   Chat stays name-based (chat rows are user content and are never
+   tagged): a documented limitation, not gold-plated here. */
+function partyMid() {
+  if (!PARTY.code) return '';
+  /* Boot renders reach here before the zone section has initialized
+     the ZONE var: never mint (or even load) against a not-yet-born
+     zone store; the legacy fallback key serves those early paints
+     and every post-boot call derives the real mid. */
+  if (typeof ZONE === 'undefined' || !ZONE) return '';
+  try { zoneLoadIdentity(); } catch (e) {}
+  if (!ZONE.dev) { try { zoneMintDev(); } catch (e) {} }
+  if (!ZONE.dev) return '';
+  return zoneHash53('party|' + PARTY.code + '|' + ZONE.dev, 13);
+}
+function partyMyKey() {
+  var mid = partyMid();
+  return mid ? ('id:' + mid) : ('legacy:' + (PARTY.name || ''));
+}
+function partyTagParse(msg) {
+  if (!msg || String(msg).indexOf('av1|') !== 0) return null;
+  var parts = String(msg).split('|');
+  var mid = '';
+  if (parts[3] && parts[3].indexOf('m:') === 0) mid = parts[3].slice(2);
+  return { avatar: parts[1] || '', color: parts[2] || '', mid: mid };
+}
+function memberKey(r) {
+  if (!r) return 'legacy:';
+  var t = partyTagParse(r.msg);
+  if (t && t.mid) return 'id:' + t.mid;
+  return 'legacy:' + String(r.name == null ? '' : r.name);
+}
+function partyTag() {
+  var mid = partyMid();
+  var col = PARTY.color || partyColor(PARTY.name);
+  if (PARTY.avatar) return 'av1|' + PARTY.avatar + '|' + col + (mid ? '|m:' + mid : '');
+  /* No walker picked yet: still carry the mid. 'av1||<color>|m:<mid>'
+     parses harmlessly under the v7.13 reader (parts[1] is not a
+     walker id, so no meta is recorded there). */
+  if (mid) return 'av1||' + col + '|m:' + mid;
+  return '';
+}
+function partyDisplayName(k) {
+  if (PARTY.names && PARTY.names[k]) return PARTY.names[k];
+  if (typeof k === 'string' && k.indexOf('legacy:') === 0) return k.slice(7);
+  if (typeof k === 'string' && k.indexOf('id:') === 0) {
+    /* My own key always displays as my name, even before partyApply
+       has recorded it in PARTY.names (the just-joined roster). */
+    if (PARTY.name && k === partyMyKey()) return PARTY.name;
+    return k.slice(3);
+  }
+  return String(k == null ? '' : k);
+}
+function partyIsKey(k) { return typeof k === 'string' && (k.indexOf('id:') === 0 || k.indexOf('legacy:') === 0); }
+function partyIsSelfKey(k) {
+  if (!PARTY.name || k == null) return false;
+  if (!partyIsKey(k)) return k === PARTY.name;
+  if (k.indexOf('id:') === 0) return k === partyMyKey();
+  /* A legacy bucket carrying my name is me only when no id-keyed
+     bucket claims my name: with exactly one claimant partyApply's
+     merge has already folded it, and with 2+ claimants the bucket
+     is an ambiguous separate member, not me. */
+  if (partyDisplayName(k) !== PARTY.name) return false;
+  var names = PARTY.names || {};
+  var claimants = Object.keys(names).filter(function (k2) { return k2.indexOf('id:') === 0 && names[k2] === PARTY.name; });
+  return claimants.length === 0;
+}
 function partyPost(obj) {
   if (!partyOn()) return;
   obj.room = PARTY.code; obj.name = PARTY.name;
-  if ((obj.kind === 'pos' || obj.kind === 'count') && !obj.msg) { var tg = partyTag(); if (tg) obj.msg = tg; }
+  /* v7.14: pin rows carry the tag too (they were untagged before);
+     chat rows are NEVER tagged (msg is user content there). */
+  if ((obj.kind === 'pos' || obj.kind === 'count' || obj.kind === 'pin') && !obj.msg) { var tg = partyTag(); if (tg) obj.msg = tg; }
   fetch(CROWD.url + '/rest/v1/party_posts', { method: 'POST', headers: crowdHeaders(), body: JSON.stringify(obj) }).catch(function () {});
 }
 function partyGenCode() {
@@ -5459,11 +5538,23 @@ function avatarSvg(id) {
   return '<svg class="avatar-glyph av-' + id + '" viewBox="0 0 24 24" aria-hidden="true"><g' + nudge + '>' + AVATAR_BODY[id] + '</g></svg>';
 }
 function partyHash(str) { var h = 0; var t = String(str || ''); for (var i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) >>> 0; return h; }
-function partyMetaFor(name) {
-  if (name === PARTY.name && PARTY.avatar) return { avatar: PARTY.avatar, color: PARTY.color || partyColor(name) };
-  var m = PARTY.meta[name];
-  if (m && (m.avatar || m.color)) return { avatar: m.avatar || null, color: m.color || partyColor(name) };
-  return { avatar: null, color: partyColor(name) };
+function partyMetaFor(x) {
+  /* Accepts a memberKey (the v7.14 contract: PARTY.meta is keyed by
+     memberKey and is the source of truth), a plain display name
+     (display-only lookups: chat badges ride name-only rows, so they
+     resolve through the PARTY.metaByName projection partyApply
+     builds), or a raw name-keyed entry seeded directly into
+     PARTY.meta by older callers. */
+  if (x == null) return { avatar: null, color: partyColor('') };
+  var isK = partyIsKey(x);
+  var disp = isK ? partyDisplayName(x) : String(x);
+  if (!isK && x === PARTY.name && PARTY.avatar) return { avatar: PARTY.avatar, color: PARTY.color || partyColor(disp) };
+  if (isK && PARTY.avatar && x === partyMyKey()) return { avatar: PARTY.avatar, color: PARTY.color || partyColor(disp) };
+  var m = PARTY.meta && PARTY.meta[x];
+  if (m && (m.avatar || m.color)) return { avatar: m.avatar || null, color: m.color || partyColor(disp) };
+  var proj = PARTY.metaByName && PARTY.metaByName[disp];
+  if (proj && (proj.avatar || proj.color)) return { avatar: proj.avatar || null, color: proj.color || partyColor(disp) };
+  return { avatar: null, color: partyColor(disp) };
 }
 function partyDefaultAvatar(seed, taken) {
   var start = partyHash(seed || 'party') % 8;
@@ -5536,9 +5627,10 @@ function identitySheetClose(commit) {
     var nm = String(d.name || '').trim().slice(0, 24) || profileDefaultName(d.walker);
     profileSave({ name: nm, walker: d.walker, color: d.color });
     /* Mid-party, the live identity syncs walker + color through the av1
-       tag, exactly like the roster walker editor: the name is the
-       presence-row key, so a rename applies at the next join (and in
-       Local immediately), never by orphaning this session's rows. */
+       tag, exactly like the roster walker editor: presence is keyed by
+       member id since v7.14 (the name is only the display label), so a
+       rename applies at the next join (and in Local immediately),
+       never by orphaning this session's rows. */
     if (PARTY.code && PARTY.name) {
       PARTY.avatar = PROFILE.v.walker; PARTY.color = PROFILE.v.color;
       PARTY.avatarDraft = PROFILE.v.walker; PARTY.colorDraft = PROFILE.v.color; PARTY.avatarExplicit = true;
@@ -5613,17 +5705,24 @@ function identityInit() {
   setTimeout(identityMaybePrompt, 500);
   setInterval(identityMaybePrompt, 1500);
 }
-function partyTakenMap(exceptName) {
+function partyTakenMap(except) {
+  /* Values are DISPLAY names (the walker-tile claimer pill prints
+     them); except may be a memberKey or a plain display name. The
+     avatar-yield arbitration does its own key-level comparison and
+     does not rely on these values beyond taken/free. */
   var t = {};
-  Object.keys(PARTY.meta || {}).forEach(function (n) { if (n !== exceptName && PARTY.meta[n] && PARTY.meta[n].avatar) t[PARTY.meta[n].avatar] = n; });
+  Object.keys(PARTY.meta || {}).forEach(function (k) {
+    if (k === except || partyDisplayName(k) === except) return;
+    if (PARTY.meta[k] && PARTY.meta[k].avatar) t[PARTY.meta[k].avatar] = partyDisplayName(k);
+  });
   return t;
 }
 function partyBearing(a, b) {
   var dy = b.lat - a.lat, dx = (b.lng - a.lng) * Math.cos(b.lat * Math.PI / 180);
   return (Math.atan2(dx, dy) * 180 / Math.PI + 360) % 360;
 }
-function partyMemberState(name) {
-  var rows = PARTY.trailRows[name] || [];
+function partyMemberState(key) {
+  var rows = PARTY.trailRows[key] || [];
   if (rows.length < 2) return { dwell: true, bearing: null, speed: 0 };
   var nw = rows[0], ol = rows[1];
   var d = haversine({ lat: ol.lat, lng: ol.lng }, { lat: nw.lat, lng: nw.lng });
@@ -5631,17 +5730,18 @@ function partyMemberState(name) {
   var sp = d / dt;
   return { dwell: d < 8 || sp < 0.5, bearing: d >= 8 ? partyBearing(ol, nw) : null, speed: sp };
 }
-function partyPuckHtml(name, st) {
-  var meta = partyMetaFor(name);
+function partyPuckHtml(key, st) {
+  var name = partyDisplayName(key);
+  var meta = partyMetaFor(key);
   var inner = meta.avatar ? avatarSvg(meta.avatar) : '<span class="puck-ini">' + esc(partyInitials(name)) + '</span>';
-  var showLabel = !PARTY.dock[name] && ((PARTY.labelUntil[name] || 0) > Date.now() || (map.getZoom && map.getZoom() >= 17.5));
-  var off = PARTY.dock[name];
+  var showLabel = !PARTY.dock[key] && ((PARTY.labelUntil[key] || 0) > Date.now() || (map.getZoom && map.getZoom() >= 17.5));
+  var off = PARTY.dock[key];
   var style = '--pc:' + meta.color + (off ? ';transform:translate(' + off.x + 'px,' + off.y + 'px)' : '');
   var pip = (!st.dwell && st.bearing != null) ? '<span class="puck-pipwrap" style="transform:rotate(' + Math.round(st.bearing) + 'deg)"><span class="puck-pip"></span></span>' : '';
   return '<div class="puck' + (PARTY.compact ? ' puck-compact' : '') + (st.dwell ? ' puck-dwell' : '') + '" style="' + style + '">' + inner + pip + (showLabel ? '<span class="puck-label">' + esc(name) + '</span>' : '') + '</div>';
 }
-function partyFlashPuck(name) {
-  var m = PARTY.markers[name]; if (!m || !m.getElement) return;
+function partyFlashPuck(key) {
+  var m = PARTY.markers[key]; if (!m || !m.getElement) return;
   var el = m.getElement(); if (!el || !el.querySelector) return;
   var puck = el.querySelector('.puck'); if (!puck) return;
   puck.classList.add('puck-flash');
@@ -5651,40 +5751,42 @@ function partyFlashPuck(name) {
 function partyRefreshMarkers(force) {
   if (!partyOn()) return;
   var seen = {};
-  Object.keys(PARTY.posRows).forEach(function (name) {
+  Object.keys(PARTY.posRows).forEach(function (key) {
     /* v7.5 Fix 17: the local member is never drawn by the party layer;
        the profile self puck is the only self marker (the sweep below
        removes any stale self marker). Presence posting is unchanged,
-       so peers still see this walker. */
-    if (name === PARTY.name) return;
-    if (PARTY.dockHidden && PARTY.dockHidden[name]) {
-      var hm = PARTY.markers[name];
-      if (hm) { try { if (partyMarkLayer.removeLayer) partyMarkLayer.removeLayer(hm); } catch (e) {} delete PARTY.markers[name]; delete PARTY.iconSigs[name]; }
+       so peers still see this walker. v7.14: "local member" is the
+       memberKey test (partyIsSelfKey), so a second member who merely
+       shares my display name still gets their puck. */
+    if (partyIsSelfKey(key)) return;
+    if (PARTY.dockHidden && PARTY.dockHidden[key]) {
+      var hm = PARTY.markers[key];
+      if (hm) { try { if (partyMarkLayer.removeLayer) partyMarkLayer.removeLayer(hm); } catch (e) {} delete PARTY.markers[key]; delete PARTY.iconSigs[key]; }
       return;
     }
-    seen[name] = 1;
-    var r = PARTY.posRows[name];
-    var st = partyMemberState(name);
-    var was = PARTY.states[name];
-    if (was && was.dwell && !st.dwell) PARTY.labelUntil[name] = Date.now() + 3500;
-    PARTY.states[name] = st;
+    seen[key] = 1;
+    var r = PARTY.posRows[key];
+    var st = partyMemberState(key);
+    var was = PARTY.states[key];
+    if (was && was.dwell && !st.dwell) PARTY.labelUntil[key] = Date.now() + 3500;
+    PARTY.states[key] = st;
     var size = PARTY.compact ? 24 : 32;
-    var html = partyPuckHtml(name, st);
+    var html = partyPuckHtml(key, st);
     var sig = html + '|' + size;
-    var m = PARTY.markers[name];
+    var m = PARTY.markers[key];
     if (!m) {
       m = L.marker([r.lat, r.lng], { icon: L.divIcon({ className: 'partyicon', iconSize: [size, size], iconAnchor: [size / 2, size / 2], html: html }) });
-      if (name !== PARTY.name) {
-        m.bindPopup('<div class="pop"><b>' + esc(name) + '</b><br><span class="muted" style="font-size:12px">In your party · ' + partyAge(new Date(r.created_at).getTime()) + '</span></div>');
-        m.on('click', function () { PARTY.labelUntil[name] = Date.now() + 6000; PARTY.iconSigs[name] = ''; setTimeout(function () { partyRefreshMarkers(false); }, 6300); });
+      if (!partyIsSelfKey(key)) {
+        m.bindPopup('<div class="pop"><b>' + esc(partyDisplayName(key)) + '</b><br><span class="muted" style="font-size:12px">In your party · ' + partyAge(new Date(r.created_at).getTime()) + '</span></div>');
+        m.on('click', function () { PARTY.labelUntil[key] = Date.now() + 6000; PARTY.iconSigs[key] = ''; setTimeout(function () { partyRefreshMarkers(false); }, 6300); });
       }
       m.addTo(partyMarkLayer);
-      PARTY.markers[name] = m; PARTY.iconSigs[name] = sig;
-      if (!PARTY.labelUntil[name]) PARTY.labelUntil[name] = Date.now() + 4000;
+      PARTY.markers[key] = m; PARTY.iconSigs[key] = sig;
+      if (!PARTY.labelUntil[key]) PARTY.labelUntil[key] = Date.now() + 4000;
       return;
     }
     m.setLatLng([r.lat, r.lng]);
-    if (force || PARTY.iconSigs[name] !== sig) { m.setIcon(L.divIcon({ className: 'partyicon', iconSize: [size, size], iconAnchor: [size / 2, size / 2], html: html })); PARTY.iconSigs[name] = sig; }
+    if (force || PARTY.iconSigs[key] !== sig) { m.setIcon(L.divIcon({ className: 'partyicon', iconSize: [size, size], iconAnchor: [size / 2, size / 2], html: html })); PARTY.iconSigs[key] = sig; }
   });
   Object.keys(PARTY.markers).forEach(function (name) {
     if (seen[name]) return;
@@ -5791,15 +5893,16 @@ function tmResetParty() {
     if (k.indexOf('p:') === 0) delete TMATCH.state[k];
   });
 }
-function drawPartyTrail(name, rowsDesc) {
+function drawPartyTrail(key, rowsDesc) {
   /* rowsDesc: this member's pos rows, newest first (poll order). Draws the
      street-matched line + raw crumbs when a match is on file; otherwise
-     the raw polyline, exactly as before v6.8. */
-  var color = partyMetaFor(name).color;
+     the raw polyline, exactly as before v6.8. v7.14: the trail is keyed
+     by memberKey, so same-name members keep separate trails/matches. */
+  var color = partyMetaFor(key).color;
   var fixes = rowsDesc.slice(0, TMATCH.MAX_FIXES).slice().reverse().map(function (r) {
     return { lat: r.lat, lng: r.lng, t: new Date(r.created_at).getTime() };
   });
-  var line = tmConsider('p:' + name, fixes, function () {
+  var line = tmConsider('p:' + key, fixes, function () {
     if (PARTY.lastRows && partyOn()) partyApply(PARTY.lastRows);
   });
   if (line && line.length >= 2) {
@@ -5818,50 +5921,135 @@ function drawPartyTrail(name, rowsDesc) {
 }
 
 function partyApply(rows) {
-  var now = Date.now(), pos = {}, counts = {}, pinMap = {}, kicks = {}, trails = {};
+  var now = Date.now(), pos = {}, counts = {}, pinMap = {}, trails = {};
+  /* Kicks (v7.14): a kick row carrying msg 'kick1|<mid>' targets that
+     ONE member (kicksByKey); a kick row without a mid (a v7.13 host)
+     targets the display name and applies to every row with that name,
+     exactly the v5.6 semantics (kicksByName). The kick row's name
+     column always holds the target's display name so legacy readers
+     keep working. The host's own local kicks merge the same way. */
+  var kicksByKey = {}, kicksByName = {};
   rows.forEach(function (r) {
-    if (r.kind === 'kick') { var kt = new Date(r.created_at).getTime(); if (!kicks[r.name] || kt > kicks[r.name]) kicks[r.name] = kt; }
+    if (r.kind !== 'kick') return;
+    var kt = new Date(r.created_at).getTime(); if (!isFinite(kt)) return;
+    var km = /^kick1\|(.+)$/.exec(String(r.msg || ''));
+    if (km) { var kk = 'id:' + km[1]; if (!kicksByKey[kk] || kt > kicksByKey[kk]) kicksByKey[kk] = kt; }
+    else if (r.name) { if (!kicksByName[r.name] || kt > kicksByName[r.name]) kicksByName[r.name] = kt; }
   });
-  Object.keys(PARTY.kickedLocal).forEach(function (n) { if (!kicks[n] || PARTY.kickedLocal[n] > kicks[n]) kicks[n] = PARTY.kickedLocal[n]; });
-  PARTY.kicked = kicks;
-  if (PARTY.name && kicks[PARTY.name] && kicks[PARTY.name] > (PARTY.joinTs || 0)) { partyEject(); return; }
-  function live(name, ts) { return !kicks[name] || ts > kicks[name]; }
+  Object.keys(PARTY.kickedLocal || {}).forEach(function (k) { if (!kicksByKey[k] || PARTY.kickedLocal[k] > kicksByKey[k]) kicksByKey[k] = PARTY.kickedLocal[k]; });
+  Object.keys(PARTY.kickedLocalNames || {}).forEach(function (n) { if (!kicksByName[n] || PARTY.kickedLocalNames[n] > kicksByName[n]) kicksByName[n] = PARTY.kickedLocalNames[n]; });
+  PARTY.kickedByKey = kicksByKey; PARTY.kickedByName = kicksByName;
+  PARTY.kicked = {};
+  Object.keys(kicksByKey).forEach(function (k) { PARTY.kicked[k] = kicksByKey[k]; });
+  Object.keys(kicksByName).forEach(function (n) { PARTY.kicked[n] = kicksByName[n]; });
+  /* Self-eject: a mid-kick aimed at MY mid, or a legacy name-kick
+     matching my name, either newer than my join. */
+  var myKey = partyMyKey();
+  if (PARTY.name && ((kicksByKey[myKey] && kicksByKey[myKey] > (PARTY.joinTs || 0)) || (kicksByName[PARTY.name] && kicksByName[PARTY.name] > (PARTY.joinTs || 0)))) { partyEject(); return; }
+  function live(r, ts) {
+    var k = memberKey(r);
+    if (kicksByKey[k] && ts <= kicksByKey[k]) return false;
+    if (r.name && kicksByName[r.name] && ts <= kicksByName[r.name]) return false;
+    return true;
+  }
+  function rowTs(r) { var t = new Date(r.created_at).getTime(); return isFinite(t) ? t : 0; }
+  /* Display names per memberKey first (pin rendering and the
+     self-bucket tests below read PARTY.names). */
+  var names = {};
   rows.forEach(function (r) {
-    var rts = new Date(r.created_at).getTime();
+    if (r.kind !== 'pos' && r.kind !== 'count' && r.kind !== 'pin') return;
+    var k0 = memberKey(r);
+    if (!names[k0]) names[k0] = String(r.name == null ? '' : r.name);
+  });
+  PARTY.names = names;
+  rows.forEach(function (r) {
+    var rts = rowTs(r);
     var age = now - rts;
-    if (!live(r.name, rts)) return;
-    if (r.kind === 'pos' && age < 45 * 60000) { if (!pos[r.name]) pos[r.name] = r; (trails[r.name] = trails[r.name] || []).push(r); }
-    else if (r.kind === 'count') { if (!counts[r.name]) counts[r.name] = r; }
-    else if (r.kind === 'pin' && age < 6 * 3600000 && r.name !== PARTY.name) {
+    if (!live(r, rts)) return;
+    var key = memberKey(r);
+    if (r.kind === 'pos' && age < 45 * 60000) { if (!pos[key]) pos[key] = r; (trails[key] = trails[key] || []).push(r); }
+    else if (r.kind === 'count') { if (!counts[key]) counts[key] = r; }
+    else if (r.kind === 'pin' && age < 6 * 3600000 && !partyIsSelfKey(key)) {
       var k = Math.round(r.lat * 2000) + ',' + Math.round(r.lng * 2000) + ',' + r.status;
       if (!pinMap[k]) pinMap[k] = r;
     }
   });
-  /* Avatar meta: newest 'av1|<id>|<color>' tag per member wins; the
-     created_at of the post carrying it is the member's claim time (ts). */
+  /* Avatar meta: newest av1 tag per MEMBER (keyed by memberKey) wins;
+     the created_at of the post carrying it is the member's claim
+     time (ts). A tag carrying only a mid + color (no walker) still
+     records the member's color. Dead (kicked) rows contribute no
+     meta: a kick's pre-kick activity stays hidden, as before. */
   var meta = {};
   rows.forEach(function (r) {
-    if (meta[r.name] || !r.msg || String(r.msg).indexOf('av1|') !== 0) return;
-    var parts = String(r.msg).split('|');
-    var rts = new Date(r.created_at).getTime();
-    if (AVATAR_BODY[parts[1]]) meta[r.name] = { avatar: parts[1], color: /^#[0-9a-f]{6}$/i.test(parts[2] || '') ? parts[2] : null, ts: isFinite(rts) ? rts : 0 };
+    if (r.kind !== 'pos' && r.kind !== 'count' && r.kind !== 'pin') return;
+    var key = memberKey(r);
+    if (meta[key]) return;
+    var tag = partyTagParse(r.msg);
+    if (!tag) return;
+    if (!live(r, rowTs(r))) return;
+    var colOk = /^#[0-9a-f]{6}$/i.test(tag.color || '') ? tag.color : null;
+    if (AVATAR_BODY[tag.avatar]) meta[key] = { avatar: tag.avatar, color: colOk, ts: rowTs(r) };
+    else if (tag.mid && colOk) meta[key] = { avatar: null, color: colOk, ts: rowTs(r) };
   });
+  /* Mixed-version merge (Argon's rule): a legacy bucket whose display
+     name is claimed by EXACTLY ONE id-keyed member folds into that
+     member (an upgraded device must not appear twice); with zero or
+     2+ claimants the legacy bucket stays its own member, because
+     folding could merge it into the wrong person. pos/count: the
+     newest created_at wins; trails merge; meta: the id member's
+     wins unless it has none. */
+  var idByName = {};
+  Object.keys(names).forEach(function (k) {
+    if (k.indexOf('id:') !== 0) return;
+    (idByName[names[k]] = idByName[names[k]] || []).push(k);
+  });
+  Object.keys(names).forEach(function (lk) {
+    if (lk.indexOf('legacy:') !== 0) return;
+    var claimants = idByName[names[lk]] || [];
+    if (claimants.length !== 1) return;
+    var tk = claimants[0];
+    if (pos[lk]) { if (!pos[tk] || rowTs(pos[lk]) > rowTs(pos[tk])) pos[tk] = pos[lk]; delete pos[lk]; }
+    if (counts[lk]) { if (!counts[tk] || rowTs(counts[lk]) > rowTs(counts[tk])) counts[tk] = counts[lk]; delete counts[lk]; }
+    if (trails[lk]) {
+      trails[tk] = (trails[tk] || []).concat(trails[lk]).sort(function (a, b) { return rowTs(b) - rowTs(a); });
+      delete trails[lk];
+    }
+    if (meta[lk] && !meta[tk]) meta[tk] = meta[lk];
+    if (meta[lk]) delete meta[lk];
+    delete names[lk];
+  });
+  PARTY.names = names;
   PARTY.meta = meta;
+  /* Name-to-meta projection for display-only lookups that only have
+     a name (chat badges; pin collars resolve by memberKey directly).
+     Newest claim wins the projection when names collide. */
+  var byName = {};
+  Object.keys(meta).sort(function (a, b) { return (meta[b].ts || 0) - (meta[a].ts || 0); }).forEach(function (k) {
+    var dn = names[k] || partyDisplayName(k);
+    if (dn && !byName[dn]) byName[dn] = meta[k];
+  });
+  PARTY.metaByName = byName;
   /* Uniqueness, deterministic: of two members claiming one walker, the
      earlier claim holds (claim time = created_at of the newest av1 post;
      ours falls back to joinTs). Equal times go to the lexicographically
-     smaller name. Only the loser yields, once. */
+     smaller MEMBERKEY (v7.14; was the smaller name). Only the loser
+     yields, once. Our own claim may sit under our id key or, in a
+     legacy-only feed, under our legacy key. */
   if (PARTY.avatar && !PARTY._avatarYielded) {
-    var ownMeta = meta[PARTY.name];
+    var repKeys = [myKey, 'legacy:' + (PARTY.name || '')];
+    var ownRepKey = myKey, ownMeta = null;
+    for (var ri = 0; ri < repKeys.length; ri++) { if (meta[repKeys[ri]]) { ownRepKey = repKeys[ri]; ownMeta = meta[repKeys[ri]]; break; } }
     var ourTs = (ownMeta && ownMeta.avatar === PARTY.avatar && ownMeta.ts) ? ownMeta.ts : (PARTY.joinTs || 0);
     var holder = null;
-    Object.keys(meta).forEach(function (n) {
-      if (n === PARTY.name || meta[n].avatar !== PARTY.avatar) return;
-      var hts = meta[n].ts || 0;
-      if (hts < ourTs || (hts === ourTs && n < PARTY.name)) holder = n;
+    Object.keys(meta).forEach(function (k) {
+      if (k === ownRepKey || k === myKey) return;
+      if (partyIsSelfKey(k)) return;
+      if (meta[k].avatar !== PARTY.avatar) return;
+      var hts = meta[k].ts || 0;
+      if (hts < ourTs || (hts === ourTs && k < ownRepKey)) holder = k;
     });
     if (holder) {
-      var takenY = partyTakenMap(PARTY.name); takenY[PARTY.avatar] = holder;
+      var takenY = partyTakenMap(ownRepKey); takenY[PARTY.avatar] = partyDisplayName(holder);
       PARTY.avatar = partyDefaultAvatar(PARTY.code + PARTY.name, takenY);
       PARTY._avatarYielded = true;
       try { store.set('party', { code: PARTY.code, name: PARTY.name, avatar: PARTY.avatar, color: PARTY.color, joinTs: PARTY.joinTs }); } catch (e) {}
@@ -5872,10 +6060,13 @@ function partyApply(rows) {
   PARTY.members = pos; PARTY.counts = counts;
   PARTY.trails = trails;
   PARTY.trailRows = trails;
-  if (partyOn() && S.pos && !pos[PARTY.name]) pos[PARTY.name] = { lat: S.pos.lat, lng: S.pos.lng, created_at: new Date().toISOString() };
+  if (partyOn() && S.pos) {
+    var haveSelfPos = Object.keys(pos).some(function (k) { return partyIsSelfKey(k); });
+    if (!haveSelfPos) { pos[myKey] = { lat: S.pos.lat, lng: S.pos.lng, created_at: new Date().toISOString() }; if (!names[myKey]) names[myKey] = PARTY.name; PARTY.names = names; }
+  }
   PARTY.posRows = pos;
   partyLayer.clearLayers();
-  Object.keys(trails).forEach(function (name) { drawPartyTrail(name, trails[name]); });
+  Object.keys(trails).forEach(function (key) { drawPartyTrail(key, trails[key]); });
   /* Co-location dock: 2-6 members within 18 screen px fan out sideways
      (26px centers) instead of stacking, own name sorted first. Beyond 6,
      the first 5 pucks show plus a bone +N overflow pill in the 6th slot;
@@ -5887,7 +6078,7 @@ function partyApply(rows) {
     pnames.forEach(function (n) {
       var grp = pnames.filter(function (o) { var a = ppx[n], b = ppx[o]; return Math.hypot(a.x - b.x, a.y - b.y) <= 18; });
       if (grp.length < 2) return;
-      grp.sort(function (a, b) { if (a === PARTY.name) return -1; if (b === PARTY.name) return 1; return a < b ? -1 : 1; });
+      grp.sort(function (a, b) { if (partyIsSelfKey(a)) return -1; if (partyIsSelfKey(b)) return 1; return a < b ? -1 : 1; });
       var gi = grp.indexOf(n);
       if (grp.length <= 6) {
         PARTY.dock[n] = { x: Math.round((gi - (grp.length - 1) / 2) * 26), y: 0 };
@@ -5904,27 +6095,34 @@ function partyApply(rows) {
   var firstPins = !PARTY.pinSeenInit;
   Object.keys(pinMap).forEach(function (k) {
     var r = pinMap[k];
-    var m = L.marker([r.lat, r.lng], { icon: L.divIcon({ className: 'pinicon', iconSize: [34, 34], iconAnchor: [17, 30], html: '<div style="position:relative">' + pinIconHtml(r.status, r.pkind) + '<span class="party-collar" style="border-color:' + partyMetaFor(r.name).color + '"></span><span class="party-badge"><svg viewBox="0 0 24 24"><use href="#i-users"/></svg></span></div>' }) });
+    var m = L.marker([r.lat, r.lng], { icon: L.divIcon({ className: 'pinicon', iconSize: [34, 34], iconAnchor: [17, 30], html: '<div style="position:relative">' + pinIconHtml(r.status, r.pkind) + '<span class="party-collar" style="border-color:' + partyMetaFor(memberKey(r)).color + '"></span><span class="party-badge"><svg viewBox="0 0 24 24"><use href="#i-users"/></svg></span></div>' }) });
     m.bindPopup('<div class="pop"><b>' + esc(PIN_TYPES[r.status] ? PIN_TYPES[r.status].label : 'Treat spot') + '</b><br><span class="muted" style="font-size:12px">Logged by ' + esc(r.name) + ' · ' + partyAge(new Date(r.created_at).getTime()) + '</span></div>');
     m.addTo(partyLayer);
-    if (!firstPins && !PARTY.pinSeen[k] && r.name !== PARTY.name) partyFlashPuck(r.name);
+    if (!firstPins && !PARTY.pinSeen[k] && !partyIsSelfKey(memberKey(r))) partyFlashPuck(memberKey(r));
     PARTY.pinSeen[k] = 1;
   });
   PARTY.pinSeenInit = true;
   renderPartyInfo();
 }
 function partyTotals() {
-  var h = 0, c = 0, names = {};
-  Object.keys(PARTY.counts).forEach(function (n) { h += PARTY.counts[n].houses || 0; c += PARTY.counts[n].candy || 0; names[n] = 1; });
-  Object.keys(PARTY.members).forEach(function (n) { names[n] = 1; });
-  if (PARTY.name) names[PARTY.name] = 1;
-  return { houses: h, candy: c, people: Object.keys(names).length };
+  /* v7.14: counts/members are keyed by memberKey; people counts
+     distinct memberKeys, plus the local member when no bucket
+     represents them yet. */
+  var h = 0, c = 0, keys = {};
+  Object.keys(PARTY.counts).forEach(function (k) { h += PARTY.counts[k].houses || 0; c += PARTY.counts[k].candy || 0; keys[k] = 1; });
+  Object.keys(PARTY.members).forEach(function (k) { keys[k] = 1; });
+  if (PARTY.name && !Object.keys(keys).some(function (k) { return partyIsSelfKey(k); })) keys[partyMyKey()] = 1;
+  return { houses: h, candy: c, people: Object.keys(keys).length };
 }
 function partyRosterNames() {
+  /* v7.14: despite the historical name, this returns MEMBERKEYS (the
+     roster's unit since the re-key). Display goes through
+     partyDisplayName(key); plain-name keys seeded directly by older
+     callers pass through unchanged. */
   var roster = {};
-  Object.keys(PARTY.counts).forEach(function (n) { roster[n] = 1; });
-  Object.keys(PARTY.members).forEach(function (n) { roster[n] = 1; });
-  if (PARTY.name) roster[PARTY.name] = 1;
+  Object.keys(PARTY.counts).forEach(function (k) { roster[k] = 1; });
+  Object.keys(PARTY.members).forEach(function (k) { roster[k] = 1; });
+  if (PARTY.name && !Object.keys(roster).some(function (k) { return partyIsSelfKey(k); })) roster[partyMyKey()] = 1;
   return Object.keys(roster);
 }
 /* Unified top bar (v7.1 Fix 14): the bar's middle slot has exactly one
@@ -5935,14 +6133,16 @@ function partyRosterNames() {
    every party/GPS/snap change already calls. (BAR and LOC are declared
    up by paintChromeState: applySnap runs during boot.) */
 function partyLag() {
-  var names = partyRosterNames();
-  for (var i = 0; i < names.length; i++) {
-    var n = names[i];
-    if (n === PARTY.name) continue;
-    var pos = PARTY.posRows[n];
+  /* Returns the lagging member's DISPLAY name (the bar strip prints
+     it); iteration is over memberKeys. */
+  var keys = partyRosterNames();
+  for (var i = 0; i < keys.length; i++) {
+    var k = keys[i];
+    if (partyIsSelfKey(k)) continue;
+    var pos = PARTY.posRows[k];
     var fresh = !!(pos && pos.created_at && (Date.now() - new Date(pos.created_at).getTime() < 180000));
-    if (!fresh) return n;
-    if (S.pos && pos.lat != null && haversine(S.pos, { lat: pos.lat, lng: pos.lng }) > 152) return n;
+    if (!fresh) return partyDisplayName(k);
+    if (S.pos && pos.lat != null && haversine(S.pos, { lat: pos.lat, lng: pos.lng }) > 152) return partyDisplayName(k);
   }
   return null;
 }
@@ -6022,9 +6222,10 @@ function rosterHtml() {
   /* v7.11 Fix 25: the self row is row 1 (it is the pane's identity
      surface now), the same self-first order the party drawer uses. */
   var names = partyRosterNames();
-  names.sort(function (a, b) { return (a === PARTY.name ? 0 : 1) - (b === PARTY.name ? 0 : 1); });
+  names.sort(function (a, b) { return (partyIsSelfKey(a) ? 0 : 1) - (partyIsSelfKey(b) ? 0 : 1); });
   return names.map(function (n) {
-    var self = n === PARTY.name;
+    var self = partyIsSelfKey(n);
+    var disp = partyDisplayName(n);
     var c = PARTY.counts[n];
     var meta = partyMetaFor(n);
     var pos = PARTY.posRows[n];
@@ -6036,20 +6237,23 @@ function rosterHtml() {
         fresh += partyAge(ts);
       }
     }
-    var av = '<span class="roster-puck" style="--pc:' + meta.color + '">' + (meta.avatar ? avatarSvg(meta.avatar) : '<span class="puck-ini">' + esc(partyInitials(n)) + '</span>') + '</span>';
+    var av = '<span class="roster-puck" style="--pc:' + meta.color + '">' + (meta.avatar ? avatarSvg(meta.avatar) : '<span class="puck-ini">' + esc(partyInitials(disp)) + '</span>') + '</span>';
     /* v7.11 Fix 25: the count is the #i-home glyph + a tabular numeral
        (owner decision: the glyph carries the unit, the word "houses"
        leaves the rows). No count posted yet keeps "on the map". */
     var count = c
       ? '<span class="roster-count"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-home"/></svg><span class="roster-num">' + (c.houses || 0) + '</span></span>'
       : '<span class="muted">on the map</span>';
-    var kick = (isAdmin && !self) ? ' <span class="btn btn-ghost btn-sm partyKick" role="button" data-name="' + esc(n) + '">Kick</span>' : '';
+    var kick = (isAdmin && !self) ? ' <span class="btn btn-ghost btn-sm partyKick" role="button" data-key="' + esc(n) + '" data-name="' + esc(disp) + '">Kick</span>' : '';
     /* v7.11 Fix 25: You / Host are quiet inline text tags after the
        name, not pill badges. The self row is the pane's only identity
-       surface and opens the Unified Identity Sheet. */
+       surface and opens the Unified Identity Sheet. v7.14: the row
+       keeps data-name as the DISPLAY name and gains data-key as the
+       memberKey the click/kick handlers act on; between two same-name
+       rows the walker + color on the row are the disambiguation. */
     var tags = self ? '<span class="roster-tags"> &middot; You' + (isAdmin ? ' &middot; Host' : '') + '</span>' : '';
-    return '<div class="roster-row' + (self ? ' roster-self' : '') + '" data-name="' + esc(n) + '" role="button" aria-label="' + (self ? 'Edit your walker and name' : 'Find ' + esc(n) + ' on the map') + '">' + av +
-      '<span class="roster-main"><span class="roster-name">' + esc(n) + tags + '</span>' +
+    return '<div class="roster-row' + (self ? ' roster-self' : '') + '" data-name="' + esc(disp) + '" data-key="' + esc(n) + '" role="button" aria-label="' + (self ? 'Edit your walker and name' : 'Find ' + esc(disp) + ' on the map') + '">' + av +
+      '<span class="roster-main"><span class="roster-name">' + esc(disp) + tags + '</span>' +
       '<span class="roster-sub">' + (self ? 'Edit walker &amp; name' : (fresh || 'Party member')) + '</span></span>' +
       '<span class="roster-right">' + count + kick + (self ? '<span class="roster-chev" aria-hidden="true">&rsaquo;</span>' : '') + '</span></div>';
   }).join('');
@@ -6188,12 +6392,12 @@ function renderPartyBox() {
   var pcs = $('partyCardShare');
   if (pcs) pcs.addEventListener('click', function () { openShareSheet('party'); });
   box.querySelectorAll('.partyKick').forEach(function (b) {
-    b.addEventListener('click', function (e) { e.stopPropagation(); partyKick(b.getAttribute('data-name')); });
+    b.addEventListener('click', function (e) { e.stopPropagation(); partyKick(b.getAttribute('data-key') || b.getAttribute('data-name')); });
   });
   box.querySelectorAll('.roster-row').forEach(function (row) {
     row.addEventListener('click', function () {
-      var n = row.getAttribute('data-name');
-      if (n === PARTY.name) { identitySheetOpen(true); return; }
+      var n = row.getAttribute('data-key') || row.getAttribute('data-name');
+      if (partyIsSelfKey(n)) { identitySheetOpen(true); return; }
       var pos = PARTY.posRows[n];
       if (pos && pos.lat != null) { try { map.flyTo([pos.lat, pos.lng], Math.max(map.getZoom ? map.getZoom() : 16, 16), { duration: 0.5 }); } catch (e) {} applySnap('peek'); }
     });
@@ -6280,25 +6484,25 @@ function paintPartyCard() {
   var t = partyTotals();
   var box = $('drawerRows'); if (!box) return;
   var names = partyRosterNames().slice();
-  names.sort(function (a, b) { return (a === PARTY.name ? 0 : 1) - (b === PARTY.name ? 0 : 1); });
+  names.sort(function (a, b) { return (partyIsSelfKey(a) ? 0 : 1) - (partyIsSelfKey(b) ? 0 : 1); });
   box.innerHTML = names.map(function (n) {
     var pos = PARTY.posRows[n];
-    var fresh = n === PARTY.name || !!(pos && pos.created_at && (Date.now() - new Date(pos.created_at).getTime() < 180000));
-    return '<button type="button" class="dw-row" data-name="' + esc(n) + '"><span class="dw-dot" style="background:' + (fresh ? '#7BE382' : '#F5B04C') + '"></span>' + esc(n) + '</button>';
+    var fresh = partyIsSelfKey(n) || !!(pos && pos.created_at && (Date.now() - new Date(pos.created_at).getTime() < 180000));
+    return '<button type="button" class="dw-row" data-name="' + esc(partyDisplayName(n)) + '" data-key="' + esc(n) + '"><span class="dw-dot" style="background:' + (fresh ? '#7BE382' : '#F5B04C') + '"></span>' + esc(partyDisplayName(n)) + '</button>';
   }).join('');
   box.querySelectorAll('.dw-row').forEach(function (r) {
-    r.addEventListener('click', function () { partyCardFocus(r.getAttribute('data-name')); });
+    r.addEventListener('click', function () { partyCardFocus(r.getAttribute('data-key') || r.getAttribute('data-name')); });
   });
   var dh = $('drawerHouses'); if (dh) dh.textContent = t.houses + (t.houses === 1 ? ' house' : ' houses') + ' pooled';
 }
 function partyCardFocus(n) {
   partyCardClose();
-  if (!n || n === PARTY.name) return;
+  if (!n || partyIsSelfKey(n)) return;
   var pos = PARTY.posRows[n];
   var ll = null;
   if (pos && pos.lat != null) ll = [pos.lat, pos.lng];
   else if (PARTY.markers && PARTY.markers[n] && PARTY.markers[n].getLatLng) { var m = PARTY.markers[n].getLatLng(); ll = [m.lat, m.lng]; }
-  if (!ll) { toast('No location from ' + n + ' yet.', 'warn'); return; }
+  if (!ll) { toast('No location from ' + partyDisplayName(n) + ' yet.', 'warn'); return; }
   try { map.flyTo(ll, Math.max(map.getZoom ? map.getZoom() : 16, 16), { duration: 0.5 }); } catch (e) {}
   try {
     var ring = L.circleMarker(ll, { radius: 14, color: partyMetaFor(n).color, weight: 3, fillOpacity: 0 }).addTo(map);
@@ -7109,12 +7313,16 @@ function exportSpots() {
 }
 $('btnSpotsExport').addEventListener('click', exportSpots);
 
-/* ---------- Party host + kick (v5.6) ----------
+/* ---------- Party host + kick (v5.6; v7.14 Fix 28 re-key) ----------
    The device that created the party is its host (remembered locally).
-   A kick is a party_posts row of kind 'kick' naming the member; everyone
-   stops rendering that member's activity from before the kick, and the
-   kicked device leaves on its next poll. Names are the identity here, so
-   two members sharing one name share its fate. */
+   A kick is a party_posts row of kind 'kick'; everyone stops rendering
+   that member's activity from before the kick, and the kicked device
+   leaves on its next poll. v7.14: the kick targets a memberKey. The
+   row's name column keeps the target's DISPLAY name (legacy readers),
+   and for an id-keyed target msg carries 'kick1|<mid>', so the kick
+   lands on that one member and never touches a same-name twin. A
+   legacy target has no mid to aim at, so its kick is a name kick,
+   with exactly the v5.6 shared-fate semantics. */
 function partyIsAdmin() {
   try { return !!PARTY.code && store.get('partyAdmin', '') === PARTY.code; } catch (e) { return false; }
 }
@@ -7123,13 +7331,28 @@ function partyPostRaw(obj) {
   obj.room = PARTY.code;
   fetch(CROWD.url + '/rest/v1/party_posts', { method: 'POST', headers: crowdHeaders(), body: JSON.stringify(obj) }).catch(function () {});
 }
-function partyKick(name) {
-  if (!name || name === PARTY.name || !partyIsAdmin()) return;
-  PARTY.kickedLocal[name] = Date.now();
-  partyPostRaw({ kind: 'kick', name: name });
+function partyKick(target) {
+  if (!target || !partyIsAdmin()) return;
+  /* Resolve a plain display name (older callers) to a memberKey when
+     exactly one roster member carries it; an ambiguous plain name
+     stays a name kick, the v5.6 behavior. */
+  var key = target;
+  if (!partyIsKey(key)) {
+    var matches = partyRosterNames().filter(function (k) { return partyDisplayName(k) === target || k === target; });
+    if (matches.length === 1) key = matches[0];
+  }
+  if (partyIsSelfKey(key) || key === PARTY.name) return;
+  var disp = partyDisplayName(key);
+  if (typeof key === 'string' && key.indexOf('id:') === 0) {
+    PARTY.kickedLocal[key] = Date.now();
+    partyPostRaw({ kind: 'kick', name: disp, msg: 'kick1|' + key.slice(3) });
+  } else {
+    PARTY.kickedLocalNames[disp] = Date.now();
+    partyPostRaw({ kind: 'kick', name: disp });
+  }
   if (PARTY.lastRows) partyApply(PARTY.lastRows);
   renderPartyBox();
-  toast(name + ' removed from the party.', 'ok');
+  toast(disp + ' removed from the party.', 'ok');
 }
 function partyEject() {
   tmResetParty();
@@ -7522,12 +7745,50 @@ $('chatPhotoLib').addEventListener('change', function () { chatPhotoPicked($('ch
    distinguishes remote media by its https: src (data URLs are local
    media). GIF media is loaded at runtime from GIPHY, never bundled.
    All fetches fail soft: a toast, and the sheet stays usable. */
-var GIFP = { items: [], timer: null };
+var GIFP = { items: [], timer: null, cache: {} };
 function paintGifChrome() { var b = $('chatGifBtn'); if (b) b.hidden = !CT_GIPHY_KEY; }
+/* v7.14 Fix 28: GIPHY hardening. The beta key is capped at 100 calls
+   an hour GLOBALLY, so (a) HTTP status is checked: a 429 (or any
+   non-OK / network failure) signals failure with cb(null), and
+   gifLoad shows the existing failure copy instead of mistaking an
+   error body for an empty result set; (b) successful trending and
+   search responses are cached for 2 hours, in memory and in
+   sessionStorage, keyed by path+query, so reopening the picker and
+   repeating a search burn no calls. All storage access is guarded:
+   a corrupt or unavailable cache is simply ignored. */
+var GIF_CACHE_TTL_MS = 2 * 3600 * 1000;
+function gifCacheKey(path, q) { return path + '|' + (q || ''); }
+function gifCacheGet(key) {
+  var hit = GIFP.cache[key];
+  if (hit && (Date.now() - hit.t) < GIF_CACHE_TTL_MS) return hit.j;
+  if (hit) delete GIFP.cache[key];
+  try {
+    var raw = sessionStorage.getItem('ct_gif_cache:' + key);
+    if (!raw) return null;
+    var ent = JSON.parse(raw);
+    if (!ent || typeof ent.t !== 'number' || !ent.j || (Date.now() - ent.t) >= GIF_CACHE_TTL_MS) return null;
+    GIFP.cache[key] = ent;
+    return ent.j;
+  } catch (e) { return null; }
+}
+function gifCachePut(key, j) {
+  var ent = { t: Date.now(), j: j };
+  GIFP.cache[key] = ent;
+  try { sessionStorage.setItem('ct_gif_cache:' + key, JSON.stringify(ent)); } catch (e) {}
+}
 function giphyFetch(path, q, cb) {
+  var ckey = gifCacheKey(path, q);
+  var cached = gifCacheGet(ckey);
+  if (cached) { cb(cached); return; }
   var url = 'https://api.giphy.com/v1/gifs/' + path + '?api_key=' + encodeURIComponent(CT_GIPHY_KEY) +
     '&limit=24&rating=g' + (q ? '&q=' + encodeURIComponent(q) + '&lang=en' : '');
-  fetch(url).then(function (r) { return r.json(); }).then(function (j) { cb(j || {}); }, function () { cb(null); });
+  fetch(url).then(function (r) {
+    if (!r || r.ok === false || (typeof r.status === 'number' && (r.status < 200 || r.status >= 300))) throw new Error('giphy http ' + (r && r.status));
+    return r.json();
+  }).then(function (j) {
+    if (j && Array.isArray(j.data)) gifCachePut(ckey, j);
+    cb(j || {});
+  }, function () { cb(null); });
 }
 function gifStatus(txt) { var s = $('gifStatus'); if (s) { s.textContent = txt; s.hidden = !txt; } }
 function gifRender() {
@@ -7548,6 +7809,9 @@ function gifRender() {
   });
 }
 function gifLoad(q) {
+  /* v7.14: a 1-character query never fires a request (0 characters
+     still loads trending); the picker just keeps what it shows. */
+  if (q && String(q).length === 1) return;
   gifStatus('Loading GIFs…');
   var grid = $('gifGrid'); if (grid) grid.innerHTML = '';
   giphyFetch(q ? 'search' : 'trending', q, function (j) {
@@ -10624,7 +10888,7 @@ function partyCardData() {
   var t = partyTotals();
   var members = partyRosterNames().map(function (n) {
     var meta = partyMetaFor(n), c = PARTY.counts[n] || {};
-    return { name: n, color: meta.color, avatar: meta.avatar || null, houses: c.houses || 0, you: n === PARTY.name };
+    return { name: partyDisplayName(n), color: meta.color, avatar: meta.avatar || null, houses: c.houses || 0, you: partyIsSelfKey(n) };
   });
   members.sort(function (a, b) { return (b.houses - a.houses) || (a.name < b.name ? -1 : 1); });
   var data = { kind: 'party', title: 'Party ' + PARTY.code, code: PARTY.code, houses: t.houses, people: t.people, members: members, place: cardPlace() };
@@ -12367,7 +12631,7 @@ paintChromeState();
 /* v6.4.1 boot self-check marker: the shell's checker script verifies this
    was set. If boot died anywhere above, the repair overlay appears instead
    of a silently half-dead app. */
-window.__ctBootOK = '7.13';
+window.__ctBootOK = '7.14';
 
 </script>
 <script>
